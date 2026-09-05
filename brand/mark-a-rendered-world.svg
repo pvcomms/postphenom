@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <pattern id="dots" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5.5" cy="5.5" r="2.1" fill="#16181C"/></pattern>
+    <clipPath id="c"><circle cx="104" cy="120" r="82"/></clipPath>
+  </defs>
+  <circle cx="104" cy="120" r="82" fill="#16181C"/>
+  <g clip-path="url(#c)">
+    <rect x="118" y="26" width="104" height="188" rx="14" fill="#F1F1EE"/>
+    <rect x="118" y="26" width="104" height="188" rx="14" fill="url(#dots)"/>
+  </g>
+  <rect x="118" y="26" width="104" height="188" rx="14" fill="none" stroke="#16181C" stroke-width="3"/>
+</svg>

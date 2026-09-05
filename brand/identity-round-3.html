@@ -1,0 +1,157 @@
+<meta charset="utf-8">
+<title>Postphenom Wordmarks</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Spectral:ital,wght@0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root { color-scheme:light; --paper:#F1F1EE; --ink:#16181C; --graphite:#5B5F66; --rule:#D6D7D2; --signal:#2E4FD3; --ground:var(--paper); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme:dark; --paper:#101216; --ink:#E9E9E4; --graphite:#9A9EA6; --rule:#2A2E36; --signal:#7C93F0; --ground:var(--paper); } }
+  :root[data-theme="dark"] { color-scheme:dark; --paper:#101216; --ink:#E9E9E4; --graphite:#9A9EA6; --rule:#2A2E36; --signal:#7C93F0; --ground:var(--paper); }
+  html, body { background:var(--paper); color:var(--ink); }
+  body { font-family:"Spectral", Georgia, serif; font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .mono { font-family:"IBM Plex Mono", Menlo, monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--graphite); }
+  .wrap { max-width:1180px; margin:0 auto; padding:64px 32px 120px; }
+  header { display:grid; grid-template-columns:1.2fr 1fr; gap:48px; align-items:end; padding-bottom:36px; border-bottom:1px solid var(--rule); margin-bottom:56px; }
+  header h1 { font-size:42px; line-height:1.05; font-weight:400; letter-spacing:-.02em; margin:10px 0 0; text-wrap:balance; }
+  header h1 em { font-weight:300; }
+  header p { margin:0; color:var(--graphite); max-width:44ch; }
+  .opt { display:grid; grid-template-columns:220px 1fr; gap:32px; padding:40px 0; border-bottom:1px solid var(--rule); }
+  .opt h2 { font-size:26px; font-weight:400; letter-spacing:-.015em; margin:6px 0 8px; line-height:1.1; }
+  .opt p { margin:0; color:var(--graphite); font-size:15px; max-width:30ch; }
+  .plates { display:grid; gap:14px; min-width:0; }
+  .plate { border:1px solid var(--rule); display:grid; place-items:center; padding:56px 40px; min-width:0; overflow:hidden; }
+  .plate.light { background:#F1F1EE; color:#16181C; --ground:#F1F1EE; border-color:#D6D7D2; }
+  .plate.dark { background:#101216; color:#E9E9E4; --ground:#101216; border-color:#2A2E36; }
+  .plate.dark .accent { --ink-accent:#7C93F0; }
+  .plate.light .accent { --ink-accent:#2E4FD3; }
+  .favrow { display:flex; gap:28px; padding:20px 24px; justify-content:flex-start; }
+  .f { display:grid; gap:6px; justify-items:center; }
+  .f span { font-family:"IBM Plex Mono", monospace; font-size:10px; color:var(--graphite); }
+  .chip { width:64px; height:64px; display:grid; place-items:center; border-radius:14px; background:#16181C; color:#F1F1EE; --ground:#16181C; }
+  .chip.sm { width:32px; height:32px; border-radius:7px; }
+  .chip.xs { width:16px; height:16px; border-radius:4px; }
+
+  /* wordmarks */
+  .wm { font-family:"Archivo", "Archivo Black", Futura, sans-serif; font-weight:800; font-variation-settings:"wdth" 118; text-transform:uppercase; letter-spacing:.03em; font-size:clamp(34px, 6.2vw, 74px); line-height:1; white-space:nowrap; display:inline-flex; align-items:center; }
+  .wm.narrow { font-variation-settings:"wdth" 88; letter-spacing:.02em; font-size:clamp(28px, 4.6vw, 54px); }
+  .wm.bric { font-family:"Bricolage Grotesque", "Archivo", sans-serif; font-weight:800; font-variation-settings:"wdth" 100, "opsz" 96; letter-spacing:.01em; }
+  .wm.serif { font-family:"Spectral", Georgia, serif; font-weight:600; letter-spacing:.06em; font-variation-settings:normal; }
+  .wm .o { height:.71em; width:.80em; display:inline-block; vertical-align:baseline; margin:0 .02em; color:currentColor; }
+  .wm.narrow .o { width:.62em; }
+  .wm.serif .o { height:.70em; width:.74em; }
+  .wm.bric .o { height:.70em; width:.76em; }
+  .wm .o.accent { color:var(--ink-accent, var(--signal)); }
+  .stack { display:grid; justify-items:start; line-height:.92; }
+  .stack .post { font-family:"Archivo", sans-serif; font-weight:800; font-variation-settings:"wdth" 118; text-transform:uppercase; letter-spacing:.03em; font-size:clamp(44px, 8.5vw, 104px);
+    background-image: radial-gradient(circle, currentColor 2.1px, transparent 2.4px); background-size:7px 7px; -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stack .phenom { font-family:"Archivo", sans-serif; font-weight:800; font-variation-settings:"wdth" 118; text-transform:uppercase; letter-spacing:.03em; font-size:clamp(44px, 8.5vw, 104px); }
+  .lock { display:grid; gap:10px; justify-items:start; }
+  .lock .eyebrow { font-family:"IBM Plex Mono", monospace; font-size:clamp(9px, 1vw, 12px); letter-spacing:.32em; text-transform:uppercase; opacity:.75; }
+  .lock .rule { width:100%; height:2px; background:currentColor; }
+  .verdict { padding-top:40px; display:grid; grid-template-columns:220px 1fr; gap:32px; }
+  .verdict p { margin:0 0 12px; max-width:64ch; }
+  .verdict strong { font-weight:500; }
+  @media (max-width:860px) { header, .opt, .verdict { grid-template-columns:1fr; } .opt p { max-width:60ch; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <pattern id="d" width="16.6" height="16.6" patternUnits="userSpaceOnUse"><circle cx="8.3" cy="8.3" r="4.6" fill="currentColor"/></pattern>
+  <pattern id="d-ground" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="2.2" fill="var(--ground)"/></pattern>
+  <pattern id="df" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="2.3" fill="currentColor"/></pattern>
+  <clipPath id="oc"><circle cx="50" cy="50" r="48"/></clipPath>
+  <!-- solid O -->
+  <symbol id="o-solid" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="currentColor"/></symbol>
+  <!-- dotted O -->
+  <symbol id="o-dots" viewBox="0 0 100 100"><g clip-path="url(#oc)"><rect width="100" height="100" fill="url(#d)"/></g></symbol>
+  <!-- rendered: solid with the right half as knocked-out dots (the screen) -->
+  <symbol id="o-render" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="48" fill="currentColor"/>
+    <g clip-path="url(#oc)"><rect x="52" y="0" width="48" height="100" fill="var(--ground)"/><rect x="52" y="0" width="48" height="100" fill="url(#d)"/></g>
+  </symbol>
+  <!-- diagonal split -->
+  <symbol id="o-split" viewBox="0 0 100 100">
+    <g clip-path="url(#oc)"><rect width="100" height="100" fill="url(#d)"/><polygon points="0,0 72,0 28,100 0,100" fill="currentColor"/><polygon points="72,0 80,0 36,100 28,100" fill="var(--ground)"/></g>
+  </symbol>
+  <!-- crop: thin ring, heavy 9:16 strip -->
+  <symbol id="o-crop" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="4"/>
+    <g clip-path="url(#oc)"><rect x="35" y="0" width="30" height="100" fill="currentColor"/></g>
+  </symbol>
+  <!-- phi with a screen for a stroke -->
+  <symbol id="o-phi" viewBox="0 0 100 100">
+    <circle cx="50" cy="52" r="34" fill="none" stroke="currentColor" stroke-width="12"/>
+    <rect x="39" y="0" width="22" height="100" rx="7" fill="currentColor"/>
+    <rect x="44" y="8" width="12" height="84" rx="3" fill="var(--ground)"/>
+    <rect x="44" y="8" width="12" height="84" rx="3" fill="url(#df)"/>
+  </symbol>
+</defs></svg>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="mono">postphenom.com · identity, round three</div>
+      <h1>The word is the logo. The <em>O</em> is the argument.</h1>
+    </div>
+    <p>Same move as the polycrisis.org mark, done with more intent: a heavy expanded grotesk, and the letter that becomes the symbol is chosen because the word has two of it. Everything here is one ink; the cobalt is optional.</p>
+  </header>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 1</span><h2>Before, After</h2><p>POSTPHENOM has two O's. The first is the world, solid. The second is the same world after the screen: dots. The word reads itself.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="wm">P<svg class="o"><use href="#o-solid"/></svg>STPHEN<svg class="o"><use href="#o-dots"/></svg>M</div></div>
+      <div class="plate dark"><div class="wm">P<svg class="o"><use href="#o-solid"/></svg>STPHEN<svg class="o"><use href="#o-dots"/></svg>M</div></div>
+      <div class="plate light favrow"><div class="f"><div class="chip"><svg width="46" height="46"><use href="#o-render"/></svg></div><span>64</span></div><div class="f"><div class="chip sm"><svg width="22" height="22"><use href="#o-render"/></svg></div><span>32</span></div><div class="f"><div class="chip xs"><svg width="11" height="11"><use href="#o-render"/></svg></div><span>16</span></div></div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 2</span><h2>Rendered O</h2><p>One O carries the whole round-one mark: half world, half rendering. The other letters stay letters. Closest to the reference, and the cleanest.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="wm">P<svg class="o"><use href="#o-render"/></svg>STPHENOM</div></div>
+      <div class="plate dark"><div class="wm accent">P<svg class="o accent"><use href="#o-render"/></svg>STPHENOM</div></div>
+      <div class="plate light"><div class="wm narrow">P<svg class="o"><use href="#o-render"/></svg>STPHENOMENOLOGY</div></div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 3</span><h2>Phi</h2><p>The second O becomes Φ, phenomenology's own letter, with a phone for its stroke. PHENΦM is a pun only the field gets, which is the point of a center.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="wm">POSTPHEN<svg class="o"><use href="#o-phi"/></svg>M</div></div>
+      <div class="plate dark"><div class="wm accent">POSTPHEN<svg class="o accent"><use href="#o-phi"/></svg>M</div></div>
+      <div class="plate light favrow"><div class="f"><div class="chip"><svg width="46" height="46"><use href="#o-phi"/></svg></div><span>64</span></div><div class="f"><div class="chip sm"><svg width="22" height="22"><use href="#o-phi"/></svg></div><span>32</span></div><div class="f"><div class="chip xs"><svg width="11" height="11"><use href="#o-phi"/></svg></div><span>16</span></div></div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 4</span><h2>The Cut</h2><p>The first O split on the diagonal of the slash in post/phenomenology. Solid before, sampled after, a hairline of ground between.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="wm">P<svg class="o"><use href="#o-split"/></svg>STPHENOM</div></div>
+      <div class="plate dark"><div class="wm">P<svg class="o"><use href="#o-split"/></svg>STPHENOM</div></div>
+      <div class="plate light favrow"><div class="f"><div class="chip"><svg width="46" height="46"><use href="#o-split"/></svg></div><span>64</span></div><div class="f"><div class="chip sm"><svg width="22" height="22"><use href="#o-split"/></svg></div><span>32</span></div><div class="f"><div class="chip xs"><svg width="11" height="11"><use href="#o-split"/></svg></div><span>16</span></div></div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 5</span><h2>POST in dots</h2><p>Stacked. The prefix is set entirely in halftone: the era after the screen is the rendered one. PHENOM underneath, solid, is what it was done to.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="stack"><span class="post">POST</span><span class="phenom">PHENOM</span></div></div>
+      <div class="plate dark"><div class="stack"><span class="post">POST</span><span class="phenom">PHENOM</span></div></div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div><span class="mono">Wordmark 6</span><h2>Institutional lockup</h2><p>Wordmark 2 with the full name over it, ruled like a journal masthead. This is the version for the paper, the letterhead, the JSTOR listing.</p></div>
+    <div class="plates">
+      <div class="plate light"><div class="lock"><div class="eyebrow">The Center for Applied Postphenomenology</div><div class="rule"></div><div class="wm">P<svg class="o"><use href="#o-render"/></svg>STPHENOM</div></div></div>
+      <div class="plate dark"><div class="lock"><div class="eyebrow">The Center for Applied Postphenomenology</div><div class="rule"></div><div class="wm bric">P<svg class="o"><use href="#o-crop"/></svg>STPHENOM</div></div></div>
+      <div class="plate light"><div class="lock"><div class="eyebrow">The Center for Applied Postphenomenology</div><div class="rule"></div><div class="wm serif">P<svg class="o"><use href="#o-render"/></svg>STPHENOM</div></div></div>
+    </div>
+  </section>
+
+  <div class="verdict">
+    <div class="mono">Where I land</div>
+    <div>
+      <p><strong>Wordmark 2, with Wordmark 1 as its long-form sibling.</strong> Wordmark 2 is the polycrisis move executed with a mark that means something: the O is half world, half screen, and it lifts straight out as the favicon and the app icon. Wordmark 1 is the same system stretched across the word, and it is the one to use on the research pages, where before and after is the whole subject.</p>
+      <p>The typeface is Archivo at its widest and heaviest, which is what gives it the weight of the reference without borrowing its Montserrat-ish softness. The last plate shows the same O in Spectral, if you'd rather the institute lean scholarly than activist.</p>
+      <p>Cobalt only ever lands on the O. Never on the letters.</p>
+    </div>
+  </div>
+</div>

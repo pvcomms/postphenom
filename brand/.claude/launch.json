@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "brand", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4747}"], "port": 4747, "autoPort": true }
+  ]
+}

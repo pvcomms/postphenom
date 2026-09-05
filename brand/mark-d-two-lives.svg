@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <pattern id="di" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5.5" cy="5.5" r="2.1" fill="#16181C"/></pattern>
+    <pattern id="dg" width="11" height="11" patternUnits="userSpaceOnUse"><circle cx="5.5" cy="5.5" r="2.1" fill="#F1F1EE"/></pattern>
+    <clipPath id="a"><circle cx="90" cy="120" r="72"/></clipPath>
+    <mask id="na"><rect width="240" height="240" fill="white"/><circle cx="90" cy="120" r="72" fill="black"/></mask>
+  </defs>
+  <circle cx="90" cy="120" r="72" fill="#16181C"/>
+  <g mask="url(#na)"><circle cx="150" cy="120" r="72" fill="url(#di)"/></g>
+  <g clip-path="url(#a)"><circle cx="150" cy="120" r="72" fill="url(#dg)"/></g>
+</svg>
