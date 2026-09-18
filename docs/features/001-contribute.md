@@ -1,8 +1,12 @@
 ---
 title: Make Contribute actually collect an account
-status: next
+status: draft
 created: 2026-09-19
 ---
+
+> **Blocked on a decision: where a submission goes has to be settled before anyone builds
+this, and it is the whole difficulty. Promote to `next` once it is written into
+docs/DECISIONS.md.**
 
 # 001 — Make Contribute actually collect an account
 
