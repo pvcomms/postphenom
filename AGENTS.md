@@ -1,6 +1,6 @@
 # Agents
 
-Constellation-wide rules: `~/Code/cfap/AGENTS.md`. Read it once, then this. The map is
+Constellation-wide rules: `~/Code/spine/AGENTS.md`. Read it once, then this. The map is
 `docs/ARCHITECTURE.md`.
 
 ## Shape
@@ -55,7 +55,7 @@ heavy site. Do not remove them chasing a visual.
 ## Where the rest is
 
 `docs/ARCHITECTURE.md` — the map. `docs/DESIGN.md` — tokens and Figma pins.
-`~/Code/cfap/THESIS.md` — what this institution is for, when a copy decision is contested.
+`~/Code/spine/THESIS.md` — what this institution is for, when a copy decision is contested.
 
 ---
 

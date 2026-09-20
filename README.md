@@ -36,4 +36,4 @@ renders its mark from `site/components/marks.ts`.
 ## More
 
 `AGENTS.md` for the agent contract. `docs/` for architecture, design pins and the feature
-queue. The thesis this institution exists to advance is in `~/Code/cfap/THESIS.md`.
+queue. The thesis this institution exists to advance is in `~/Code/spine/THESIS.md`.

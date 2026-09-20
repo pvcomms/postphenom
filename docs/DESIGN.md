@@ -1,12 +1,12 @@
 # Design
 
-Grammar and bans: `~/Code/cfap/docs/DESIGN-SYSTEM.md`. Machine-readable values:
-`~/Code/cfap/docs/tokens.json` under `surfaces.postphenom`. This file is what is specific to
+Grammar and bans: `~/work/capp/spine/docs/DESIGN-SYSTEM.md`. Machine-readable values:
+`~/work/capp/spine/docs/tokens.json` under `surfaces.postphenom`. This file is what is specific to
 this site.
 
 ## Tokens
 
-`site/app/globals.css` is the source of truth. The cfap mirror is updated alongside any
+`site/app/globals.css` is the source of truth. The CAPP mirror is updated alongside any
 change here.
 
 | Token        | Light     | Dark      | Use                         |

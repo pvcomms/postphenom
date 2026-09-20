@@ -33,5 +33,5 @@ to GitHub the same day.
 ---
 
 **2026-09-19 — Doc set adopted.**
-Repo joined the `cfap` constellation standard: `README.md`, `AGENTS.md`,
+Repo joined the `CAPP` constellation standard: `README.md`, `AGENTS.md`,
 `docs/ARCHITECTURE.md`, this file, `docs/DESIGN.md`, `docs/features/`.
