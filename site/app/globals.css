@@ -5,6 +5,7 @@
   --ink: #1E2436;
   --graphite: #5D6270;
   --rule: #D3D4CF;
+  --vermillion: #B23A22;
   --reveal-y: 14px;
 }
 @media (prefers-color-scheme: dark) {
@@ -15,11 +16,12 @@
     --ink: #E6E4DC;
     --graphite: #9A9EA6;
     --rule: #2A2E36;
+    --vermillion: #E25A3E;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #12141A; --paper-2: #1A1D25; --ink: #E6E4DC; --graphite: #9A9EA6; --rule: #2A2E36;
+  --paper: #12141A; --paper-2: #1A1D25; --ink: #E6E4DC; --graphite: #9A9EA6; --rule: #2A2E36; --vermillion: #E25A3E;
 }
 
 * { box-sizing: border-box; }

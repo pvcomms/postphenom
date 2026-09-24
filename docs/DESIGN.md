@@ -16,8 +16,9 @@ change here.
 | `--ink`      | `#1E2436` | `#E6E4DC` | body text                   |
 | `--graphite` | `#5D6270` | `#9A9EA6` | secondary text, mono labels |
 | `--rule`     | `#D3D4CF` | `#2A2E36` | hairlines                   |
+| `--vermillion` | `#B23A22` | `#E25A3E` | the one accent: the point in the mark, nothing else |
 
-Light is defined on bare `:root`. Dark redefines only these five, in both the
+Light is defined on bare `:root`. Dark redefines only these six, in both the
 `prefers-color-scheme` block (guarded as `:root:not([data-theme="light"])`) and
 `:root[data-theme="dark"]`. No colour gets its only definition inside a media block.
 
@@ -45,7 +46,7 @@ else animates on scroll.
 
 ## The marks
 
-`brand/` holds four rounds of exploration and five candidates:
+`brand/` holds four rounds of exploration and six candidates. The live one is the unit:
 
 | File                         | Mark                     |
 | ---------------------------- | ------------------------ |
@@ -54,10 +55,19 @@ else animates on scroll.
 | `mark-b-bracketed-world.svg` | the bracketed world      |
 | `mark-c-relation.svg`        | the relation             |
 | `mark-d-two-lives.svg`       | two lives                |
+| `mark-e-the-unit.svg`        | **the unit** (live since 24 Sep 2026) |
 
-The live site renders from `site/components/marks.ts`. The paths are hand-drawn and carry
-deliberate irregularity — do not regularise, re-path or optimise the wobble out of them. The
-rejected candidates stay in the repo because they are the argument for the chosen one.
+The unit is two brush-drawn rings round one vermillion point: the horizon a platform draws,
+the self shaped inside it, the unit of attention being sold. The inner ring sits off-centre on
+purpose. Only the point ever takes colour; the rings never do.
+
+`brand/generate-marks.py` draws `MARK` and `GLYPH` into `site/components/marks.ts` and the
+favicon into `site/app/icon.svg`, seeded, so a re-run reproduces the same wobble. The wordmark
+pieces in the same file (`CARET`, `UNDERLINE`, `LOOP`, `RULE`) are frozen hand-drawn paths with
+no generator; the script keeps them verbatim. The paths carry deliberate irregularity — do not
+regularise, re-path or optimise the wobble out of them, and never redraw the mark clean: as a
+geometric target it is generic. The rejected candidates stay in the repo because they are the
+argument for the chosen one.
 
 ## Figma pins
 

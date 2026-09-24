@@ -102,6 +102,6 @@ export const site = {
   aboutName: {
     kicker: "On the name",
     text:
-      "Postphenomenology is an existing school in philosophy of technology, associated with Don Ihde and Peter-Paul Verbeek, which studies how technologies shape the relation between people and the world. The applied part is ours: taking that lens out of the seminar and into first-person data, and back out again as interventions.",
+      "Postphenomenology is an existing school in philosophy of technology. It studies how technologies shape the relation between people and the world. The applied part is ours: taking that lens out of the seminar and into first-person data, and back out again as interventions.",
   },
 } as const;

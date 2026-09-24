@@ -35,3 +35,13 @@ to GitHub the same day.
 **2026-09-19 — Doc set adopted.**
 Repo joined the `CAPP` constellation standard: `README.md`, `AGENTS.md`,
 `docs/ARCHITECTURE.md`, this file, `docs/DESIGN.md`, `docs/features/`.
+
+---
+
+**2026-09-24 — The unit replaces the rendered world.**
+The mark is now two hand-drawn rings round one vermillion point: the horizon a platform draws,
+the self shaped inside it, and the unit of attention being sold. Chosen over geometric
+versions of the same idea for the reason rounds 1–3 were rejected: computed lines under the
+words "drawn, not computed". Vermillion is the identity's only accent and only the point
+carries it. The correction wordmark stays. The note on the name no longer names individual
+philosophers.

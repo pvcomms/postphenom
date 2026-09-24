@@ -19,17 +19,18 @@ postphenom/
       layout.tsx           fonts via next/font, metadata
       globals.css          all styling. plain CSS custom properties, no Tailwind
       sitemap.ts
-      icon.svg
+      icon.svg             favicon, written by brand/generate-marks.py
     components/
       Mark.tsx             renders the hand-drawn identity mark
-      marks.ts             the mark path data
+      marks.ts             the mark path data. MARK + GLYPH generated, the rest frozen
       Reveal.tsx           scroll reveal wrapper — 14px rise, one shared curve
     content/
       site.ts              ALL COPY. the content layer
     public/                llms.txt, robots.txt
-  brand/                   identity exploration. static HTML + SVG, built by nothing
+  brand/                   identity exploration. static HTML + SVG
+    generate-marks.py      draws the unit into site/ — seeded, reproducible
     identity-round-{1..4}.html
-    mark-{a,b,c,d}-*.svg
+    mark-{a,b,c,d,e}-*.svg
 ```
 
 ## Content flow

@@ -1,6 +1,25 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "brand", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-4747}"], "port": 4747, "autoPort": true }
+    {
+      "name": "brand",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server ${PORT:-4747}"
+      ],
+      "port": 4747,
+      "autoPort": true
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd site && pnpm exec next dev -p ${PORT:-4749}"
+      ],
+      "port": 4749,
+      "autoPort": true
+    }
   ]
 }

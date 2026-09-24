@@ -15,7 +15,7 @@ cd site && pnpm dev    # localhost:4748
 | Directory | What                                                                    |
 | --------- | ----------------------------------------------------------------------- |
 | `site/`   | the Next.js landing site. this is what deploys                          |
-| `brand/`  | identity exploration — four rounds of HTML, five candidate marks as SVG |
+| `brand/`  | identity exploration — four rounds of HTML, six candidate marks as SVG, and the mark generator |
 
 ## The content layer
 
@@ -28,10 +28,11 @@ a component, so writing a new section is writing, not engineering.
 
 ## The identity
 
-Hand-drawn correction marks over set type — the institution marking its own copy. The
-candidates live in `brand/` as SVG (`mark-a-rendered-world`, `mark-b-bracketed-world`,
-`mark-c-relation`, `mark-d-two-lives`) with four rounds of exploration as HTML. The site
-renders its mark from `site/components/marks.ts`.
+Hand-drawn correction marks over set type — the institution marking its own copy. The mark is
+the unit: two brush-drawn rings, the horizon and the self, round one vermillion point, the unit
+of attention. `brand/generate-marks.py` draws it into `site/components/marks.ts` and the
+favicon; the earlier candidates (`mark-a` to `mark-d`) and four rounds of exploration stay in
+`brand/` as the argument for it.
 
 ## More
 
