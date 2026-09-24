@@ -45,3 +45,14 @@ versions of the same idea for the reason rounds 1–3 were rejected: computed li
 words "drawn, not computed". Vermillion is the identity's only accent and only the point
 carries it. The correction wordmark stays. The note on the name no longer names individual
 philosophers.
+
+---
+
+**2026-09-25 — The page is a document, not a landing page.**
+Param's verdict on the 24 Sep site: not formal enough, visibly generated. The tells were the
+grammar of the product landing page — mono uppercase kickers, a giant rotated hero wordmark,
+a four-column steps grid, scroll reveals, an arrow button, handwriting in five places. The
+site is now set as a printed prospectus: title page, contents, six numbered parts with margin
+notes, a working-paper register, a colophon, and a running head. Same copy, same mark, same
+tokens. Spectral SC replaces IBM Plex Mono for every label; the hand face appears once, in
+the correction. `Reveal.tsx` is gone; nothing animates on scroll.

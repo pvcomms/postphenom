@@ -1,4 +1,5 @@
-// Everything editable on the landing page lives here.
+// Everything editable on the site lives here. Components render whatever is in it.
+// The page is one document: a title page, a contents table, six numbered parts, a colophon.
 export const site = {
   name: "The Center for Applied Postphenomenology",
   short: "postphenom",
@@ -10,17 +11,21 @@ export const site = {
   description:
     "An independent research center collecting first-person accounts of life before and after the screen, to study how technologically mediated life has changed language, perception, society and what it means to be human.",
 
-  nav: [
-    { label: "Question", href: "#question" },
-    { label: "Method", href: "#method" },
-    { label: "Programme", href: "#programme" },
-    { label: "Contribute", href: "#contribute" },
-    { label: "Papers", href: "#papers" },
-  ],
+  // The title page. The name is set in two lines: the first in small capitals, the second
+  // as the correction — "phenomenology" typeset, "post" written in above it.
+  masthead: {
+    line: "The Center for Applied",
+    hand: "post",
+    set: "phenomenology",
+    imprint: "An independent research center · founded 2026",
+    contents: "Contents",
+  },
 
   question: {
-    kicker: "The question",
-    lede:
+    id: "question",
+    numeral: "I",
+    title: "The question",
+    opening:
       "Technology no longer sits between us and the world. It is the way the world arrives.",
     body: [
       "Maps turned distance into minutes. Feeds turned attention into currency. Recommendation turned taste into a setting. Each time the means of receiving, making and passing on information changes, the language we use for the world changes with it, then the perception underneath the language, then what we take to be normal, possible and real.",
@@ -28,7 +33,7 @@ export const site = {
       "The center studies that reversal, and what it has cost.",
     ],
     trades: {
-      kicker: "What was traded",
+      title: "What was traded",
       items: [
         ["Convenience", "for privacy"],
         ["Discovery", "for taste"],
@@ -39,15 +44,17 @@ export const site = {
       ],
     },
     example: {
-      kicker: "A small example",
+      title: "A small example",
       text:
         "Nobody says how far away a place is any more. They say how many minutes. The map did that. The unit of the world changed without anyone deciding it should, and the way we picture a city changed with the unit.",
     },
   },
 
   method: {
-    kicker: "Method",
-    lede: "First-person accounts, collected as data.",
+    id: "method",
+    numeral: "II",
+    title: "Method",
+    opening: "First-person accounts, collected as data.",
     body: [
       "The center collects lived experience from people across generations, countries and screen-times: what life was like before the screen, and what changed. How they move through a room, a city, a relationship, a decision. What they hope for. What they no longer notice.",
       "Accounts are gathered under a fixed protocol so they can be compared, and published in full so they can be checked. Anecdote becomes evidence when it is collected the same way every time and kept where anyone can read it.",
@@ -61,8 +68,10 @@ export const site = {
   },
 
   programme: {
-    kicker: "Programme",
-    lede: "Interventions at three scales, and institutions for the fourth.",
+    id: "programme",
+    numeral: "III",
+    title: "Programme",
+    opening: "Interventions at three scales, and institutions for the fourth.",
     levels: [
       {
         name: "Personal",
@@ -84,15 +93,21 @@ export const site = {
   },
 
   contribute: {
-    kicker: "Contribute",
-    lede: "Your account is the data.",
+    id: "contribute",
+    numeral: "IV",
+    title: "Call for accounts",
+    opening: "Your account is the data.",
     body:
       "If you remember life before the screen, or if you don't, we want the account. The first cohort is being assembled now. Write to us and we will send the protocol.",
     cta: "Send your account",
+    subject: "My account",
   },
 
   papers: {
-    kicker: "Working papers",
+    id: "papers",
+    numeral: "V",
+    title: "Working papers",
+    columns: ["No.", "Title", "Status"],
     items: [
       { n: "01", title: "On the vocabulary of mediated distance", status: "in preparation" },
       { n: "02", title: "Digital-first: norms learned online, applied offline", status: "forthcoming" },
@@ -100,8 +115,12 @@ export const site = {
   },
 
   aboutName: {
-    kicker: "On the name",
+    id: "name",
+    numeral: "VI",
+    title: "On the name",
     text:
       "Postphenomenology is an existing school in philosophy of technology. It studies how technologies shape the relation between people and the world. The applied part is ours: taking that lens out of the seminar and into first-person data, and back out again as interventions.",
   },
 } as const;
+
+export const parts = [site.question, site.method, site.programme, site.contribute, site.papers, site.aboutName] as const;
