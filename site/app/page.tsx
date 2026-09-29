@@ -1,6 +1,7 @@
 import { site, parts } from "@/content/site";
 import { Mark } from "@/components/Mark";
 import { RunningHead } from "@/components/RunningHead";
+import { Contact } from "@/components/Contact";
 
 function PartHead({ id, numeral, title }: { id: string; numeral: string; title: string }) {
   return (
@@ -13,7 +14,6 @@ function PartHead({ id, numeral, title }: { id: string; numeral: string; title: 
 
 export default function Page() {
   const q = site.question;
-  const mailto = `mailto:${site.contact}?subject=${encodeURIComponent(site.contribute.subject)}`;
 
   return (
     <>
@@ -102,7 +102,7 @@ export default function Page() {
             <PartHead id={site.contribute.id} numeral={site.contribute.numeral} title={site.contribute.title} />
             <p className="opening">{site.contribute.opening}</p>
             <p>{site.contribute.body}</p>
-            <a className="button" href={mailto}>{site.contribute.cta}</a>
+            <div className="cta"><Contact>{site.contribute.cta}</Contact></div>
             <p className="address">{site.contact}</p>
           </div>
         </section>
@@ -141,7 +141,8 @@ export default function Page() {
         <hr className="short" />
         <Mark kind="glyph" className="colophon-mark" />
         <p className="caps colophon-name">{site.name}</p>
-        <p>{site.domain} · <a href={`mailto:${site.contact}`}>{site.contact}</a></p>
+        <p>{site.domain} · {site.contact}</p>
+        <p>{site.proof.credit} <a href={site.proof.url}>{site.proof.name}</a></p>
         <p className="caps rights">© {site.founded}</p>
       </footer>
     </>

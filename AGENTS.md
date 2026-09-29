@@ -38,6 +38,9 @@ colour its only definition inside a media block.
 
 **No analytics, no third-party scripts, no CDN.** Fonts through `next/font`, self-hosted at
 build.
+altcha is the one vendored script (`site/public/vendor/altcha`, MIT). It runs the load gate and
+guards the address; the address exists only as an encrypted payload (`contactPayload`), never as
+text. After changing it: `npx altcha-lib obfuscate "mailto:<address>?subject=<subject>"`.
 
 **The marks are hand-drawn.** They are SVG paths with deliberate irregularity. Do not
 regularise, re-path or "clean up" a mark; the wobble is the identity.

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Spectral, Spectral_SC, Homemade_Apple } from "next/font/google";
 import { site } from "@/content/site";
+import { Gate } from "@/components/Gate";
 import "./globals.css";
 
 const body = Spectral({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-body", display: "swap" });
@@ -30,9 +31,10 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${body.variable} ${caps.variable} ${hand.variable}`}>
+    <html lang="en" className={`${body.variable} ${caps.variable} ${hand.variable}`} suppressHydrationWarning>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <Gate />
         {children}
       </body>
     </html>

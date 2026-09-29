@@ -56,3 +56,15 @@ site is now set as a printed prospectus: title page, contents, six numbered part
 notes, a working-paper register, a colophon, and a running head. Same copy, same mark, same
 tokens. Spectral SC replaces IBM Plex Mono for every label; the hand face appears once, in
 the correction. `Reveal.tsx` is gone; nothing animates on scroll.
+
+---
+
+**2026-09-29 — The page opens with a proof-of-work; the address sits behind one.**
+Param asked for altcha (altcha.org) on postphenom.com, as on paramv.com. Two uses, both
+first-party: a curtain that runs a small PBKDF2 challenge before the page opens (once per tab
+session, fails open on error or after 8s, no script → no gate), and the contact address stored
+AES-encrypted in the page and decrypted in the reader's browser when the proof is solved. The
+address is no longer in the source anywhere; `contact` in `site.ts` is the anti-harvest text
+form. The widget is vendored in `public/vendor/altcha` (MIT), so the "no third-party scripts"
+rule still holds. The colophon credits altcha.
+

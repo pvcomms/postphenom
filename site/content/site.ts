@@ -5,7 +5,12 @@ export const site = {
   short: "postphenom",
   domain: "postphenom.com",
   url: "https://postphenom.com",
-  contact: "hello@postphenom.com",
+  // The address is never written into the page. `contact` is the anti-harvest form shown as text;
+  // `contactPayload` is the mailto AES-encrypted by altcha, opened by a proof-of-work in the reader's
+  // browser. Regenerate with: npx altcha-lib obfuscate "mailto:<address>?subject=<subject>"
+  contact: "hello (at) postphenom dot com",
+  contactPayload:
+    "eyJwYXJhbWV0ZXJzIjp7ImFsZ29yaXRobSI6IlBCS0RGMi9TSEEtMjU2IiwiY29zdCI6NTAwMCwia2V5TGVuZ3RoIjozMiwia2V5UHJlZml4IjoiM2UxODQ2ZDQyM2JlZjdiNzUzNTJlYTQ2ZmNhNmFlZTUiLCJub25jZSI6ImUzZjRlZjc5OTI0MWQxOTU0OGNhMzM3MjZhZTBhMDAyIiwic2FsdCI6ImQ1MmRkMzJiMzdhOGU1MzcyYjVlNmM2NzYzZTA0NGVjIn0sImNpcGhlciI6eyJpdiI6IjUxYTMyZWRhNTAwYzljMTU5YzU4YzY3YSIsImRhdGEiOiI5ODFlZmUwYjFiMzg5MDU3M2FhMTU2MDBhYTk3NDhlODVmNTMxMjVkMGUyMjJjZjFjYzAxZGMwNjRiN2UyYTIyMGZiOTFjNTI0NWQzMzk0ZDI3OTI2NmRjMTdjYTM1ZWVmZmJkMTVhYmRhMzhmZThiZTM4M2Y0MTBkY2I2OTk1MSJ9fQ==",
   founded: "2026",
   tagline: "Examining how the algorithm mediates, and exacerbates, the polycrisis.",
   description:
@@ -101,6 +106,19 @@ export const site = {
       "If you remember life before the screen, or if you don't, we want the account. The first cohort is being assembled now. Write to us and we will send the protocol.",
     cta: "Send your account",
     subject: "My account",
+  },
+
+  // The proof-of-work that opens the page and guards the address. altcha, vendored in public/vendor/altcha.
+  proof: {
+    kicker: "postphenom.com · proof of work",
+    note: "A small computation runs in your browser before the page opens. Nothing to click, nothing sent anywhere. Scrapers pay for the page in processor time instead.",
+    credit: "Proof of work by",
+    name: "altcha",
+    url: "https://altcha.org",
+    // A fixed challenge: keyPrefix "00" is found after ~256 PBKDF2 rounds. Fresh nonce and salt per site.
+    challenge:
+      '{"parameters":{"algorithm":"PBKDF2/SHA-256","cost":5000,"keyLength":32,"keyPrefix":"00","nonce":"b0ffc7ad3d19b929cd3821b7b2c19d90","salt":"e8e8a9f3c09c8741b7f3c72834a678d2"}}',
+    hint: "Reveal the address",
   },
 
   papers: {

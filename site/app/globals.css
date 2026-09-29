@@ -151,13 +151,36 @@ hr.short { width: 56px; border: 0; border-top: 1px solid var(--ink); margin: 0 a
 .levels dt { font-weight: 500; }
 .levels dd { margin: 0; font-size: 17px; }
 
-.button {
+.button, .cta a {
   display: inline-block; margin-top: 8px; padding: 12px 24px;
   border: 1px solid var(--ink); text-decoration: none;
   font-family: var(--font-caps), var(--font-body), serif; font-size: 14px; letter-spacing: 0.1em;
   transition: background 200ms var(--ease), color 200ms var(--ease);
 }
-.button:hover { background: var(--ink); color: var(--paper); }
+button.button { appearance: none; background: none; color: var(--ink); cursor: pointer; border-radius: 0; }
+.button:hover, .cta a:hover { background: var(--ink); color: var(--paper); }
+.cta altcha-widget {
+  display: inline-block;
+  --altcha-color-base: var(--paper);
+  --altcha-color-base-content: var(--ink);
+  --altcha-color-neutral: var(--rule);
+  --altcha-color-neutral-content: var(--graphite);
+  --altcha-color-primary: var(--ink);
+  --altcha-color-primary-content: var(--paper);
+  --altcha-color-success: var(--ink);
+  --altcha-color-success-content: var(--paper);
+  --altcha-border-color: var(--ink);
+  --altcha-border-width: 1px;
+  --altcha-border-radius: 0;
+  --altcha-checkbox-border-color: var(--ink);
+  --altcha-checkbox-border-radius: 0;
+  --altcha-checkbox-size: 16px;
+  --altcha-spinner-color: var(--vermillion);
+  --altcha-max-width: 280px;
+  --altcha-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+  font-family: var(--font-body), Georgia, serif;
+  font-size: 15px;
+}
 .address { margin: 18px 0 0; color: var(--graphite); font-size: 16px; }
 
 .register { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums lining-nums; }
@@ -170,6 +193,36 @@ hr.short { width: 56px; border: 0; border-top: 1px solid var(--ink); margin: 0 a
 .register .num { width: 48px; color: var(--graphite); }
 .register .status { text-align: right; font-style: italic; color: var(--graphite); white-space: nowrap; }
 .register th:last-child { text-align: right; }
+
+/* Gate: a proof-of-work runs before the page opens. No script → no gate. */
+html.gated { overflow: hidden; }
+.gate { display: none; position: fixed; inset: 0; z-index: 1000; background: var(--paper); padding: 24px; transition: opacity 450ms var(--ease); }
+html.gated .gate, .gate.out { display: grid; place-items: center; }
+.gate.out { opacity: 0; pointer-events: none; }
+.gate-inner { display: grid; gap: 18px; justify-items: start; max-width: 320px; color: var(--graphite); font-size: 15px; line-height: 1.6; }
+.gate-kicker { color: var(--ink); }
+.gate-note { margin: 0; }
+.gate altcha-widget {
+  --altcha-color-base: var(--paper);
+  --altcha-color-base-content: var(--ink);
+  --altcha-color-neutral: var(--rule);
+  --altcha-color-neutral-content: var(--graphite);
+  --altcha-color-primary: var(--ink);
+  --altcha-color-primary-content: var(--paper);
+  --altcha-color-success: var(--ink);
+  --altcha-color-success-content: var(--paper);
+  --altcha-border-color: var(--ink);
+  --altcha-border-width: 1px;
+  --altcha-border-radius: 0;
+  --altcha-checkbox-border-color: var(--ink);
+  --altcha-checkbox-border-radius: 0;
+  --altcha-checkbox-size: 16px;
+  --altcha-spinner-color: var(--vermillion);
+  --altcha-max-width: 320px;
+  font-family: var(--font-body), Georgia, serif;
+  font-size: 15px;
+}
+@media (prefers-reduced-motion: reduce) { .gate { transition: none; } }
 
 /* Colophon */
 .colophon { text-align: center; padding: 128px 0 80px; max-width: 620px; margin: 0 auto; color: var(--graphite); font-size: 15px; }
