@@ -110,6 +110,7 @@ hr.short { width: 56px; border: 0; border-top: 1px solid var(--ink); margin: 0 a
 .contents li .numeral { color: var(--graphite); }
 .contents li a { text-decoration: none; }
 .contents li a:hover { text-decoration: underline; text-decoration-color: var(--ink); }
+.elsewhere-label { margin-top: 28px; }
 
 /* Parts */
 /* Symmetric: an empty margin, the text column, the notes margin. The column stays centred. */

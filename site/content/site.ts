@@ -26,6 +26,16 @@ export const site = {
     contents: "Contents",
   },
 
+  // Pages that live beside the document rather than in it, listed under the contents.
+  elsewhere: {
+    label: "Elsewhere",
+    items: [
+      { title: "Figures", href: "/figures" },
+      { title: "Reading the Figures", href: "/figures/legend" },
+      { title: "What You Study", href: "/position" },
+    ],
+  },
+
   question: {
     id: "question",
     numeral: "I",

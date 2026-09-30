@@ -46,6 +46,15 @@ export default function Page() {
               </li>
             ))}
           </ol>
+          <span className="caps contents-label elsewhere-label">{site.elsewhere.label}</span>
+          <ol>
+            {site.elsewhere.items.map((e) => (
+              <li key={e.href}>
+                <span className="caps numeral" aria-hidden="true">&rarr;</span>
+                <a href={e.href}>{e.title}</a>
+              </li>
+            ))}
+          </ol>
         </nav>
 
         {/* I. The question */}

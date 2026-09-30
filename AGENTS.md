@@ -36,6 +36,14 @@ under both `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-the
 and `:root[data-theme="dark"]`, so an explicit toggle wins in both directions. Never give a
 colour its only definition inside a media block.
 
+**The figures are the exception to all of the above.** `public/figures.html`,
+`public/figures/legend.html` and `public/position.html` came over from paramv.com on 2026-09-30
+as finished documents: their own dark theme, their own copy, their own self-hosted fonts in
+`public/fonts/`, vanilla JS. They are not rendered from `site.ts` and don't use the tokens. Edit
+them in place. The instruments are the argument: a change that makes one prettier and less
+operable is a regression, and `figures/legend.html` is updated when a figure's behaviour changes.
+Check them in a real browser; an embedded preview pane suspends animation frames.
+
 **No analytics, no third-party scripts, no CDN.** Fonts through `next/font`, self-hosted at
 build.
 altcha is the one vendored script (`site/public/vendor/altcha`, MIT). It runs the load gate and
@@ -77,6 +85,8 @@ heavy site. Do not remove them chasing a visual.
 The Center for Applied Post-Phenomenology — the institution these tools ship under.
 
 **How it relates to the whole.** A public surface. Publishing needs an explicit go-ahead, every time.
+
+Siblings (site, capp): `cohort-study`.
 
 The two trees are `~/work/capp/` (the Center) and `~/personal/` (everything else). `~/Code/` is a compatibility symlink farm — never build there.
 

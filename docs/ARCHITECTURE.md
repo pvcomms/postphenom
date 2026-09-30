@@ -27,6 +27,11 @@ postphenom/
     content/
       site.ts              ALL COPY. the content layer
     public/                llms.txt, robots.txt
+      figures.html         the six figures — standalone HTML, moved from paramv.com as-is
+      figures/legend.html  Reading the Figures
+      position.html        What You Study
+      fonts/               Newsreader + Plex Mono .woff2 for those three pages only
+  next.config.ts           rewrites /figures, /figures/legend, /position to those files
   brand/                   identity exploration. static HTML + SVG
     generate-marks.py      draws the unit into site/ — seeded, reproducible
     identity-round-{1..4}.html

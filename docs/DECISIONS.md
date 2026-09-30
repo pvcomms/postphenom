@@ -68,3 +68,13 @@ address is no longer in the source anywhere; `contact` in `site.ts` is the anti-
 form. The widget is vendored in `public/vendor/altcha` (MIT), so the "no third-party scripts"
 rule still holds. The colophon credits altcha.
 
+---
+
+**2026-09-30 — The figures moved here from paramv.com.**
+Param moved his six interactive figures, "Reading the Figures" and "What You Study" to the
+Center: the instruments belong to the institution, the personal site keeps the person. They
+came as they were — standalone HTML in `public/`, their dark theme and code untouched — at
+`/figures`, `/figures/legend` and `/position`, listed under the contents as "Elsewhere". Fig. 3
+names people (Kierkegaard, Clark & Chalmers, Meredith Whittaker, Fleet Foxes …); Param kept the
+names on purpose, a deliberate exception to the no-named-individuals line of 2026-09-24. Fig. 1's
+two circles whose rooms stayed on paramv.com (thoughts.log, create) link there.

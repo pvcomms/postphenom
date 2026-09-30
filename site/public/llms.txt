@@ -15,5 +15,10 @@ Structured first-person accounts collected under a fixed protocol, compared acro
 ## Programme
 Interventions at personal, institutional and societal scale; new institutions for a post-scarcity society.
 
+## Figures
+- [Figures](https://postphenom.com/figures): six interactive figures — what coexists, the distribution of taste, the influence graph, precedence, directionally correct, the arbitration.
+- [Reading the Figures](https://postphenom.com/figures/legend): what each figure claims, what every animation means, and an audit of which claims are grounded.
+- [What You Study](https://postphenom.com/position): thesis, the fields it maps to, and a manifesto.
+
 ## Contact
 hello (at) postphenom dot com · https://postphenom.com
