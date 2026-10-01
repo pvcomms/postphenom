@@ -78,3 +78,27 @@ came as they were — standalone HTML in `public/`, their dark theme and code un
 names people (Kierkegaard, Clark & Chalmers, Meredith Whittaker, Fleet Foxes …); Param kept the
 names on purpose, a deliberate exception to the no-named-individuals line of 2026-09-24. Fig. 1's
 two circles whose rooms stayed on paramv.com (thoughts.log, create) link there.
+
+---
+
+**2026-10-02 — Six pages with tabs, after laurenleek.eu.**
+Param pointed at laurenleek.eu as the template and asked for tabs, Journal and Contributors
+among them, "super professional", in the register of the Center for Applied Rationality's
+site, not vibe-coded. Taken from the reference: its shape, which is a bar with the name left
+and tabs right, pages built from labelled sections, and a columned footer. Not taken: its dark
+slate theme, the teal gradient glow, pill tabs, the photo hero, typewriter copy, cards and the
+scroll-progress rail. Those are the tells this site removed on 25 Sep. The identity, tokens,
+fonts, the correction and the gate are unchanged.
+
+The single document became six routes: Home, About, Research, Instruments, Journal,
+Contributors. All copy stays in `content/site.ts`. The running head became a sticky bar; the
+`§` numerals went with the single page. New copy draws only on what the repos record: the
+instruments table, the published reports on `pvcomms`, the two whitepaper drafts, Cohort
+Study and this file. The journal opens with five entries, each written from a decision above.
+Contributors names the founder, which is his own name and so not covered by the 24 Sep rule
+against other people's names, and says why cohort contributors are not named. Suji and the
+other local-only instruments are left out of the public list.
+
+The gate no longer removes its own element. Removing a node React rendered, before
+hydration, made every reload in a solved tab fail to hydrate; with six pages that became every
+page load after the first. The element now stays and CSS hides it.

@@ -15,6 +15,13 @@ Structured first-person accounts collected under a fixed protocol, compared acro
 ## Programme
 Interventions at personal, institutional and societal scale; new institutions for a post-scarcity society.
 
+## Pages
+- [About](https://postphenom.com/about): the question, how the Center works, the programme, the name.
+- [Research](https://postphenom.com/research): method, Cohort Study, working papers, technical reports.
+- [Instruments](https://postphenom.com/instruments): house rules, the figures, built and named instruments.
+- [Journal](https://postphenom.com/journal): dated notes on what was built and why.
+- [Contributors](https://postphenom.com/contributors): who works here and how to contribute.
+
 ## Figures
 - [Figures](https://postphenom.com/figures): six interactive figures — what coexists, the distribution of taste, the influence graph, precedence, directionally correct, the arbitration.
 - [Reading the Figures](https://postphenom.com/figures/legend): what each figure claims, what every animation means, and an audit of which claims are grounded.

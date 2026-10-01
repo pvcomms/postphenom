@@ -4,25 +4,37 @@ Grammar and bans: `~/work/capp/spine/docs/DESIGN-SYSTEM.md`. Machine-readable va
 `~/work/capp/spine/docs/tokens.json` under `surfaces.postphenom`. This file is what is specific to
 this site.
 
-## The page is a document
+## The site is six pages
 
-Since 25 Sep 2026 the site is set as a printed prospectus, not a landing page. In order:
+Since 2 Oct 2026 the site is a small institutional site with tabs, modelled on the shape of
+laurenleek.eu (a bar with the name on the left and tabs on the right, sectioned pages, a
+columned footer) and set in this identity's type and rules. In order:
 
-1. **Title page** — the unit, the name in two lines (small capitals, then the correction), a
-   short rule, the statement of purpose, the imprint line.
-2. **Contents** — six numbered entries. This is the primary navigation.
-3. **Parts I–VI** — each opens with a rule across the column, a `§` numeral and its title.
-   The question · Method · Programme · Call for accounts · Working papers · On the name.
-4. **Colophon** — glyph, name, address, year.
+1. **The bar** (`components/Header.tsx`, `Nav.tsx`) — the glyph and the name in small capitals
+   on the left, five tabs on the right: About · Research · Instruments · Journal ·
+   Contributors. The open tab is underlined in `--ink`. Sticky on desktop, solid paper, one
+   hairline; never blurred. Below `820px` the tabs drop under the name and wrap; below `640px`
+   the bar is no longer sticky.
+2. **Home** — the title page (the unit, the name in two lines with the correction, a short
+   rule, the statement, a sentence on what the Center does, the imprint), then four sections:
+   what the Center does · now · from the journal · call for accounts.
+3. **Inner pages** — a title block (h1 and one sentence), then sections. A section is an
+   `--ink` rule across the wrap, a small-capitals label in a `200px` left column, and the body
+   on the right (`components/Section.tsx`).
+4. **Rows** (`components/Rows.tsx`) — every list on the site: a small-capitals meta column,
+   the entry, a small-capitals link at the right, separated by `--rule` hairlines. Rows with
+   no meta or no link drop that column.
+5. **Journal** — an index of dated rows and one page per entry at `/journal/<slug>`, set as an
+   article: date, title, italic dek, an `--ink` rule, the body with its first line in small
+   capitals.
+6. **Colophon** — an `--ink` rule, the name and address, the pages, elsewhere; then the glyph,
+   the year and the altcha credit.
 
-A **running head** (`components/RunningHead.tsx`) slides in once the title page has scrolled
-off: the institution's name on the left, the parts on the right with the one being read
-underlined. It is hidden, not merely transparent, while the title page is on screen.
-
-What was removed and must not come back: the sticky blurred product nav, mono uppercase
+What must not come back from before 25 Sep: blurred sticky product nav, mono uppercase
 kickers, the 112px hero wordmark, the four-column steps grid, the arrow-icon button, scroll
-reveals, and handwriting anywhere but the correction. Those were the tells of a generated
-landing page. The institution's voice is set type, rules, small capitals and numerals.
+reveals, and handwriting anywhere but the correction. Cards with shadows and pill tabs from
+the reference site were not adopted either. The institution's voice is set type, rules, small
+capitals and numerals.
 
 ## Tokens
 
@@ -47,7 +59,7 @@ Light is defined on bare `:root`. Dark redefines only these six, in both the
 | Face               | Role                                                                 |
 | ------------------ | -------------------------------------------------------------------- |
 | **Spectral**       | body and headings. 18px, 1.65 leading, old-style figures             |
-| **Spectral SC**    | the `.caps` class — 13px, `0.1em` tracking. Labels, numerals, the running head, the button, table heads. Typed as prose: the face sets lowercase as small capitals, so no `text-transform` |
+| **Spectral SC**    | the `.caps` class — 13px, `0.1em` tracking. Labels, numerals, the tabs, row links, the button, table heads. Typed as prose: the face sets lowercase as small capitals, so no `text-transform` |
 | **Homemade Apple** | the `.hand` class — the correction, once, in the title page          |
 
 All three through `next/font`, self-hosted at build. IBM Plex Mono was dropped on 25 Sep: a
@@ -56,18 +68,19 @@ whole gesture and appears exactly once.
 
 ## Measure and rhythm
 
-Text column `620px`, centred. Margin notes (`.notes`) `240px` wide, `40px` off the column,
-on the right; the grid has a matching empty column on the left so the text stays centred on
-the page. Below `1240px` the notes fall in line under the text, ruled off. Below `640px` the
-body drops to 17px and the gutter to 20px. Running head `48px`, solid paper, one hairline.
-8px spacing rhythm; parts open `104px` apart.
+Wrap `1120px` with a `32px` gutter (`20px` below `640px`). Section label column `200px`,
+`48px` off the body. Paragraphs hold a `640px` measure inside the body; rows run the full
+body width with a `160px` meta column and a `96px` link column. Bar `64px`. Body 18px at 1.65
+(17px below `640px`). Sections open `28px` under their rule and close `72px` above the next.
+Below `900px` the label column folds above its section. 8px spacing rhythm.
 
 ## Motion
 
-One curve: `cubic-bezier(0.16, 1, 0.3, 1)`. The title page settles once on load (staggered
-fade-up, the correction arriving last). The running head slides in over 360ms. Links move
-their underline from `--rule` to `--ink` on hover. Nothing animates on scroll. All of it is
-inside `prefers-reduced-motion: no-preference`.
+One curve: `cubic-bezier(0.16, 1, 0.3, 1)`. The home title page and each page's title block
+settle once on load (staggered fade-up; on home the correction arrives last). Links move their
+underline from `--rule` to `--ink` on hover, tabs from `--graphite` to `--ink`; hovering a row
+underlines its title and its link. Nothing animates on scroll. All of it is inside
+`prefers-reduced-motion: no-preference`.
 
 ## The marks
 
@@ -84,8 +97,8 @@ inside `prefers-reduced-motion: no-preference`.
 
 The unit is two brush-drawn rings round one vermillion point: the horizon a platform draws,
 the self shaped inside it, the unit of attention being sold. The inner ring sits off-centre on
-purpose. Only the point ever takes colour; the rings never do. It appears at 96px on the title
-page and as the 30px glyph in the colophon.
+purpose. Only the point ever takes colour; the rings never do. It appears at 88px on the home title
+page and as the glyph in the bar and the colophon.
 
 `brand/generate-marks.py` draws `MARK` and `GLYPH` into `site/components/marks.ts` and the
 favicon into `site/app/icon.svg`, seeded, so a re-run reproduces the same wobble. The wordmark
@@ -114,5 +127,5 @@ argument for the chosen one.
 Focus is `2px solid var(--ink)` at `4px` offset on every link and button, and it is
 load-bearing on a page that is almost entirely text and links. Body text holds 4.5:1 in both
 themes. `--graphite` is for labels and secondary text only; the trades, steps and programme
-descriptions are set in `--ink`. The running head's links are unfocusable while it is hidden.
-Each part is a `section` labelled by its heading.
+descriptions are set in `--ink`. The open tab carries `aria-current="page"`.
+Each section is labelled by its small-capitals heading.

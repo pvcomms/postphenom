@@ -14,13 +14,13 @@ cd site && pnpm dev    # localhost:4748
 
 | Directory | What                                                                    |
 | --------- | ----------------------------------------------------------------------- |
-| `site/`   | the Next.js landing site. this is what deploys                          |
+| `site/`   | the Next.js site, six pages. this is what deploys                       |
 | `brand/`  | identity exploration — four rounds of HTML, six candidate marks as SVG, and the mark generator |
 
 ## The content layer
 
-Everything on the page that is words lives in `site/content/site.ts` — the question, the
-method, the programme, the calls to contribute, the papers. Editing the site's text means
+Everything on the site that is words lives in `site/content/site.ts` — the tabs, each of the
+six pages (Home, About, Research, Instruments, Journal, Contributors) and the journal entries. Editing the site's text means
 editing that one file and nothing else. The components render whatever is in it.
 
 This is deliberate and it is the property to preserve: the site is editable without touching

@@ -4,10 +4,11 @@
 
 ## In one paragraph
 
-A single-page Next.js site whose entire copy lives in one TypeScript object. `content/site.ts`
-holds the name, tagline, navigation, and every section's kicker, lede and body paragraphs;
-`app/page.tsx` renders them through a small set of presentational components. There is no CMS,
-no database and no API. Changing what the site says is editing one file.
+A six-page Next.js site whose entire copy lives in one TypeScript object. `content/site.ts`
+holds the name, the tabs (`nav`), each page's copy under its own key (`home`, `about`,
+`research`, `instruments`, `journal`, `contributors`) and the journal entries; each route in
+`app/` renders its key through a small set of shared components. There is no CMS, no database
+and no API. Changing what the site says is editing one file.
 
 ## The tree
 
@@ -15,15 +16,22 @@ no database and no API. Changing what the site says is editing one file.
 postphenom/
   site/                    the app. THE DEPLOY ROOT — vercel runs from here
     app/
-      page.tsx             the single page; renders sections from content/site.ts
-      layout.tsx           fonts via next/font, metadata
+      layout.tsx           fonts via next/font, metadata, Gate + Header + Footer round every page
+      page.tsx             home: the title page, then work · now · journal · call
+      about/ research/ instruments/ contributors/   one page.tsx each
+      journal/page.tsx     the index; journal/[slug]/page.tsx renders one entry, statically
       globals.css          all styling. plain CSS custom properties, no Tailwind
-      sitemap.ts
+      sitemap.ts           built from site.nav and site.journal.entries
       icon.svg             favicon, written by brand/generate-marks.py
     components/
-      Mark.tsx             renders the hand-drawn identity mark
-      marks.ts             the mark path data. MARK + GLYPH generated, the rest frozen
-      Reveal.tsx           scroll reveal wrapper — 14px rise, one shared curve
+      Header.tsx, Nav.tsx  the bar and its tabs (Nav is the one client component: active tab)
+      Footer.tsx           the colophon
+      PageHead.tsx         an inner page's title block
+      Section.tsx          rule, small-capitals label column, body
+      Rows.tsx             every list: meta, entry, link, between hairlines
+      Contact.tsx          the altcha-guarded address
+      Gate.tsx             the proof-of-work curtain
+      Mark.tsx, marks.ts   the hand-drawn marks. MARK + GLYPH generated, the rest frozen
     content/
       site.ts              ALL COPY. the content layer
     public/                llms.txt, robots.txt
@@ -41,14 +49,15 @@ postphenom/
 ## Content flow
 
 ```
-content/site.ts  ──▶  app/page.tsx  ──▶  <section> per entry
-       │                    │
-       │                    └──▶ Reveal.tsx (scroll reveal)
+content/site.ts ──▶ app/<route>/page.tsx ──▶ PageHead + Section + Rows
+       │
+       ├──▶ Header/Nav (site.nav), Footer
        └──▶ layout.tsx metadata, sitemap.ts
 ```
 
-Sections are data. A new one is an entry in `site.ts` plus a `nav` item — not a new component,
-unless it needs a genuinely new shape.
+A new journal entry is an object at the top of `site.journal.entries`; its page, the index,
+the home section and the sitemap pick it up. A new section on a page is an entry under that
+page's key and a `<Section>` in the route. A new tab is an item in `site.nav` and a route.
 
 ## Styling
 
@@ -57,8 +66,9 @@ redefines only the five colours that change, under both the `prefers-color-schem
 (guarded as `:root:not([data-theme="light"])`) and `:root[data-theme="dark"]` so an explicit
 choice wins either way.
 
-Measure: `1120px` wrap, `28px` gutter, `18px` body at `1.6`. Motion: one curve,
-`cubic-bezier(0.16, 1, 0.3, 1)`, 200ms for hover and 260ms for reveals.
+Measure: `1120px` wrap, `32px` gutter, `200px` label column, `640px` paragraph measure,
+`18px` body at `1.65`. Motion: one curve, `cubic-bezier(0.16, 1, 0.3, 1)`, 200ms for hover;
+title blocks settle once on load; nothing on scroll. `docs/DESIGN.md` has the rest.
 
 ## Invariants
 

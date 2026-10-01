@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Spectral, Spectral_SC, Homemade_Apple } from "next/font/google";
 import { site } from "@/content/site";
 import { Gate } from "@/components/Gate";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const body = Spectral({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-body", display: "swap" });
@@ -35,7 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <Gate />
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -3,18 +3,20 @@ import { site } from "@/content/site";
 
 // A proof-of-work runs before the page opens. No script → no gate. Solved once per tab session.
 // Fails open on error or after 8s, so a broken widget never locks a reader out.
+// The gate is hidden by CSS once html loses .gated, never removed: React owns the node, and
+// deleting it before hydration made every reload in a solved tab fail to hydrate.
 const arm = `try{if(!sessionStorage.getItem("pp-gate"))document.documentElement.classList.add("gated")}catch(e){}`;
 
 const open = `(function(){
   var root=document.documentElement,gate=document.getElementById("gate");
   if(!gate)return;
-  if(!root.classList.contains("gated")){gate.remove();return}
+  if(!root.classList.contains("gated"))return;
   var done=false;
   function go(){
     if(done)return;done=true;
     try{sessionStorage.setItem("pp-gate","1")}catch(e){}
     gate.classList.add("out");root.classList.remove("gated");
-    setTimeout(function(){gate.remove()},500);
+    setTimeout(function(){gate.classList.remove("out")},500);
   }
   var w=document.getElementById("gate-altcha");
   w.addEventListener("verified",go);

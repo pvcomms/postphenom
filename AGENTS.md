@@ -26,10 +26,11 @@ vercel --prod --yes    # from site/, not the repo root
 
 ## Invariants
 
-**Copy lives in `content/site.ts`.** Every word on the page comes from that file. Never
+**Copy lives in `content/site.ts`.** Every word on the site comes from that file. Never
 hardcode user-visible text into a component — the whole point is that the site is editable by
-writing, not by editing JSX. A new section means a new entry in `site.ts` and a component that
-renders it generically.
+writing, not by editing JSX. Six pages, one key each; the tabs are `site.nav`; a journal entry
+is an object at the top of `site.journal.entries`. A new section means a new entry in
+`site.ts` rendered through `Section` and `Rows`.
 
 **Themes are tokens.** The full palette is on bare `:root`; dark redefines only what changes,
 under both `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-theme="light"])`
