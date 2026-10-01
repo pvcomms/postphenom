@@ -13,7 +13,7 @@ and SVG, built by nothing.
 
 Next.js 16 (App Router) · React 19 · TypeScript · pnpm. Plain CSS in `app/globals.css` with
 custom properties — **no Tailwind in this repo**, unlike the others. Fonts via `next/font`:
-Spectral for body, IBM Plex Mono for meta, Homemade Apple for the hand.
+Public Sans for everything, self-hosted at build.
 
 ## Commands
 
@@ -32,10 +32,10 @@ writing, not by editing JSX. Six pages, one key each; the tabs are `site.nav`; a
 is an object at the top of `site.journal.entries`. A new section means a new entry in
 `site.ts` rendered through `Section` and `Rows`.
 
-**Themes are tokens.** The full palette is on bare `:root`; dark redefines only what changes,
-under both `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-theme="light"])`
-and `:root[data-theme="dark"]`, so an explicit toggle wins in both directions. Never give a
-colour its only definition inside a media block.
+**Every colour is a token.** One light theme, the full palette on bare `:root`. There is no
+dark mode on this site, by decision (DECISIONS, 2 Oct 2026). If one is ever added, dark
+redefines only what changes, under both `@media (prefers-color-scheme: dark)` guarded as
+`:root:not([data-theme="light"])` and `:root[data-theme="dark"]`.
 
 **The figures are the exception to all of the above.** `public/figures.html`,
 `public/figures/legend.html` and `public/position.html` came over from paramv.com on 2026-09-30

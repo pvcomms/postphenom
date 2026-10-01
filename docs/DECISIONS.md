@@ -102,3 +102,23 @@ other local-only instruments are left out of the public list.
 The gate no longer removes its own element. Removing a node React rendered, before
 hydration, made every reload in a solved tab fail to hydrate; with six pages that became every
 page load after the first. The element now stays and CSS hides it.
+
+---
+
+**2026-10-02 — An institute's site, after rationality.org.**
+Param's verdict on the six-page serif version, the same day: "so vibe coded. be professional
+af like the center for applied rationality." The serif, small capitals, hairline rows, label
+columns and the handwritten correction were the tell: they are the house style of generated
+"editorial" pages. Taken from CFAR: a logo lockup of mark, short name and the full name set
+small; large sans tabs with the open one in the accent colour and a call to action behind a
+rule; a photographic hero with a translucent band carrying the line; alternating white and
+grey bands with large light headings; cards with soft shadows holding studies, reports and
+entries; stat cards; a sub-navigation bar on inner pages; a plain three-part footer. Not taken:
+Roboto (banned here; Public Sans instead), Material Bootstrap from a CDN, stock photography.
+
+The hero and every card image are screenshots of the Center's own instruments and of Cohort
+Study, so the site shows its work instead of illustrating it. The vermillion of the mark's
+point is now the site's accent. Dark mode is dropped: the institutions this is modelled on
+are light, and a theme that flips makes the site read as an app. Spectral, Spectral SC and
+Homemade Apple are no longer loaded. The correction wordmark is retired from the site; the
+mark stays, in the lockup. All copy still lives in `content/site.ts`.

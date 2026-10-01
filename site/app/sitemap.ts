@@ -3,11 +3,11 @@ import { site } from "@/content/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["", ...site.nav.map((n) => n.href)].map((p) => ({
-    url: `${site.url}${p}`,
+  const pages = site.nav.map((n) => ({
+    url: `${site.url}${n.href === "/" ? "" : n.href}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: p === "" ? 1 : 0.8,
+    priority: n.href === "/" ? 1 : 0.8,
   }));
   const entries = site.journal.entries.map((e) => ({
     url: `${site.url}/journal/${e.slug}`,

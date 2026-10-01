@@ -24,17 +24,17 @@ postphenom/
       sitemap.ts           built from site.nav and site.journal.entries
       icon.svg             favicon, written by brand/generate-marks.py
     components/
-      Header.tsx, Nav.tsx  the bar and its tabs (Nav is the one client component: active tab)
-      Footer.tsx           the colophon
-      PageHead.tsx         an inner page's title block
-      Section.tsx          rule, small-capitals label column, body
-      Rows.tsx             every list: meta, entry, link, between hairlines
+      Header.tsx, Nav.tsx  lockup, tabs, call to action, phone menu (Nav is the client part)
+      PageHead.tsx         an inner page's anchor bar and title
+      Footer.tsx           the footer
+      A.tsx                Link for routes on this site, <a> for everything else
       Contact.tsx          the altcha-guarded address
       Gate.tsx             the proof-of-work curtain
       Mark.tsx, marks.ts   the hand-drawn marks. MARK + GLYPH generated, the rest frozen
     content/
       site.ts              ALL COPY. the content layer
     public/                llms.txt, robots.txt
+      images/              screenshots of the instruments and Cohort Study, cropped, JPEG
       figures.html         the six figures — standalone HTML, moved from paramv.com as-is
       figures/legend.html  Reading the Figures
       position.html        What You Study
@@ -49,7 +49,7 @@ postphenom/
 ## Content flow
 
 ```
-content/site.ts ──▶ app/<route>/page.tsx ──▶ PageHead + Section + Rows
+content/site.ts ──▶ app/<route>/page.tsx ──▶ PageHead + bands + cards
        │
        ├──▶ Header/Nav (site.nav), Footer
        └──▶ layout.tsx metadata, sitemap.ts
@@ -57,22 +57,17 @@ content/site.ts ──▶ app/<route>/page.tsx ──▶ PageHead + Section + Ro
 
 A new journal entry is an object at the top of `site.journal.entries`; its page, the index,
 the home section and the sitemap pick it up. A new section on a page is an entry under that
-page's key and a `<Section>` in the route. A new tab is an item in `site.nav` and a route.
+page's key, a band in the route, and an anchor in that page's `sub`. A new tab is an item in
+`site.nav` and a route.
 
 ## Styling
 
-`app/globals.css`, plain CSS custom properties. Light is defined on bare `:root`; dark
-redefines only the five colours that change, under both the `prefers-color-scheme` query
-(guarded as `:root:not([data-theme="light"])`) and `:root[data-theme="dark"]` so an explicit
-choice wins either way.
-
-Measure: `1120px` wrap, `32px` gutter, `200px` label column, `640px` paragraph measure,
-`18px` body at `1.65`. Motion: one curve, `cubic-bezier(0.16, 1, 0.3, 1)`, 200ms for hover;
-title blocks settle once on load; nothing on scroll. `docs/DESIGN.md` has the rest.
+`app/globals.css`, plain CSS custom properties, one light theme on bare `:root`. Container
+`1140px`, `24px` gutter, Public Sans throughout. `docs/DESIGN.md` has the tokens and grammar.
 
 ## Invariants
 
-All copy in `content/site.ts`. Tokens on bare `:root` with dark as an override. No analytics,
+All copy in `content/site.ts`. Every colour a token on bare `:root`. No analytics,
 no third-party scripts, no CDN. The hand-drawn marks keep their irregularity.
 
 ## Known sharp edges

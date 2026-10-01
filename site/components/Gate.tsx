@@ -30,7 +30,7 @@ export function Gate() {
       <script dangerouslySetInnerHTML={{ __html: arm }} />
       <div className="gate" id="gate" aria-live="polite">
         <div className="gate-inner">
-          <span className="caps gate-kicker">{site.proof.kicker}</span>
+          <span className="gate-kicker">{site.proof.kicker}</span>
           <altcha-widget
             id="gate-altcha"
             auto="onload"

@@ -1,10 +1,10 @@
 // Everything editable on the site lives here. Components render whatever is in it.
-// The site is six pages. `nav` is the header tabs; each page's copy is the object of the same
-// name (home, about, research, instruments, journal, contributors); journal entries are
-// `journal.entries`, newest first. Adding an entry is adding an object to that array.
+// Six pages, one key each (home, about, research, instruments, journal, contributors). The header
+// tabs are `nav`; journal entries are `journal.entries`, newest first. Images live in
+// public/images and are referenced by path. Adding an entry is adding an object to an array.
 export const site = {
   name: "The Center for Applied Postphenomenology",
-  short: "postphenom",
+  short: "CAPP",
   domain: "postphenom.com",
   url: "https://postphenom.com",
   // The address is never written into the page. `contact` is the anti-harvest form shown as text;
@@ -18,94 +18,97 @@ export const site = {
   description:
     "An independent research center collecting first-person accounts of life before and after the screen, to study how technologically mediated life has changed language, perception, society and what it means to be human.",
 
-  // The header tabs. The wordmark is the link home.
+  // The logo lockup: the mark, the short name, and the full name set small in two lines.
+  lockup: { lines: ["Center for Applied", "Postphenomenology"] },
+
   nav: [
+    { title: "Home", href: "/" },
     { title: "About", href: "/about" },
     { title: "Research", href: "/research" },
     { title: "Instruments", href: "/instruments" },
     { title: "Journal", href: "/journal" },
     { title: "Contributors", href: "/contributors" },
   ],
-
-  // The name is set in two lines: the first in small capitals, the second as the correction —
-  // "phenomenology" typeset, "post" written in above it.
-  masthead: {
-    line: "The Center for Applied",
-    hand: "post",
-    set: "phenomenology",
-    imprint: "An independent research center · founded 2026",
-  },
+  cta: { title: "Send an account", href: "/contributors#contribute" },
+  menu: "Menu",
 
   home: {
-    statement: "Technology no longer sits between us and the world. It is the way the world arrives.",
-    sub:
-      "The Center collects first-person accounts of life before and after the screen, builds instruments that let a reader test a claim about perception on themselves, and publishes what it finds in full.",
-    work: {
-      label: "What the Center does",
-      items: [
-        {
-          meta: "Accounts",
-          text: "First-person accounts of life before and after the screen, collected under one protocol so they can be compared and published in full so they can be checked.",
-          href: "/research",
-          link: "Method",
-        },
-        {
-          meta: "Instruments",
-          text: "Single-file tools that each make a claim about perception. They open offline, ask for no account, and read nothing but what is on the reader's own disk.",
-          href: "/instruments",
-          link: "Catalogue",
-        },
-        {
-          meta: "Papers",
-          text: "Working papers and technical reports, published with the code and the runs, including the ones that retract an earlier result.",
-          href: "/research#papers",
-          link: "Register",
-        },
-      ],
+    hero: {
+      lines: ["Examining how the algorithm mediates,", "and exacerbates, the polycrisis."],
+      image: "/images/hero-terra-cognita.jpg",
+      alt: "A life drawn as a contoured landmass, from the Center's instrument Terra Cognita. Districts are labelled Family, Belonging, Work, Money, Body and Taste.",
     },
-    now: {
-      label: "Now",
-      items: [
-        {
-          meta: "30 Sep 2026",
-          title: "Cohort Study",
-          href: "https://cohortstudy.co",
-          text: "A standing panel of Gen Z interior life. Two instruments, one index, every row published.",
-          link: "Open",
-        },
-        {
-          meta: "30 Sep 2026",
-          title: "Three new instruments",
-          href: "/instruments",
-          text: "The Half-Second, The Familiar Voice and Stop Flowing: the feed and the body, ease mistaken for truth, and positions that drift.",
-          link: "Catalogue",
-        },
-        {
-          meta: "30 Sep 2026",
-          title: "The figures",
-          href: "/figures",
-          text: "Six interactive figures, their legend and a position paper, moved to the Center from the founder's own site.",
-          link: "Open",
-        },
-      ],
+    about: {
+      title: "About",
+      text:
+        "The Center for Applied Postphenomenology is an independent research center. It studies how technologically mediated life has changed language, perception, society and what it means to be human. It collects first-person accounts of life before and after the screen, builds instruments that let a person test a claim about perception on themselves, and publishes what it finds in full.",
+      link: { title: "Read about the Center", href: "/about" },
     },
-    journal: { label: "From the journal", all: "All entries" },
+    journal: { title: "Journal", all: { title: "All journal entries", href: "/journal" } },
+    research: {
+      title: "Research",
+      lead:
+        "The Center's method is first-person accounts, collected under one protocol so they can be compared and published in full so they can be checked. Its first standing study is Cohort Study, a panel of Gen Z interior life: one row for each lived moment, the same eighteen questions every month, and every row published as it arrives.",
+      card: {
+        title: "Cohort Study",
+        subtitle: "A standing panel of Gen Z interior life",
+        heading: "Opened 30 September 2026",
+        detail: "Two instruments, one index, every row published",
+        link: { title: "See the panel", href: "https://cohortstudy.co" },
+      },
+      image: {
+        src: "/images/cohort-study.jpg",
+        alt: "The Cohort Study home page: Gen Z, measured from the inside.",
+      },
+      after: { title: "Contribute to Cohort Study", href: "https://cohortstudy.co/contribute" },
+    },
+    instruments: {
+      title: "Instruments",
+      lead:
+        "An instrument here makes one claim about perception and lets a person test it on themselves. Each is a single file that opens offline, asks for no account and sends nothing anywhere.",
+      feature: "half-second",
+      all: { title: "All instruments", href: "/instruments" },
+    },
+    record: {
+      title: "The record so far",
+      text: [
+        "Everything the Center publishes comes with what it was built from: the code, the runs and the rows.",
+        "Two of its technical reports audit or retract its own earlier results. That is the standard, not the exception.",
+      ],
+      stats: [
+        { label: "Instruments published", value: "6", unit: "open source", note: "Offline, no account, nothing sent" },
+        { label: "Technical reports", value: "6", unit: "with code", note: "Runs and data included" },
+        { label: "Working papers", value: "4", unit: "in progress", note: "Two in preparation, two in draft" },
+      ],
+      where: {
+        title: "Where the work is published",
+        items: [
+          { title: "postphenom.com", href: "/research", text: "Papers, instruments and the journal" },
+          { title: "cohortstudy.co", href: "https://cohortstudy.co", text: "The panel and every row in it" },
+          { title: "github.com/pvcomms", href: "https://github.com/pvcomms", text: "Source for every instrument and report" },
+        ],
+      },
+    },
     call: {
-      label: "Call for accounts",
-      opening: "Your account is the data.",
-      body:
-        "If you remember life before the screen, or if you don't, we want the account. The first cohort is being assembled now. Write to us and we will send the protocol.",
+      title: "Call for accounts",
+      text:
+        "If you remember life before the screen, or if you don't, the Center wants your account. The first cohort is being assembled now. Write, and the protocol is sent by return.",
       cta: "Send your account",
     },
   },
 
   about: {
     title: "About",
-    lede: "Examining how the algorithm mediates, and exacerbates, the polycrisis.",
-    question: {
-      label: "The question",
-      opening:
-        "Technology no longer sits between us and the world. It is the way the world arrives.",
+    sub: [
+      { title: "Mission", href: "#mission" },
+      { title: "How the Center works", href: "#principles" },
+      { title: "Programme", href: "#programme" },
+      { title: "On the name", href: "#name" },
+    ],
+    mission: {
+      id: "mission",
+      title: "Mission",
+      lead: "Technology no longer sits between us and the world. It is the way the world arrives.",
       body: [
         "Maps turned distance into minutes. Feeds turned attention into currency. Recommendation turned taste into a setting. Each time the means of receiving, making and passing on information changes, the language we use for the world changes with it, then the perception underneath the language, then what we take to be normal, possible and real.",
         "For every generation until this one, the physical world came first. It is where people learned what to want, how to read a room, which signals meant reward and which meant risk. A generation has now grown up the other way round: online first, through a pandemic, inside platforms whose rules were written to maximise engagement and whose incentives reward the most reactive part of us. They learned the norms of that world and carried them back into the physical one.",
@@ -129,29 +132,31 @@ export const site = {
       },
     },
     principles: {
-      label: "How the Center works",
+      id: "principles",
+      title: "How the Center works",
       items: [
         {
-          meta: "Local by default",
+          title: "Local by default",
           text: "Nothing on this site or in any instrument phones home. No analytics, no third-party scripts, no fonts from a CDN. A person's data stays on the machine that made it.",
         },
         {
-          meta: "The tool never decides",
-          text: "Nothing here ranks a person's options, scores them against a norm, or recommends. Instruments surface; people judge.",
+          title: "The tool never decides",
+          text: "Nothing here ranks a person's options, scores them against a norm or recommends. Instruments surface; people judge.",
         },
         {
-          meta: "Published in full",
+          title: "Published in full",
           text: "Accounts, rows and runs are published whole, so that a reader who distrusts the Center can check it.",
         },
         {
-          meta: "Negative results count",
-          text: "A benchmark that failed to separate the models is published because it failed. A figure with no dated run behind it does not go in a paper.",
+          title: "Negative results count",
+          text: "A result that did not hold is published because it did not hold. A figure with no dated run behind it does not go in a paper.",
         },
       ],
     },
     programme: {
-      label: "Programme",
-      opening: "Interventions at three scales, and institutions for the fourth.",
+      id: "programme",
+      title: "Programme",
+      lead: "Interventions at three scales, and institutions for the fourth.",
       levels: [
         {
           name: "Personal",
@@ -171,8 +176,9 @@ export const site = {
         },
       ],
     },
-    aboutName: {
-      label: "On the name",
+    name: {
+      id: "name",
+      title: "On the name",
       text:
         "Postphenomenology is an existing school in philosophy of technology. It studies how technologies shape the relation between people and the world. The applied part is ours: taking that lens out of the seminar and into first-person data, and back out again as interventions.",
     },
@@ -180,10 +186,16 @@ export const site = {
 
   research: {
     title: "Research",
-    lede: "First-person accounts collected as data, a standing panel of one generation, and papers published with the runs behind them.",
+    sub: [
+      { title: "Method", href: "#method" },
+      { title: "Cohort Study", href: "#cohort" },
+      { title: "Working papers", href: "#papers" },
+      { title: "Technical reports", href: "#reports" },
+    ],
     method: {
-      label: "Method",
-      opening: "First-person accounts, collected as data.",
+      id: "method",
+      title: "Method",
+      lead: "First-person accounts, collected as data.",
       body: [
         "The Center collects lived experience from people across generations, countries and screen-times: what life was like before the screen, and what changed. How they move through a room, a city, a relationship, a decision. What they hope for. What they no longer notice.",
         "Accounts are gathered under a fixed protocol so they can be compared, and published in full so they can be checked. Anecdote becomes evidence when it is collected the same way every time and kept where anyone can read it.",
@@ -196,66 +208,62 @@ export const site = {
       ],
     },
     cohort: {
-      label: "Cohort Study",
-      title: "A standing panel of Gen Z interior life",
-      href: "https://cohortstudy.co",
-      link: "Open Cohort Study",
+      id: "cohort",
+      title: "Cohort Study",
       body: [
-        "Cohort Study opened on 30 September 2026 at cohortstudy.co. It is a panel, not a survey: the same people, the same questions, and every row published as it arrives.",
-        "CS-001, Moments, takes one row per lived moment: what took attention or asked for a decision, what was felt first, what the body did, how fast it went, how long it held, what decided it, and the verdict afterwards. CS-002, the Barometer, asks eighteen items every month across activation, capture, mediation, norms drift and atomisation, and builds a five-score index per wave. Finding 00 pre-registers every test and scores it live on the contributed rows.",
+        "Cohort Study opened on 30 September 2026. It is a panel, not a survey: the same people, the same questions, and every row published as it arrives.",
+        "CS-001, Moments, takes one row per lived moment: what took attention or asked for a decision, what was felt first, what the body did, how fast it went, how long it held, what decided it, and the verdict afterwards. CS-002, the Barometer, asks eighteen items every month across activation, capture, mediation, norms drift and atomisation, and builds a five-score index for each wave. Finding 00 pre-registers every test and scores it live on the contributed rows.",
       ],
+      link: { title: "Open Cohort Study", href: "https://cohortstudy.co" },
+      image: { src: "/images/cohort-study.jpg", alt: "The Cohort Study home page: Gen Z, measured from the inside." },
     },
     papers: {
       id: "papers",
-      label: "Working papers",
+      title: "Working papers",
       columns: ["No.", "Title", "Status"],
       items: [
-        { n: "01", title: "On the vocabulary of mediated distance", status: "in preparation" },
-        { n: "02", title: "Digital-first: norms learned online, applied offline", status: "forthcoming" },
-        { n: "03", title: "The canyon method", status: "draft, design only" },
-        { n: "04", title: "Thinking cap, no zap", status: "draft, literature study" },
+        { n: "01", title: "On the vocabulary of mediated distance", status: "In preparation" },
+        { n: "02", title: "Digital-first: norms learned online, applied offline", status: "Forthcoming" },
+        { n: "03", title: "The canyon method", status: "Draft, design only" },
+        { n: "04", title: "Thinking cap, no zap", status: "Draft, literature study" },
       ],
     },
     reports: {
-      label: "Technical reports",
+      id: "reports",
+      title: "Technical reports",
       intro:
-        "Published in full on GitHub, with code and runs. Two of them audit or retract the Center's own earlier results. That is the standard here.",
+        "Published in full on GitHub, with code and runs. Two of them audit or retract the Center's own earlier results.",
+      link: "Read on GitHub",
       items: [
         {
           title: "Auditing my own evals",
-          href: "https://github.com/pvcomms/auditing-my-own-evals",
+          repo: "pvcomms/auditing-my-own-evals",
           text: "Fourteen lessons on eval statistics, pointed at the author's own published benchmarks. Most claims did not survive.",
-          link: "Source",
         },
         {
           title: "CMCHP",
-          href: "https://github.com/pvcomms/cmchp",
+          repo: "pvcomms/cmchp",
           text: "A wire format for handing agent state between models, and the retraction of its original benchmark, which scored 100% by construction.",
-          link: "Source",
         },
         {
           title: "Tool selection under load",
-          href: "https://github.com/pvcomms/tool-selection-under-load",
+          repo: "pvcomms/tool-selection-under-load",
           text: "How tool-selection accuracy degrades as the menu grows. Seven models, 665 trials, 34 tools, and the audit showing most of the leaderboard is noise.",
-          link: "Source",
         },
         {
           title: "Error bars",
-          href: "https://github.com/pvcomms/error-bars",
+          repo: "pvcomms/error-bars",
           text: "A statistical audit for small-n LLM benchmarks: Wilson intervals, exact McNemar, rank-stability bootstrap. No dependencies.",
-          link: "Source",
         },
         {
           title: "BONP",
-          href: "https://github.com/pvcomms/bonp",
+          repo: "pvcomms/bonp",
           text: "A signed-envelope protocol for biometric claims. Version 1.1 fixes a canonicalisation defect that made every 1.0 signature forgeable.",
-          link: "Source",
         },
         {
           title: "MCP fleet",
-          href: "https://github.com/pvcomms/mcp-fleet",
+          repo: "pvcomms/mcp-fleet",
           text: "Four servers that independently converged on three patterns: single-flight credential refresh, dry-run by default, and audit tools that return ranked next actions.",
-          link: "Source",
         },
       ],
     },
@@ -263,99 +271,133 @@ export const site = {
 
   instruments: {
     title: "Instruments",
-    lede: "The instruments are the argument. Each one makes a claim about perception and lets the reader test it on themselves.",
-    rules: {
-      label: "House rules",
+    sub: [
+      { title: "Built", href: "#built" },
+      { title: "The figures", href: "#figures" },
+      { title: "Named, not yet built", href: "#named" },
+      { title: "House rules", href: "#rules" },
+    ],
+    built: {
+      id: "built",
+      title: "Built",
+      lead:
+        "Each instrument makes one claim about perception and lets a person test it on themselves. Every one ships with a synthetic specimen, so a stranger can understand it before supplying their own life.",
       items: [
-        "A single HTML file where it can be. No build step, no server, no account.",
-        "It opens offline, and it will still open in ten years.",
-        "Data stays on the reader's disk. An instrument that reads a life never sends it anywhere.",
-        "It ships with synthetic specimen data, so a stranger can open it and understand it before supplying their own life.",
+        {
+          slug: "half-second",
+          title: "The Half-Second",
+          kind: "Affect and the feed",
+          claim: "The screen does not persuade you. It moves you, and you write the story afterwards.",
+          href: "https://github.com/pvcomms/half-second",
+          link: "Source",
+          image: "/images/half-second.jpg",
+          alt: "The Half-Second: a synthetic feed beside a synthetic body and its readings.",
+        },
+        {
+          slug: "familiar-voice",
+          title: "The Familiar Voice",
+          kind: "Repetition and warmth",
+          claim: "Truth and being understood are both felt as ease. A machine can supply the ease without the truth or the care.",
+          href: "https://github.com/pvcomms/familiar-voice",
+          link: "Source",
+          image: "/images/familiar-voice.jpg",
+          alt: "The Familiar Voice: a chart of how true statements felt, seen before against new.",
+        },
+        {
+          slug: "stop-flowing",
+          title: "Stop Flowing",
+          kind: "Positions and the crowd",
+          claim: "A position you drifted into feels like one you hold. Only moving the crowd tells them apart.",
+          href: "https://github.com/pvcomms/stop-flowing",
+          link: "Source",
+          image: "/images/stop-flowing.jpg",
+          alt: "Stop Flowing: a specimen run marking which positions held, carried or wobbled.",
+        },
+        {
+          slug: "terra-cognita",
+          title: "Terra Cognita",
+          kind: "Inner-life cartography",
+          claim: "Interiority is cartographable, and drawing the map changes the territory.",
+          href: "https://terra-cognita.vercel.app",
+          link: "Open",
+          image: "/images/terra-cognita.jpg",
+          alt: "Terra Cognita: a synthetic life drawn as a contoured landmass.",
+        },
+        {
+          slug: "chronology",
+          title: "Chronology",
+          kind: "A number line of a life",
+          claim: "A life has structure, conjuncture and event layers, and ordinary self-narration collapses them into one.",
+          href: "https://github.com/pvcomms/chronology",
+          link: "Source",
+          image: "/images/chronology.jpg",
+          alt: "Chronology: a synthetic life on one age axis, with its conditions drawn above.",
+        },
+        {
+          slug: "venn",
+          title: "Venn",
+          kind: "Identity as intersection",
+          claim: "Identity claims are intersections, not points.",
+          href: "https://interactive-venn-template.vercel.app",
+          link: "Open",
+          image: "/images/venn.jpg",
+          alt: "Venn: five overlapping domains with one highlighted.",
+        },
       ],
+      note: "Some instruments read a person's own record and are never distributed. They are not listed.",
     },
     figures: {
-      label: "The figures",
+      id: "figures",
+      title: "The figures",
       items: [
         {
           title: "Figures",
           href: "/figures",
           text: "Six interactive figures: what coexists, the distribution of taste, the influence graph, precedence, directionally correct, and the arbitration.",
-          link: "Open",
         },
         {
           title: "Reading the Figures",
           href: "/figures/legend",
           text: "What each figure claims, what every animation means, and an audit of which claims are grounded.",
-          link: "Open",
         },
         {
           title: "What You Study",
           href: "/position",
           text: "The thesis, the fields it maps to in words other people already use, and a manifesto.",
-          link: "Open",
         },
       ],
-    },
-    built: {
-      label: "Built",
-      items: [
-        {
-          meta: "Chronology",
-          text: "A life has structure, conjuncture and event layers, and ordinary self-narration collapses them into one.",
-          href: "https://github.com/pvcomms/chronology",
-          link: "Source",
-        },
-        {
-          meta: "Terra Cognita",
-          text: "Interiority is cartographable, and drawing the map changes the territory.",
-          href: "https://terra-cognita.vercel.app",
-          link: "Open",
-        },
-        {
-          meta: "The Half-Second",
-          text: "The screen does not persuade you. It moves you, and you write the story afterwards.",
-          href: "https://github.com/pvcomms/half-second",
-          link: "Source",
-        },
-        {
-          meta: "The Familiar Voice",
-          text: "Truth and being understood are both felt as ease. A machine can supply the ease without the truth or the care.",
-          href: "https://github.com/pvcomms/familiar-voice",
-          link: "Source",
-        },
-        {
-          meta: "Stop Flowing",
-          text: "A position you drifted into feels like one you hold. Only moving the crowd tells them apart, and a held belief is one you would say in every room.",
-          href: "https://github.com/pvcomms/stop-flowing",
-          link: "Source",
-        },
-        {
-          meta: "Venn",
-          text: "Identity claims are intersections, not points.",
-          href: "https://interactive-venn-template.vercel.app",
-          link: "Open",
-        },
-      ],
-      note: "Some instruments read a person's own record and are never distributed. They are not listed.",
     },
     named: {
-      label: "Named, not yet built",
+      id: "named",
+      title: "Named, not yet built",
       items: [
-        { meta: "Real self, ideal self", text: "The gap as a navigable surface rather than a deficit to close." },
-        { meta: "Attention curation", text: "Attention as something you compose, not something that is captured from you." },
-        { meta: "Life is normal", text: "The normal distribution as a model of a life. Most of it is the middle, and the middle is not failure." },
+        { title: "Real self, ideal self", text: "The gap as a navigable surface rather than a deficit to close." },
+        { title: "Attention curation", text: "Attention as something you compose, not something that is captured from you." },
+        { title: "Life is normal", text: "The normal distribution as a model of a life. Most of it is the middle, and the middle is not failure." },
+      ],
+    },
+    rules: {
+      id: "rules",
+      title: "House rules",
+      items: [
+        { name: "One file", text: "A single HTML file where it can be. No build step, no server, no account." },
+        { name: "Offline", text: "It opens offline, and it will still open in ten years." },
+        { name: "Local", text: "Data stays on the reader's disk. An instrument that reads a life never sends it anywhere." },
+        { name: "Specimen", text: "It ships with synthetic data, so a stranger can understand it before supplying their own life." },
       ],
     },
   },
 
   journal: {
     title: "Journal",
-    lede: "Dated notes from the Center: what was built, what changed, and why.",
-    back: "All entries",
+    recent: "Recent",
+    archive: "Archive",
+    more: "Read more",
+    back: "Journal",
     entries: [
       {
         slug: "the-figures-move-to-the-center",
-        date: "30 Sep 2026",
+        date: "30 September 2026",
         iso: "2026-09-30",
         title: "The figures move to the Center",
         dek: "Six figures, their legend and a position paper, now at postphenom.com.",
@@ -366,7 +408,7 @@ export const site = {
       },
       {
         slug: "cohort-study-opens",
-        date: "30 Sep 2026",
+        date: "30 September 2026",
         iso: "2026-09-30",
         title: "Cohort Study opens",
         dek: "A standing panel of Gen Z interior life, every row published.",
@@ -378,7 +420,7 @@ export const site = {
       },
       {
         slug: "a-proof-of-work-at-the-door",
-        date: "29 Sep 2026",
+        date: "29 September 2026",
         iso: "2026-09-29",
         title: "A proof of work at the door",
         dek: "Why the page opens with a small computation, and where the address went.",
@@ -390,18 +432,18 @@ export const site = {
       },
       {
         slug: "the-unit",
-        date: "24 Sep 2026",
+        date: "24 September 2026",
         iso: "2026-09-24",
         title: "The unit",
         dek: "On the mark.",
         body: [
           "The mark is two rings drawn by hand round one vermillion point. The outer ring is the horizon a platform draws: the edge of what can be seen from inside it. The inner ring, off-centre on purpose, is the self shaped inside that horizon. The point is the unit of attention, which is the thing being sold.",
-          "It is drawn, not computed. Three earlier rounds of geometric marks were rejected for a reason that is also the Center's: a computed line under the words drawn, not computed would have been the argument failing in its own letterhead. Vermillion is the identity's only accent, and only the point carries it.",
+          "It is drawn, not computed. Three earlier rounds of geometric marks were rejected because a computed line under the words drawn, not computed would have been the argument failing in its own letterhead. Vermillion is the identity's only accent, and only the point carries it.",
         ],
       },
       {
         slug: "the-center-is-founded",
-        date: "5 Sep 2026",
+        date: "5 September 2026",
         iso: "2026-09-05",
         title: "The Center is founded",
         dek: "An independent research center for the mediated life.",
@@ -415,58 +457,63 @@ export const site = {
 
   contributors: {
     title: "Contributors",
-    lede: "The Center is small: one founder, the people who contribute accounts and rows, and anyone who builds an instrument under the house rules.",
+    sub: [
+      { title: "People", href: "#people" },
+      { title: "The cohort", href: "#cohort" },
+      { title: "How to contribute", href: "#contribute" },
+    ],
     people: {
-      label: "People",
+      id: "people",
+      title: "People",
       items: [
         {
-          meta: "Founder",
-          title: "Param Vaswani",
-          href: "https://paramv.com",
-          text: "Builds the instruments, keeps the record they are built from, and writes the papers.",
-          link: "paramv.com",
+          name: "Param Vaswani",
+          role: "Founder",
+          text: "Param Vaswani founded the Center in September 2026. He builds its instruments, keeps the record they are built from, and writes its papers.",
+          link: { title: "paramv.com", href: "https://paramv.com" },
         },
       ],
     },
     cohort: {
-      label: "The cohort",
-      body: [
+      id: "cohort",
+      title: "The cohort",
+      text:
         "Most of the Center's contributors send an account or a row, and they are not named here. A Cohort Study row carries no name. It is linked to a contributor's other rows by a random panel id that lives in their own browser and nowhere else.",
-      ],
     },
     ways: {
-      label: "How to contribute",
+      id: "contribute",
+      title: "How to contribute",
       items: [
         {
-          meta: "An account",
+          title: "An account",
           text: "If you remember life before the screen, or if you don't, the Center wants the account. Write, and the protocol is sent by return.",
         },
         {
-          meta: "A row",
+          title: "A row",
           text: "Cohort Study takes contributions directly: a moment, or a month's Barometer.",
-          href: "https://cohortstudy.co/contribute",
-          link: "Contribute",
+          link: { title: "Contribute to Cohort Study", href: "https://cohortstudy.co/contribute" },
         },
         {
-          meta: "An instrument",
+          title: "An instrument",
           text: "An instrument earns its place by making a claim about perception. Single file, opens offline, data stays on the reader's disk, ships with specimen data. Send the claim first.",
         },
         {
-          meta: "A correction",
+          title: "A correction",
           text: "Every claim on this site and in every paper is meant to be checkable. If one is wrong, say so. It will be fixed, and the correction dated.",
         },
       ],
+      cta: "Write to the Center",
     },
-    cta: "Write to the Center",
   },
 
   footer: {
-    center: "The Center",
-    pages: "Pages",
-    elsewhere: "Elsewhere",
+    statement: "The Center for Applied Postphenomenology is an independent research center, founded in 2026.",
+    rights: "All rights reserved.",
+    write: "Write to the Center",
     links: [
-      { title: "Figures", href: "/figures" },
+      { title: "Send an account", href: "/contributors#contribute" },
       { title: "Cohort Study", href: "https://cohortstudy.co" },
+      { title: "The figures", href: "/figures" },
       { title: "Source on GitHub", href: "https://github.com/pvcomms" },
     ],
   },
@@ -484,11 +531,3 @@ export const site = {
     hint: "Reveal the address",
   },
 } as const;
-
-export type Row = {
-  meta?: string;
-  title?: string;
-  text?: string;
-  href?: string;
-  link?: string;
-};

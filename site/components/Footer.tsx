@@ -1,41 +1,23 @@
-import Link from "next/link";
 import { site } from "@/content/site";
-import { Mark } from "./Mark";
+import { A } from "./A";
 
 export function Footer() {
+  const f = site.footer;
   return (
-    <footer className="colophon">
-      <div className="wrap">
-        <div className="colophon-grid">
-          <div>
-            <span className="caps colophon-name">{site.name}</span>
-            <p>{site.masthead.imprint}</p>
-            <p>{site.domain} · {site.contact}</p>
-          </div>
-          <div>
-            <span className="caps">{site.footer.pages}</span>
-            <ul>
-              {site.nav.map((n) => (
-                <li key={n.href}><Link href={n.href}>{n.title}</Link></li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <span className="caps">{site.footer.elsewhere}</span>
-            <ul>
-              {site.footer.links.map((l) => (
-                <li key={l.href}>
-                  {l.href.startsWith("http") ? <a href={l.href}>{l.title}</a> : <Link href={l.href}>{l.title}</Link>}
-                </li>
-              ))}
-            </ul>
-          </div>
+    <footer className="site-footer">
+      <div className="container footer-grid">
+        <div>
+          <p>{f.statement}</p>
+          <p className="footer-rights">© {site.founded} {site.name}. {f.rights}</p>
         </div>
-        <div className="colophon-foot">
-          <Mark kind="glyph" className="colophon-mark" />
-          <span className="caps">© {site.founded}</span>
-          <span>{site.proof.credit} <a href={site.proof.url}>{site.proof.name}</a></span>
+        <div>
+          <p className="footer-label">{f.write}</p>
+          <p>{site.contact}</p>
+          <p className="footer-credit">{site.proof.credit} <a href={site.proof.url}>{site.proof.name}</a></p>
         </div>
+        <ul className="footer-links">
+          {f.links.map((l) => <li key={l.href}><A href={l.href}>{l.title}</A></li>)}
+        </ul>
       </div>
     </footer>
   );
