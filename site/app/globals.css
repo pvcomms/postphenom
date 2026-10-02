@@ -9,6 +9,7 @@
   --rule: #E2E3DF;
   --accent: #B23A22;
   --accent-deep: #8C2D1A;
+  --vermillion: var(--accent);
   --shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent), 0 2px 10px color-mix(in srgb, var(--ink) 6%, transparent);
   --shadow-up: 0 2px 4px color-mix(in srgb, var(--ink) 12%, transparent), 0 10px 28px color-mix(in srgb, var(--ink) 11%, transparent);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);

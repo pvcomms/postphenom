@@ -49,6 +49,7 @@ the institutions this site is modelled on. The CAPP mirror is updated alongside 
 | `--rule`        | `#E2E3DF` | hairlines inside cards and lists                       |
 | `--accent`      | `#B23A22` | links, the open tab, buttons. The vermillion of the mark's point |
 | `--accent-deep` | `#8C2D1A` | hover on links and buttons                             |
+| `--vermillion`  | `--accent` | the point of the inline marks; they read it by this name, so it must stay defined |
 
 Shadows are `--shadow` and `--shadow-up`, mixed from `--ink`.
 
