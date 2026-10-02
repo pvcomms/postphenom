@@ -23,6 +23,8 @@ do, and what can be made to it.
 - Before: CORS `*`. After: pinned to `https://postphenom.com`.
 - Before: Next 16.3.4. After: 16.3.8, `pnpm audit` clean.
 - Before: the framework's 404. After: one in the site's own chrome.
+- New: Vercel's Bot Protection challenges non-browser clients (browsers pass unseen); a first-in-line
+  rule exempts `robots.txt`, `sitemap.xml`, `llms.txt` and `security.txt`.
 - Before: no firewall. After: probes for paths this site lacks get 403; one IP is limited to
   300 requests a minute (the rule is active; it has not been seen to fire, see Notes).
 - New: `/.well-known/security.txt`.
@@ -76,6 +78,11 @@ Run on production on 2 Oct 2026, after the deploy and `vercel firewall publish`:
 - `vercel firewall overview`: 2 active rules, no pending draft.
 - In a real browser, `/`, `/contributors`, `/figures`, `/figures/legend`, `/position` and a journal
   entry showed no console errors; the gate cleared and the address revealed with no CSP violation.
+
+**Bot Protection, added later the same day.** Real browser: pages load with no checkpoint. Plain
+`curl`, `curl` with a browser User-Agent and a spoofed Googlebot header: 429, `x-vercel-mitigated:
+challenge`. The four exempt files return 200 to plain `curl`. A real Googlebot and the AI crawlers
+were not tested; see DECISIONS.
 
 **Not observed: the 429.** Two bursts of 340 requests from one IP were met by Vercel's automatic
 mitigation (`x-vercel-mitigated: challenge`, a `system-action` with no rule id) before the 300-a-minute

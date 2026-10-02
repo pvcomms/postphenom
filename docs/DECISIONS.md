@@ -167,3 +167,20 @@ to it bounced. The encrypted payload, the anti-harvest text form in `content/sit
 repo, which is public: the whole point of the payload is that it appears nowhere as text. When
 the address changes again, regenerate the payload as `content/site.ts` says and check it with
 `npx altcha-lib deobfuscate`.
+
+---
+
+**2026-10-02 — Bot Protection is on, in challenge mode, with four files exempt.**
+Param asked for it. Vercel's Bot Protection managed ruleset challenges clients that are not
+browsers. Checked on production: a fresh real browser loads pages directly, with no checkpoint;
+plain `curl`, `curl` with a browser User-Agent and a spoofed Googlebot header all get 429 with
+`x-vercel-mitigated: challenge`. A real Googlebot could not be tested; Vercel recognises verified
+crawlers itself.
+
+A bypass rule, first in line, exempts `/robots.txt`, `/sitemap.xml`, `/llms.txt` and
+`/.well-known/security.txt`: they exist for programs to fetch, and Google reads a 429 on
+`robots.txt` as a server error and can stop crawling. The site still welcomes the AI crawlers by
+name, and whether Vercel's verified list covers each of them was not checked, so one of them being
+challenged is the thing to look for if the crawlers' visits stop. To soften it to log-only, send
+`{"action":"managedRules.update","id":"bot_protection","value":{"active":true,"action":"log"}}` to
+`PATCH /v1/security/firewall/config`, or use the dashboard under Firewall → Bot Management.
