@@ -157,3 +157,13 @@ state to rate-limit in code; "flat files are the database" rules out a hosted co
 third-party CAPTCHA, by the standing rule. `robots.txt` still welcomes the AI crawlers by name;
 that is a policy about reading, not about security, and was left as it was.
 
+
+---
+
+**2026-10-02 — The contact address is the Proton one.**
+The address the site revealed sat on `postphenom.com`, which has no MX record, so anything sent
+to it bounced. The encrypted payload, the anti-harvest text form in `content/site.ts` and
+`llms.txt` now carry the Proton address Param reads. It is deliberately not written out in this
+repo, which is public: the whole point of the payload is that it appears nowhere as text. When
+the address changes again, regenerate the payload as `content/site.ts` says and check it with
+`npx altcha-lib deobfuscate`.

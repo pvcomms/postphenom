@@ -10,9 +10,9 @@ export const site = {
   // The address is never written into the page. `contact` is the anti-harvest form shown as text;
   // `contactPayload` is the mailto AES-encrypted by altcha, opened by a proof-of-work in the reader's
   // browser. Regenerate with: npx altcha-lib obfuscate "mailto:<address>?subject=<subject>"
-  contact: "hello (at) postphenom dot com",
+  contact: "postphenom (at) proton dot me",
   contactPayload:
-    "eyJwYXJhbWV0ZXJzIjp7ImFsZ29yaXRobSI6IlBCS0RGMi9TSEEtMjU2IiwiY29zdCI6NTAwMCwia2V5TGVuZ3RoIjozMiwia2V5UHJlZml4IjoiM2UxODQ2ZDQyM2JlZjdiNzUzNTJlYTQ2ZmNhNmFlZTUiLCJub25jZSI6ImUzZjRlZjc5OTI0MWQxOTU0OGNhMzM3MjZhZTBhMDAyIiwic2FsdCI6ImQ1MmRkMzJiMzdhOGU1MzcyYjVlNmM2NzYzZTA0NGVjIn0sImNpcGhlciI6eyJpdiI6IjUxYTMyZWRhNTAwYzljMTU5YzU4YzY3YSIsImRhdGEiOiI5ODFlZmUwYjFiMzg5MDU3M2FhMTU2MDBhYTk3NDhlODVmNTMxMjVkMGUyMjJjZjFjYzAxZGMwNjRiN2UyYTIyMGZiOTFjNTI0NWQzMzk0ZDI3OTI2NmRjMTdjYTM1ZWVmZmJkMTVhYmRhMzhmZThiZTM4M2Y0MTBkY2I2OTk1MSJ9fQ==",
+    "eyJwYXJhbWV0ZXJzIjp7ImFsZ29yaXRobSI6IlBCS0RGMi9TSEEtMjU2IiwiY29zdCI6NTAwMCwia2V5TGVuZ3RoIjozMiwia2V5UHJlZml4IjoiOGM1MDYzNDQ5N2YwNWEzNzFlZGNhMzU5MTI2NDFmNjciLCJub25jZSI6IjRiNTZhY2FjZGU5Mzc2NWNiMzNjYWRiZmE1Y2FlZDVkIiwic2FsdCI6IjVmMjY0OWRkMTA1YmRkNjllOGQyYmE3YjBlODlmMGFjIn0sImNpcGhlciI6eyJpdiI6ImQ5ZWY0NWNhMjJhNGI4NmE0ZWYwMTUzNCIsImRhdGEiOiJkMGM1MThlNGZlNmE1NzA3MDQ0YmRiZWM4MGQ0YmYwZTA0YmI1OTdiNWQ4N2ZhNmE2MTEzZmZmZTg1YzNmYTBmYTIzOGZhODk0MGI1NWZmM2I4OWM1MmYzMzA5MDEwZGU2MjRkMzFjNjgyZDhhNDQ2YTQzYmIyODJlYzIxMmEwOCJ9fQ==",
   founded: "2026",
   tagline: "Examining how the algorithm mediates, and exacerbates, the polycrisis.",
   description:
