@@ -12,7 +12,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const e = find((await params).slug);
-  return e ? { title: e.title, description: e.dek } : {};
+  return e ? { title: e.title } : {};
 }
 
 export default async function Entry({ params }: Params) {
@@ -23,11 +23,6 @@ export default async function Entry({ params }: Params) {
       <article className="container article">
         <p className="crumb"><Link href="/journal">{site.journal.back}</Link></p>
         <h1 className="page-title">{e.title}</h1>
-        <p className="article-meta"><time dateTime={e.iso}>{e.date}</time></p>
-        <p className="lead">{e.dek}</p>
-        <div className="article-body">
-          {e.body.map((p, i) => <p key={i}>{p}</p>)}
-        </div>
       </article>
     </section>
   );

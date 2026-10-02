@@ -37,7 +37,6 @@ export function Gate() {
             challenge={site.proof.challenge}
             configuration='{"hideLogo":true,"hideFooter":true,"minDuration":700}'
           />
-          <p className="gate-note">{site.proof.note}</p>
         </div>
       </div>
       <Script src="/vendor/altcha/altcha-obfuscation.min.js" strategy="afterInteractive" />

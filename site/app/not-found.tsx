@@ -11,7 +11,6 @@ export default function NotFound() {
       <div className="container">
         <div className="column">
           <h1 className="display">{n.title}</h1>
-          <p>{n.text}</p>
           <p><A href={n.link.href} className="button">{n.link.title}</A></p>
         </div>
       </div>

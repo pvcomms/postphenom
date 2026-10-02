@@ -184,3 +184,29 @@ name, and whether Vercel's verified list covers each of them was not checked, so
 challenged is the thing to look for if the crawlers' visits stop. To soften it to log-only, send
 `{"action":"managedRules.update","id":"bot_protection","value":{"active":true,"action":"log"}}` to
 `PATCH /v1/security/firewall/config`, or use the dashboard under Firewall → Bot Management.
+
+---
+
+**2026-10-02 — The Contributors page no longer names a person.**
+Param asked for the founder card to come off. It was the only entry in the People section, so
+the section went with it, along with its anchor in the sub-navigation; the cohort section now
+opens the page. This supersedes the line above that Contributors names the founder. The
+journal's remark that the figures were built on "the founder's personal site" does not name him
+and was left.
+
+---
+
+**2026-10-02 — The site is headings, links and buttons.**
+Param asked for all body text to come off, headings kept, and then for the footer links to go as
+well. Every paragraph, lead, caption, date, stat and card image is gone from the six pages, the 404
+and the proof-of-work curtain. What stays: the lockup and tabs; page, section and card headings;
+buttons and links; the address line and the altcha credit. Journal entries remain as pages with a
+title and nothing under it. The About headings "Programme" and "On the name" are now "Applied
+Interventions" and "What is Applied Post Phenomenology", as Param wrote them.
+
+Not touched, and still carrying full prose: the three standalone documents (`/figures`,
+`/figures/legend`, `/position`), whose captions are part of how the figures work; `llms.txt`; and
+the `description` and JSON-LD in `content/site.ts`, which only appear in search results and link
+previews. The copyright line and the footer statement were removed with the rest. Dead CSS for the
+removed blocks (hero, stats, record, definition lists) is still in `globals.css`. The previous prose
+is in git, in the commit before this one.
