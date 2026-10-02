@@ -1,6 +1,6 @@
 ---
 title: Security headers, a CSP and a firewall
-status: building
+status: shipped
 created: 2026-10-02
 ---
 
@@ -23,8 +23,8 @@ do, and what can be made to it.
 - Before: CORS `*`. After: pinned to `https://postphenom.com`.
 - Before: Next 16.3.4. After: 16.3.8, `pnpm audit` clean.
 - Before: the framework's 404. After: one in the site's own chrome.
-- Before: no firewall. After: probes for paths this site lacks get 403; one IP gets 429 above
-  300 requests a minute.
+- Before: no firewall. After: probes for paths this site lacks get 403; one IP is limited to
+  300 requests a minute (the rule is active; it has not been seen to fire, see Notes).
 - New: `/.well-known/security.txt`.
 
 ## Where
@@ -59,13 +59,27 @@ curl -s -o /dev/null -w "%{http_code}\n" https://postphenom.com/.well-known/secu
 vercel firewall overview                                      # two rules, no pending draft
 ```
 
-- [ ] A fresh browser tab on `/`, `/contributors`, `/figures`, `/figures/legend`, `/position` and
+- [x] A fresh browser tab on `/`, `/contributors`, `/figures`, `/figures/legend`, `/position` and
       a 404 shows no `Content Security Policy` error in the console
-- [ ] On `/contributors`, `document.querySelector('altcha-widget[data-obfuscated]').verify()`
+- [x] On `/contributors`, `document.querySelector('altcha-widget[data-obfuscated]').verify()`
       reaches `verified` and the `mailto:` link appears
 
 ## Notes
 
-Checked locally with `next start` and on two private preview deployments; not yet on production.
-The browser checks above passed on the local build. Stays `building` until the production deploy,
-the firewall publish and the curl checks have run.
+Run on production on 2 Oct 2026, after the deploy and `vercel firewall publish`:
+
+- `pnpm audit`: No known vulnerabilities found. `pnpm build`: compiles, 15 static pages.
+- Live headers on `/`, `/figures`, `/about` and a 404: one CSP, CORS pinned to
+  `https://postphenom.com`, `X-Frame-Options: DENY`, HSTS, `nosniff`, `same-origin` referrers.
+- `/wp-login.php`, `/.env`, `/.git/config`, `/xmlrpc.php`, `/index.php`: 403.
+  `/.well-known/security.txt` and `/vendor/altcha/altcha.min.js`: 200.
+- `vercel firewall overview`: 2 active rules, no pending draft.
+- In a real browser, `/`, `/contributors`, `/figures`, `/figures/legend`, `/position` and a journal
+  entry showed no console errors; the gate cleared and the address revealed with no CSP violation.
+
+**Not observed: the 429.** Two bursts of 340 requests from one IP were met by Vercel's automatic
+mitigation (`x-vercel-mitigated: challenge`, a `system-action` with no rule id) before the 300-a-minute
+rule could count to 300, and the challenge then held that IP for about ten minutes. So the rule
+is configured and enabled (`vercel firewall rules inspect "Rate limit per IP"`) but its 429 has not
+been seen. Vercel's own mitigation sits in front of it for fast floods; the rule is for slower,
+sustained scraping. Do not repeat the burst test from a machine you need to browse from.
