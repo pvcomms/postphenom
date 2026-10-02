@@ -530,4 +530,12 @@ export const site = {
       '{"parameters":{"algorithm":"PBKDF2/SHA-256","cost":5000,"keyLength":32,"keyPrefix":"00","nonce":"b0ffc7ad3d19b929cd3821b7b2c19d90","salt":"e8e8a9f3c09c8741b7f3c72834a678d2"}}',
     hint: "Reveal the address",
   },
+
+  // Shown for any address that is not a page. Written here, not left to the framework default,
+  // because the Content-Security-Policy blocks the inline styles that default page depends on.
+  notFound: {
+    title: "No such page",
+    text: "That address is not one of this site's pages. It may have been renamed, or it may never have existed.",
+    link: { title: "Return to the front page", href: "/" },
+  },
 } as const;

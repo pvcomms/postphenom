@@ -122,3 +122,38 @@ point is now the site's accent. Dark mode is dropped: the institutions this is m
 are light, and a theme that flips makes the site read as an app. Spectral, Spectral SC and
 Homemade Apple are no longer loaded. The correction wordmark is retired from the site; the
 mark stays, in the lockup. All copy still lives in `content/site.ts`.
+
+---
+
+**2026-10-02 — Security headers, a Content-Security-Policy, and a firewall.**
+Param asked for the full site security and bot and spam prevention. The audit found: HSTS and
+nothing else; no CSP, `X-Frame-Options`, `nosniff`, Referrer-Policy or Permissions-Policy;
+`access-control-allow-origin: *` on every response; a critical advisory against Next 16.3.4
+(`next/og`, GHSA-vcvr-r3jv-pc5j — unreachable, nothing here imports it, but patched to 16.3.8);
+no firewall rules; and at the registrar no CAA, SPF or DMARC record.
+
+All headers are set in `site/next.config.ts`, the one place. The policy names no origin but its
+own. Three loosenings, each tested: `script-src` keeps `'unsafe-inline'`, because Next prerenders
+inline flight-data scripts that differ per page. A strict `'self'` with Next's experimental SRI
+was tried and failed to hydrate (React error #412). A nonce needs a proxy, and a proxy makes every
+page dynamic, which trades the static site for per-request rendering and widens the surface a
+flood can reach; with no form, query handling or API on the site, nothing exists for an injected
+script to arrive by. `style-src` allows exactly one inline sheet, altcha's, by hash computed from
+the vendored file at config load, so updating altcha cannot leave the policy behind; the three
+standalone figures pages need `'unsafe-inline'` for their own styles. `worker-src` allows `blob:`
+for altcha's proof-of-work worker. No `report-uri`: a violation report is telemetry.
+
+`Referrer-Policy: same-origin`, so an outbound link tells the other site nothing. CORS is pinned
+to `https://postphenom.com` rather than `*`. HSTS carries `includeSubDomains; preload`; the site
+has not been submitted to the browser preload list, because that is hard to undo and is Param's call.
+`app/not-found.tsx` replaces the framework's 404, whose styling is inline and so blocked by the
+policy. `/.well-known/security.txt` points at the Contributors page, not an address, because the
+address is deliberately not in the source; it expires 2027-10-02 and needs renewing.
+
+Bot and spam prevention is the existing altcha gate plus two Vercel firewall rules: a 403 for
+paths this site does not have (WordPress, PHP, dotfiles) and a 429 above 300 requests a minute
+from one IP. There is no form, API or database here, so there is no submission to protect and no
+state to rate-limit in code; "flat files are the database" rules out a hosted counter. No
+third-party CAPTCHA, by the standing rule. `robots.txt` still welcomes the AI crawlers by name;
+that is a policy about reading, not about security, and was left as it was.
+

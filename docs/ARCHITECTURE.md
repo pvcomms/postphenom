@@ -18,6 +18,7 @@ postphenom/
     app/
       layout.tsx           fonts via next/font, metadata, Gate + Header + Footer round every page
       page.tsx             home: the title page, then work · now · journal · call
+      not-found.tsx        the 404, in the site's own chrome (the default's inline styles are blocked by the CSP)
       about/ research/ instruments/ contributors/   one page.tsx each
       journal/page.tsx     the index; journal/[slug]/page.tsx renders one entry, statically
       globals.css          all styling. plain CSS custom properties, no Tailwind
@@ -33,13 +34,13 @@ postphenom/
       Mark.tsx, marks.ts   the hand-drawn marks. MARK + GLYPH generated, the rest frozen
     content/
       site.ts              ALL COPY. the content layer
-    public/                llms.txt, robots.txt
+    public/                llms.txt, robots.txt, .well-known/security.txt
       images/              screenshots of the instruments and Cohort Study, cropped, JPEG
       figures.html         the six figures — standalone HTML, moved from paramv.com as-is
       figures/legend.html  Reading the Figures
       position.html        What You Study
       fonts/               Newsreader + Plex Mono .woff2 for those three pages only
-  next.config.ts           rewrites /figures, /figures/legend, /position to those files
+  next.config.ts           security headers + CSP; rewrites /figures, /figures/legend, /position to those files
   brand/                   identity exploration. static HTML + SVG
     generate-marks.py      draws the unit into site/ — seeded, reproducible
     identity-round-{1..4}.html
@@ -71,6 +72,10 @@ All copy in `content/site.ts`. Every colour a token on bare `:root`. No analytic
 no third-party scripts, no CDN. The hand-drawn marks keep their irregularity.
 
 ## Known sharp edges
+
+**The CSP blocks anything not from this origin.** `script-src` allows inline (Next's static
+output needs it); `style-src` allows only altcha's sheet by hash, except on the three standalone
+figures pages. Both are computed in `next.config.ts`. See DECISIONS, 2 Oct 2026.
 
 **`site/` is the deploy root.** `vercel --prod` from the repo root ships nothing. The Vercel
 link is `site/.vercel/project.json`; `project.json.oldteam` beside it is migration history.

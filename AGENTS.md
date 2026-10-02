@@ -51,6 +51,12 @@ altcha is the one vendored script (`site/public/vendor/altcha`, MIT). It runs th
 guards the address; the address exists only as an encrypted payload (`contactPayload`), never as
 text. After changing it: `npx altcha-lib obfuscate "mailto:<address>?subject=<subject>"`.
 
+**Security headers and the CSP are set in `site/next.config.ts`, and the CSP is a contract.** It
+names no origin but `'self'`. A page that loads anything from elsewhere, or an element that sets an
+inline `style=` attribute outside the figures, is blocked in the browser, not warned about. After
+touching the policy, the pages, or altcha: `pnpm build && pnpm start`, open a page in a fresh tab,
+and read the console for `Content Security Policy` errors. `security.txt` expires 2027-10-02.
+
 **The marks are hand-drawn.** They are SVG paths with deliberate irregularity. Do not
 regularise, re-path or "clean up" a mark; the wobble is the identity.
 
