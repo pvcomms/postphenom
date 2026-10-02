@@ -3,7 +3,7 @@ import { site } from "@/content/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = site.nav.map((n) => ({
+  const pages = site.nav.filter((n) => n.href.startsWith("/")).map((n) => ({
     url: `${site.url}${n.href === "/" ? "" : n.href}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

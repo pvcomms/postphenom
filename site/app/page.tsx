@@ -1,11 +1,17 @@
 import { site } from "@/content/site";
 import { A } from "@/components/A";
 import { Contact } from "@/components/Contact";
+import { latestPosts } from "@/lib/substack";
 
-export default function Home() {
+// The Substack feed is read on the server, at build and hourly after (lib/substack.ts).
+export const revalidate = 3600;
+
+export default async function Home() {
   const h = site.home;
   const insts = site.instruments.built.items;
   const latest = site.journal.entries.slice(0, 3);
+  const sub = site.substack;
+  const posts = await latestPosts(5);
 
   return (
     <>
@@ -41,7 +47,31 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band" aria-labelledby="research-title">
+      <section className="band" aria-labelledby="latest-title">
+        <div className="container">
+          <div className="column">
+            <h2 className="display" id="latest-title">
+              {sub.latest}
+            </h2>
+            {posts.length > 0 && (
+              <ul className="teaser-list">
+                {posts.map((p) => (
+                  <li key={p.url}>
+                    <A href={p.url}>{p.title}</A>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p>
+              <A href={sub.url} className="link-strong">
+                {sub.all}
+              </A>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="band grey" aria-labelledby="research-title">
         <div className="container">
           <div className="column">
             <h2 className="display" id="research-title">
@@ -64,7 +94,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band grey" aria-labelledby="instruments-title">
+      <section className="band" aria-labelledby="instruments-title">
         <div className="container">
           <div className="column">
             <h2 className="display" id="instruments-title">
@@ -88,7 +118,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band" aria-labelledby="record-title">
+      <section className="band grey" aria-labelledby="record-title">
         <div className="container">
           <h2 className="display" id="record-title">
             {h.record.title}
@@ -106,7 +136,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band grey" aria-labelledby="call-title">
+      <section className="band" aria-labelledby="call-title">
         <div className="container">
           <div className="column">
             <h2 className="display" id="call-title">

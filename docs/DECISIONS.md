@@ -210,3 +210,19 @@ the `description` and JSON-LD in `content/site.ts`, which only appear in search 
 previews. The copyright line and the footer statement were removed with the rest. Dead CSS for the
 removed blocks (hero, stats, record, definition lists) is still in `globals.css`. The previous prose
 is in git, in the commit before this one.
+
+---
+
+**2026-10-02 — The Substack is a tab, and the homepage lists its latest posts.**
+Param asked for a Substack link on the homepage, a "Latest posts" section, and a tab in the top
+row. The address given, `postphenom.substack.co`, does not resolve; the publication is
+`postphenom.substack.com`, and that is what the site uses. The tab is a plain external link, and
+the sitemap leaves it out.
+
+The post list is the first place the site fetches from another host, so it is written down here
+and in feature 003. The server asks, never the reader's browser: `lib/substack.ts` reads
+`https://postphenom.substack.com/feed` at build and at most once an hour after, keeps only titles
+and links, drops any link that does not stay on the Substack, and returns nothing if the fetch
+fails. The reader's browser is sent a link and nothing else, so the CSP is unchanged
+(`connect-src 'self'`) and "no third-party scripts" still holds. The feed had no posts when this was
+built, so the section currently shows its heading and the link.

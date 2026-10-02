@@ -3,6 +3,8 @@
 // tabs are `nav`; journal entries are `journal.entries`, newest first. Adding an entry is adding an
 // object to an array. The site is headings, links and buttons only: the prose was cut on 2 Oct 2026
 // (docs/DECISIONS.md), and git has it.
+const substackUrl = "https://postphenom.substack.com";
+
 export const site = {
   name: "The Center for Applied Postphenomenology",
   short: "CAPP",
@@ -31,7 +33,15 @@ export const site = {
     { title: "Instruments", href: "/instruments" },
     { title: "Journal", href: "/journal" },
     { title: "Contributors", href: "/contributors" },
+    { title: "Substack", href: substackUrl },
   ],
+  substack: {
+    title: "Substack",
+    url: substackUrl,
+    feed: `${substackUrl}/feed`,
+    latest: "Latest posts",
+    all: "Read the Substack",
+  },
   cta: { title: "Send an account", href: "/contributors#contribute" },
   menu: "Menu",
 
