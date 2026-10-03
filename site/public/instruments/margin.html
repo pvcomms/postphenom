@@ -32,26 +32,22 @@
     font-display: swap;
   }
 
-  /* Layout: an exercise book. Bone paper, ink, and one red-ochre rule down the left of the sheet:
-     the time sits outside it, the words inside. The accent is only ever the margin itself —
-     the rule, the tab, the strip's heading, a note just kept. Everything else is ink. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #8a8276;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #cbc5b8;
     --accent: #b5532a;
-    --accent-wash: rgba(181, 83, 42, 0.1);
-    --hover: rgba(35, 33, 30, 0.03);
-    --shadow: rgba(35, 33, 30, 0.08);
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    --gutter: 3.6rem;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -60,13 +56,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #857e70;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473b;
       --accent: #d9763f;
-      --accent-wash: rgba(217, 118, 63, 0.14);
-      --hover: rgba(237, 233, 223, 0.03);
-      --shadow: rgba(0, 0, 0, 0.4);
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -75,10 +69,35 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #857e70;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #4a473b;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: an exercise book. Bone paper, ink, and one red-ochre rule down the left of the sheet:
+     the time sits outside it, the words inside. The accent is only ever the margin itself —
+     the rule, the tab, the strip's heading, a note just kept. Everything else is ink. */
+  /* margin's own: the second rule, the wash on a note just kept, hover, the strip's shadow, the gutter */
+  :root {
+    --rule-2: #cbc5b8;
+    --accent-wash: rgba(181, 83, 42, 0.1);
+    --hover: rgba(35, 33, 30, 0.03);
+    --shadow: rgba(35, 33, 30, 0.08);
+    --gutter: 3.6rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473b;
+      --accent-wash: rgba(217, 118, 63, 0.14);
+      --hover: rgba(237, 233, 223, 0.03);
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #4a473b;
     --accent-wash: rgba(217, 118, 63, 0.14);
     --hover: rgba(237, 233, 223, 0.03);
     --shadow: rgba(0, 0, 0, 0.4);
@@ -133,6 +152,7 @@
   }
   .label,
   .meta {
+    margin: 0;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.12em;
@@ -142,6 +162,14 @@
   .meta {
     font-size: 10px;
     letter-spacing: 0.14em;
+  }
+  .meta.accent {
+    color: var(--accent);
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   .hand {
     font-style: italic;
@@ -160,7 +188,7 @@
     padding-block: 64px 36px;
     border-bottom: 1px solid var(--rule-2);
   }
-  .mast .label {
+  .mast .meta {
     margin: 0 0 24px;
   }
   h1 {
@@ -440,8 +468,11 @@
   .desk .panel {
     padding: 18px 18px 20px;
   }
-  .desk .head {
-    color: var(--accent);
+  .desk-text {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
   }
   .field {
     display: block;
@@ -707,7 +738,7 @@
 <div class="wrap">
   <header class="mast">
     <div>
-      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
       <h1>Margin</h1>
       <p class="deck hand">
         What you said to yourself while you were looking. The margin is the tab
@@ -763,9 +794,10 @@
       </div>
       <p class="specimen-note inset hand" id="specimenNote">
         <b>The specimen's margin.</b> Fiction, like the rest of the specimen,
-        and read-only. Press <kbd>'</kbd> or the tab at the edge to start your
-        own.
+        and read-only.
+        <button class="chip" id="makeOwn" type="button">Make your own</button>
       </p>
+      <p class="specimen-note inset hand" id="carried" hidden></p>
       <div class="filters inset" id="filters" hidden></div>
       <div id="days"></div>
     </section>
@@ -776,7 +808,7 @@
         style="animation-delay: 60ms"
         aria-label="Read the margin by"
       >
-        <div class="meta head">read by</div>
+        <p class="meta accent">read by</p>
         <input
           class="field"
           id="q"
@@ -800,17 +832,40 @@
         style="animation-delay: 120ms"
         aria-label="The reading"
       >
-        <div class="meta head" id="readingHead">the reading</div>
+        <p class="meta accent" id="readingHead">the reading</p>
         <ul class="reading hand" id="reading"></ul>
         <p class="trouble hand" id="trouble" role="alert" hidden></p>
+      </section>
+
+      <section
+        class="panel rise"
+        style="animation-delay: 180ms"
+        id="lawsPanel"
+        aria-label="What the margin holds to"
+      >
+        <p class="meta accent">what the margin holds to</p>
+        <p class="desk-text">
+          You write every note, in the words it came in. The page dates it,
+          keeps it with where you were and what it was about, groups the notes
+          by day, counts them by place and by thing, and reads the counts back.
+          You change the words or take a note back; what any of it meant is
+          yours to say, later and elsewhere.
+        </p>
+        <p class="desk-text">
+          It never summarises you, never says which note mattered, never draws
+          a thread between two notes you did not draw, never prefills a note
+          except with your own words carried from another instrument, and
+          never sends a word of it anywhere: no host is called, nothing is
+          fetched, no model is asked.
+        </p>
         <p class="meta kept-where" id="keptWhere"></p>
       </section>
     </aside>
   </div>
 
   <footer>
-    <span class="label">Margin · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Margin · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -862,6 +917,7 @@
   <p class="status" id="kept" role="status" hidden>
     kept · <button type="button" id="readIt">read the margin</button>
   </p>
+  <p class="status hand" id="carryNext" hidden></p>
 </aside>
 
 <script>
@@ -940,24 +996,434 @@
   const dayOf = (at) => at.slice(0, 10);
   const timeOf = (at) => at.slice(11, 16);
 
-  const MONTHS = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
 
-  function dayWords(at, now) {
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-margin";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "margin";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  // A note's day in words, with the year only when it is not this one.
+  function dayLabel(at, now) {
     const y = at.slice(0, 4);
-    const m = MONTHS[Number(at.slice(5, 7)) - 1] ?? at.slice(5, 7);
+    const m = MON[Number(at.slice(5, 7)) - 1] ?? at.slice(5, 7);
     const d = Number(at.slice(8, 10));
     return y === now.slice(0, 4) ? `${d} ${m}` : `${d} ${m} ${y}`;
   }
@@ -1075,8 +1541,6 @@
     };
   }
 
-  const plural = (n, one) => `${n} ${one}${n === 1 ? "" : "s"}`;
-
   /** Facts about the margin. Never a grade. */
   function readings(t, now) {
     if (t.total === 0 || !t.first || !t.last)
@@ -1085,14 +1549,14 @@
       ];
     const words = [];
     words.push(
-      `${plural(t.total, "note")} since ${dayWords(t.first, now)}: ${t.spoken} spoken, ${t.written} written${
+      `${plural(t.total, "note")} since ${dayLabel(t.first, now)}: ${t.spoken} spoken, ${t.written} written${
         t.both ? `, ${t.both} both` : ""
       }.`,
     );
     words.push(
       t.days === 1
-        ? `all on ${dayWords(t.first, now)}; the last at ${timeOf(t.last)}.`
-        : `made on ${plural(t.days, "day")}; the last ${dayWords(t.last, now)} at ${timeOf(t.last)}.`,
+        ? `all on ${dayLabel(t.first, now)}; the last at ${timeOf(t.last)}.`
+        : `made on ${plural(t.days, "day")}; the last ${dayLabel(t.last, now)} at ${timeOf(t.last)}.`,
     );
     const [v0, v1, v2] = t.byView;
     if (v0)
@@ -1193,18 +1657,13 @@
   ];
 
   // ── keeping: one key in this browser ────────────────────────────────────────
-  const KEY = "pp-margin";
   const newestFirst = (a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0);
 
+  /* The envelope read back, row by row; a note that no longer reads is left out, not repaired. */
   function load() {
     const out = { notes: [], places: {}, where: "", about: "" };
-    let raw = null;
-    try {
-      raw = JSON.parse(localStorage.getItem(KEY) || "null");
-    } catch {
-      raw = null;
-    }
-    if (!raw || typeof raw !== "object") return out;
+    const raw = readStore();
+    if (!raw) return out;
     if (raw.places && typeof raw.places === "object")
       for (const [k, v] of Object.entries(raw.places))
         if (VIEW.test(k) && typeof v === "string")
@@ -1225,21 +1684,15 @@
   }
 
   function save() {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({
-          notes: S.mine,
-          places: PLACES,
-          where: S.where,
-          about: S.aboutDraft,
-        }),
-      );
-      return true;
-    } catch {
+    const ok = persist({
+      notes: S.mine,
+      places: PLACES,
+      where: S.where,
+      about: S.aboutDraft,
+    });
+    if (!ok)
       say("this browser would not keep it; it lasts until the page is closed.");
-      return false;
-    }
+    return ok;
   }
 
   // ── state ───────────────────────────────────────────────────────────────────
@@ -1247,7 +1700,9 @@
   PLACES = stored.places;
   const S = {
     mine: stored.notes,
-    source: stored.notes.length ? "mine" : "specimen",
+    specimen: stored.notes.length === 0,
+    from: "",
+    next: "",
     view: null,
     about: null,
     q: "",
@@ -1261,12 +1716,6 @@
   const now = localIso(new Date());
 
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const weekdayOf = (day) => {
     const [y, m, d] = day.split("-").map(Number);
@@ -1275,8 +1724,7 @@
   const clock = (s) =>
     `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-  const notes = () => (S.source === "mine" ? S.mine : SPECIMEN);
-  const writable = () => S.source === "mine";
+  const notes = () => (S.specimen ? SPECIMEN : S.mine);
 
   function say(msg) {
     const el = $("trouble");
@@ -1314,15 +1762,15 @@
     const days = byDay(shown);
     const whole = tally(all);
     const t = tally(shown);
-    const w = writable();
+    const w = !S.specimen;
 
-    $("srcSpecimen").setAttribute(
-      "aria-pressed",
-      String(S.source === "specimen"),
-    );
-    $("srcMine").setAttribute("aria-pressed", String(S.source === "mine"));
+    $("srcSpecimen").setAttribute("aria-pressed", String(S.specimen));
+    $("srcMine").setAttribute("aria-pressed", String(!S.specimen));
     $("srcMine").textContent = `yours · ${S.mine.length}`;
     $("specimenNote").hidden = w;
+    const carried = $("carried");
+    carried.hidden = !(w && S.from);
+    carried.textContent = w && S.from ? `Carried from ${S.from}` : "";
 
     // the filters in force
     const f = $("filters");
@@ -1352,7 +1800,7 @@
           : "nothing here reads that way."
       }</p>`;
     for (const d of days) {
-      h += `<div class="day rise"><div class="day-head inset"><h2>${esc(dayWords(d.day, now))}</h2><span class="meta">${weekdayOf(d.day)} · ${d.notes.length}</span></div><ol class="notes">`;
+      h += `<div class="day rise"><div class="day-head inset"><h2>${esc(dayLabel(d.day, now))}</h2><span class="meta">${weekdayOf(d.day)} · ${d.notes.length}</span></div><ol class="notes">`;
       for (const n of d.notes) {
         const key = aboutKey(n.about);
         const editing = S.editing && S.editing.id === n.id ? S.editing : null;
@@ -1412,9 +1860,9 @@
     $("reading").innerHTML = readings(t, now)
       .map((x) => `<li>${esc(x)}</li>`)
       .join("");
-    $("keptWhere").textContent = w
-      ? "kept in this browser, under pp-margin · nothing leaves it"
-      : "fiction, like the rest of the specimen";
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+    renderCarry();
 
     // the strip's suggestions: places and things already named
     $("places").innerHTML = Object.values(PLACES)
@@ -1426,9 +1874,9 @@
   }
 
   // ── reading the sheet ───────────────────────────────────────────────────────
-  function setSource(src) {
-    if (S.source === src) return;
-    S.source = src;
+  function showSpecimen(on) {
+    if (S.specimen === on) return;
+    S.specimen = on;
     S.view = null;
     S.about = null;
     S.editing = null;
@@ -1441,7 +1889,8 @@
   function onPick(e) {
     const b = e.target.closest("button");
     if (!b) return;
-    if (b.dataset.source) return setSource(b.dataset.source);
+    if (b.dataset.source)
+      return showSpecimen(b.dataset.source === "specimen");
     if (b.dataset.clear === "view") S.view = null;
     else if (b.dataset.clear === "about") S.about = null;
     else if (b.dataset.view !== undefined)
@@ -1511,7 +1960,7 @@
   });
   $("days").addEventListener("dblclick", (e) => {
     const p = e.target.closest('[data-edit="text"]');
-    if (!p || !writable()) return;
+    if (!p || S.specimen) return;
     const id = p.closest(".note").dataset.id;
     const n = S.mine.find((x) => x.id === id);
     if (!n) return;
@@ -1569,9 +2018,24 @@
     $("stripTrouble").hidden = true;
   }
   const canKeep = () => !!area.value.trim();
-  area.addEventListener("input", () => ($("keep").disabled = !canKeep()));
+  area.addEventListener("input", () => {
+    $("keep").disabled = !canKeep();
+    renderCarry();
+  });
 
-  const slug = (s) =>
+  /* The hand-off onward: one link, built from the strip's words (or the note just kept). */
+  function renderCarry() {
+    const el = $("carryNext");
+    const text = area.value.trim() || lastText;
+    el.hidden = !S.next || S.specimen;
+    el.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, text, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+  }
+
+  // A place or a thing is named by its words alone; the canonical slugOf names a sheet by its
+  // day, which a place does not have.
+  const placeSlug = (s) =>
     s
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -1580,6 +2044,7 @@
   const salt = () => Math.random().toString(36).slice(2, 5).padEnd(3, "0");
 
   let lastKept = null;
+  let lastText = "";
   function keep() {
     if (!canKeep()) return;
     const where = $("where")
@@ -1588,13 +2053,13 @@
       .slice(0, 60);
     const aboutLabel = $("aboutIn").value.trim().slice(0, 300);
     let view = "/margin";
-    if (where && slug(where)) {
-      view = `/${slug(where)}`;
+    if (where && placeSlug(where)) {
+      view = `/${placeSlug(where)}`;
       if (!VIEW_NAME[view]) PLACES[view] = where;
     }
     const about =
-      aboutLabel && slug(aboutLabel)
-        ? { kind: "thing", id: slug(aboutLabel), label: aboutLabel }
+      aboutLabel && placeSlug(aboutLabel)
+        ? { kind: "thing", id: placeSlug(aboutLabel), label: aboutLabel }
         : null;
     // A thing named before keeps its first wording, so its notes stay together.
     const known =
@@ -1622,12 +2087,13 @@
     S.aboutDraft = aboutLabel;
     save();
     lastKept = note.id;
+    lastText = note.text;
     area.value = "";
     $("keep").disabled = true;
     $("stripTrouble").hidden = true;
     $("kept").hidden = false;
-    if (S.source !== "mine") {
-      S.source = "mine";
+    if (S.specimen) {
+      S.specimen = false;
       S.view = null;
       S.about = null;
       writeAddress();
@@ -1638,6 +2104,10 @@
   }
 
   $("tab").addEventListener("click", openStrip);
+  $("makeOwn").addEventListener("click", () => {
+    showSpecimen(false);
+    openStrip();
+  });
   $("close").addEventListener("click", closeStrip);
   $("keep").addEventListener("click", keep);
   $("readIt").addEventListener("click", () => {
@@ -1680,6 +2150,24 @@
     true,
   );
 
+  /* A hand-off read from the address: the reader's own margin, the strip open with the carried
+     text in the words field and nothing else, not kept until the reader keeps it. */
+  function carried(h) {
+    showSpecimen(false);
+    S.from = h.from;
+    S.next = h.next;
+    openStrip();
+    if (h.set) area.value = h.set;
+    $("keep").disabled = !canKeep();
+    render();
+  }
+
   readAddress();
-  render();
+  const h = fromHash();
+  if (h) carried(h);
+  else render();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

@@ -32,18 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: a sheet on the chart table. Ink on bone; the one accent is the waterline, the hull,
-     a step that crossed the middle, and a window that has opened. Everything else is ink. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #8a8276;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --pen: #383633;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -55,10 +56,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #857e71;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
-      --pen: #d7d4ca;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -67,12 +69,16 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #857e71;
+    --faint: #7d766a;
     --rule: #302e25;
     --accent: #d9763f;
-    --pen: #d7d4ca;
+    --grain: screen;
+    --grain-o: 0.045;
   }
+  /* capp:tokens end */
 
+  /* Layout: a sheet on the chart table. Ink on bone; the one accent is the waterline, the hull,
+     a step that crossed the middle, and a window that has opened. Everything else is ink. */
   * {
     box-sizing: border-box;
   }
@@ -124,6 +130,11 @@
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   .wrap {
     max-width: 1180px;
@@ -388,6 +399,10 @@
   }
   .bare:hover {
     color: var(--accent);
+  }
+  .bare:disabled {
+    opacity: 0.45;
+    cursor: default;
   }
 
   /* the fields: a hairline under each, the ink when you are in it */
@@ -781,8 +796,8 @@
     <div>
       <p class="aside-note">
         <b>It opens on a specimen.</b> Specimen A is a made-up person with one
-        belief in the sails and one commitment in the hull. Open them, move
-        them, or clear them and set down your own.
+        belief in the sails and one commitment in the hull. Open them and read
+        them; make your own to set down something of yours.
       </p>
       <p class="aside-note">
         It never says whether a claim is so, how likely, or what to hold.
@@ -794,7 +809,7 @@
 
   <footer>
     <span class="meta">Tack · CAPP · prototype, 3 October 2026</span>
-    <span class="meta" id="kept-where">No network · kept in this browser</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -902,6 +917,430 @@
     { name: "quiet", terms: ["quiet", "private", "local", "small"] },
   ];
 
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-tack";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "tack";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
   /* logic:start ──────────────────────────────────────────────────────────────
      The tack: directional accuracy as an instrument. You cannot sail straight
      at what is so; you hold a heading, see what the water does, and correct —
@@ -972,17 +1411,6 @@
   const leanNow = (c) =>
     c.tacks.length ? c.tacks[c.tacks.length - 1].at : null;
 
-  /* days */
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
-  const utc = (d) =>
-    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
-
-  /** Whole days from a to b; negative when b is before a. */
-  function daysBetween(a, b) {
-    if (!DAY.test(a) || !DAY.test(b)) return 0;
-    return Math.round((utc(b) - utc(a)) / 86400000);
-  }
-
   /* the tally and the readings */
   function tally(c, today) {
     const tacks = c.tacks;
@@ -1047,7 +1475,6 @@
     };
   }
 
-  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
   const list = (xs) => xs.map((w) => `'${w}'`).join(", ");
   const ago = (d) =>
     d === 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
@@ -1063,9 +1490,9 @@
         );
       else
         out.push(
-          `first put ${t.first.on} at ${t.first.at} · now at ${t.now} after ${n(t.n - 1, "tack")} · moved toward so ×${t.towardSo}, toward not ×${t.towardNot}${t.still ? `, held still ×${t.still}` : ""} · largest step ${t.largest}` +
+          `first put ${t.first.on} at ${t.first.at} · now at ${t.now} after ${plural(t.n - 1, "tack")} · moved toward so ×${t.towardSo}, toward not ×${t.towardNot}${t.still ? `, held still ×${t.still}` : ""} · largest step ${t.largest}` +
             (t.crossed
-              ? ` · crossed the middle ${n(t.crossed, "time")} in one step`
+              ? ` · crossed the middle ${plural(t.crossed, "time")} in one step`
               : " · never crossed the middle in one step"),
         );
       if (t.last && t.n > 1) out.push(`last tack ${ago(t.sinceLast ?? 0)}`);
@@ -1081,20 +1508,20 @@
       if (t.n > 1) {
         const seen = t.rent.so + t.rent.not + t.rent.neither + t.rent[""];
         out.push(
-          `${n(seen, "sighting")}: ×${t.rent.so} as expected if so, ×${t.rent.not} as expected if not, ×${t.rent.neither} that said nothing either way${t.rent[""] ? `, ×${t.rent[""]} unsaid` : ""}`,
+          `${plural(seen, "sighting")}: ×${t.rent.so} as expected if so, ×${t.rent.not} as expected if not, ×${t.rent.neither} that said nothing either way${t.rent[""] ? `, ×${t.rent[""]} unsaid` : ""}`,
         );
       }
       if (t.looksKept || t.looksHollow)
         out.push(
-          `what would move it: ${n(t.looksKept, "look")} kept${t.looked ? `, ${t.looked} looked at` : ""}${t.looksHollow ? `, ${t.looksHollow} proposed and hollow` : ""}`,
+          `what would move it: ${plural(t.looksKept, "look")} kept${t.looked ? `, ${t.looked} looked at` : ""}${t.looksHollow ? `, ${t.looksHollow} proposed and hollow` : ""}`,
         );
       else out.push("nothing named yet that would move it");
     } else {
       const chosen = c.chosen || c.opened;
       out.push(
         t.letGo
-          ? `chosen ${chosen}, held ${n(t.held ?? 0, "day")}, let go ${c.letGo}`
-          : `chosen ${chosen}, held ${n(t.held ?? 0, "day")} so far`,
+          ? `chosen ${chosen}, held ${plural(t.held ?? 0, "day")}, let go ${c.letGo}`
+          : `chosen ${chosen}, held ${plural(t.held ?? 0, "day")} so far`,
       );
       if (!t.letGo)
         out.push(
@@ -1102,11 +1529,11 @@
             ? "no window set — you have not said when you will look at this again"
             : t.open
               ? `the window opened ${c.until}${(t.toGo ?? 0) < 0 ? `, ${ago(-(t.toGo ?? 0))}` : ", today"} — you said you would look again, and it is on the record whether you do`
-              : `you said not before ${c.until} — ${n(t.toGo ?? 0, "day")} to go`,
+              : `you said not before ${c.until} — ${plural(t.toGo ?? 0, "day")} to go`,
         );
       if (t.reopens)
         out.push(
-          `reopened ${n(t.reopens, "time")}${t.early ? `, ${t.early} of them early` : ""}: held again ×${t.heldAgain}, let go ×${t.reopens - t.heldAgain}`,
+          `reopened ${plural(t.reopens, "time")}${t.early ? `, ${t.early} of them early` : ""}: held again ×${t.heldAgain}, let go ×${t.reopens - t.heldAgain}`,
         );
       else out.push("never reopened");
       out.push(
@@ -1127,7 +1554,7 @@
     const gone = claims.filter((c) => c.layer === "hull" && c.letGo);
     if (!claims.length) return ["nothing set down yet"];
     const out = [
-      `${n(sails.length, "belief")} in the sails · ${n(hull.length, "commitment")} in the hull${gone.length ? ` · ${gone.length} let go` : ""}`,
+      `${plural(sails.length, "belief")} in the sails · ${plural(hull.length, "commitment")} in the hull${gone.length ? ` · ${gone.length} let go` : ""}`,
     ];
     if (sails.length) {
       const unpaid = sails.filter(
@@ -1152,7 +1579,7 @@
         (c) => c.until && daysBetween(c.until, today) >= 0,
       ).length;
       const noWindow = hull.filter((c) => !c.until).length;
-      if (open) out.push(`${n(open, "window")} open in the hull`);
+      if (open) out.push(`${plural(open, "window")} open in the hull`);
       if (noWindow) out.push(`${noWindow} in the hull with no window set`);
     }
     return out;
@@ -1191,18 +1618,6 @@
       .split(/(?<=[.!?])\s+|\n+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 1);
-  }
-
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "way"}`;
   }
 
   function titleOf(c) {
@@ -1298,102 +1713,10 @@
     return c;
   }
 
-  /* The pen. Every stroke is deterministic for its seed, so a re-draw never
-     moves a line. mulberry32, an FNV seed, and a cubic set a little off the
-     straight line, the way a quick sketch goes. */
-  function rand(seed) {
-    let a = seed >>> 0;
-    return () => {
-      a = (a + 0x6d2b79f5) >>> 0;
-      let t = a;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-  function seedOf(s) {
-    let h = 2166136261;
-    for (let i = 0; i < s.length; i++) {
-      h ^= s.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  const fx = (k) => String(Math.round(k * 10) / 10);
-  const spread = (r, amp) => (r() * 2 - 1) * amp;
-  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    const len = Math.hypot(dx, dy) || 1;
-    const ux = dx / len;
-    const uy = dy / len;
-    const nx = -uy;
-    const ny = ux;
-    const back = r() * overshoot;
-    const past = r() * overshoot;
-    const s = [
-      a[0] - ux * back + nx * spread(r, wobble * 0.4),
-      a[1] - uy * back + ny * spread(r, wobble * 0.4),
-    ];
-    const e = [
-      b[0] + ux * past + nx * spread(r, wobble * 0.4),
-      b[1] + uy * past + ny * spread(r, wobble * 0.4),
-    ];
-    const bow = spread(r, wobble);
-    const t1 = 0.25 + r() * 0.15;
-    const t2 = 0.6 + r() * 0.15;
-    const c1 = [
-      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
-      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
-    ];
-    const c2 = [
-      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
-      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
-    ];
-    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
-  }
-  function roughRect(
-    w,
-    h,
-    seed,
-    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
-  ) {
-    const r = rand(seed);
-    const x0 = inset;
-    const y0 = inset;
-    const x1 = w - inset;
-    const y1 = h - inset;
-    return [
-      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
-      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
-      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
-      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
-    ].join("");
-  }
-  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
-    const r = rand(seed);
-    return stroke(
-      [-1 - r() * 2, y],
-      [w + 1 + r() * 2, y + spread(r, 0.8)],
-      r,
-      wobble,
-      0,
-    );
-  }
   /* logic:end */
 
   /* ── keeping: one key in this browser, and nothing anywhere else ────────── */
 
-  const KEY = "pp-tack";
-  const localToday = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  };
-  const plusDays = (day, k) => {
-    const d = new Date(`${day}T12:00:00`);
-    d.setDate(d.getDate() + k);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  };
   const today = localToday();
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const byTouched = (a, b) =>
@@ -1413,56 +1736,41 @@
       .filter((v) => v.name);
   }
 
+  /* The sheet: whether the specimen is on it, and where a carried claim came from and goes
+     next. The specimen's claims are read from SPECIMEN_CLAIMS and never written; `claims` is
+     the reader's own, kept under KEY beside their values. */
+  const S = { specimen: false, from: "", next: "" };
   let claims = [];
   let values = [];
   let storable = true;
+  const shown = () => (S.specimen ? SPECIMEN_CLAIMS : claims);
 
-  function load() {
-    let raw = null;
-    try {
-      raw = localStorage.getItem(KEY);
-    } catch {
-      storable = false;
-    }
-    let data = null;
-    if (raw)
+  /* The rows read back, checked one by one. A bad row is dropped, and so is a row under a
+     specimen slug: the specimen was never the reader's. */
+  function readOwn(env) {
+    const out = [];
+    for (const r of Array.isArray(env?.claims) ? env.claims : []) {
+      let c = null;
       try {
-        data = JSON.parse(raw);
+        c = validateClaim(r, today);
       } catch {
-        data = null;
+        c = null;
       }
-    if (data && Array.isArray(data.claims)) {
-      claims = data.claims
-        .map((c) => {
-          try {
-            return validateClaim(c, today);
-          } catch {
-            return null;
-          }
-        })
-        .filter(Boolean)
-        .sort(byTouched);
-      values = validValues(data.values) ?? clone(SPECIMEN_VALUES);
-    } else {
-      claims = clone(SPECIMEN_CLAIMS);
-      values = clone(SPECIMEN_VALUES);
+      if (
+        c &&
+        !SPECIMEN_SLUGS.has(c.slug) &&
+        !out.some((x) => x.slug === c.slug)
+      )
+        out.push(c);
     }
+    return out.sort(byTouched);
   }
 
-  function persist() {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({
-          v: 1,
-          claims,
-          values: values.filter((v) => v.name.trim()),
-        }),
-      );
-      storable = true;
-    } catch {
-      storable = false;
-    }
+  function persistAll() {
+    storable = persist({
+      claims,
+      values: values.filter((v) => v.name.trim()),
+    });
     keptWhere();
     return storable;
   }
@@ -1496,6 +1804,7 @@
   const seen = new Set();
 
   function save(c) {
+    if (S.specimen) return null;
     const fresh = !slugRef;
     let out;
     try {
@@ -1522,11 +1831,12 @@
     const i = claims.findIndex((x) => x.slug === out.slug);
     if (i >= 0) claims[i] = out;
     else claims.unshift(out);
-    if (!persist()) ui.trouble = NOT_KEPT;
+    if (!persistAll()) ui.trouble = NOT_KEPT;
     return out;
   }
 
   function keepNow(next) {
+    if (S.specimen) return;
     ui.trouble = null;
     open = next;
     save(next);
@@ -1605,7 +1915,9 @@
       {
         class: `panel sketched ${o.cls || ""} ${fresh ? "rise" : ""}`,
         style: fresh ? `animation-delay:${o.delay ?? (delay += 50)}ms` : null,
+        id: o.id,
         "aria-label": o.label,
+        "data-yours": o.yours ? "" : null,
         "data-seed": o.seed,
         "data-pen": o.pen ? "acc" : null,
       },
@@ -1794,19 +2106,17 @@
         class: "s-rule",
       }),
     );
-    tacks
-      .slice(0, -1)
-      .forEach((t) =>
-        svg.append(
-          s("circle", {
-            cx: xOf(t.at),
-            cy: ht / 2,
-            r: 2.2,
-            class: "f-surface s-faint",
-            "stroke-width": 1,
-          }),
-        ),
-      );
+    tacks.slice(0, -1).forEach((t) =>
+      svg.append(
+        s("circle", {
+          cx: xOf(t.at),
+          cy: ht / 2,
+          r: 2.2,
+          class: "f-surface s-faint",
+          "stroke-width": 1,
+        }),
+      ),
+    );
     if (tacks.length)
       svg.append(
         s("circle", {
@@ -1970,8 +2280,8 @@
   }
 
   function viewIndex() {
-    const sails = claims.filter((c) => c.layer === "sail");
-    const hull = claims.filter((c) => c.layer === "hull");
+    const sails = shown().filter((c) => c.layer === "sail");
+    const hull = shown().filter((c) => c.layer === "hull");
     const can = Boolean(ui.text.trim() && ui.layer0);
     const arrive = ui.layer0 !== arrivedLayer;
     arrivedLayer = ui.layer0;
@@ -1991,61 +2301,84 @@
       beginBtn.classList.toggle("on", ok);
     };
 
+    /* On the specimen the set-down form is not shown: the sheet is read before it is written. */
+    const specimenHead = [
+      h(
+        "div",
+        { class: "head" },
+        meta("accent", "the specimen · fiction · read only"),
+        chip("Make your own", makeOwn, { on: true, f: "makeown" }),
+      ),
+      hand(
+        "mt2",
+        h("span", { class: "accent" }, "A specimen."),
+        " Specimen A is a made-up person with one belief in the sails and one commitment in the hull, there to read before you write. It can't be changed; make your own to set down something of yours.",
+      ),
+    ];
+
     const sheet = panel(
       {
         tag: "section",
         cls: "big",
-        label: "Set a claim down",
+        label: S.specimen ? "The specimen" : "Set a claim down",
         seed: "tack-begin",
         delay: 60,
       },
-      meta("accent", "the claim"),
-      h("textarea", {
-        class: "case claim display mt3",
-        rows: 2,
-        value: ui.text,
-        placeholder: "what you think is so — or what you will stay loyal to",
-        "aria-label": "The claim",
-        "data-f": "text",
-        oninput: (e) => {
-          ui.text = e.target.value;
-          syncBegin();
-        },
-      }),
-      meta("accent mt5", "the flinch"),
-      h(
-        "p",
-        { class: "display mt1", style: "font-size:19px;line-height:1.3" },
-        "Do you want evidence to be able to change this?",
-      ),
-      h(
-        "div",
-        { class: "row-wrap mt3" },
-        chip("yes — a belief, into the sails", () => setLayer0("sail"), {
-          on: ui.layer0 === "sail",
-          pressed: ui.layer0 === "sail",
-          f: "l0-sail",
+      S.specimen && specimenHead,
+      !S.specimen && meta("accent", "the claim"),
+      !S.specimen && S.from && hand("mt1", `Carried from ${S.from}`),
+      !S.specimen &&
+        h("textarea", {
+          class: "case claim display mt3",
+          rows: 2,
+          value: ui.text,
+          placeholder: "what you think is so — or what you will stay loyal to",
+          "aria-label": "The claim",
+          "data-f": "text",
+          oninput: (e) => {
+            ui.text = e.target.value;
+            syncBegin();
+          },
         }),
-        chip("no — a commitment, into the hull", () => setLayer0("hull"), {
-          on: ui.layer0 === "hull",
-          acc: ui.layer0 === "hull",
-          pressed: ui.layer0 === "hull",
-          f: "l0-hull",
+      !S.specimen && meta("accent mt5", "the flinch"),
+      !S.specimen &&
+        h(
+          "p",
+          { class: "display mt1", style: "font-size:19px;line-height:1.3" },
+          "Do you want evidence to be able to change this?",
+        ),
+      !S.specimen &&
+        h(
+          "div",
+          { class: "row-wrap mt3" },
+          chip("yes — a belief, into the sails", () => setLayer0("sail"), {
+            on: ui.layer0 === "sail",
+            pressed: ui.layer0 === "sail",
+            f: "l0-sail",
+          }),
+          chip("no — a commitment, into the hull", () => setLayer0("hull"), {
+            on: ui.layer0 === "hull",
+            acc: ui.layer0 === "hull",
+            pressed: ui.layer0 === "hull",
+            f: "l0-hull",
+          }),
+        ),
+      !S.specimen &&
+        hand(
+          "mt2",
+          "if even asking felt like a small betrayal, that flinch is the answer: it is a commitment, not a belief",
+        ),
+      !S.specimen &&
+        h("input", {
+          class: "case mt3",
+          value: ui.flinch0,
+          placeholder: "what the flinch said, in your words — optional",
+          "aria-label": "What the flinch said",
+          "data-f": "flinch0",
+          oninput: (e) => (ui.flinch0 = e.target.value),
         }),
-      ),
-      hand(
-        "mt2",
-        "if even asking felt like a small betrayal, that flinch is the answer: it is a commitment, not a belief",
-      ),
-      h("input", {
-        class: "case mt3",
-        value: ui.flinch0,
-        placeholder: "what the flinch said, in your words — optional",
-        "aria-label": "What the flinch said",
-        "data-f": "flinch0",
-        oninput: (e) => (ui.flinch0 = e.target.value),
-      }),
-      ui.layer0 === "sail" &&
+      !S.specimen &&
+        ui.layer0 === "sail" &&
         h(
           "div",
           { class: `mt5 ${arrive ? "arrive" : ""}` },
@@ -2056,7 +2389,8 @@
             "never 0, never 100 — the ends are not places you can stand",
           ),
         ),
-      ui.layer0 === "hull" &&
+      !S.specimen &&
+        ui.layer0 === "hull" &&
         h(
           "div",
           { class: `mt5 ${arrive ? "arrive" : ""}` },
@@ -2088,12 +2422,12 @@
                 chip(
                   k === 365 ? "a year" : `${k} days`,
                   () => {
-                    ui.until0 = plusDays(today, k);
+                    ui.until0 = addDays(today, k);
                     render();
                   },
                   {
-                    on: ui.until0 === plusDays(today, k),
-                    pressed: ui.until0 === plusDays(today, k),
+                    on: ui.until0 === addDays(today, k),
+                    pressed: ui.until0 === addDays(today, k),
                     f: `u0-${k}`,
                   },
                 ),
@@ -2105,16 +2439,21 @@
             "a day you name — no evidence is owed, and none will be asked for",
           ),
         ),
-      h(
-        "div",
-        { class: "row-wrap mt5" },
-        beginBtn,
-        h("span", { class: "hand" }, "sorted by your flinch, not by the tool"),
-      ),
-      claims.length > 0 && [
+      !S.specimen &&
         h(
           "div",
-          { class: "head mt8" },
+          { class: "row-wrap mt5" },
+          beginBtn,
+          h(
+            "span",
+            { class: "hand" },
+            "sorted by your flinch, not by the tool",
+          ),
+        ),
+      shown().length > 0 && [
+        h(
+          "div",
+          { class: S.specimen ? "head mt5" : "head mt8" },
           meta("accent", "the sails"),
           h(
             "span",
@@ -2148,7 +2487,7 @@
           ? h("ol", { class: "rows" }, hull.map(claimRow))
           : meta("plain mt2", "nothing in the hull"),
       ],
-      !claims.length &&
+      !shown().length &&
         hand("mt8", "nothing set down yet — the first claim begins above"),
     );
 
@@ -2196,7 +2535,6 @@
       ),
     );
 
-    const specimenHere = claims.some((c) => SPECIMEN_SLUGS.has(c.slug));
     const whole = panel(
       {
         tag: "section",
@@ -2206,37 +2544,24 @@
         delay: 180,
       },
       meta("accent", "the whole sheet"),
-      h("p", { class: "body-s mt2" }, wholeReadings(claims, today).join(" · ")),
+      h(
+        "p",
+        { class: "body-s mt2" },
+        wholeReadings(shown(), today).join(" · "),
+      ),
       h(
         "div",
         { class: "mt4" },
-        specimenHere
-          ? [
-              meta(
-                "plain",
-                "the two marked specimen are Specimen A's — fiction, a made-up life",
-              ),
-              h(
-                "div",
-                { class: "row-wrap mt2" },
-                chip("clear the specimen", clearSpecimen, {
-                  f: "clear-specimen",
-                }),
-              ),
-            ]
+        S.specimen
+          ? meta(
+              "plain",
+              "the two marked specimen are Specimen A's — fiction, a made-up life",
+            )
           : h(
               "div",
               { class: "row-wrap" },
-              chip("put the specimen back", restoreSpecimen, {
-                f: "restore-specimen",
-              }),
+              chip("the specimen", showSpecimen, { f: "specimen" }),
             ),
-        meta(
-          "plain mt3",
-          storable
-            ? "kept in this browser only — nothing leaves the page"
-            : NOT_KEPT,
-        ),
       ),
       h(
         "p",
@@ -2254,7 +2579,40 @@
       "div",
       { class: "grid" },
       sheet,
-      h("aside", { class: "col" }, how, whole, valuesPanel(false)),
+      h(
+        "aside",
+        { class: "col" },
+        how,
+        whole,
+        lawsPanel(220),
+        valuesPanel(false),
+      ),
+    );
+  }
+
+  /** What the tack holds to: the line between what the page does and what is yours. */
+  function lawsPanel(delayMs) {
+    return panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "What the tack holds to",
+        seed: "tack-laws",
+        delay: delayMs,
+        id: "lawsPanel",
+      },
+      meta("accent", "what the tack holds to"),
+      h(
+        "p",
+        { class: "body-s mt2" },
+        "The page keeps the record and does the arithmetic. It dates each tack, counts the steps toward so and toward not, marks a step that crossed the middle, measures the window, and reads back what is there as counts. You write the claim, answer the flinch, say where you lean and move it, name what would move it, and say why you hold a commitment.",
+      ),
+      h(
+        "p",
+        { class: "body-s mt2" },
+        "It never says whether a claim is so, how likely, or what to hold. It never sorts a claim into the sails or the hull for you, proposes a look, or moves the lean. Nothing is fetched and no model is asked; what you write stays in this browser.",
+      ),
+      h("p", { class: "meta plain mt3", id: "keptWhere" }),
     );
   }
 
@@ -2291,18 +2649,25 @@
     hashTo(slugRef);
   }
 
-  function clearSpecimen() {
-    claims = claims.filter((c) => !SPECIMEN_SLUGS.has(c.slug));
-    if (!persist()) ui.trouble = NOT_KEPT;
+  /* Leaving the specimen for a sheet of the reader's own, and looking at it again. Neither
+     writes anything. */
+  function makeOwn() {
+    S.specimen = false;
+    slugRef = "";
+    open = null;
+    resetClaimUi();
     render();
+    hashTo("");
   }
-  function restoreSpecimen() {
-    claims = [
-      ...claims.filter((c) => !SPECIMEN_SLUGS.has(c.slug)),
-      ...clone(SPECIMEN_CLAIMS),
-    ].sort(byTouched);
-    if (!persist()) ui.trouble = NOT_KEPT;
+  function showSpecimen() {
+    S.specimen = true;
+    S.from = "";
+    S.next = "";
+    slugRef = "";
+    open = null;
+    resetClaimUi();
     render();
+    hashTo("");
   }
 
   /* ── your values: names and the words that say them ───────────────────── */
@@ -2328,7 +2693,7 @@
               values[i].name = e.target.value.slice(0, 40);
               refreshDesk();
             },
-            onchange: () => persist(),
+            onchange: () => persistAll(),
           }),
           h("input", {
             class: "case",
@@ -2344,7 +2709,7 @@
                 .slice(0, 24);
               refreshDesk();
             },
-            onchange: () => persist(),
+            onchange: () => persistAll(),
           }),
           h(
             "button",
@@ -2355,7 +2720,7 @@
               "data-f": `vx-${i}`,
               onclick: () => {
                 values.splice(i, 1);
-                persist();
+                persistAll();
                 render();
               },
             },
@@ -2370,7 +2735,8 @@
         cls: "small",
         label: "Your values",
         seed: inDesk ? "tack-values-desk" : "tack-values",
-        delay: inDesk ? 200 : 240,
+        delay: inDesk ? 240 : 280,
+        yours: true,
       },
       h(
         "div",
@@ -2403,7 +2769,7 @@
             "put the specimen's back",
             () => {
               values = clone(SPECIMEN_VALUES);
-              persist();
+              persistAll();
               render();
             },
             { f: "v-restore" },
@@ -2430,6 +2796,8 @@
   function openOne(c) {
     slugRef = c.slug;
     open = clone(c);
+    S.from = "";
+    S.next = "";
     resetClaimUi();
     render();
     hashTo(c.slug);
@@ -2437,6 +2805,8 @@
   function close() {
     slugRef = "";
     open = null;
+    S.from = "";
+    S.next = "";
     resetClaimUi();
     render();
     hashTo("");
@@ -2472,7 +2842,7 @@
   function viewOpen() {
     const c = open;
     const t = tally(c, today);
-    const specimen = SPECIMEN_SLUGS.has(slugRef);
+    const specimen = S.specimen;
     const now = leanNow(c);
 
     const claimPanel = panel(
@@ -2493,9 +2863,12 @@
         h(
           "div",
           { class: "row-wrap", style: "gap:6px" },
+          specimen &&
+            chip("Make your own", makeOwn, { on: true, f: "makeown" }),
           chip("all claims", close, { f: "close" }),
         ),
       ),
+      S.from && hand("mt1", `Carried from ${S.from}`),
       h("textarea", {
         ...fieldAttrs("text", "The claim"),
         class: `case claim display mt3 ${c.letGo ? "strike" : ""}`,
@@ -2942,7 +3315,7 @@
                 "reopen the question",
                 () => {
                   ui.reopening = true;
-                  ui.untilNew = plusDays(today, 90);
+                  ui.untilNew = addDays(today, 90);
                   render();
                   const el = document.querySelector('[data-f="saidnew"]');
                   if (el) el.focus();
@@ -3015,34 +3388,46 @@
             h(
               "ol",
               { class: "log" },
-              [...c.reopened]
-                .reverse()
-                .map((r, i) =>
+              [...c.reopened].reverse().map((r, i) =>
+                h(
+                  "li",
+                  arrivals(
+                    `r:${slugRef}:${c.reopened.length - 1 - i}:${r.on}`,
+                    i,
+                  ),
                   h(
-                    "li",
-                    arrivals(
-                      `r:${slugRef}:${c.reopened.length - 1 - i}:${r.on}`,
-                      i,
-                    ),
-                    h(
-                      "span",
-                      {
-                        class: `meta plain ${r.went === "let-go" ? "accent" : ""}`,
-                      },
-                      `${r.on} · ${r.went === "held" ? `held again${r.until ? ` until ${r.until}` : ""}` : "let go"}${r.early ? " · early" : ""}`,
-                    ),
-                    h(
-                      "span",
-                      { class: "said" },
-                      r.said || h("span", { class: "faint" }, "nothing said"),
-                    ),
+                    "span",
+                    {
+                      class: `meta plain ${r.went === "let-go" ? "accent" : ""}`,
+                    },
+                    `${r.on} · ${r.went === "held" ? `held again${r.until ? ` until ${r.until}` : ""}` : "let go"}${r.early ? " · early" : ""}`,
+                  ),
+                  h(
+                    "span",
+                    { class: "said" },
+                    r.said || h("span", { class: "faint" }, "nothing said"),
                   ),
                 ),
+              ),
             ),
           troubleLine(),
         ),
       );
     }
+
+    /* afterwards: where a carried claim goes next, with the claim's words as they stand */
+    if (S.next && !specimen)
+      parts.push(
+        h(
+          "p",
+          { class: "hand", id: "carryNext" },
+          h(
+            "a",
+            { href: carryHref(S.next, c.text, "") },
+            `Carry this to ${S.next}`,
+          ),
+        ),
+      );
 
     /* the desk */
     const reading = panel(
@@ -3095,21 +3480,21 @@
           { acc: ui.sure === "claim", f: "remove" },
         ),
       ),
-      meta(
-        "plain mt4",
-        specimen
-          ? "fiction, like the rest of the specimen"
-          : storable
-            ? "kept in this browser only — nothing leaves the page"
-            : NOT_KEPT,
-      ),
+      specimen && meta("plain mt4", "fiction, like the rest of the specimen"),
     );
 
     return h(
       "div",
       { class: "grid" },
       h("section", { class: "col", "aria-label": "The claim" }, parts),
-      h("aside", { class: "col" }, reading, layers, valuesPanel(true)),
+      h(
+        "aside",
+        { class: "col" },
+        reading,
+        layers,
+        lawsPanel(180),
+        valuesPanel(true),
+      ),
     );
   }
 
@@ -3256,20 +3641,37 @@
       });
   }
   function remove() {
-    if (!open) return;
+    if (!open || S.specimen) return;
     claims = claims.filter((x) => x.slug !== slugRef);
-    if (!persist()) ui.trouble = NOT_KEPT;
+    if (!persistAll()) ui.trouble = NOT_KEPT;
     close();
   }
 
   /* ── drawing the page ─────────────────────────────────────────────────── */
 
   function keptWhere() {
-    const el = $("kept-where");
+    const el = $("keptWhere");
     if (el)
       el.textContent = storable
-        ? "No network · kept in this browser"
-        : "No network · not kept";
+        ? `kept in this browser only, under ${KEY} · nowhere else`
+        : NOT_KEPT;
+  }
+
+  /* The specimen is read only: every field on it is locked and every chip is disabled, but for
+     the ones that leave it and the rows that open a claim. The values are the reader's and
+     stay open. */
+  function lockSpecimen(root) {
+    root.querySelectorAll("input, textarea, select, button").forEach((el) => {
+      const f = el.dataset.f;
+      if (f === "close" || f === "makeown") return;
+      if (el.closest("[data-yours], .tk-row")) return;
+      if (
+        el.tagName === "TEXTAREA" ||
+        (el.tagName === "INPUT" && el.type === "text")
+      )
+        el.readOnly = true;
+      else el.disabled = true;
+    });
   }
 
   function render() {
@@ -3281,7 +3683,9 @@
       document.activeElement && document.activeElement.getAttribute("data-f");
     const sheet = $("sheet");
     sheet.replaceChildren(open ? viewOpen() : viewIndex());
+    if (S.specimen) lockSpecimen(sheet);
     sketchAll(fresh);
+    keptWhere();
     if (open) refreshDesk();
     if (focused) {
       const el = sheet.querySelector(`[data-f="${focused}"]`);
@@ -3305,17 +3709,56 @@
       location.replace(want || "#");
     }
   }
-  function fromHash() {
+  function openFromHash() {
     const slug = decodeURIComponent(location.hash.slice(1));
     if (slug === (open ? slugRef : "")) return;
-    const c = slug && claims.find((x) => x.slug === slug);
+    let c = slug && shown().find((x) => x.slug === slug);
+    if (!c && slug && SPECIMEN_SLUGS.has(slug)) {
+      c = SPECIMEN_CLAIMS.find((x) => x.slug === slug);
+      S.specimen = true;
+    }
     if (c) openOne(c);
     else if (open) close();
   }
-  window.addEventListener("hashchange", fromHash);
 
-  load();
-  keptWhere();
-  render();
-  fromHash();
+  /* A hand-off read from the address: a new claim of the reader's own, the carried text in the
+     claim field and nothing else, not kept until it is put down. */
+  function carried(hh) {
+    S.specimen = false;
+    S.from = hh.from;
+    S.next = hh.next;
+    slugRef = "";
+    open = null;
+    resetClaimUi();
+    Object.assign(ui, {
+      text: hh.set,
+      layer0: null,
+      flinch0: "",
+      at0: 50,
+      until0: "",
+    });
+    render();
+  }
+
+  /* The hash is read twice over: a hand-off (`set=`, `from=`, `next=`) opens a new claim of
+     the reader's own; a bare `#<slug>` is the open claim, as before. */
+  function onHash() {
+    const hh = fromHash();
+    if (hh) carried(hh);
+    else openFromHash();
+  }
+
+  function boot() {
+    const env = readStore();
+    claims = readOwn(env);
+    values = validValues(env?.values) ?? clone(SPECIMEN_VALUES);
+    S.specimen = !claims.length;
+    const hh = fromHash();
+    if (hh) return carried(hh);
+    render();
+    openFromHash();
+  }
+
+  window.addEventListener("hashchange", onHash);
+  boot();
 </script>

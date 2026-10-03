@@ -32,20 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: a card table. Bone paper, sumi ink, one rust accent for where a card came from
-     and what is in hand. The borders are drawn, the way a card is ruled by hand. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
-    --paper: #f4f2ed;
-    --sheet: #faf9f6;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
     --ink: #23211e;
-    --ink-2: #5f594f;
-    --ink-3: #7d766b;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #c9c2b4;
     --accent: #b5532a;
-    --accent-wash: rgba(181, 83, 42, 0.1);
-    --pen: color-mix(in srgb, var(--ink) 88%, var(--paper));
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -53,27 +52,46 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --paper: #16150f;
-      --sheet: #1f1e17;
+      --bg: #16150f;
+      --surface: #1f1e17;
       --ink: #ede9df;
-      --ink-2: #a39c8e;
-      --ink-3: #857e70;
+      --muted: #a39c8e;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473b;
       --accent: #d9763f;
-      --accent-wash: rgba(217, 118, 63, 0.14);
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --paper: #16150f;
-    --sheet: #1f1e17;
+    --bg: #16150f;
+    --surface: #1f1e17;
     --ink: #ede9df;
-    --ink-2: #a39c8e;
-    --ink-3: #857e70;
+    --muted: #a39c8e;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #4a473b;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: a card table. Bone paper, sumi ink, one rust accent for where a card came from
+     and what is in hand. The borders are drawn, the way a card is ruled by hand. Oblique's
+     own hues: the heavier rule under the masthead and the wash behind a hovered ×. */
+  :root {
+    --rule-2: #c9c2b4;
+    --accent-wash: rgba(181, 83, 42, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473b;
+      --accent-wash: rgba(217, 118, 63, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #4a473b;
     --accent-wash: rgba(217, 118, 63, 0.14);
   }
 
@@ -85,7 +103,7 @@
   }
   html,
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
   body {
@@ -115,7 +133,7 @@
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .hand {
     font-family: var(--serif);
@@ -188,7 +206,7 @@
     margin: 22px 0 0;
     font-size: clamp(20px, 2.4vw, 24px);
     line-height: 1.36;
-    color: var(--ink-2);
+    color: var(--muted);
     max-width: 32ch;
   }
   .deck em {
@@ -208,7 +226,7 @@
     border-bottom: 1px solid var(--rule);
     font-size: 15.5px;
     line-height: 1.4;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .keys kbd,
   .keys b {
@@ -237,7 +255,7 @@
     color: var(--accent);
   }
   .faint {
-    color: var(--ink-3);
+    color: var(--faint);
   }
 
   .card {
@@ -248,7 +266,7 @@
     min-height: 26rem;
     padding: 40px;
     text-align: left;
-    background: var(--sheet);
+    background: var(--surface);
     border-radius: 3px;
     transition:
       transform 220ms var(--ease),
@@ -306,12 +324,12 @@
   }
   .card .foot {
     font-size: 15.5px;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .face.empty .foot {
     margin-top: 12px;
     font-size: 17px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
 
   .chips {
@@ -328,7 +346,7 @@
     text-transform: uppercase;
     line-height: 1.2;
     padding: 6px 11px;
-    color: var(--ink-2);
+    color: var(--muted);
     border: 1px solid var(--rule-2);
     border-radius: 999px;
     transition:
@@ -350,7 +368,7 @@
     border-color: var(--ink);
   }
   .chip.off {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .chip.sure {
     color: var(--accent);
@@ -385,7 +403,7 @@
     transition: border-color 180ms var(--ease);
   }
   .field::placeholder {
-    color: var(--ink-3);
+    color: var(--faint);
     font-style: italic;
   }
   .field:focus {
@@ -395,8 +413,25 @@
   }
   .said {
     font-size: 15px;
-    color: var(--ink-3);
+    color: var(--faint);
     min-height: 1.4em;
+  }
+  .spec-note,
+  .carried,
+  .carry-next {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .spec-note b {
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .carry-next a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
 
   .history {
@@ -412,7 +447,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 16px;
-    color: var(--ink-3);
+    color: var(--faint);
     transition: color 160ms var(--ease);
   }
   .draw-item:hover {
@@ -437,7 +472,7 @@
   .panel {
     position: relative;
     padding: 20px 20px 18px;
-    background: var(--sheet);
+    background: var(--surface);
     border-radius: 3px;
   }
   .panel > :not(.sketch) {
@@ -447,7 +482,7 @@
   .panel .sub {
     margin: 4px 0 0;
     font-size: 15px;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .panel .meta + .chips,
   .panel .sub + .meta {
@@ -480,12 +515,12 @@
   }
   .notes .about {
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .notes .when {
     font-family: var(--mono);
     font-size: 10.5px;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .notes .x {
     grid-row: 1 / span 3;
@@ -496,7 +531,7 @@
     border-radius: 999px;
     font-family: var(--mono);
     font-size: 12px;
-    color: var(--ink-3);
+    color: var(--faint);
     transition:
       color 140ms var(--ease),
       background-color 140ms var(--ease);
@@ -541,7 +576,7 @@
   }
   .small {
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   footer {
     margin-top: 56px;
@@ -551,6 +586,10 @@
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
+  }
+  footer .meta {
+    letter-spacing: 0.14em;
+    color: var(--muted);
   }
 
   /* entry */
@@ -633,7 +672,16 @@
     <section class="rise" style="animation-delay: 100ms" aria-label="The card">
       <button class="card" id="card" type="button"></button>
       <div class="under">
+        <p class="hand spec-note" id="specNote" hidden>
+          <b>A specimen.</b> One card from a sitting that never happened, and
+          what it turned up, there to read before you deal. It can't be changed;
+          make your own to deal a card of yours.
+        </p>
+        <p class="hand carried" id="carried" hidden></p>
         <div class="chips">
+          <button class="chip on" id="makeOwn" type="button" hidden>
+            Make your own
+          </button>
           <button class="chip on" id="deal" type="button">deal</button>
           <button class="chip" id="back" type="button">← back</button>
           <button
@@ -662,6 +710,7 @@
             </button>
             <span class="said hand" id="noteSaid" aria-live="polite"></span>
           </div>
+          <p class="hand carry-next" id="carryNext" hidden></p>
         </div>
         <div
           class="history"
@@ -719,6 +768,31 @@
           your decks and notes stay in this browser
         </p>
       </section>
+
+      <section
+        class="panel rise"
+        id="lawsPanel"
+        style="animation-delay: 280ms"
+        aria-label="What the oblique holds to"
+      >
+        <div class="meta accent">what the oblique holds to</div>
+        <p class="reading">
+          It deals one card at a time from a seeded shuffle of every deck that
+          is not struck, so nothing repeats until the pool is out. It counts
+          what is in the shuffle, what was dealt this sitting and how many notes
+          are kept, and it dates each note.
+        </p>
+        <p class="reading">
+          It never weighs a card, never picks one over another, never says what
+          one means, and never writes the note for you. No host is called,
+          nothing is fetched, and no model is asked.
+        </p>
+        <p
+          class="meta faint gap"
+          id="keptWhere"
+          style="text-transform: none; letter-spacing: 0.02em"
+        ></p>
+      </section>
     </aside>
   </main>
 
@@ -753,8 +827,8 @@
   </section>
 
   <footer>
-    <span class="label">Oblique · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Oblique · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -762,18 +836,16 @@
   "use strict";
   (() => {
     const $ = (id) => document.getElementById(id);
-    const esc = (s) =>
-      String(s).replace(
-        /[&<>"']/g,
-        (c) =>
-          ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-          })[c],
-      );
+    /* capp:esc begin */
+    const ESC = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+    /* capp:esc end */
 
     /* ── the starter deck: prompts in this page's own words ───────────── */
     const STARTER = {
@@ -840,7 +912,15 @@
       ],
     };
 
-    /* ── the hand: deterministic pen strokes (niwa lib/hand.ts) ───────── */
+    /* capp:hand begin */
+    /**
+     * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+     * and the client draw the same line and a re-render never redraws a border.
+     * Amplitudes are in px and small on purpose: a line that wobbles more than a
+     * pixel or two stops reading as drawn and starts reading as broken.
+     */
+
+    /** mulberry32 — small, fast, and the same number sequence everywhere. */
     function rand(seed) {
       let a = seed >>> 0;
       return () => {
@@ -851,6 +931,8 @@
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
       };
     }
+
+    /** A stable seed from a string, so a note's stroke is its own every time. */
     function seedOf(s) {
       let h = 2166136261;
       for (let i = 0; i < s.length; i++) {
@@ -859,8 +941,15 @@
       }
       return h >>> 0;
     }
-    const f1 = (n) => String(Math.round(n * 10) / 10);
+
+    const fx = (n) => String(Math.round(n * 10) / 10);
     const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+    /**
+     * One pen stroke from a to b: a cubic whose control points sit a little off
+     * the straight line, the pen starting and stopping just past the ends the way
+     * a quick sketch does. Returns a segment beginning with its own M.
+     */
     function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
       const dx = b[0] - a[0];
       const dy = b[1] - a[1];
@@ -879,6 +968,8 @@
         b[0] + ux * past + nx * spread(r, wobble * 0.4),
         b[1] + uy * past + ny * spread(r, wobble * 0.4),
       ];
+      // The bow: both control points lean the same way more often than not, so a
+      // long side curves gently rather than kinking.
       const bow = spread(r, wobble);
       const t1 = 0.25 + r() * 0.15;
       const t2 = 0.6 + r() * 0.15;
@@ -890,38 +981,130 @@
         a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
         a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
       ];
-      return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+      return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
     }
-    function roughRect(w, h, seed) {
+
+    /** A box drawn as four strokes, each running a little past its corner. */
+    function roughRect(
+      w,
+      h,
+      seed,
+      { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+    ) {
       const r = rand(seed);
-      const i = 0.5;
+      const x0 = inset;
+      const y0 = inset;
+      const x1 = w - inset;
+      const y1 = h - inset;
       return [
-        stroke([i, i], [w - i, i], r, 1.1, 3),
-        stroke([w - i, i], [w - i, h - i], r, 1.1, 3),
-        stroke([w - i, h - i], [i, h - i], r, 1.1, 3),
-        stroke([i, h - i], [i, i], r, 1.1, 3),
+        stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+        stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+        stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+        stroke([x0, y1], [x0, y0], r, wobble, overshoot),
       ].join("");
     }
-    function roughUnderline(w, seed, y) {
+
+    /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+    function smooth(pts) {
+      let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[Math.max(0, i - 1)];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[Math.min(pts.length - 1, i + 2)];
+        const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+        const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+      }
+      return d;
+    }
+
+    /**
+     * The circling: a loop around a w×h box that starts somewhere on the left,
+     * goes once round, and runs past its own start — the way a word gets ringed
+     * in a notebook. `pad` is how far outside the box the pen stays.
+     */
+    function roughEllipse(
+      w,
+      h,
+      seed,
+      { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+    ) {
+      const r = rand(seed);
+      const cx = w / 2;
+      const cy = h / 2;
+      // An ellipse that only just clears a box cuts through its corners; `grow`
+      // widens it so the ring passes outside the letters at the ends.
+      const rx = (w / 2) * grow + pad;
+      const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+      const tilt = spread(r, 0.06);
+      const a0 = Math.PI * (0.8 + r() * 0.4);
+      const overlap = 1.08 + r() * 0.06;
+      const pts = [];
+      const n = Math.round(steps * overlap);
+      for (let i = 0; i <= n; i++) {
+        const a = a0 + (i / steps) * Math.PI * 2;
+        const kx = rx + spread(r, wobble);
+        const ky = ry + spread(r, wobble);
+        const x = Math.cos(a) * kx;
+        const y = Math.sin(a) * ky;
+        pts.push([
+          cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+          cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+        ]);
+      }
+      return smooth(pts);
+    }
+
+    /** A line drawn under something: a touch before, a touch after, a slight sag. */
+    function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
       const r = rand(seed);
       return stroke(
         [-1 - r() * 2, y],
         [w + 1 + r() * 2, y + spread(r, 0.8)],
         r,
-        0.8,
+        wobble,
         0,
       );
     }
-    function roughStrike(w, h, seed) {
+
+    /**
+     * A long vertical line, like the left edge of a sheet laid on the desk: long
+     * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+     * once or twice on the way down.
+     */
+    function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+      const r = rand(seed);
+      const pts = [];
+      const step = 90;
+      for (let y = -2; y <= h + 2; y += step)
+        pts.push([x + spread(r, wobble), y]);
+      pts.push([x + spread(r, wobble), h + 2]);
+      return smooth(pts);
+    }
+
+    /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+    function jitter(seed, amp = 0.6, turn = 14) {
+      const r = rand(seed);
+      return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+    }
+
+    /** Struck through: a line across the middle that rises a little to the right. */
+    function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
       const r = rand(seed);
       return stroke(
         [-2 - r() * 2, h * 0.58],
         [w + 2 + r() * 2, h * 0.42],
         r,
-        0.9,
+        wobble,
         0,
       );
     }
+
+    /**
+     * A path from this file (M, C and L only, absolute), sampled into points per
+     * subpath — the centreline a pen would have followed.
+     */
     function sample(d) {
       const subs = [];
       let cur = [0, 0];
@@ -970,6 +1153,13 @@
       if (pts.length > 1) subs.push(pts);
       return subs;
     }
+
+    /**
+     * The pen's pressure: a centreline turned into a filled ribbon that is thin
+     * where the pen lands and lifts, fullest through the middle, and never quite
+     * even — a few knots of pressure along the way, interpolated. `width` is the
+     * width at full pressure. Each subpath is its own stroke.
+     */
     function ribbon(d, width = 1.5, seed = 1) {
       const r = rand(seed);
       const out = [];
@@ -1002,10 +1192,11 @@
           right.push([pts[i][0] - nx, pts[i][1] - ny]);
         }
         const poly = [...left, ...right.reverse()];
-        out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+        out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
       }
       return out.join("");
     }
+    /* capp:hand end */
 
     /* A pen line over an element: drawn on when it first appears, re-drawn only when its size changes. */
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1049,7 +1240,7 @@
         sk.kind === "box"
           ? roughRect(w, h, s)
           : sk.kind === "underline"
-            ? roughUnderline(w, s, h - 0.5)
+            ? roughUnderline(w, s, { y: h - 0.5 })
             : roughStrike(w, h, s);
       const pen = PEN[sk.kind];
       const ink = ribbon(line, pen, s);
@@ -1114,7 +1305,45 @@
       return a;
     }
 
+    /* capp:dates begin */
+    const DAY = /^\d{4}-\d{2}-\d{2}$/;
+    const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+    const localToday = () => {
+      const d = new Date();
+      const p = (k) => String(k).padStart(2, "0");
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    };
+    const utc = (d) =>
+      Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+    function daysBetween(a, b) {
+      if (!DAY.test(a) || !DAY.test(b)) return 0;
+      return Math.round((utc(b) - utc(a)) / 86400000);
+    }
+    function addDays(d, k) {
+      if (!DAY.test(d)) return d;
+      return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+    }
+    const dayWords = (d) =>
+      DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+    /* capp:dates end */
+
+    /* capp:slug begin */
+    function slugOf(title, day) {
+      const t = String(title)
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 56)
+        .replace(/-+$/g, "");
+      return `${day.slice(0, 10)}-${t || "sheet"}`;
+    }
+    /* capp:slug end */
+
+    /* capp:plural begin */
     const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+    /* capp:plural end */
 
     /** Facts about the shuffle, none a verdict on any card. */
     function readings(decks, { pool, dealt, notes }) {
@@ -1138,58 +1367,142 @@
 
     /* ── what this browser keeps: the reader's decks and notes ───────── */
     const KEY = "pp-oblique";
-    function load() {
+    /* capp:store begin */
+    function readStore() {
       try {
-        const raw = JSON.parse(localStorage.getItem(KEY) || "null");
-        if (!raw || typeof raw !== "object") return { decks: [], notes: [] };
-        const decks = (Array.isArray(raw.decks) ? raw.decks : [])
-          .filter(
-            (d) =>
-              d &&
-              typeof d.slug === "string" &&
-              SLUG.test(d.slug) &&
-              d.slug !== "starter",
-          )
-          .map((d) => ({
-            slug: d.slug,
-            title:
-              typeof d.title === "string" && d.title.trim()
-                ? clean(d.title).slice(0, 80)
-                : d.slug,
-            own: true,
-            cards: (Array.isArray(d.cards) ? d.cards : [])
-              .filter(
-                (c) =>
-                  typeof c === "string" && clean(c) && clean(c).length <= 300,
-              )
-              .map(clean),
-          }));
-        const notes = (Array.isArray(raw.notes) ? raw.notes : []).filter(
-          (n) => n && typeof n.said === "string" && typeof n.at === "string",
-        );
-        return { decks, notes };
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        return d && typeof d === "object" && d.v === 1 ? d : null;
       } catch {
-        return { decks: [], notes: [] };
+        return null;
       }
     }
-    function save() {
+    function persist(data) {
       try {
-        localStorage.setItem(
-          KEY,
-          JSON.stringify({
-            decks: own.map(({ slug, title, cards }) => ({
-              slug,
-              title,
-              cards,
-            })),
-            notes,
-          }),
-        );
+        localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
         return true;
       } catch {
         return false;
       }
     }
+    /* capp:store end */
+
+    /* The envelope read back, checked row by row: a deck is a slug, a title and cards of at
+       most 300 characters; a note is what was said and the day. A bad row is dropped. */
+    function load() {
+      const env = readStore();
+      if (!env) return { decks: [], notes: [] };
+      const decks = (Array.isArray(env.decks) ? env.decks : [])
+        .filter(
+          (d) =>
+            d &&
+            typeof d.slug === "string" &&
+            SLUG.test(d.slug) &&
+            d.slug !== "starter",
+        )
+        .map((d) => ({
+          slug: d.slug,
+          title:
+            typeof d.title === "string" && d.title.trim()
+              ? clean(d.title).slice(0, 80)
+              : d.slug,
+          own: true,
+          cards: (Array.isArray(d.cards) ? d.cards : [])
+            .filter(
+              (c) =>
+                typeof c === "string" && clean(c) && clean(c).length <= 300,
+            )
+            .map(clean),
+        }));
+      const notes = (Array.isArray(env.notes) ? env.notes : []).filter(
+        (n) => n && typeof n.said === "string" && typeof n.at === "string",
+      );
+      return { decks, notes };
+    }
+    function save() {
+      return persist({
+        decks: own.map(({ slug, title, cards }) => ({ slug, title, cards })),
+        notes,
+      });
+    }
+
+    const SELF = "oblique";
+    const SLUGS = [
+      "catalogue",
+      "bearing",
+      "distribution",
+      "flow",
+      "course",
+      "alarm",
+      "way",
+      "margin",
+      "provenance",
+      "oblique",
+      "dialogue",
+      "mask",
+      "tack",
+      "sieve",
+      "wish",
+      "break",
+      "overview",
+      "fence",
+      "muster",
+      "botec",
+      "act",
+      "crowd",
+      "canon",
+      "panel",
+      "slice",
+      "toll",
+      "unison",
+      "spine",
+      "circuits",
+      "real-ideal",
+      "attention",
+      "normal",
+      "half-second",
+      "familiar-voice",
+      "stop-flowing",
+      "chronology",
+    ];
+    /* capp:hash begin */
+    function fromHash() {
+      const h = location.hash.slice(1);
+      if (!h.includes("=")) return null;
+      const q = new URLSearchParams(h);
+      const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+      const set = q.get("set") || "";
+      const out = {
+        set: set.length <= 4000 ? set : "",
+        from: ok(q.get("from") || "") ? q.get("from") : "",
+        next: ok(q.get("next") || "") ? q.get("next") : "",
+      };
+      try {
+        history.replaceState(null, "", location.pathname + location.search);
+      } catch {}
+      return out.set || out.from || out.next ? out : null;
+    }
+    function carryHref(slug, text, next) {
+      const base =
+        location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+      const q = new URLSearchParams();
+      q.set("set", text);
+      q.set("from", SELF);
+      if (next) q.set("next", next);
+      return `${base}#${q}`;
+    }
+    /* capp:hash end */
+
+    /* ── the specimen ──────────────────────────────────────────────────
+       One card from a sitting that never happened, and what ten minutes with it turned up.
+       Fiction, read-only, never written. */
+    const SPECIMEN = {
+      card: "Which word are you leaning on? Take it out.",
+      deck: "the starter deck",
+      said: "The word was 'just'. Without it the sentence asked for a day's work, which is what it was.",
+      at: "2026-09-21",
+    };
 
     /* ── state ────────────────────────────────────────────────────────── */
     const kept = load();
@@ -1197,7 +1510,7 @@
     let notes = kept.notes;
     const off = new Set();
     let seed = Math.floor(Math.random() * 1e9);
-    let history = [];
+    let dealt = [];
     let at = -1;
     let pos = 0;
     let pool = [];
@@ -1206,6 +1519,7 @@
     let naming = false;
     let sure = false;
     let shownKey = "";
+    const S = { specimen: false, from: "", next: "" };
 
     const decks = () => [STARTER, ...own];
     function rebuild() {
@@ -1214,10 +1528,11 @@
       order = shuffle(pool, seed);
       pos = 0;
     }
-    const card = () => (at >= 0 ? history[at] : null);
+    const card = () => (at >= 0 ? dealt[at] : null);
 
     function deal() {
-      if (at < history.length - 1) {
+      if (S.specimen) return;
+      if (at < dealt.length - 1) {
         at++;
         sure = false;
         return render();
@@ -1230,8 +1545,8 @@
         next = order[0];
         pos = 1;
       } else next = order[pos++];
-      history.push(next);
-      at = history.length - 1;
+      dealt.push(next);
+      at = dealt.length - 1;
       sure = false;
       render();
     }
@@ -1305,7 +1620,7 @@
         card: c.text,
         deck: d ? d.title : c.from,
         said: said.slice(0, 2000),
-        at: new Date().toISOString(),
+        at: localToday(),
       });
       const ok = save();
       $("note").value = "";
@@ -1319,18 +1634,35 @@
     function renderCard() {
       const c = card();
       const el = $("card");
-      el.disabled = !pool.length && !c;
-      el.setAttribute("aria-label", c ? "Deal the next card" : "Deal a card");
-      const key = c ? `${at}:${c.id}` : `empty:${pool.length ? 1 : 0}`;
+      el.disabled = S.specimen || (!pool.length && !c);
+      el.setAttribute(
+        "aria-label",
+        S.specimen
+          ? "The specimen card"
+          : c
+            ? "Deal the next card"
+            : "Deal a card",
+      );
+      const key = S.specimen
+        ? "specimen"
+        : c
+          ? `${at}:${c.id}`
+          : `empty:${pool.length ? 1 : 0}`;
       if (key === shownKey) return;
       shownKey = key;
       const svg = el.querySelector(":scope > svg.sketch");
       el.innerHTML = "";
-      if (c) {
+      if (S.specimen) {
+        el.innerHTML =
+          `<div class="face dealt"><div class="head meta"><span class="accent">${esc(SPECIMEN.deck)}</span>` +
+          `<span class="faint">the specimen · fiction · read only</span></div>` +
+          `<p class="words">${esc(SPECIMEN.card)}</p>` +
+          `<span class="foot hand">make your own to deal a card of yours</span></div>`;
+      } else if (c) {
         const d = decks().find((x) => x.slug === c.from);
         el.innerHTML =
           `<div class="face dealt"><div class="head meta"><span class="accent">${esc(d ? d.title : c.from)}</span>` +
-          `<span class="faint">${at + 1} of ${history.length} this sitting</span></div>` +
+          `<span class="faint">${at + 1} of ${dealt.length} this sitting</span></div>` +
           `<p class="words">${esc(c.text)}</p>` +
           `<span class="foot hand">click, space or → for the next · ← back</span></div>`;
       } else {
@@ -1342,32 +1674,55 @@
           `</div>`;
       }
       if (svg) el.appendChild(svg);
-      sketch(el, "box", c ? c.id + ":" + at : "oblique-empty");
+      sketch(
+        el,
+        "box",
+        S.specimen ? "oblique-specimen" : c ? c.id + ":" + at : "oblique-empty",
+      );
     }
 
     function renderControls() {
       const c = card();
-      $("deal").disabled = !pool.length && !(at < history.length - 1);
-      $("back").disabled = at <= 0;
-      $("again").disabled = !pool.length;
+      const ro = S.specimen;
+      $("specNote").hidden = !ro;
+      const carried = $("carried");
+      carried.hidden = !S.from;
+      carried.textContent = S.from ? `Carried from ${S.from}` : "";
+      $("makeOwn").hidden = !ro;
+      $("deal").disabled = ro || (!pool.length && !(at < dealt.length - 1));
+      $("back").disabled = ro || at <= 0;
+      $("again").disabled = ro || !pool.length;
       const d = c && own.find((x) => x.slug === c.from);
       const tb = $("takeBack");
       tb.hidden = !d;
       tb.textContent = sure ? "take it back — sure?" : "take this card back";
       tb.classList.toggle("sure", sure);
-      $("count").textContent = pool.length
-        ? `${Math.min(pos, order.length)} of ${pool.length} in this shuffle`
+      $("count").textContent =
+        pool.length && !ro
+          ? `${Math.min(pos, order.length)} of ${pool.length} in this shuffle`
+          : "";
+      $("turned").hidden = !c && !ro;
+      $("note").readOnly = ro;
+      $("keepNote").hidden = ro;
+      renderCarry();
+    }
+
+    /* The hand-off onward: one link in what it turned up, built from the note as it stands. */
+    function renderCarry() {
+      const el = $("carryNext");
+      el.hidden = !S.next || S.specimen;
+      el.innerHTML = S.next
+        ? `<a href="${esc(carryHref(S.next, $("note").value, ""))}">Carry this to ${esc(S.next)}</a>`
         : "";
-      $("turned").hidden = !c;
     }
 
     function renderHistory() {
       const h = $("history");
-      h.hidden = history.length < 2;
+      h.hidden = S.specimen || dealt.length < 2;
       if (h.hidden) return (h.innerHTML = "");
       h.innerHTML =
         `<span class="meta faint">dealt</span>` +
-        history
+        dealt
           .map(
             (c, i) =>
               `<button type="button" class="draw-item hand" data-i="${i}"${i === at ? ' aria-current="true"' : ""}><span class="clip">${esc(c.text)}</span></button>`,
@@ -1413,7 +1768,7 @@
     function renderReading() {
       $("reading").textContent = readings(decks(), {
         pool: pool.length,
-        dealt: history.length,
+        dealt: dealt.length,
         notes: notes.length,
       }).join(" · ");
       $("notesWrap").hidden = !notes.length;
@@ -1427,6 +1782,8 @@
             `<button type="button" class="x" data-note="${esc(n.id)}" aria-label="Take this note back" title="take this note back">×</button></li>`,
         )
         .join("");
+      $("keptWhere").textContent =
+        `kept in this browser only, under ${KEY} · nowhere else`;
     }
 
     /** The sitting: the card, its controls, the draws and the reading. The desk is drawn only when it changes. */
@@ -1509,6 +1866,7 @@
         add();
       }
     });
+    $("makeOwn").addEventListener("click", fresh);
     $("keepNote").addEventListener("click", keepNote);
     $("note").addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -1516,7 +1874,10 @@
         keepNote();
       }
     });
-    $("note").addEventListener("input", () => ($("noteSaid").textContent = ""));
+    $("note").addEventListener("input", () => {
+      $("noteSaid").textContent = "";
+      renderCarry();
+    });
     $("notes").addEventListener("click", (e) => {
       const b = e.target.closest("[data-note]");
       if (!b) return;
@@ -1549,9 +1910,58 @@
       }
     });
 
-    rebuild();
-    render(true);
+    /* ── opening ──────────────────────────────────────────────────────── */
+
+    /* A sitting of the reader's own: no card yet, the note empty, nothing carried. */
+    function fresh() {
+      S.specimen = false;
+      S.from = "";
+      S.next = "";
+      dealt = [];
+      at = -1;
+      sure = false;
+      $("note").value = "";
+      $("noteSaid").textContent = "";
+      render(true);
+    }
+
+    function loadSpecimen() {
+      S.specimen = true;
+      S.from = "";
+      S.next = "";
+      dealt = [];
+      at = -1;
+      sure = false;
+      $("note").value = SPECIMEN.said;
+      $("noteSaid").textContent = "";
+      render(true);
+    }
+
+    /* A hand-off read from the address: a new sitting of the reader's own, the carried text in
+       the note for what the next card turns up and nothing else, not kept until the note is. */
+    function carried(h) {
+      fresh();
+      S.from = h.from;
+      S.next = h.next;
+      if (h.set) $("note").value = h.set;
+      render();
+    }
+
+    function boot() {
+      rebuild();
+      const h = fromHash();
+      if (h) return carried(h);
+      if (own.length || notes.length) fresh();
+      else loadSpecimen();
+    }
+
+    boot();
     sketch($("shufflePanel"), "box", "oblique-desk");
     sketch($("readingPanel"), "box", "oblique-reading");
+    sketch($("lawsPanel"), "box", "oblique-laws");
+    window.addEventListener("hashchange", () => {
+      const h = fromHash();
+      if (h) carried(h);
+    });
   })();
 </script>

@@ -32,24 +32,20 @@
     font-display: swap;
   }
 
-  /* Layout: a sheet of drawing paper with a desk beside it. Ink on bone. The alarm's five colours are
-     only ever the circuit: rust is the amygdala and the low road, slate the prefrontal brake, moss the
-     vagal brake and calm, ochre the sympathetic surge, plum the defences that fire on their own. */
+  /* Layout: a sheet of drawing paper with a desk beside it. Ink on bone. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #9a9287;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --alarm-amyg: #a8452c;
-    --alarm-pfc: #4f5f8a;
-    --alarm-vagal: #5e7a4e;
-    --alarm-symp: #b08a3e;
-    --alarm-freeze: #7e5a78;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -61,14 +57,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #6f685c;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
-      --alarm-amyg: #c4623f;
-      --alarm-pfc: #8393c4;
-      --alarm-vagal: #8dae78;
-      --alarm-symp: #d2aa5a;
-      --alarm-freeze: #b48aad;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -77,9 +70,34 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #6f685c;
+    --faint: #7d766a;
     --rule: #302e25;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* The alarm's five colours are only ever the circuit: rust is the amygdala and the low road,
+     slate the prefrontal brake, moss the vagal brake and calm, ochre the sympathetic surge, plum
+     the defences that fire on their own. */
+  :root {
+    --alarm-amyg: #a8452c;
+    --alarm-pfc: #4f5f8a;
+    --alarm-vagal: #5e7a4e;
+    --alarm-symp: #b08a3e;
+    --alarm-freeze: #7e5a78;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --alarm-amyg: #c4623f;
+      --alarm-pfc: #8393c4;
+      --alarm-vagal: #8dae78;
+      --alarm-symp: #d2aa5a;
+      --alarm-freeze: #b48aad;
+    }
+  }
+  :root[data-theme="dark"] {
     --alarm-amyg: #c4623f;
     --alarm-pfc: #8393c4;
     --alarm-vagal: #8dae78;
@@ -116,18 +134,8 @@
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
     background-size: 220px 220px;
-    opacity: 0.06;
-    mix-blend-mode: multiply;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) body::after {
-      mix-blend-mode: screen;
-      opacity: 0.045;
-    }
-  }
-  :root[data-theme="dark"] body::after {
-    mix-blend-mode: screen;
-    opacity: 0.045;
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
   }
   ::selection {
     background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -176,6 +184,9 @@
   .meta.plain {
     text-transform: none;
     letter-spacing: 0.04em;
+  }
+  .meta.accent {
+    color: var(--accent);
   }
   .hand {
     font-family: var(--serif);
@@ -752,14 +763,26 @@
     flex: 1;
     min-width: 8rem;
   }
-  .how {
-    font-size: 15px;
-    line-height: 1.45;
-    color: var(--faint);
-    margin: 0;
+  .desk-text {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
   }
-  .how em {
-    font-style: italic;
+  #keptWhere {
+    margin-top: 12px;
+    color: var(--faint);
+  }
+  .carried,
+  .carry {
+    margin: 6px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .carry a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
 
   /* coda */
@@ -793,6 +816,9 @@
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
+  }
+  footer .meta {
+    color: var(--muted);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -954,19 +980,33 @@
 
       <section aria-label="Pathways asked" id="asked"></section>
 
-      <p class="how hand">
-        how it is read: name what sets your alarm off, what fires when it does,
-        and what brings it down. then mark a pathway against them and poke it.
-        the body here is a toy; the names are yours. a touched trigger bends the
-        pathway&rsquo;s line up by how hard it hits times how much of it is on
-        the path; a brake within reach bends it down by how fast it works, with
-        less room the more loaded you are today. the line is your marks added up
-        and nothing else. the run is the sandbox&rsquo;s physics, unchanged: the
-        low road wins the race, sleep debt and stress lower the brake&rsquo;s
-        ceiling, hold the alarm too high and it flips to freeze. nothing here
-        scores a person.
-        <span id="whereKept"></span>
-      </p>
+      <section
+        class="panel"
+        id="lawsPanel"
+        aria-label="What the alarm holds to"
+      >
+        <p class="meta accent">what the alarm holds to</p>
+        <p class="desk-text">
+          How it is read: name what sets your alarm off, what fires when it
+          does, and what brings it down; then mark a pathway against them and
+          poke it. The body here is a toy; the names are yours. A touched
+          trigger bends the pathway&rsquo;s line up by how hard it hits times
+          how much of it is on the path; a brake within reach bends it down by
+          how fast it works, with less room the more loaded you are today. The
+          line is your marks added up and nothing else. The run is the
+          sandbox&rsquo;s physics, unchanged: the low road wins the race, sleep
+          debt and stress lower the brake&rsquo;s ceiling, hold the alarm too
+          high and it flips to freeze.
+        </p>
+        <p class="desk-text">
+          It never scores a person, ranks a pathway or says which road you will
+          take. Nothing is guessed in: a trigger you did not name does not bend
+          the line, and the reading counts and dates and never grades. No host
+          is called, no model is asked, and nothing you write leaves this
+          browser.
+        </p>
+        <p class="meta plain" id="keptWhere"></p>
+      </section>
       <p class="meta plain faint">
         / find · n ask · space poke · b brake · r reset · esc
       </p>
@@ -1007,13 +1047,64 @@
   </section>
 
   <footer>
-    <span class="label">Alarm · CAPP · prototype, October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Alarm · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
 <script>
   "use strict";
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
 
   // ---- pure: begin ----------------------------------------------------------------------------
   // The alarm's model, ported by hand from niwa's lib/alarm.ts with the maths unchanged: the toy
@@ -1387,7 +1478,6 @@
   // validation at the boundary: what comes out of storage, and what the desk asks to keep
   const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
   const ID = /^[a-z][a-z0-9-]{0,39}$/;
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
   const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
   const strs = (v, n, max) =>
     Array.isArray(v)
@@ -1402,18 +1492,6 @@
     return Number.isFinite(n) ? Math.round(Math.max(0, Math.min(100, n))) : d;
   };
   const dayStr = (v) => (typeof v === "string" ? v.trim() : "");
-
-  function slugOf(title) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 64)
-      .replace(/-+$/g, "");
-    return t || "pathway";
-  }
 
   /** An id for a named thing in the circuit, from its label. */
   function idOf(label, taken) {
@@ -1531,7 +1609,7 @@
     const title = str(p.title, 200);
     if (!title) throw new Error("pathway: it needs a title");
     const slugIn = str(p.slug, 80);
-    const slug = slugIn || slugOf(title);
+    const slug = slugIn || slugOf(title, today);
     if (!SLUG.test(slug)) throw new Error("pathway: bad slug");
     const triggerIds = new Set(c.triggers.map((t) => t.id));
     const touches = {};
@@ -1575,7 +1653,15 @@
     note: "",
   });
 
-  // ---- the hand: deterministic pen strokes, from niwa's lib/hand.ts ----
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -1586,6 +1672,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -1594,10 +1682,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
-  /** One pen stroke from a to b, starting and stopping just past the ends. */
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -1616,6 +1709,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -1627,26 +1722,32 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
 
   /** A box drawn as four strokes, each running a little past its corner. */
-  function roughRect(w, h, seed) {
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
     const r = rand(seed);
-    const x0 = 0.5;
-    const y0 = 0.5;
-    const x1 = w - 0.5;
-    const y1 = h - 0.5;
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
     return [
-      stroke([x0, y0], [x1, y0], r, 1.1, 3),
-      stroke([x1, y0], [x1, y1], r, 1.1, 3),
-      stroke([x1, y1], [x0, y1], r, 1.1, 3),
-      stroke([x0, y1], [x0, y0], r, 1.1, 3),
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
     ].join("");
   }
 
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[Math.max(0, i - 1)];
       const p1 = pts[i];
@@ -1654,12 +1755,16 @@
       const p3 = pts[Math.min(pts.length - 1, i + 2)];
       const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
       const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
     }
     return d;
   }
 
-  /** The circling: once round a w×h box and a little past its own start. */
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -1669,6 +1774,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -1690,6 +1797,55 @@
     return smooth(pts);
   }
 
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1739,7 +1895,12 @@
     return subs;
   }
 
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -1770,10 +1931,11 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
   // ---- pure: end ------------------------------------------------------------------------------
 
   // ---- Specimen A: a synthetic circuit with three pathways. Fiction; nobody's nervous system. ----
@@ -1918,42 +2080,8 @@
 
   // ---- the page ---------------------------------------------------------------------------------
   const NS = "http://www.w3.org/2000/svg";
-  const KEY = "pp-alarm";
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
-  const todayStr = () => new Date().toISOString().slice(0, 10);
   const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
-  const MON = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const dayOf = (iso) => {
-    if (!iso) return "";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return `${d.getUTCDate()} ${MON[d.getUTCMonth()]}${d.getUTCFullYear() !== new Date().getUTCFullYear() ? ` ${d.getUTCFullYear()}` : ""}`;
-  };
   const STATE_COLOR = {
     calm: "var(--alarm-vagal)",
     rest: "var(--alarm-vagal)",
@@ -2011,7 +2139,7 @@
 
   // ---- state ----
   let own = { circuit: EMPTY_CIRCUIT, pathways: [] };
-  let view = "specimen";
+  const S = { specimen: true, from: "", next: "" };
   let selected = null;
   let draft = null; // { pathway, fresh }
   let sure = false;
@@ -2036,10 +2164,8 @@
   let accum = { out: 0, brake: 0, sample: 0, quiet: 0 };
   let heartPhase = 0;
 
-  const isSpec = () => view === "specimen";
-  const writable = () => !isSpec();
-  const circuit = () => (isSpec() ? SPECIMEN_CIRCUIT : own.circuit);
-  const pathways = () => (isSpec() ? SPECIMEN_PATHWAYS : own.pathways);
+  const circuit = () => (S.specimen ? SPECIMEN_CIRCUIT : own.circuit);
+  const pathways = () => (S.specimen ? SPECIMEN_PATHWAYS : own.pathways);
   const curLoad = () => loadDraft || circuit().load;
   const knobs = () => knobsOf(curLoad());
   const P = () => (draft ? draft.pathway : null);
@@ -2053,21 +2179,32 @@
   const clone = (x) => JSON.parse(JSON.stringify(x));
 
   // ---- keeping: one key in this browser, and the page still works when storage throws ----
-  function loadStore() {
-    let raw = null;
+  const KEY = "pp-alarm";
+  /* capp:store begin */
+  function readStore() {
     try {
-      raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
     } catch {
-      return;
+      return null;
     }
-    if (!raw) return;
-    let data;
+  }
+  function persist(data) {
     try {
-      data = JSON.parse(raw);
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
     } catch {
-      return;
+      return false;
     }
-    if (!data || typeof data !== "object") return;
+  }
+  /* capp:store end */
+  /* The envelope read back, row by row: a circuit that does not validate is the empty one,
+     a pathway that does not is dropped. */
+  function loadOwn() {
+    const data = readStore();
+    if (!data) return;
     let c = EMPTY_CIRCUIT;
     try {
       c = validateCircuit(data.circuit);
@@ -2079,24 +2216,14 @@
       .filter((p) => !!p)
       .sort((a, b) => (a.asked < b.asked ? 1 : a.asked > b.asked ? -1 : 0));
     own = { circuit: c, pathways: ps };
-    if (data.view === "own") view = "own";
+    if (data.view === "own") S.specimen = false;
   }
-  function saveStore() {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({
-          v: 1,
-          view,
-          circuit: own.circuit,
-          pathways: own.pathways,
-        }),
-      );
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  const saveOwn = () =>
+    persist({
+      view: S.specimen ? "specimen" : "own",
+      circuit: own.circuit,
+      pathways: own.pathways,
+    });
   function settleKept(state) {
     kept = state;
     renderPokes();
@@ -2119,10 +2246,10 @@
 
   /** Ask a pathway, or rewrite one. A fresh one whose slug is taken gets a numbered one. */
   function putPathway(pw, fresh) {
-    if (!writable()) return null;
+    if (S.specimen) return null;
     let k;
     try {
-      k = validatePathway(pw, own.circuit, todayStr());
+      k = validatePathway(pw, own.circuit, localToday());
     } catch (e) {
       settleKept("error");
       say(String(e.message).replace(/^pathway: /, ""));
@@ -2137,12 +2264,12 @@
     own.pathways = fresh
       ? [k, ...own.pathways.filter((x) => x.slug !== k.slug)]
       : own.pathways.map((x) => (x.slug === k.slug ? k : x));
-    settleKept(saveStore() ? "kept" : "error");
+    settleKept(saveOwn() ? "kept" : "error");
     return k;
   }
 
   function putCircuit(next) {
-    if (!writable()) return;
+    if (S.specimen) return;
     try {
       own.circuit = validateCircuit(next);
     } catch (e) {
@@ -2150,14 +2277,14 @@
       say(String(e.message).replace(/^circuit: /, ""));
       return;
     }
-    settleKept(saveStore() ? "kept" : "error");
+    settleKept(saveOwn() ? "kept" : "error");
     render();
   }
 
   function remove(slug) {
-    if (!writable()) return;
+    if (S.specimen) return;
     own.pathways = own.pathways.filter((x) => x.slug !== slug);
-    saveStore();
+    saveOwn();
     selected = null;
     draft = null;
     sure = false;
@@ -2166,7 +2293,7 @@
   }
 
   function keepDraft() {
-    if (!draft || !writable()) return;
+    if (!draft || S.specimen) return;
     if (!draft.pathway.title.trim()) {
       say("it needs a title.");
       $("pwTitle")?.focus();
@@ -2182,14 +2309,16 @@
   }
 
   function begin(title = "") {
-    if (!writable()) {
+    if (S.specimen) {
       say(
-        isSpec() ? "the specimen is not yours to change." : "read-only here.",
+        S.specimen ? "the specimen is not yours to change." : "read-only here.",
       );
       return;
     }
     selected = null;
-    draft = { pathway: emptyPathway(todayStr(), title), fresh: true };
+    S.from = "";
+    S.next = "";
+    draft = { pathway: emptyPathway(localToday(), title), fresh: true };
     sure = false;
     render();
     $("pwTitle")?.focus();
@@ -2197,6 +2326,8 @@
 
   function pick(slug) {
     selected = slug;
+    S.from = "";
+    S.next = "";
     const c = chosen();
     draft = c ? { pathway: clone(c), fresh: false } : null;
     sure = false;
@@ -2205,6 +2336,8 @@
 
   function close() {
     selected = null;
+    S.from = "";
+    S.next = "";
     draft = null;
     sure = false;
     render();
@@ -2216,8 +2349,12 @@
   }
 
   function sayWent(w) {
-    if (!draft || !writable()) return;
-    const next = { ...draft.pathway, went: w, wentDay: w ? todayStr() : null };
+    if (!draft || S.specimen) return;
+    const next = {
+      ...draft.pathway,
+      went: w,
+      wentDay: w ? localToday() : null,
+    };
     draft = { ...draft, pathway: next };
     if (!draft.fresh) {
       const k = putPathway(next, false);
@@ -2233,18 +2370,87 @@
   }
 
   function setView(v) {
-    if (v === view) return;
+    if ((v === "specimen") === S.specimen) return;
     reset();
-    view = v;
+    S.specimen = v === "specimen";
+    S.from = "";
+    S.next = "";
     selected = null;
     draft = null;
     sure = false;
     loadDraft = null;
     if (v === "own" && own.circuit.triggers.length === 0) circuitOpen = true;
     if (v === "specimen") openSpecimen();
-    saveStore();
+    saveOwn();
     render();
   }
+
+  const SELF = "alarm";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
 
   // ---- the drawing -----------------------------------------------------------------------------
   const bez = (a, c1, c2, b) =>
@@ -2893,13 +3099,12 @@
   function renderWhose() {
     put(
       $("whose"),
-      isSpec()
-        ? `<span>Specimen A&rsquo;s circuit — a synthetic nervous system, fiction to show the instrument; nobody&rsquo;s.</span><button type="button" class="link" data-act="view" data-v="own" data-k="view">make your own</button>`
+      S.specimen
+        ? `<span>Specimen A&rsquo;s circuit — a synthetic nervous system, fiction to show the instrument; nobody&rsquo;s.</span><button type="button" class="link" data-act="view" data-v="own" data-k="view">Make your own</button>`
         : `<span>Your circuit — kept in this browser, and nowhere else.</span><button type="button" class="link" data-act="view" data-v="specimen" data-k="view">show the specimen</button>`,
     );
-    $("whereKept").textContent = isSpec()
-      ? ""
-      : `kept in this browser, under ${KEY}; nothing leaves it.`;
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
   }
 
   function renderPokes() {
@@ -2931,7 +3136,7 @@
           ? "kept"
           : kept === "error"
             ? "not kept"
-            : writable()
+            : !S.specimen
               ? ""
               : "specimen";
     h += `<span class="meta" style="color:${kept === "error" ? "var(--accent)" : "var(--faint)"}">${status}</span>`;
@@ -2945,13 +3150,13 @@
         : x.went === "calm"
           ? "var(--alarm-vagal)"
           : "var(--faint)";
-    return `<li><button type="button" class="row${selected === x.slug ? " on" : ""}" data-act="pick" data-slug="${esc(x.slug)}" data-k="pick-${esc(x.slug)}"><span class="hand">${esc(x.title)}</span><span class="meta plain" style="color:${c}">${esc(x.went ?? dayOf(x.asked))}</span></button></li>`;
+    return `<li><button type="button" class="row${selected === x.slug ? " on" : ""}" data-act="pick" data-slug="${esc(x.slug)}" data-k="pick-${esc(x.slug)}"><span class="hand">${esc(x.title)}</span><span class="meta plain" style="color:${c}">${esc(x.went ?? dayWords(x.asked))}</span></button></li>`;
   }
 
   function renderSearch() {
     put(
       $("qLabel"),
-      `a pathway asked${writable() ? ` · <button type="button" class="link-in" data-act="begin" data-k="begin" style="color:var(--muted);text-transform:none;letter-spacing:0;text-decoration:underline">ask a new one</button>` : ""}`,
+      `a pathway asked${!S.specimen ? ` · <button type="button" class="link-in" data-act="begin" data-k="begin" style="color:var(--muted);text-transform:none;letter-spacing:0;text-decoration:underline">ask a new one</button>` : ""}`,
     );
     const q = query.trim().toLowerCase();
     const results =
@@ -2985,10 +3190,11 @@
     }
     pwSketch.reseed(`pathway-${p.slug || "fresh"}`);
     const c = circuit();
-    const ro = writable() ? "" : " readonly";
-    const dis = !writable();
+    const ro = !S.specimen ? "" : " readonly";
+    const dis = S.specimen;
     const lean = leanOf(bendsOf(p, c).lean);
     let h = `<div class="pw-head"><div class="meta" style="color:var(--accent)">${draft.fresh ? "asking" : "on the desk"}<span class="faint"> · ${lean === "vigilant" ? "runs to hypervigilance" : lean === "calm" ? "runs to calm" : "hangs between"}</span></div><button type="button" class="meta faint" data-act="close" data-k="close" aria-label="Close">esc</button></div>`;
+    if (S.from) h += `<p class="hand carried">Carried from ${esc(S.from)}</p>`;
     h += `<input id="pwTitle" data-field="title" data-k="title" class="search hand title mt1" maxlength="200" placeholder="the decision, the plan, the road" aria-label="Title"${ro} />`;
     h += `<textarea id="pwPut" data-field="put" data-k="put" class="search hand mt1" rows="2" maxlength="5000" placeholder="in words — what it would actually be like, day to day" aria-label="The pathway in words"${ro}></textarea>`;
     h += `<div class="meta mt" style="color:var(--alarm-amyg)">what it touches <span class="faint">· how much of each is on it</span></div>`;
@@ -3041,10 +3247,10 @@
     h += `<label class="meta faint mt" style="display:block" for="pwNote">note</label>`;
     h += `<textarea id="pwNote" data-field="note" data-k="note" class="search hand mt1" rows="2" maxlength="20000" placeholder="what you know already"${ro}></textarea>`;
     h += `<div class="chips" style="margin-top:10px">`;
-    if (writable())
+    if (!S.specimen)
       h += `<button type="button" class="chip" id="keepBtn" data-act="keep" data-k="keep" style="color:var(--accent);border-color:var(--accent)">${draft.fresh ? "ask it" : "keep"}</button>`;
     const ch = chosen();
-    if (writable() && !draft.fresh && ch)
+    if (!S.specimen && !draft.fresh && ch)
       h += `<button type="button" class="chip" data-act="take" data-k="take" style="color:${sure ? "var(--accent)" : "var(--faint)"};${sure ? "border-color:var(--accent)" : ""}">${sure ? "yes, take it back" : "take it back"}</button>`;
     h += `</div>`;
     if (!draft.fresh && ch) {
@@ -3064,11 +3270,13 @@
             label: w,
           }),
       ).join("")}</div>`;
-      h += `<p class="meta plain faint" style="margin:8px 0 0">asked ${esc(dayOf(ch.asked))}${ch.went ? ` · said ${esc(ch.went)} ${esc(dayOf(ch.wentDay))}` : ""}</p></div>`;
+      h += `<p class="meta plain faint" style="margin:8px 0 0">asked ${esc(dayWords(ch.asked))}${ch.went ? ` · said ${esc(ch.went)} ${esc(dayWords(ch.wentDay))}` : ""}</p></div>`;
     }
+    if (S.next && !S.specimen)
+      h += `<p class="hand carry"><a href="${esc(carryHref(S.next, p.put, ""))}">Carry this to ${esc(S.next)}</a></p>`;
     const rebuilt = put($("pwIn"), h);
     // the text the reader is typing is set once per pathway, never re-rendered under the caret
-    const sig = `${p.slug}|${draft.fresh}|${view}`;
+    const sig = `${p.slug}|${draft.fresh}|${S.specimen}`;
     if (rebuilt || $("pwIn").__sig !== sig) {
       for (const [id, k] of [
         ["pwTitle", "title"],
@@ -3098,7 +3306,7 @@
     const c = circuit();
     const words = readings(tally(p, c, pathways()), p, c);
     let h = `<ul class="reading mt1">${words.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>`;
-    if (writable() && c.triggers.length === 0)
+    if (!S.specimen && c.triggers.length === 0)
       h += `<div style="margin-top:12px">${chip({ act: "view", args: { v: "specimen" }, label: "show the specimen · a synthetic circuit", k: "spec-chip" })}</div>`;
     put($("readingIn"), h);
   }
@@ -3106,18 +3314,18 @@
   function renderLoad() {
     const c = circuit();
     const l = curLoad();
-    let h = `<div class="meta faint between"><span>as you are today${c.loadDay ? ` · set ${esc(dayOf(c.loadDay))}` : ""}</span><span id="ceil" style="color:var(--alarm-pfc)">ceiling ${Math.round(ceilingOf(knobs()))}</span></div><ul class="dials mt1">`;
+    let h = `<div class="meta faint between"><span>as you are today${c.loadDay ? ` · set ${esc(dayWords(c.loadDay))}` : ""}</span><span id="ceil" style="color:var(--alarm-pfc)">ceiling ${Math.round(ceilingOf(knobs()))}</span></div><ul class="dials mt1">`;
     for (const [k, label, hint] of LOADS)
-      h += `<li><label class="hand" for="dial-${k}">${label}<span class="hint"> · ${hint}</span></label><input type="range" class="dial" id="dial-${k}" data-dial="${k}" data-k="dial-${k}" min="0" max="100" value="${l[k]}"${writable() ? "" : " disabled"} /><span class="meta plain v" id="dv-${k}">${l[k]}</span></li>`;
+      h += `<li><label class="hand" for="dial-${k}">${label}<span class="hint"> · ${hint}</span></label><input type="range" class="dial" id="dial-${k}" data-dial="${k}" data-k="dial-${k}" min="0" max="100" value="${l[k]}"${!S.specimen ? "" : " disabled"} /><span class="meta plain v" id="dv-${k}">${l[k]}</span></li>`;
     h += `</ul>`;
     put($("load"), h);
   }
 
   function editLabel(kind, x) {
-    return `<input class="search hand small" data-edit="${kind}" data-id="${esc(x.id)}" data-k="edit-${kind}-${esc(x.id)}" value="${esc(x.label)}" aria-label="${kind} name"${writable() ? "" : " readonly"} />`;
+    return `<input class="search hand small" data-edit="${kind}" data-id="${esc(x.id)}" data-k="edit-${kind}-${esc(x.id)}" value="${esc(x.label)}" aria-label="${kind} name"${!S.specimen ? "" : " readonly"} />`;
   }
   function removeBtn(kind, x) {
-    return writable()
+    return !S.specimen
       ? `<button type="button" class="x" data-act="rm" data-kind="${kind}" data-id="${esc(x.id)}" data-k="rm-${kind}-${esc(x.id)}" aria-label="Remove ${esc(x.label)}">×</button>`
       : "";
   }
@@ -3132,7 +3340,7 @@
     );
     $("circ").hidden = !circuitOpen;
     if (!circuitOpen) return;
-    const dis = !writable();
+    const dis = S.specimen;
     const ro = dis ? " readonly" : "";
     let h = `<div class="meta" style="color:var(--alarm-amyg)">triggers <span class="faint">· what sets it off, and how hard</span></div><ul class="named mt1">`;
     for (const tr of c.triggers) {
@@ -3334,7 +3542,7 @@
         circuitOpen = !circuitOpen;
         return renderCircuit();
       case "touch": {
-        if (!writable() || !p) return;
+        if (S.specimen || !p) return;
         const n = +btn.dataset.n;
         const next = { ...p.touches };
         if (n === 0) delete next[id];
@@ -3343,7 +3551,7 @@
         return render();
       }
       case "brake":
-        if (!writable() || !p) return;
+        if (S.specimen || !p) return;
         setField(
           "brakes",
           p.brakes.includes(id)
@@ -3352,7 +3560,7 @@
         );
         return render();
       case "expect":
-        if (!writable() || !p) return;
+        if (S.specimen || !p) return;
         setField(
           "expects",
           p.expects.includes(id)
@@ -3407,7 +3615,7 @@
     brake: "brakes",
   };
   function commitEdit(el) {
-    if (!writable()) return;
+    if (S.specimen) return;
     const c = circuit();
     const id = el.dataset.id;
     const v = el.value.trim();
@@ -3447,7 +3655,7 @@
 
   function addNamed(el) {
     const label = el.value.trim();
-    if (!label || !writable()) return;
+    if (!label || S.specimen) return;
     const c = circuit();
     const id = idOf(
       label,
@@ -3484,14 +3692,14 @@
       query = el.value;
       return renderSearch();
     }
-    if (el.dataset.field && draft && writable()) {
+    if (el.dataset.field && draft && !S.specimen) {
       setField(el.dataset.field, el.value);
       if (el.tagName === "TEXTAREA") fit(el);
       updateDirty();
       if (el.dataset.field === "title") renderLine();
       return;
     }
-    if (el.dataset.dial && writable()) {
+    if (el.dataset.dial && !S.specimen) {
       loadDraft = { ...curLoad(), [el.dataset.dial]: +el.value };
       $(`dv-${el.dataset.dial}`).textContent = el.value;
       $("ceil").textContent = `ceiling ${Math.round(ceilingOf(knobs()))}`;
@@ -3502,8 +3710,8 @@
     }
   });
   function dialDone() {
-    if (!loadDraft || !writable()) return;
-    const next = { ...circuit(), load: loadDraft, loadDay: todayStr() };
+    if (!loadDraft || S.specimen) return;
+    const next = { ...circuit(), load: loadDraft, loadDay: localToday() };
     loadDraft = null;
     putCircuit(next);
   }
@@ -3568,8 +3776,36 @@
   sketch($("reading"), "alarm-reading");
   sketch($("circ"), "alarm-circuit");
   sketch($("found"), "alarm-found");
+  sketch($("lawsPanel"), "alarm-laws");
   const pwSketch = sketch($("pw"), "pathway-fresh", "var(--accent)");
-  loadStore();
-  if (isSpec()) openSpecimen();
-  render();
+
+  /* A hand-off read from the address: a new pathway of the reader's own, the carried text in
+     its words and nothing else, not kept until it is asked. */
+  function carried(h) {
+    reset();
+    S.specimen = false;
+    S.from = h.from;
+    S.next = h.next;
+    selected = null;
+    loadDraft = null;
+    sure = false;
+    if (own.circuit.triggers.length === 0) circuitOpen = true;
+    draft = { pathway: emptyPathway(localToday()), fresh: true };
+    if (h.set) draft.pathway.put = h.set;
+    $("pwIn").__sig = "";
+    render();
+    $("pwTitle")?.focus({ preventScroll: true });
+  }
+
+  loadOwn();
+  const h0 = fromHash();
+  if (h0) carried(h0);
+  else {
+    if (S.specimen) openSpecimen();
+    render();
+  }
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

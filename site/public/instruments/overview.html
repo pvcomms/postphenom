@@ -32,21 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: a sheet on a desk. Ink on bone. The dip is only ever ochre-red, the
-     difference the step makes is only ever moss, the end of the road is the accent.
-     Everything else is ink, let down by degrees. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #8c8478;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --toward: #5e7a4e;
-    --dip: #a8452c;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -58,11 +56,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #7f786b;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
-      --toward: #8dae78;
-      --dip: #c4623f;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -71,9 +69,28 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #7f786b;
+    --faint: #7d766a;
     --rule: #302e25;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Overview's own hues. The dip is only ever ochre-red, the difference the step
+     makes is only ever moss, the end of the road is the accent. Everything else
+     is ink, let down by degrees. */
+  :root {
+    --toward: #5e7a4e;
+    --dip: #a8452c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --toward: #8dae78;
+      --dip: #c4623f;
+    }
+  }
+  :root[data-theme="dark"] {
     --toward: #8dae78;
     --dip: #c4623f;
   }
@@ -883,6 +900,7 @@
           <button class="chip" type="button" id="newStep">a new step</button>
         </div>
       </div>
+      <p class="hint hand" id="carried" hidden></p>
 
       <textarea
         id="fStep"
@@ -1030,7 +1048,7 @@
         <div id="cSpecimen" hidden>
           <div class="chips">
             <button class="chip accent" type="button" id="ownStep">
-              write your own step
+              Make your own
             </button>
           </div>
           <p class="hint hand">
@@ -1118,6 +1136,8 @@
             <button class="chip" type="button" id="newAfter">a new step</button>
           </div>
         </div>
+
+        <p class="hint hand" id="carryNext" style="margin-top: 12px" hidden></p>
 
         <div class="chips" id="removeWrap" style="margin-top: 20px" hidden>
           <button class="chip" type="button" id="remove">
@@ -1227,7 +1247,7 @@
 
   <footer>
     <span class="meta">Overview · CAPP · prototype, 3 October 2026</span>
-    <span class="meta">No network · kept in this browser only</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -1557,7 +1577,7 @@
     "no one two three four five six seven eight nine ten eleven twelve".split(
       " ",
     );
-  const count = (k, one, many = `${one}s`) =>
+  const countOf = (k, one, many = `${one}s`) =>
     k === 1
       ? `${/^[aeiouh]/.test(one) && one !== "year" ? "an" : "a"} ${one}`
       : `${k <= 12 ? SMALL[k] : k.toLocaleString("en")} ${many}`;
@@ -1576,15 +1596,15 @@
     }
     const h = days / HOUR;
     if (h < 1.75) return "an hour and a half";
-    if (h < 22.5) return count(Math.round(h), "hour");
-    if (days < 10.5) return count(Math.max(1, Math.round(days)), "day");
+    if (h < 22.5) return countOf(Math.round(h), "hour");
+    if (days < 10.5) return countOf(Math.max(1, Math.round(days)), "day");
     const w = days / WEEK;
-    if (w < 7.5) return count(Math.round(w), "week");
+    if (w < 7.5) return countOf(Math.round(w), "week");
     const mo = days / MONTH;
-    if (mo < 11.5) return count(Math.round(mo), "month");
+    if (mo < 11.5) return countOf(Math.round(mo), "month");
     const y = days / YEAR;
     if (y > 1.35 && y < 1.65) return "a year and a half";
-    return count(Math.round(y), "year");
+    return countOf(Math.round(y), "year");
   }
   const nextWords = (days) =>
     `the next ${spanWords(days).replace(/^an? /, "")}`;
@@ -1693,12 +1713,57 @@
     return { n, of: ss.length, words: [...words].slice(0, 5) };
   }
 
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
   const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
   const dayWords = (d) =>
-    /^\d{4}-\d{2}-\d{2}/.test(d)
-      ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}`
-      : d;
-  const nOf = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
   const level = (v) =>
     v === 0 ? "at now" : v > 0 ? `${v} above now` : `${-v} below now`;
 
@@ -1744,7 +1809,7 @@
     else {
       const a = lookingAhead(s.life);
       out.push(
-        `the life: ${nOf(a.of, "sentence")}${
+        `the life: ${plural(a.of, "sentence")}${
           a.n
             ? `, ${a.n} still look${a.n === 1 ? "s" : ""} ahead — ${a.words.join(", ")}. it is meant to be written as it is`
             : ", each written as it is"
@@ -1759,19 +1824,21 @@
     const put = `put down ${dayWords(s.put)}`;
     out.push(
       s.notToday.length
-        ? `${put} · let go for today ${nOf(s.notToday.length, "time")}: ${s.notToday.map((x) => dayWords(x.on)).join(", ")}`
+        ? `${put} · let go for today ${plural(s.notToday.length, "time")}: ${s.notToday.map((x) => dayWords(x.on)).join(", ")}`
         : put,
     );
     const st = statusOf(s);
     if (st === "in-it")
-      out.push(`in it since ${dayWords(s.took)} ${s.took.slice(11, 16)}`);
+      out.push(
+        `in it since ${dayWords(s.took.slice(0, 10))} ${s.took.slice(11, 16)}`,
+      );
     if (st === "taken") {
       const felt =
         s.felt === null
           ? "how hard it was is not said yet"
           : `${s.felt} of 10${s.feltLasts !== null ? ` for ${lastsWords(s.feltLasts)}` : ""}`;
       out.push(
-        `taken ${dayWords(s.took)} · before, you said ${s.hurt} of 10 for ${lastsWords(s.lasts)}; after, ${felt}`,
+        `taken ${dayWords(s.took.slice(0, 10))} · before, you said ${s.hurt} of 10 for ${lastsWords(s.lasts)}; after, ${felt}`,
       );
     }
     return out;
@@ -1810,11 +1877,11 @@
   function wholeReadings(t) {
     if (!t.n) return ["no steps put down yet"];
     const out = [
-      `${nOf(t.n, "step")} put down · ${t.taken} taken · ${t.inIt} in it · ${t.open} open`,
+      `${plural(t.n, "step")} put down · ${t.taken} taken · ${t.inIt} in it · ${t.open} open`,
     ];
     if (t.letGo)
       out.push(
-        `let go for today ${nOf(t.letGo, "time")}, across ${nOf(t.letGoSteps, "step")}`,
+        `let go for today ${plural(t.letGo, "time")}, across ${plural(t.letGoSteps, "step")}`,
       );
     if (t.pairs.length) {
       out.push(
@@ -1841,17 +1908,6 @@
 
   /* ── keeping: niwa wrote a markdown file per step; here one record in this browser ── */
 
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "way"}`;
-  }
   function titleOf(s) {
     const first = (sentencesOf(s.step)[0] ?? s.step.trim())
       .replace(/[.!…]+$/, "")
@@ -1863,7 +1919,6 @@
       : "a step";
   }
 
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
   const AT =
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?([+-]\d{2}:\d{2}|Z)?$/;
   const str = (v, max) =>
@@ -1957,17 +2012,101 @@
   }
 
   const KEY = "pp-overview";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "overview";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
   const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
 
-  /* The reader's steps, newest touched first. Storage may throw; the page works without it. */
+  /* The reader's steps, newest touched first, validated row by row. Storage may throw; the
+     page works without it. */
   function readSteps() {
-    let raw = null;
-    try {
-      raw = JSON.parse(localStorage.getItem(KEY) || "null");
-    } catch {
-      raw = null;
-    }
-    const list = raw && Array.isArray(raw.steps) ? raw.steps : [];
+    const env = readStore();
+    const list = env && Array.isArray(env.steps) ? env.steps : [];
     return list
       .map((x) => {
         try {
@@ -1990,17 +2129,17 @@
               : -1,
       );
   }
-  function writeSteps() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ v: 1, steps: mine }));
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  const writeSteps = () => persist({ steps: mine });
 
-  /* ── hand-drawn strokes (niwa's lib/hand.ts): deterministic for a seed ── */
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
 
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -2011,6 +2150,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -2019,8 +2160,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -2039,6 +2187,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -2050,8 +2200,10 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
   function roughRect(
     w,
     h,
@@ -2070,6 +2222,60 @@
       stroke([x0, y1], [x0, y0], r, wobble, overshoot),
     ].join("");
   }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
   function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
     const r = rand(seed);
     return stroke(
@@ -2080,6 +2286,44 @@
       0,
     );
   }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -2128,7 +2372,13 @@
     if (pts.length > 1) subs.push(pts);
     return subs;
   }
-  /* The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -2159,10 +2409,11 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
 
   /* A pen line laid over the element it sits in, re-drawn when the element changes size.
      `draw` brings it on once, from one end; later re-draws are already there. */
@@ -2211,18 +2462,6 @@
   /* ── the page ─────────────────────────────────────────────────────────── */
 
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const reducedMotion = () =>
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -2233,7 +2472,6 @@
     const sign = off >= 0 ? "+" : "-";
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}${sign}${p(Math.floor(Math.abs(off) / 60))}:${p(Math.abs(off) % 60)}`;
   };
-  const localToday = () => nowIso().slice(0, 10);
   const clone = (s) => JSON.parse(JSON.stringify(s));
 
   const UNIT_MIN = { minutes: 1, hours: 60, days: 1440 };
@@ -2249,7 +2487,8 @@
   let mine = readSteps();
   let open = null;
   let kept = false;
-  let specimen = false;
+  /* The specimen, and the hand-off: what the address bar set on the sheet. */
+  const S = { specimen: false, from: "", next: "" };
   let example = false;
   let trouble = null;
   let sure = false;
@@ -2263,7 +2502,7 @@
   let introKey = 0;
   const today = localToday();
 
-  const writable = () => !specimen;
+  const canWrite = () => !S.specimen;
   const status = () => (open ? statusOf(open) : "open");
   const mode = () => {
     const st = status();
@@ -2286,7 +2525,9 @@
       : emptyStep(today);
     slugRef = "";
     kept = false;
-    specimen = false;
+    S.specimen = false;
+    S.from = "";
+    S.next = "";
     example = asExample;
     open = base;
     unit = unitOf(base.lasts);
@@ -2299,7 +2540,9 @@
   function load(s, isSpecimen = false) {
     slugRef = isSpecimen ? "" : s.slug;
     kept = true;
-    specimen = isSpecimen;
+    S.specimen = isSpecimen;
+    S.from = "";
+    S.next = "";
     example = false;
     open = clone(s);
     unit = unitOf(s.lasts);
@@ -2312,7 +2555,7 @@
 
   /* Keep a step in this browser. A fresh one whose slug is taken gets a numbered one. */
   function save(s) {
-    if (specimen) return null;
+    if (S.specimen) return null;
     const isFresh = !slugRef;
     let out;
     try {
@@ -2356,17 +2599,17 @@
   const set = (p) => {
     if (!open) return;
     open = { ...open, ...p };
-    if (kept && writable()) save(open);
+    if (kept && canWrite()) save(open);
     render();
   };
   const commit = () => {
-    if (open && kept && writable() && open.step.trim()) {
+    if (open && kept && canWrite() && open.step.trim()) {
       save(open);
       render();
     }
   };
   const needsStep = () => {
-    if (!open || !writable()) return null;
+    if (!open || !canWrite()) return null;
     if (!open.step.trim()) {
       trouble = "write the step, in a line";
       render();
@@ -2391,7 +2634,7 @@
     render();
   }
   function over() {
-    if (!open?.took || !writable()) return;
+    if (!open?.took || !canWrite()) return;
     const done = nowIso();
     open = {
       ...open,
@@ -2402,7 +2645,7 @@
     render();
   }
   function stopClock() {
-    if (!open || !writable()) return;
+    if (!open || !canWrite()) return;
     open = { ...open, took: null, done: null, felt: null, feltLasts: null };
     save(open);
     render();
@@ -2447,7 +2690,7 @@
   }
 
   function remove() {
-    if (!open || !writable() || !kept) return;
+    if (!open || !canWrite() || !kept) return;
     const slug = open.slug;
     mine = mine.filter((x) => x.slug !== slug);
     if (!writeSteps())
@@ -2665,7 +2908,7 @@
 
     const inFrame = (x) => x >= PL - 1 && x <= W - PR + 1;
     const last = step.marks.length - 1;
-    const canDrag = writable() && md !== "in-it";
+    const canDrag = canWrite() && md !== "in-it";
     let marksSvg = "";
     let handles = "";
     step.marks.forEach((m, i) => {
@@ -2677,7 +2920,7 @@
       if (canDrag)
         handles += `<circle class="grab" data-grab="mark-${i}" cx="${x}" cy="${y}" r="${tall ? 26 : 16}" aria-label="How far above now by ${esc(m.when)}"/>`;
     });
-    if (writable() && (md === "draft" || md === "open") && dipW >= 18)
+    if (canWrite() && (md === "draft" || md === "open") && dipW >= 18)
       handles += `<circle class="grab" data-grab="hurt" cx="${worst[0]}" cy="${worst[1]}" r="${tall ? 30 : 18}" aria-label="How hard at its worst"/>`;
     if (canDrag && z > 0.97)
       handles += `<circle class="grab" data-grab="without" cx="${xOf(step.horizon * YEAR)}" cy="${yOf(step.without)}" r="${tall ? 26 : 16}" aria-label="Where the road without it is by then"/>`;
@@ -2804,7 +3047,7 @@
   };
   svg.addEventListener("pointerdown", (e) => {
     const g = e.target.closest?.("[data-grab]");
-    if (!g || e.button !== 0 || !writable() || !open) return;
+    if (!g || e.button !== 0 || !canWrite() || !open) return;
     e.preventDefault();
     halt();
     if (introTimer !== null) {
@@ -3014,7 +3257,7 @@
       min: 1,
       max: 10,
       label: "How hard at its worst, 1 to 10",
-      writable: () => writable() && status() !== "taken",
+      writable: () => canWrite() && status() !== "taken",
       commit: (hurt) => set({ hurt }),
     }),
     makeNum($("nLasts"), {
@@ -3025,7 +3268,7 @@
       min: 1,
       max: () => Math.floor((60 * 1440) / UNIT_MIN[unit]),
       label: () => `How long it will last, in ${unit}`,
-      writable: () => writable() && status() !== "taken",
+      writable: () => canWrite() && status() !== "taken",
       commit: (v) => set({ lasts: v * UNIT_MIN[unit] }),
     }),
     makeNum($("nWithout"), {
@@ -3034,7 +3277,7 @@
       max: 10,
       label:
         "Where the road without it is by then, -10 to 10; 0 is as it is now",
-      writable,
+      writable: canWrite,
       commit: (without) => set({ without }),
     }),
     makeNum($("nFelt"), {
@@ -3043,7 +3286,7 @@
       max: 10,
       placeholder: "?",
       label: "How hard it was at its worst, 1 to 10",
-      writable,
+      writable: canWrite,
       commit: (felt) => set({ felt }),
     }),
     makeNum($("nFeltLasts"), {
@@ -3051,7 +3294,7 @@
       min: 1,
       max: 60 * 1440,
       label: "How long it lasted, in minutes",
-      writable,
+      writable: canWrite,
       commit: (feltLasts) => set({ feltLasts }),
     }),
   ];
@@ -3084,7 +3327,7 @@
     });
     el.addEventListener("blur", commit);
     return () => {
-      el.readOnly = !writable();
+      el.readOnly = !canWrite();
       if (document.activeElement !== el) el.value = get() ?? "";
     };
   };
@@ -3166,7 +3409,7 @@
           max: 10,
           size: 18,
           label: `How far above now by ${m.when}, 0 to 10`,
-          writable,
+          writable: canWrite,
           commit: (lv) =>
             set({
               marks: open.marks.map((x, j) =>
@@ -3177,7 +3420,7 @@
         markNums.push({
           sync() {
             nm.sync();
-            line.readOnly = !writable();
+            line.readOnly = !canWrite();
             if (document.activeElement !== line)
               line.value = open.marks[i]?.line ?? "";
           },
@@ -3210,10 +3453,10 @@
       .slice(0, 24)
       .map((s, i) => {
         const st = statusOf(s);
-        const on = kept && specimen === isSpec && open?.slug === s.slug;
+        const on = kept && S.specimen === isSpec && open?.slug === s.slug;
         const metaLine =
           (st === "taken"
-            ? `taken ${dayWords(s.took ?? s.put)}`
+            ? `taken ${dayWords((s.took ?? s.put).slice(0, 10))}`
             : st === "in-it"
               ? "in it"
               : `open since ${dayWords(s.put)}`) +
@@ -3247,7 +3490,7 @@
         for (const b of document.querySelectorAll(".ov-row button")) {
           const isSpec = b.dataset.spec === "1";
           const on =
-            kept && specimen === isSpec && open?.slug === b.dataset.slug;
+            kept && S.specimen === isSpec && open?.slug === b.dataset.slug;
           if (on) b.setAttribute("aria-current", "true");
           else b.removeAttribute("aria-current");
         }
@@ -3278,22 +3521,25 @@
     if (!open) return;
     const st = status();
     const md = mode();
-    const w = writable();
+    const w = canWrite();
 
     $("status").textContent =
-      (specimen ? "the specimen · fiction · " : "") +
+      (S.specimen ? "the specimen · fiction · " : "") +
       (!kept
         ? example
-          ? "an example · write your own step over it"
+          ? "an example · write over it with your own step"
           : "a step · not put down yet"
         : st === "taken"
-          ? `taken · ${dayWords(open.took ?? open.put)}`
+          ? `taken · ${dayWords((open.took ?? open.put).slice(0, 10))}`
           : st === "in-it"
             ? `in it · since ${open.took?.slice(11, 16)}`
             : `a step · put down ${dayWords(open.put)}`);
     $("newWrap").hidden = !kept;
-    $("newStep").textContent = specimen ? "write your own step" : "a new step";
-    $("newStep").classList.toggle("accent", specimen);
+    $("newStep").textContent = S.specimen ? "Make your own" : "a new step";
+    $("newStep").classList.toggle("accent", S.specimen);
+    const carried = $("carried");
+    carried.hidden = !S.from;
+    carried.textContent = S.from ? `Carried from ${S.from}` : "";
 
     for (const t of texts) t();
     for (const n of nums) n.sync();
@@ -3312,8 +3558,8 @@
     renderMarks();
 
     // the choice
-    $("cSpecimen").hidden = !specimen;
-    $("cOpen").hidden = specimen || st !== "open";
+    $("cSpecimen").hidden = !S.specimen;
+    $("cOpen").hidden = S.specimen || st !== "open";
     $("cInIt").hidden = st !== "in-it";
     $("cTaken").hidden = st !== "taken";
     $("keep").hidden = kept;
@@ -3338,6 +3584,11 @@
     $("remove").classList.toggle("accent", sure);
     $("trouble").hidden = !trouble;
     $("trouble").textContent = trouble ?? "";
+    const carry = $("carryNext");
+    carry.hidden = !S.next || S.specimen;
+    carry.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, open.step, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
 
     // the desk
     const words = open.step.trim()
@@ -3347,12 +3598,11 @@
       ? words.join(" · ")
       : "write the step, and the reading begins";
     renderRecord();
-    $("keptWhere").textContent = specimen
-      ? "fiction, like the rest of the specimen"
-      : "kept in this browser only — nothing is sent anywhere";
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
 
     sheetSketch?.reseed(
-      `overview-${specimen ? "spec-" : ""}${open.slug || "fresh"}`,
+      `overview-${S.specimen ? "spec-" : ""}${open.slug || "fresh"}`,
     );
     drawScope();
   }
@@ -3406,11 +3656,28 @@
   sketch($("pSources"), { seed: "overview-sources", draw: true });
   sketch($("railLine"), { kind: "underline", seed: "ov-rail" });
 
-  // Opens on the reader's own step still going; with none of their own, on the specimen.
+  /* A hand-off read from the address: a new step of the reader's own, the carried text in the
+     step field and nothing else, not kept until it is put down. */
+  function carried(h) {
+    fresh();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) patch({ step: h.set });
+    else render();
+  }
+
+  // Opens on a hand-off if the address carries one; else on the reader's own step still
+  // going; with none of their own, on the specimen.
   tall = wrap.offsetWidth < 460;
   railW = rail.offsetWidth;
+  const h = fromHash();
   const going = mine.find((s) => statusOf(s) !== "taken");
-  if (going) load(going);
+  if (h) carried(h);
+  else if (going) load(going);
   else if (mine.length) fresh();
   else load(SPECIMEN_STEPS[0], true);
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

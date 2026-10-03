@@ -32,57 +32,69 @@
     font-display: swap;
   }
 
-  /* Layout: a ward sheet. Ink on bone. Red ochre is only ever a person who has the thing;
-     slate blue is only ever the ring a test puts round someone it flags. Everything else is ink. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
-    --paper: #f4f2ed;
-    --sheet: #faf9f6;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
     --ink: #23211e;
-    --ink-2: #6b655c;
-    --ink-3: #776f64;
-    --faint: #9a9287;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #c9c3b6;
-    --so: #a8452c;
-    --flag: #4f5f8a;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    --grain-blend: multiply;
-    --grain: 0.05;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --paper: #16150f;
-      --sheet: #1f1e17;
+      --bg: #16150f;
+      --surface: #1f1e17;
       --ink: #ede9df;
-      --ink-2: #a39c8e;
-      --ink-3: #8f887a;
-      --faint: #6f685c;
+      --muted: #a39c8e;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473c;
-      --so: #c4623f;
-      --flag: #8393c4;
-      --grain-blend: screen;
-      --grain: 0.04;
+      --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --paper: #16150f;
-    --sheet: #1f1e17;
+    --bg: #16150f;
+    --surface: #1f1e17;
     --ink: #ede9df;
-    --ink-2: #a39c8e;
-    --ink-3: #8f887a;
-    --faint: #6f685c;
+    --muted: #a39c8e;
+    --faint: #7d766a;
     --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Crowd's own hues. Red ochre is only ever a person who has the thing; slate blue is only
+     ever the ring a test puts round someone it flags. Everything else is ink. */
+  :root {
+    --rule-2: #c9c3b6;
+    --so: #a8452c;
+    --flag: #4f5f8a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473c;
+      --so: #c4623f;
+      --flag: #8393c4;
+    }
+  }
+  :root[data-theme="dark"] {
     --rule-2: #4a473c;
     --so: #c4623f;
     --flag: #8393c4;
-    --grain-blend: screen;
-    --grain: 0.04;
   }
 
   * {
@@ -93,7 +105,7 @@
   }
   html,
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
   body {
@@ -113,8 +125,8 @@
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
     background-size: 220px 220px;
-    opacity: var(--grain);
-    mix-blend-mode: var(--grain-blend);
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
   }
   p {
     margin: 0 0 1em;
@@ -140,20 +152,20 @@
   }
   .small {
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .label {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .hint {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.04em;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .num {
     font-variant-numeric: tabular-nums;
@@ -184,16 +196,26 @@
     margin: 22px 0 0;
     font-size: clamp(20px, 2.4vw, 24px);
     line-height: 1.36;
-    color: var(--ink-2);
+    color: var(--muted);
     max-width: 30ch;
   }
   .deck em {
     color: var(--ink);
   }
+  /* What came in by the address bar: one line under the deck, nothing else. */
+  .carried {
+    margin: 18px 0 0;
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.4;
+    color: var(--muted);
+    max-width: 40ch;
+    overflow-wrap: anywhere;
+  }
   .question {
     margin: 0;
     padding: 24px 24px 20px;
-    background: var(--sheet);
+    background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: 4px;
   }
@@ -212,7 +234,7 @@
   .question .then {
     font-size: 16.5px;
     line-height: 1.6;
-    color: var(--ink-2);
+    color: var(--muted);
     margin: 0 0 16px;
   }
   .ask {
@@ -279,7 +301,7 @@
     letter-spacing: 0.04em;
     padding: 11px 18px;
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
     border: 1px solid var(--ink);
     border-radius: 4px;
     transition:
@@ -309,8 +331,8 @@
     padding: 6px 12px;
     border: 1px solid var(--rule-2);
     border-radius: 999px;
-    color: var(--ink-2);
-    background: var(--sheet);
+    color: var(--muted);
+    background: var(--surface);
     transition:
       background-color 160ms var(--ease),
       color 160ms var(--ease),
@@ -318,7 +340,7 @@
       transform 160ms var(--ease);
   }
   .chip:hover:not(:disabled) {
-    border-color: var(--ink-2);
+    border-color: var(--muted);
     color: var(--ink);
   }
   .chip:active:not(:disabled) {
@@ -327,7 +349,7 @@
   .chip[aria-pressed="true"] {
     background: var(--ink);
     border-color: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
   }
   .chip.accent {
     border-color: var(--ink);
@@ -338,11 +360,11 @@
     cursor: default;
   }
   .chip .k {
-    color: var(--ink-3);
+    color: var(--faint);
     margin-right: 8px;
   }
   .chip[aria-pressed="true"] .k {
-    color: var(--paper);
+    color: var(--bg);
     opacity: 0.6;
   }
 
@@ -372,7 +394,7 @@
     height: 14px;
     margin-top: -6px;
     border-radius: 999px;
-    background: var(--sheet);
+    background: var(--surface);
     border: 1.5px solid var(--ink);
     transition: transform 160ms var(--ease);
   }
@@ -387,14 +409,14 @@
     width: 14px;
     height: 14px;
     border-radius: 999px;
-    background: var(--sheet);
+    background: var(--surface);
     border: 1.5px solid var(--ink);
   }
 
   /* I: your number */
   .yours {
     padding: 20px 22px 22px;
-    background: var(--sheet);
+    background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: 4px;
   }
@@ -408,7 +430,7 @@
   .yours .before {
     font-size: 15px;
     line-height: 1.4;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .big {
     font-size: 48px;
@@ -419,7 +441,7 @@
   .big small {
     font-size: 17px;
     letter-spacing: 0;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .yours .actions {
     margin-top: 14px;
@@ -439,7 +461,7 @@
   .after .read {
     font-size: 15.5px;
     line-height: 1.55;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .bars3 {
     display: grid;
@@ -457,7 +479,7 @@
   .bars3 .who {
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .bars3 .v {
     text-align: right;
@@ -469,7 +491,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     overflow: hidden;
-    background: var(--paper);
+    background: var(--bg);
   }
   .bar > span {
     display: block;
@@ -501,7 +523,7 @@
     height: auto;
   }
   .seats circle {
-    fill: color-mix(in srgb, var(--faint) 55%, var(--sheet));
+    fill: color-mix(in srgb, var(--faint) 55%, var(--surface));
     stroke: transparent;
     stroke-width: 1.7;
     transition:
@@ -523,7 +545,7 @@
   }
   .field {
     padding: 18px;
-    background: var(--sheet);
+    background: var(--surface);
     border: 1px solid var(--rule);
     border-radius: 4px;
   }
@@ -534,7 +556,7 @@
     margin-top: 12px;
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .legend span {
     display: inline-flex;
@@ -546,7 +568,7 @@
     width: 10px;
     height: 10px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--faint) 55%, var(--sheet));
+    background: color-mix(in srgb, var(--faint) 55%, var(--surface));
   }
   .key.so {
     background: var(--so);
@@ -609,13 +631,13 @@
     margin: 2px 0 0;
     font-size: 14px;
     line-height: 1.45;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .note {
     margin: 12px 0 0;
     font-size: 15px;
     line-height: 1.5;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .readout {
     display: grid;
@@ -631,7 +653,7 @@
   .huge small {
     font-size: 19px;
     letter-spacing: 0;
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .meter {
     display: flex;
@@ -640,7 +662,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     overflow: hidden;
-    background: var(--sheet);
+    background: var(--surface);
   }
   .meter span {
     display: block;
@@ -687,7 +709,7 @@
     border-bottom: 1px solid var(--rule);
     font-size: 15px;
     line-height: 1.4;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .leans li b {
     font-family: var(--mono);
@@ -744,7 +766,7 @@
     margin: 12px 0 0;
     font-size: 15px;
     line-height: 1.5;
-    color: var(--ink-2);
+    color: var(--muted);
     max-width: 64ch;
   }
   .refs li {
@@ -852,6 +874,7 @@
         A positive result, set against how rare the thing is.
         <em>Not in percentages: in a crowd of a thousand, one dot each.</em>
       </p>
+      <p class="carried" id="carried" hidden></p>
     </div>
     <figure class="question rise" style="--i: 1" aria-label="The question">
       <p class="label"><span>The question</span><span>since 1978</span></p>
@@ -1050,6 +1073,7 @@
     <div class="body">
       <p class="last" id="leaves"></p>
       <p class="small" id="numbersNote" style="max-width: 64ch"></p>
+      <p class="small" id="carryNext" hidden></p>
       <p class="label" style="margin-top: 40px">Sources</p>
       <ul class="refs">
         <li>
@@ -1079,12 +1103,414 @@
 
   <footer>
     <span class="label">Crowd · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network, no storage</span>
+    <span class="label">No network · keeps nothing</span>
   </footer>
 </div>
 
 <script>
   "use strict";
+
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const SELF = "crowd";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
 
   // ---- the crowd, by hand from niwa lib/crowd.ts: the maths is the same ----
   const N = 1000;
@@ -1111,16 +1537,9 @@
     };
   }
 
-  const mulberry32 = (a) => () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-
+  // The shuffle's numbers come from the pen's `rand` above: the same mulberry32 niwa used.
   function order(seed, n = N) {
-    const r = mulberry32(seed);
+    const r = rand(seed);
     const a = Array.from({ length: n }, (_, i) => i);
     for (let j = n - 1; j > 0; j--) {
       const k = Math.floor(r() * (j + 1));
@@ -1314,18 +1733,6 @@
 
   // ---- the page ----
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
   const COLS = 40;
   const SEATS = order(7);
   const SVGNS = "http://www.w3.org/2000/svg";
@@ -1337,6 +1744,9 @@
     catches: Math.round(CLASSIC.catches * 100),
     flags: Math.round(CLASSIC.flags * 1000),
     situation: SITUATIONS[0].slug,
+    set: "",
+    from: "",
+    next: "",
   };
 
   // A thousand seats. The first `so` seats in the shuffled order have the thing; of those the
@@ -1513,10 +1923,35 @@
   $("leaves").textContent = LEAVES;
   $("numbersNote").textContent = NUMBERS_NOTE;
 
+  // A hand-off read from the address. There is no set-down field here, so the carried words
+  // are shown as one line at the top and nothing else; `next` is one link in the coda, built
+  // with the same words. Nothing is kept.
+  function carried(h) {
+    S.set = h.set;
+    S.from = h.from;
+    S.next = h.next;
+    const line = $("carried");
+    line.hidden = !(h.from || h.set);
+    line.textContent = h.from
+      ? `Carried from ${h.from}${h.set ? `: ${h.set}` : ""}`
+      : `Carried: ${h.set}`;
+    const carry = $("carryNext");
+    carry.hidden = !h.next;
+    carry.innerHTML = h.next
+      ? `<a href="${esc(carryHref(h.next, h.set, ""))}">Carry this to ${esc(h.next)}</a>`
+      : "";
+  }
+
   seatsInit($("seatsA"));
   seatsInit($("seatsB"));
   seatsSet($("seatsA"), CLASSIC);
   $("legendA").innerHTML = legendHTML(CLASSIC_WORDS);
   setStage(0);
   renderDials();
+  const h0 = fromHash();
+  if (h0) carried(h0);
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

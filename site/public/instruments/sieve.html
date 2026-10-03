@@ -32,26 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: a primer's page with the pen left on it. Ink on bone; the worlds take their hues in
-     order and nothing else is coloured; the accent is only ever the reader's hand on the sheet. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
+    --muted: #645e55;
     --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --value-0: #b08a3e;
-    --value-1: #4f5f8a;
-    --value-2: #5e7a4e;
-    --value-3: #7e5a78;
-    --value-4: #3f6b66;
-    --value-5: #8c5a45;
-    --noise-blend: multiply;
-    --noise: 0.06;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -63,17 +56,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #857e71;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
-      --value-0: #d2aa5a;
-      --value-1: #8393c4;
-      --value-2: #8dae78;
-      --value-3: #b48aad;
-      --value-4: #7fa8a1;
-      --value-5: #c4876a;
-      --noise-blend: screen;
-      --noise: 0.045;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -82,17 +69,40 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #857e71;
+    --faint: #7d766a;
     --rule: #302e25;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* The sieve's own hues: the worlds take them in order, and nothing else is coloured. */
+  :root {
+    --value-0: #b08a3e;
+    --value-1: #4f5f8a;
+    --value-2: #5e7a4e;
+    --value-3: #7e5a78;
+    --value-4: #3f6b66;
+    --value-5: #8c5a45;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --value-0: #d2aa5a;
+      --value-1: #8393c4;
+      --value-2: #8dae78;
+      --value-3: #b48aad;
+      --value-4: #7fa8a1;
+      --value-5: #c4876a;
+    }
+  }
+  :root[data-theme="dark"] {
     --value-0: #d2aa5a;
     --value-1: #8393c4;
     --value-2: #8dae78;
     --value-3: #b48aad;
     --value-4: #7fa8a1;
     --value-5: #c4876a;
-    --noise-blend: screen;
-    --noise: 0.045;
   }
 
   * {
@@ -124,8 +134,8 @@
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
     background-size: 220px 220px;
-    opacity: var(--noise);
-    mix-blend-mode: var(--noise-blend);
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
   }
   ::selection {
     background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -152,6 +162,11 @@
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   .wrap {
     max-width: 86rem;
@@ -757,6 +772,17 @@
   .trouble {
     margin-top: 8px;
   }
+  .carried {
+    margin-top: 8px;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .carry-next {
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
 
   /* the desk */
   .reading {
@@ -872,6 +898,7 @@
         <p class="meta accent" id="status"></p>
         <button class="chip accent" id="keep" data-k="keep"></button>
       </div>
+      <p class="hand carried" id="carried" hidden></p>
       <textarea
         id="question"
         class="case"
@@ -917,6 +944,7 @@
         the arrow keys, shift for ten · click any number to type it · + sift to
         pass the next thing you saw through what passed the last
       </p>
+      <p class="hand carry-next" id="carryNext" hidden></p>
       <p class="meta accent lower trouble" id="trouble" role="alert" hidden></p>
     </section>
 
@@ -965,17 +993,23 @@
           itself. Nothing passes at 0 or 100: a world that says never cannot
           come back.
         </p>
+        <p class="laws">
+          It never says which world is so. Every width and every shade is yours;
+          the page multiplies, reduces and draws, and supplies no number of its
+          own. Nothing is fetched, no model is asked, and nothing you did not
+          write is kept.
+        </p>
         <div class="chips" id="offWrap" hidden>
           <button class="chip" id="off" data-k="off"></button>
         </div>
-        <p class="meta lower faint sub" id="where"></p>
+        <p class="meta lower faint sub" id="keptWhere"></p>
       </section>
     </aside>
   </div>
 
   <footer>
     <span class="meta">The Sieve · CAPP · prototype, 3 October 2026</span>
-    <span class="meta">No network · kept only in this browser</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -984,13 +1018,16 @@
 
   const $ = (id) => document.getElementById(id);
   const SVGNS = "http://www.w3.org/2000/svg";
-  const KEY = "pp-sieve";
 
-  /* ── the pen (lib/hand.ts) ─────────────────────────────────────────────
-     Hand-drawn strokes. Every path is deterministic for its seed, so a re-render never
-     redraws a border differently. */
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
 
-  /** mulberry32: small, fast, and the same number sequence everywhere. */
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -1001,6 +1038,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -1009,10 +1048,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
-  /** One pen stroke from a to b: a cubic a little off the straight line, running just past its ends. */
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -1031,6 +1075,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -1042,7 +1088,7 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
 
   /** A box drawn as four strokes, each running a little past its corner. */
@@ -1065,6 +1111,58 @@
     ].join("");
   }
 
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
   /** A line drawn under something: a touch before, a touch after, a slight sag. */
   function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
     const r = rand(seed);
@@ -1077,7 +1175,43 @@
     );
   }
 
-  /** A path from this file (M, C and L only, absolute), sampled into points per subpath. */
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1127,7 +1261,12 @@
     return subs;
   }
 
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -1158,10 +1297,151 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-sieve";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "sieve";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
 
   /** A pen line laid over a positioned element: a box round it, or a line under it. */
   let maskN = 0;
@@ -1376,7 +1656,6 @@
     };
   }
 
-  const nOf = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
   const quote = (saw) => {
     const s = saw.replace(/\s+/g, " ").trim();
     if (!s) return "an unnamed sighting";
@@ -1408,7 +1687,7 @@
         return `${quote(g.saw)} ${passed} — ${factorOf(h.factor)} for ${nm(h.for)}`;
       });
       out.push(
-        `${nOf(t.n, "sighting")} sifted: ${said.join("; ")}${t.n > 4 ? `; and ${t.n - 4} more` : ""}`,
+        `${plural(t.n, "sighting")} sifted: ${said.join("; ")}${t.n > 4 ? `; and ${t.n - 4} more` : ""}`,
       );
       out.push(
         `what passes, by your numbers: ${ratio(t.now)} — ${hundreds(t.nowShares)}`,
@@ -1419,7 +1698,7 @@
         );
       else
         out.push(
-          `the widest column changed hands ${nOf(t.turns.length, "time")}: ${t.turns
+          `the widest column changed hands ${plural(t.turns.length, "time")}: ${t.turns
             .map(
               (x) =>
                 `after ${quote(s.sightings[x.after]?.saw ?? "")}, ${nm(x.lead)}`,
@@ -1445,7 +1724,7 @@
     if (!sieves.length) return ["nothing on the sieve yet"];
     const sifted = sum(sieves.map((s) => s.sightings.length));
     const out = [
-      `${nOf(sieves.length, "question")} on the sieve · ${nOf(sifted, "sighting")} sifted in all`,
+      `${plural(sieves.length, "question")} on the sieve · ${plural(sifted, "sighting")} sifted in all`,
     ];
     const bare = sieves.filter((s) => !s.sightings.length).length;
     if (bare) out.push(`${bare} with nothing sifted yet`);
@@ -1463,18 +1742,6 @@
       .map((s) => s.trim())
       .filter((s) => s.length > 1);
 
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "way"}`;
-  }
-
   function titleOf(s) {
     if (s.title.trim()) return s.title.trim();
     const first = (sentencesOf(s.question)[0] ?? s.question.trim())
@@ -1485,7 +1752,6 @@
     return "a question";
   }
 
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
   const str = (v, max) =>
     typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
 
@@ -1622,10 +1888,6 @@
   /* ── the page ────────────────────────────────────────────────────────── */
 
   const clone = (x) => JSON.parse(JSON.stringify(x));
-  const localToday = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  };
   const today = localToday();
   const short = (s, max = 14) => {
     const t = s.replace(/\s+/g, " ").trim();
@@ -1633,18 +1895,6 @@
     const cut = t.slice(0, max).replace(/\s+\S*$/, "");
     return `${cut || t.slice(0, max - 1)}…`;
   };
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
   const vc = (i) => `v${i % 6}`;
 
   function h(tag, props, ...kids) {
@@ -1665,59 +1915,36 @@
 
   /*
    * State. `kind` is what is on the sheet: one of the reader's kept questions, a specimen
-   * question (fiction, editable, never kept unless copied), or a draft.
+   * question (fiction, editable, never kept unless copied), or a draft. `specimen` is the
+   * same fact as a boolean; `from` and `next` are the hand-off read from the address.
    */
   const S = {
     kept: [],
     open: null,
     kind: "draft",
+    specimen: false,
     step: 0,
     sure: null,
     trouble: null,
     gen: 0,
     stored: false,
     drag: null,
+    from: "",
+    next: "",
   };
 
   /* ── keeping: one key in this browser, never anywhere else ───────────── */
 
-  function readStore() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw === null) return null;
-      S.stored = true;
-      const o = JSON.parse(raw);
-      const sieves = (Array.isArray(o?.sieves) ? o.sieves : [])
-        .map((x) => {
-          try {
-            return validateSieve(x, today);
-          } catch {
-            return null;
-          }
-        })
-        .filter(Boolean);
-      return { sieves, open: typeof o?.open === "string" ? o.open : null };
-    } catch {
-      return null;
-    }
-  }
+  /** Write what is kept. Nothing is written until something is, so a visitor who keeps nothing leaves no key. */
   function writeStore() {
     if (!S.kept.length && !S.stored) return true;
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({
-          v: 1,
-          sieves: S.kept,
-          open: S.kind === "kept" ? S.open.slug : null,
-        }),
-      );
-      S.stored = true;
-      return true;
-    } catch {
-      S.trouble = "not kept — this browser would not hold it";
-      return false;
-    }
+    const ok = persist({
+      sieves: S.kept,
+      open: S.kind === "kept" ? S.open.slug : null,
+    });
+    if (ok) S.stored = true;
+    else S.trouble = "not kept — this browser would not hold it";
+    return ok;
   }
   const byTouched = (a, b) =>
     a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0;
@@ -1766,11 +1993,24 @@
   function load(sv, kind, at) {
     S.open = clone(sv);
     S.kind = kind;
+    S.specimen = kind === "specimen";
     S.step = at ?? (sv.sightings.length ? sv.sightings.length : 0);
     S.sure = null;
     S.trouble = null;
+    S.from = "";
+    S.next = "";
     S.gen++;
     writeStore();
+  }
+
+  /* A hand-off read from the address: a new question of the reader's own, the carried text in
+     the question field and nothing else, not kept until the reader keeps it. */
+  function carried(hd) {
+    load(emptySieve(today), "draft", 0);
+    if (hd.set) S.open.question = hd.set;
+    S.from = hd.from;
+    S.next = hd.next;
+    render();
   }
 
   function keep() {
@@ -2724,7 +2964,7 @@
     $("whole").textContent = wholeReadings(S.kept).join(" · ");
     $("specimens").replaceChildren(
       ...SPECIMEN.map((x) =>
-        row(x, "specimen", S.kind === "specimen" && sv.slug === x.slug),
+        row(x, "specimen", S.specimen && sv.slug === x.slug),
       ),
     );
     const offWrap = $("offWrap");
@@ -2735,11 +2975,11 @@
         ? "take it off the sieve — sure?"
         : "take it off the sieve";
     off.classList.toggle("accent", S.sure === "sieve");
-    $("where").textContent =
+    $("keptWhere").textContent =
       S.kind === "kept"
         ? `kept in this browser only, under ${KEY} · nowhere else`
-        : S.kind === "specimen"
-          ? "fiction, like the rest of the specimen · keep a copy to make it yours"
+        : S.specimen
+          ? "fiction, like the rest of the specimen · nothing done to it is kept"
           : `kept questions stay in this browser, under ${KEY}`;
   }
 
@@ -2759,13 +2999,20 @@
     $("status").textContent =
       S.kind === "kept"
         ? `on the sieve · ${sv.opened}`
-        : S.kind === "specimen"
+        : S.specimen
           ? "the specimen · fiction · not kept"
           : "a draft · not kept";
     const keepBtn = $("keep");
     keepBtn.hidden = S.kind === "kept";
-    keepBtn.textContent =
-      S.kind === "specimen" ? "keep a copy" : "keep this question";
+    keepBtn.textContent = S.specimen ? "Make your own" : "keep this question";
+    const carriedEl = $("carried");
+    carriedEl.hidden = !S.from;
+    carriedEl.textContent = S.from ? `Carried from ${S.from}` : "";
+    const carry = $("carryNext");
+    carry.hidden = !S.next || S.specimen;
+    carry.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, sv.question, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
     if (questionGen !== S.gen) {
       questionGen = S.gen;
       $("question").value = sv.question;
@@ -2843,17 +3090,33 @@
     render();
   });
 
-  // Opens on what this browser kept, and on the specimen when it has kept nothing.
-  const stored = readStore();
-  S.kept = stored?.sieves ?? [];
-  const wanted = stored?.open
-    ? S.kept.find((x) => x.slug === stored.open)
-    : null;
-  const first = [...S.kept].sort(byTouched)[0];
-  if (wanted) load(wanted, "kept");
-  else if (first) load(first, "kept");
-  else load(SPECIMEN[0], "specimen");
-  render();
+  // Opens on what this browser kept, and on the specimen when it has kept nothing. A hand-off
+  // in the address opens a new question of the reader's own instead.
+  const env = readStore();
+  S.stored = env !== null;
+  S.kept = [];
+  for (const x of Array.isArray(env?.sieves) ? env.sieves : []) {
+    try {
+      S.kept.push(validateSieve(x, today));
+    } catch {
+      // a row that is not the shape a sieve has is dropped, never repaired
+    }
+  }
+  const openSlug = typeof env?.open === "string" ? env.open : null;
+  const hd = fromHash();
+  if (hd) carried(hd);
+  else {
+    const wanted = openSlug ? S.kept.find((x) => x.slug === openSlug) : null;
+    const first = [...S.kept].sort(byTouched)[0];
+    if (wanted) load(wanted, "kept");
+    else if (first) load(first, "kept");
+    else load(SPECIMEN[0], "specimen");
+    render();
+  }
+  window.addEventListener("hashchange", () => {
+    const next = fromHash();
+    if (next) carried(next);
+  });
 
   sketch($("sheet"), `sheet-${S.open.slug || "draft"}`, { draw: true });
   sketch($("readingPanel"), "sieve-reading", { draw: true });

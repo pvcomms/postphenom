@@ -34,19 +34,20 @@
 
   /* Layout: a chain of custody drawn on bone paper. Ink is the reader's own hand: solid where
      they checked. Rust is the first saying and anything that turned. Everything else is ink let
-     down. The two palettes are niwa's paper and sumi. */
+     down. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #857d71;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #cdc7ba;
     --accent: #b5532a;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
-    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -58,10 +59,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #847d70;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #46433a;
       --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -70,10 +72,27 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #847d70;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #46433a;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Provenance's own hues: a second, harder rule for the chain's borders, and a wash of the
+     accent under whatever is selected. */
+  :root {
+    --rule-2: #cdc7ba;
+    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #46433a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #46433a;
   }
 
   * {
@@ -144,6 +163,7 @@
     color: var(--muted);
   }
   .meta.acc,
+  .meta.accent,
   .acc-t {
     color: var(--accent);
   }
@@ -168,13 +188,6 @@
     align-items: end;
     padding-block: 64px 40px;
     border-bottom: 1px solid var(--rule-2);
-  }
-  .mast-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    margin: 0 0 24px;
   }
   h1 {
     font-size: clamp(56px, 9vw, 104px);
@@ -531,6 +544,20 @@
   }
   .banner b {
     font-weight: 500;
+  }
+  .carried,
+  .carry-next {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .carry-next {
+    margin-top: 22px;
+  }
+  .carry-next a {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
   }
 
   /* the chain */
@@ -991,38 +1018,32 @@
   .reading li::marker {
     color: var(--faint);
   }
-  .howread {
-    margin: 0;
-    font-style: italic;
+  .laws p {
+    margin: 8px 0 0;
     font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .laws .never {
+    color: var(--muted);
+  }
+  .limits {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    font-size: 13.5px;
     line-height: 1.45;
     color: var(--muted);
   }
-
-  /* coda */
-  .coda {
-    border-top: 1px solid var(--rule-2);
-    margin-top: 64px;
-    padding-top: 48px;
-    display: grid;
-    grid-template-columns: 96px minmax(0, 1fr);
-    gap: 32px;
-  }
-  .coda .last {
-    font-size: clamp(22px, 2.8vw, 28px);
-    line-height: 1.38;
-    letter-spacing: -0.01em;
-    max-width: 34ch;
-  }
-  .limits {
-    margin: 12px 0 0;
-    padding-left: 18px;
-    font-size: 16px;
-    color: var(--muted);
-    max-width: 64ch;
-  }
   .limits li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+  }
+  .limits li::marker {
+    color: var(--faint);
+  }
+  #keptWhere {
+    display: block;
+    margin: 12px 0 0;
+    text-transform: none;
+    letter-spacing: 0.04em;
   }
   footer {
     margin-top: 56px;
@@ -1057,8 +1078,7 @@
       gap: 36px;
       padding-top: 44px;
     }
-    .lede,
-    .coda {
+    .lede {
       grid-template-columns: minmax(0, 1fr);
       gap: 14px;
     }
@@ -1086,14 +1106,9 @@
 <div class="wrap">
   <header class="mast">
     <div>
-      <div class="mast-top">
-        <p class="label" style="margin: 0">
-          Center for Applied Post-Phenomenology · Instrument
-        </p>
-        <button class="chip" id="theme" type="button" aria-label="Toggle theme">
-          sumi
-        </button>
-      </div>
+      <p class="label" style="margin: 0 0 24px">
+        Center for Applied Post-Phenomenology · Instrument
+      </p>
       <h1>Provenance</h1>
       <p class="deck">
         <em>How did this reach you?</em> The hands a claim came through, what
@@ -1156,6 +1171,7 @@
         <span class="meta" id="status" style="margin-left: auto"></span>
       </div>
       <p class="cap" id="cap" hidden></p>
+      <p class="hand carried" id="carried" hidden></p>
 
       <div class="banner" id="banner" hidden>
         <p>
@@ -1165,7 +1181,7 @@
           chain to put it on the desk.
         </p>
         <button class="go" type="button" data-act="begin">
-          Begin your own · n
+          Make your own · n
         </button>
       </div>
 
@@ -1252,6 +1268,7 @@
           <ul class="checks" id="checks"></ul>
         </div>
       </div>
+      <p class="hand carry-next" id="carryNext" hidden></p>
     </div>
 
     <aside class="desk rise" style="animation-delay: 140ms">
@@ -1282,54 +1299,55 @@
 
       <section id="file" aria-label="Where it is kept"></section>
 
-      <p class="howread">
-        how it is read: nothing here says whether the claim is so. the chain is
-        the hands you can name between the first saying and you, drawn solid
-        where you checked a hand yourself or saw with your own eyes, and hollow
-        where you did not; the wordings are compared as words, the census counts
-        the usual ones, and the interests are what you wrote about each hand. a
-        check settles what it settles and nothing more.
-      </p>
+      <section
+        class="panel laws"
+        id="lawsPanel"
+        aria-label="What the provenance holds to"
+      >
+        <p class="meta accent">what the provenance holds to</p>
+        <p>
+          Solid is a mark you make, not a thing the page can see. It means you
+          went to the hand and read what it said for yourself. Everything else
+          reached you on trust, which is how most of what anyone knows reaches
+          them. The chain is the hands you can name between the first saying
+          and you, drawn solid where you checked a hand yourself or saw with
+          your own eyes, and hollow where you did not; the wordings are
+          compared as words, the census counts the usual ones, and the
+          interests are what you wrote about each hand. A check settles what
+          it settles and nothing more.
+        </p>
+        <p class="never">
+          Nothing here says whether the claim is so, likely, credible or
+          trustworthy. No hand is ranked above another, no question or check
+          is written for you, no link is fetched and no model is asked. What
+          you write is kept in this browser and goes nowhere else.
+        </p>
+        <ul class="limits">
+          <li>
+            The census is a fixed list of English words in seven families. A
+            wording can lean hard without any of them, and a careful one can
+            use them honestly. It counts; it does not judge.
+          </li>
+          <li>
+            The drift compares words, not meanings. A faithful paraphrase
+            still shows words gained and lost, and a turn that keeps the words
+            but changes the sense shows nothing.
+          </li>
+          <li>
+            The chain is the hands you can name. The ones you cannot remember
+            are not on it, and they are usually the feed.
+          </li>
+        </ul>
+        <p class="meta" id="keptWhere"></p>
+      </section>
+
       <p class="meta low" style="margin: 0">/ find · n new · h a hand · esc</p>
     </aside>
   </section>
 
-  <section class="coda">
-    <div class="rail"><span class="label">Coda</span></div>
-    <div class="body">
-      <p class="last">
-        Solid is a mark you make, not a thing the page can see. It means you
-        went to the hand and read what it said for yourself. Everything else
-        reached you on trust, which is how most of what anyone knows reaches
-        them.
-      </p>
-      <p class="label" style="margin-top: 40px">Honest limits</p>
-      <ul class="limits">
-        <li>
-          The census is a fixed list of English words in seven families. A
-          wording can lean hard without any of them, and a careful one can use
-          them honestly. It counts; it does not judge.
-        </li>
-        <li>
-          The drift compares words, not meanings. A faithful paraphrase still
-          shows words gained and lost, and a turn that keeps the words but
-          changes the sense shows nothing.
-        </li>
-        <li>
-          The chain is the hands you can name. The ones you cannot remember are
-          not on it, and they are usually the feed.
-        </li>
-        <li>
-          What you write is kept in this browser's storage and nowhere else.
-          Clearing site data clears it, and another browser will not see it.
-        </li>
-      </ul>
-    </div>
-  </section>
-
   <footer>
-    <span class="label">Provenance · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Provenance · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -1339,25 +1357,20 @@
   const KEY = "pp-provenance";
   const SPEC = "specimen";
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
-  const todayStr = () => new Date().toISOString().slice(0, 10);
   const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const uid = () =>
     Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
 
-  // ── hand-drawn strokes (niwa lib/hand.ts): deterministic for a seed ─────
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -1368,6 +1381,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -1376,8 +1391,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -1396,6 +1418,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -1407,8 +1431,10 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
   function roughRect(
     w,
     h,
@@ -1427,8 +1453,10 @@
       stroke([x0, y1], [x0, y0], r, wobble, overshoot),
     ].join("");
   }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[Math.max(0, i - 1)];
       const p1 = pts[i];
@@ -1436,10 +1464,16 @@
       const p3 = pts[Math.min(pts.length - 1, i + 2)];
       const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
       const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
     }
     return d;
   }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -1449,6 +1483,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -1469,6 +1505,56 @@
     }
     return smooth(pts);
   }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1517,6 +1603,13 @@
     if (pts.length > 1) subs.push(pts);
     return subs;
   }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -1547,10 +1640,150 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "provenance";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
 
   // A pen line laid over a panel, re-drawn only when the panel changes size.
   const SK = new WeakMap();
@@ -1589,22 +1822,8 @@
     );
   }
 
-  // ── days (niwa lib/chronology.ts) ─────────────────────────────────────
+  // ── days (niwa lib/chronology.ts): a hand's day may be a year, a month or a day ──
   const DAY_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
-  const MON = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
   function validDay(s) {
     if (typeof s !== "string") return false;
     const m = DAY_RE.exec(s);
@@ -1914,8 +2133,6 @@
     return t;
   }
 
-  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
-
   /** Facts about the provenance. None of them is a verdict on the claim. */
   function readings(p) {
     const out = [];
@@ -2000,17 +2217,6 @@
     return out;
   }
 
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[̀-ͯ]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "claim"}`;
-  }
   function titleOf(p) {
     if (p.title.trim()) return p.title.trim();
     const first = sentencesOf(p.claim)[0] ?? "";
@@ -2249,43 +2455,13 @@
     selected: null,
     query: "",
     sure: null, // "hand" | "file"
-    theme: "",
+    specimen: false, // the open sheet is the specimen: read-only, never written
+    from: "", // a hand-off: the instrument the claim was carried from
+    next: "", // a hand-off: the instrument to carry it to
     openKey: 0,
     chainFor: -1,
     drawn: new Set(),
   };
-  const writable = () => !!S.draft && S.slug !== SPEC;
-
-  function loadStore() {
-    const empty = { provs: [], open: null, theme: "" };
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (!raw) return empty;
-      const j = obj(JSON.parse(raw));
-      if (!j) return empty;
-      return {
-        provs: arrOf(j.provs, 200, provOf).sort((a, b) =>
-          a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
-        ),
-        open: typeof j.open === "string" ? j.open : null,
-        theme: j.theme === "light" || j.theme === "dark" ? j.theme : "",
-      };
-    } catch {
-      return empty;
-    }
-  }
-  function writeStore() {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({ v: 1, provs: S.provs, open: S.slug, theme: S.theme }),
-      );
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   // ── saying and keeping ────────────────────────────────────────────────
   let capT = null;
   function say(msg) {
@@ -2318,8 +2494,8 @@
     clearTimeout(saveT);
     saveT = null;
     const d = S.draft;
-    if (!writable() || !worthKeeping(d)) return;
-    const today = todayStr();
+    if (S.specimen || !worthKeeping(d)) return;
+    const today = localToday();
     if (!d.slug) {
       const taken = new Set(S.provs.map((x) => x.slug));
       const base = slugOf(
@@ -2337,7 +2513,7 @@
     if (!kept) return;
     S.provs = [kept, ...S.provs.filter((x) => x.slug !== kept.slug)];
     S.slug = d.slug;
-    flashKept(writeStore());
+    flashKept(persist({ provs: S.provs, open: S.slug }));
     renderClaims();
     renderFile();
   }
@@ -2351,17 +2527,23 @@
     const p = slug === SPEC ? SPECIMEN : S.provs.find((x) => x.slug === slug);
     if (!p) return;
     S.slug = p.slug;
+    S.specimen = slug === SPEC;
     S.draft = clone(p);
     S.selected = null;
     S.sure = null;
+    S.from = "";
+    S.next = "";
     S.openKey++;
-    writeStore();
+    if (!S.specimen) persist({ provs: S.provs, open: S.slug });
     renderAll();
   }
   function begin() {
     if (saveT) save();
     S.slug = null;
-    S.draft = emptyProvenance(todayStr());
+    S.specimen = false;
+    S.from = "";
+    S.next = "";
+    S.draft = emptyProvenance(localToday());
     S.selected = null;
     S.sure = null;
     S.openKey++;
@@ -2371,21 +2553,31 @@
   }
   function letGo() {
     const d = S.draft;
-    if (!writable() || !d.slug) return;
+    if (S.specimen || !d.slug) return;
     S.provs = S.provs.filter((x) => x.slug !== d.slug);
     S.sure = null;
     clearTimeout(saveT);
     saveT = null;
     S.slug = null;
-    writeStore();
+    persist({ provs: S.provs, open: S.slug });
     open(S.provs[0] ? S.provs[0].slug : SPEC);
     say("let go of the claim.");
+  }
+
+  /* A hand-off read from the address: a new claim of the reader's own, the carried text as
+     the claim that reached them and nothing else. Not written until the reader adds to it. */
+  function carried(h) {
+    begin();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) S.draft.claim = h.set;
+    renderAll();
   }
 
   // ── the hands ─────────────────────────────────────────────────────────
   const hopById = (id) => S.draft.hops.find((h) => h.id === id);
   function addHop(where) {
-    if (!writable()) return;
+    if (S.specimen) return;
     const h = emptyHop();
     S.draft.hops =
       where === "before" ? [h, ...S.draft.hops] : [...S.draft.hops, h];
@@ -2426,7 +2618,7 @@
     if (fresh) S.drawn = new Set();
     const hasOrigin = !!d.origin.trim();
     const originName = hasOrigin ? d.originWho.trim() || "as first said" : "not yet written";
-    const youName = `you · ${formatDay(todayStr())}`;
+    const youName = `you · ${formatDay(localToday())}`;
     const bw = 22;
     const bh = 16;
     const CW = 6.6; // a character of the hand's name, near enough
@@ -2538,7 +2730,7 @@
       s += `</g>`;
     });
     if (n === 0) {
-      const msg = writable()
+      const msg = !S.specimen
         ? W < 720
           ? "name the hands it came through"
           : "name the hands it came through — the last one first, if that is the one you remember"
@@ -2565,7 +2757,7 @@
     const st = $("status");
     st.style.color = "";
     st.textContent =
-      S.slug === SPEC ? "specimen · read-only" : S.slug ? "" : "not yet kept";
+      S.specimen ? "specimen · read-only" : S.slug ? "" : "not yet kept";
   }
   function renderHead() {
     const d = S.draft;
@@ -2642,14 +2834,14 @@
         `data-k="${k}"`,
         {
           acc: true,
-          dis: !writable(),
+          dis: S.specimen,
         },
       ),
     ).join("");
   }
   function renderChecks() {
     const d = S.draft;
-    const w = writable();
+    const w = !S.specimen;
     const ro = w ? "" : " readonly";
     $("addCheck").hidden = !w;
     $("noChecks").hidden = d.checks.length > 0;
@@ -2679,13 +2871,24 @@
   }
   function renderFields() {
     const d = S.draft;
-    const w = writable();
+    const w = !S.specimen;
     for (const id of ["originWho", "origin", "claim", "note"]) {
       const el = $(id);
       el.value = d[id];
       el.readOnly = !w;
     }
-    $("banner").hidden = S.slug !== SPEC;
+    $("banner").hidden = !S.specimen;
+    const c = $("carried");
+    c.hidden = !S.from;
+    c.textContent = S.from ? `Carried from ${S.from}` : "";
+  }
+  /* One link in afterwards, built from the claim as it stands: the next station of the circuit. */
+  function renderCarry() {
+    const el = $("carryNext");
+    el.hidden = !S.next || S.specimen;
+    el.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, S.draft.claim, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
   }
 
   // ── the desk ──────────────────────────────────────────────────────────
@@ -2724,7 +2927,7 @@
   }
   function renderHands() {
     const d = S.draft;
-    const w = writable();
+    const w = !S.specimen;
     if (!d.hops.length && !w) {
       $("hands").innerHTML = "";
       return;
@@ -2741,7 +2944,7 @@
   }
   function renderFile() {
     const d = S.draft;
-    if (!writable()) {
+    if (S.specimen) {
       $("file").innerHTML = "";
       return;
     }
@@ -2765,7 +2968,7 @@
       cardFor = null;
       return;
     }
-    const w = writable();
+    const w = !S.specimen;
     const ro = w ? "" : " readonly";
     const dis = { dis: !w };
     const i = d.hops.indexOf(h);
@@ -2867,6 +3070,7 @@
     renderDrift();
     renderReading();
     renderHands();
+    renderCarry();
   }
   function renderAll() {
     renderStatus();
@@ -2888,7 +3092,7 @@
       return;
     }
     const fld = t.dataset && t.dataset.f;
-    if (!fld || !writable()) return;
+    if (!fld || S.specimen) return;
     const d = S.draft;
     const v = t.value;
     const h = t.dataset.h ? hopById(t.dataset.h) : null;
@@ -2922,7 +3126,7 @@
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.dataset && t.dataset.f === "h-channel" && writable()) {
+    if (t.dataset && t.dataset.f === "h-channel" && !S.specimen) {
       const h = hopById(t.dataset.h);
       if (!h) return;
       h.channel = t.value;
@@ -2943,8 +3147,7 @@
     if (act === "open") return open(b.dataset.slug);
     if (act === "sel") return select(b.dataset.h);
     if (act === "desel") return select(S.selected);
-    if (act === "theme") return;
-    if (!writable()) return;
+    if (S.specimen) return;
     if (act === "knowing") {
       const k = b.dataset.k;
       d.knowing = d.knowing.includes(k)
@@ -2972,7 +3175,7 @@
       const c = d.checks.find((x) => x.id === b.dataset.c);
       if (!c) return;
       c.went = b.dataset.w;
-      c.on = c.went ? todayStr() : null;
+      c.on = c.went ? localToday() : null;
       renderChecks();
       renderReading();
       return keepNow();
@@ -2999,7 +3202,7 @@
     if (act === "checked") {
       h.checked =
         b.dataset.v === "yes"
-          ? h.checked || { on: todayStr(), found: "" }
+          ? h.checked || { on: localToday(), found: "" }
           : null;
     } else if (act === "reframed") {
       h.reframed =
@@ -3045,35 +3248,24 @@
       S.sure = null;
       renderFile();
     } else if (e.key === "n") begin();
-    else if (e.key === "h" && writable()) addHop("after");
+    else if (e.key === "h" && !S.specimen) addHop("after");
   });
-
-  // ── the theme: niwa's paper and sumi ──────────────────────────────────
-  const dark = matchMedia("(prefers-color-scheme: dark)");
-  function applyTheme() {
-    if (S.theme) document.documentElement.dataset.theme = S.theme;
-    else delete document.documentElement.dataset.theme;
-    const isDark = S.theme ? S.theme === "dark" : dark.matches;
-    $("theme").textContent = isDark ? "paper" : "sumi";
-  }
-  $("theme").addEventListener("click", () => {
-    const isDark = S.theme ? S.theme === "dark" : dark.matches;
-    S.theme = isDark ? "light" : "dark";
-    applyTheme();
-    writeStore();
-  });
-  dark.addEventListener("change", applyTheme);
 
   // ── boot: opens on the specimen, or on the reader's last claim ────────
   function boot() {
-    const st = loadStore();
-    S.provs = st.provs;
-    S.theme = st.theme;
-    applyTheme();
-    const slug =
-      st.open && S.provs.some((p) => p.slug === st.open) ? st.open : SPEC;
+    const env = readStore();
+    S.provs = arrOf(env?.provs, 200, provOf).sort((a, b) =>
+      a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
+    );
+    const last = typeof env?.open === "string" ? env.open : null;
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+    const h = fromHash();
+    if (h) return carried(h);
+    const slug = last && S.provs.some((p) => p.slug === last) ? last : SPEC;
     const p = slug === SPEC ? SPECIMEN : S.provs.find((x) => x.slug === slug);
     S.slug = p.slug;
+    S.specimen = slug === SPEC;
     S.draft = clone(p);
     S.selected = null;
     S.sure = null;
@@ -3086,6 +3278,11 @@
     ["pOrigin", "origin", "acc"],
     ["pClaim", "claim", ""],
     ["pReading", "prov-reading", ""],
+    ["lawsPanel", "prov-laws", ""],
   ])
     sketch($(id), seed, cls, true);
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

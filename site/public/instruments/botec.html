@@ -32,20 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: the back of an envelope. Bone paper, sumi ink; the hand is Newsreader italic.
-     Rust is only ever the answer, the reader's line across it, and what is in hand. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
-    --paper: #f4f2ed;
-    --sheet: #faf9f6;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
     --ink: #23211e;
-    --ink-2: #5f594f;
-    --ink-3: #7d766b;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #c9c2b4;
     --accent: #b5532a;
-    --accent-wash: rgba(181, 83, 42, 0.12);
-    --pen: color-mix(in srgb, var(--ink) 88%, var(--paper));
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -53,27 +52,46 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --paper: #16150f;
-      --sheet: #1f1e17;
+      --bg: #16150f;
+      --surface: #1f1e17;
       --ink: #ede9df;
-      --ink-2: #a39c8e;
-      --ink-3: #857e70;
+      --muted: #a39c8e;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473b;
       --accent: #d9763f;
-      --accent-wash: rgba(217, 118, 63, 0.16);
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --paper: #16150f;
-    --sheet: #1f1e17;
+    --bg: #16150f;
+    --surface: #1f1e17;
     --ink: #ede9df;
-    --ink-2: #a39c8e;
-    --ink-3: #857e70;
+    --muted: #a39c8e;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #4a473b;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: the back of an envelope. Bone paper, sumi ink; the hand is Newsreader italic.
+     Rust is only ever the answer, the reader's line across it, and what is in hand. Botec's
+     own hues: a second rule for the heavier lines, and a wash for a line in hand. */
+  :root {
+    --rule-2: #c9c2b4;
+    --accent-wash: rgba(181, 83, 42, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473b;
+      --accent-wash: rgba(217, 118, 63, 0.16);
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #4a473b;
     --accent-wash: rgba(217, 118, 63, 0.16);
   }
 
@@ -85,7 +103,7 @@
   }
   html,
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
   body {
@@ -113,7 +131,7 @@
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .meta {
     font-family: var(--mono);
@@ -133,10 +151,10 @@
     color: var(--accent);
   }
   .faint {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .muted {
-    color: var(--ink-2);
+    color: var(--muted);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
@@ -152,6 +170,11 @@
   }
   button:disabled {
     cursor: default;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   input,
   textarea {
@@ -196,8 +219,9 @@
     padding-block: 64px 36px;
     border-bottom: 1px solid var(--rule-2);
   }
-  .mast .label {
+  .mast .meta {
     margin: 0 0 24px;
+    color: var(--muted);
   }
   h1 {
     font-size: clamp(56px, 9vw, 104px);
@@ -208,7 +232,7 @@
     margin: 22px 0 0;
     font-size: clamp(20px, 2.4vw, 24px);
     line-height: 1.36;
-    color: var(--ink-2);
+    color: var(--muted);
     max-width: 34ch;
   }
   .deck em {
@@ -228,7 +252,7 @@
     border-bottom: 1px solid var(--rule);
     font-size: 15.5px;
     line-height: 1.4;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .keys kbd {
     font-family: var(--mono);
@@ -249,7 +273,7 @@
   .panel {
     position: relative;
     padding: 20px 20px 18px;
-    background: var(--sheet);
+    background: var(--surface);
     border-radius: 3px;
   }
   .panel > :not(.sketch) {
@@ -271,7 +295,7 @@
     margin: 6px 0 0;
     font-size: 15.5px;
     line-height: 1.4;
-    color: var(--ink-3);
+    color: var(--faint);
     max-width: 60ch;
   }
   .desk {
@@ -294,7 +318,7 @@
     font-size: 10.5px;
     line-height: 1.6;
     letter-spacing: 0.02em;
-    color: var(--ink-3);
+    color: var(--faint);
   }
 
   .chips {
@@ -311,7 +335,7 @@
     text-transform: uppercase;
     line-height: 1.2;
     padding: 6px 11px;
-    color: var(--ink-2);
+    color: var(--muted);
     border: 1px solid var(--rule-2);
     border-radius: 999px;
     transition:
@@ -364,7 +388,7 @@
   }
   .bt-folds path {
     fill: none;
-    stroke: color-mix(in srgb, var(--ink-3) 40%, transparent);
+    stroke: color-mix(in srgb, var(--faint) 40%, transparent);
     stroke-width: 1.15;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -405,7 +429,7 @@
   .bt-value::placeholder,
   .bt-unit-in::placeholder,
   .bt-case::placeholder {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .rows-head {
     display: flex;
@@ -425,7 +449,7 @@
     font-style: italic;
   }
   .tick-word {
-    fill: var(--ink-3);
+    fill: var(--faint);
   }
   .bt-lines {
     list-style: none;
@@ -460,7 +484,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    border-left: 1px dashed color-mix(in srgb, var(--ink-3) 70%, transparent);
+    border-left: 1px dashed color-mix(in srgb, var(--faint) 70%, transparent);
   }
   .bt-op {
     width: 1.3rem;
@@ -470,7 +494,7 @@
     font-style: italic;
     font-size: 19px;
     line-height: 1;
-    color: var(--ink-2);
+    color: var(--muted);
     transition: color 160ms var(--ease);
   }
   button.bt-op:not(:disabled):hover {
@@ -481,7 +505,7 @@
     min-width: 0;
     background: transparent;
     border: 0;
-    border-bottom: 1px dotted color-mix(in srgb, var(--ink-3) 60%, transparent);
+    border-bottom: 1px dotted color-mix(in srgb, var(--faint) 60%, transparent);
     border-radius: 0;
     padding: 2px 0;
     font-family: var(--serif);
@@ -500,7 +524,7 @@
   .bt-eq {
     flex-shrink: 0;
     font-size: 18px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .bt-guess {
     position: relative;
@@ -523,7 +547,7 @@
       opacity 120ms var(--ease);
   }
   .bt-value:not([readonly]):hover {
-    border-bottom-color: var(--ink-3);
+    border-bottom-color: var(--faint);
   }
   .bt-value:focus {
     outline: none;
@@ -555,18 +579,18 @@
     -webkit-user-select: none;
   }
   .bt-num {
-    border-bottom: 1px dotted var(--ink-3);
+    border-bottom: 1px dotted var(--faint);
     transition: color 140ms var(--ease);
   }
   .writable .bt-num:hover {
     color: var(--accent);
   }
   .bt-to {
-    color: var(--ink-3);
+    color: var(--faint);
     white-space: pre;
   }
   .bt-unit {
-    color: var(--ink-2);
+    color: var(--muted);
     white-space: pre;
   }
   .bt-so {
@@ -574,10 +598,10 @@
     min-width: 3.9rem;
     text-align: right;
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .bt-so.sub {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .bt-so.answer,
   .rung.answer {
@@ -588,7 +612,7 @@
     color: var(--ink);
   }
   .rung.sub {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .bt-grid {
     stroke: color-mix(in srgb, var(--rule) 80%, transparent);
@@ -602,7 +626,7 @@
     gap: 2px;
     padding: 2px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--sheet) 94%, transparent);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
     transform: translateY(-50%);
     opacity: 0;
     pointer-events: none;
@@ -626,7 +650,7 @@
     font-family: var(--mono);
     font-size: 12px;
     line-height: 1;
-    color: var(--ink-3);
+    color: var(--faint);
     transition:
       color 140ms var(--ease),
       background-color 140ms var(--ease);
@@ -646,7 +670,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-size: 16.5px;
-    color: var(--ink-2);
+    color: var(--muted);
     transition: color 160ms var(--ease);
   }
   .bt-add:hover {
@@ -671,7 +695,7 @@
     color: var(--ink);
   }
   .big.none {
-    color: var(--ink-3);
+    color: var(--faint);
   }
   .bt-unit-in {
     font-size: 21px;
@@ -679,7 +703,7 @@
   .ans-say {
     font-size: 16px;
     line-height: 1.3;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .plot-box {
     position: relative;
@@ -692,11 +716,11 @@
   }
   .bt-plot .axis-line {
     fill: none;
-    stroke: var(--ink-3);
+    stroke: var(--faint);
     stroke-width: 1.1;
   }
   .bt-plot .tick {
-    stroke: var(--ink-3);
+    stroke: var(--faint);
     stroke-width: 1;
   }
   .bt-plot text,
@@ -726,7 +750,7 @@
     stroke-dasharray: 4 4;
   }
   .yours circle {
-    fill: var(--sheet);
+    fill: var(--surface);
     stroke: var(--accent);
     stroke-width: 1.4;
   }
@@ -748,7 +772,7 @@
     transition: fill 200ms var(--ease);
   }
   .bt-dot-ink.dim {
-    fill: var(--ink-3);
+    fill: var(--faint);
   }
   @keyframes fall {
     from {
@@ -784,7 +808,7 @@
     transition: border-color 160ms var(--ease);
   }
   .num-in:not([readonly]):hover {
-    border-bottom-color: var(--ink-3);
+    border-bottom-color: var(--faint);
   }
   .num-in:focus {
     outline: none;
@@ -821,7 +845,7 @@
     white-space: nowrap;
     font-size: 15px;
     line-height: 1.25;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .bt-swing.first .what {
     color: var(--ink);
@@ -832,7 +856,7 @@
   }
   .swing-bar .bar {
     fill: none;
-    stroke: var(--ink-2);
+    stroke: var(--muted);
     stroke-width: 1.8;
     stroke-linecap: round;
   }
@@ -841,7 +865,7 @@
     stroke-width: 2.6;
   }
   .swing-bar .end {
-    stroke: var(--ink-2);
+    stroke: var(--muted);
     stroke-width: 1;
   }
   .swing-bar .base {
@@ -870,7 +894,7 @@
   }
   .came-row .hand {
     font-size: 18px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .num-in.came-in {
     font-size: 21px;
@@ -924,7 +948,7 @@
   }
   .rec .n {
     font-size: 14.5px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   .rec [aria-current="true"] .meta {
     color: var(--accent);
@@ -959,7 +983,7 @@
   }
   .small {
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--muted);
   }
   footer {
     margin-top: 56px;
@@ -969,6 +993,9 @@
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
+  }
+  footer .meta {
+    color: var(--muted);
   }
 
   .rise {
@@ -1026,7 +1053,7 @@
 <div class="wrap">
   <header class="mast">
     <div class="rise">
-      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
       <h1>Botec</h1>
       <p class="deck">
         <em>If it turns on how much.</em> Work a thing out on the back of an
@@ -1057,9 +1084,10 @@
     >
       <div class="sheet-head">
         <div class="meta accent" id="sheetMeta"></div>
-        <button class="chip" id="newEnv" type="button">a new envelope</button>
+        <button class="chip" id="newEnv" type="button">Make your own</button>
       </div>
       <p class="sheet-note hand" id="sheetNote" hidden></p>
+      <p class="sheet-note hand" id="carried" hidden></p>
 
       <div class="bt-envelope" id="env">
         <svg class="bt-folds" id="folds" aria-hidden="true"></svg>
@@ -1174,6 +1202,7 @@
           aria-label="Afterwards"
         ></textarea>
       </div>
+      <p class="sheet-note hand" id="carryNext" hidden></p>
 
       <div class="keep-row" id="offRow" hidden>
         <button class="chip" id="off" type="button">
@@ -1235,7 +1264,7 @@
           Douglas Hubbard, How to Measure Anything (2007) · Kay, Kola, Hullman
           and Munson, When (ish) is my bus? (2016), the quantile dotplot
         </p>
-        <p class="refs">kept in this browser, and nowhere else</p>
+        <p class="refs" id="keptWhere"></p>
       </section>
     </aside>
   </main>
@@ -1267,15 +1296,23 @@
   </section>
 
   <footer>
-    <span class="label">Botec · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Botec · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
 <script>
   "use strict";
   (() => {
-/* ── the hand: deterministic pen strokes (niwa lib/hand.ts) ───────── */
+/* capp:hand begin */
+/**
+ * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+ * and the client draw the same line and a re-render never redraws a border.
+ * Amplitudes are in px and small on purpose: a line that wobbles more than a
+ * pixel or two stops reading as drawn and starts reading as broken.
+ */
+
+/** mulberry32 — small, fast, and the same number sequence everywhere. */
 function rand(seed) {
   let a = seed >>> 0;
   return () => {
@@ -1286,6 +1323,8 @@ function rand(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/** A stable seed from a string, so a note's stroke is its own every time. */
 function seedOf(s) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -1294,8 +1333,15 @@ function seedOf(s) {
   }
   return h >>> 0;
 }
-const f1 = (n) => String(Math.round(n * 10) / 10);
+
+const fx = (n) => String(Math.round(n * 10) / 10);
 const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+/**
+ * One pen stroke from a to b: a cubic whose control points sit a little off
+ * the straight line, the pen starting and stopping just past the ends the way
+ * a quick sketch does. Returns a segment beginning with its own M.
+ */
 function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
@@ -1314,6 +1360,8 @@ function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     b[0] + ux * past + nx * spread(r, wobble * 0.4),
     b[1] + uy * past + ny * spread(r, wobble * 0.4),
   ];
+  // The bow: both control points lean the same way more often than not, so a
+  // long side curves gently rather than kinking.
   const bow = spread(r, wobble);
   const t1 = 0.25 + r() * 0.15;
   const t2 = 0.6 + r() * 0.15;
@@ -1325,18 +1373,130 @@ function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
     a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
   ];
-  return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
 }
-function roughRect(w, h, seed) {
+
+/** A box drawn as four strokes, each running a little past its corner. */
+function roughRect(
+  w,
+  h,
+  seed,
+  { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+) {
   const r = rand(seed);
-  const i = 0.5;
+  const x0 = inset;
+  const y0 = inset;
+  const x1 = w - inset;
+  const y1 = h - inset;
   return [
-    stroke([i, i], [w - i, i], r, 1.1, 3),
-    stroke([w - i, i], [w - i, h - i], r, 1.1, 3),
-    stroke([w - i, h - i], [i, h - i], r, 1.1, 3),
-    stroke([i, h - i], [i, i], r, 1.1, 3),
+    stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+    stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+    stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+    stroke([x0, y1], [x0, y0], r, wobble, overshoot),
   ].join("");
 }
+
+/** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+function smooth(pts) {
+  let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+  }
+  return d;
+}
+
+/**
+ * The circling: a loop around a w×h box that starts somewhere on the left,
+ * goes once round, and runs past its own start — the way a word gets ringed
+ * in a notebook. `pad` is how far outside the box the pen stays.
+ */
+function roughEllipse(
+  w,
+  h,
+  seed,
+  { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+) {
+  const r = rand(seed);
+  const cx = w / 2;
+  const cy = h / 2;
+  // An ellipse that only just clears a box cuts through its corners; `grow`
+  // widens it so the ring passes outside the letters at the ends.
+  const rx = (w / 2) * grow + pad;
+  const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+  const tilt = spread(r, 0.06);
+  const a0 = Math.PI * (0.8 + r() * 0.4);
+  const overlap = 1.08 + r() * 0.06;
+  const pts = [];
+  const n = Math.round(steps * overlap);
+  for (let i = 0; i <= n; i++) {
+    const a = a0 + (i / steps) * Math.PI * 2;
+    const kx = rx + spread(r, wobble);
+    const ky = ry + spread(r, wobble);
+    const x = Math.cos(a) * kx;
+    const y = Math.sin(a) * ky;
+    pts.push([
+      cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+      cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+    ]);
+  }
+  return smooth(pts);
+}
+
+/** A line drawn under something: a touch before, a touch after, a slight sag. */
+function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+  const r = rand(seed);
+  return stroke(
+    [-1 - r() * 2, y],
+    [w + 1 + r() * 2, y + spread(r, 0.8)],
+    r,
+    wobble,
+    0,
+  );
+}
+
+/**
+ * A long vertical line, like the left edge of a sheet laid on the desk: long
+ * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+ * once or twice on the way down.
+ */
+function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+  const r = rand(seed);
+  const pts = [];
+  const step = 90;
+  for (let y = -2; y <= h + 2; y += step)
+    pts.push([x + spread(r, wobble), y]);
+  pts.push([x + spread(r, wobble), h + 2]);
+  return smooth(pts);
+}
+
+/** Where a hand would have set a stipple mark down: a little off, a little turned. */
+function jitter(seed, amp = 0.6, turn = 14) {
+  const r = rand(seed);
+  return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+}
+
+/** Struck through: a line across the middle that rises a little to the right. */
+function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+  const r = rand(seed);
+  return stroke(
+    [-2 - r() * 2, h * 0.58],
+    [w + 2 + r() * 2, h * 0.42],
+    r,
+    wobble,
+    0,
+  );
+}
+
+/**
+ * A path from this file (M, C and L only, absolute), sampled into points per
+ * subpath — the centreline a pen would have followed.
+ */
 function sample(d) {
   const subs = [];
   let cur = [0, 0];
@@ -1357,7 +1517,10 @@ function sample(d) {
       const b = [n[0], n[1]];
       for (let i = 1; i <= 3; i++) {
         const t = i / 3;
-        pts.push([cur[0] + (b[0] - cur[0]) * t, cur[1] + (b[1] - cur[1]) * t]);
+        pts.push([
+          cur[0] + (b[0] - cur[0]) * t,
+          cur[1] + (b[1] - cur[1]) * t,
+        ]);
       }
       cur = b;
     } else {
@@ -1382,6 +1545,13 @@ function sample(d) {
   if (pts.length > 1) subs.push(pts);
   return subs;
 }
+
+/**
+ * The pen's pressure: a centreline turned into a filled ribbon that is thin
+ * where the pen lands and lifts, fullest through the middle, and never quite
+ * even — a few knots of pressure along the way, interpolated. `width` is the
+ * width at full pressure. Each subpath is its own stroke.
+ */
 function ribbon(d, width = 1.5, seed = 1) {
   const r = rand(seed);
   const out = [];
@@ -1412,10 +1582,151 @@ function ribbon(d, width = 1.5, seed = 1) {
       right.push([pts[i][0] - nx, pts[i][1] - ny]);
     }
     const poly = [...left, ...right.reverse()];
-    out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
   }
   return out.join("");
 }
+/* capp:hand end */
+
+/* capp:esc begin */
+const ESC = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+/* capp:esc end */
+
+/* capp:dates begin */
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+const localToday = () => {
+  const d = new Date();
+  const p = (k) => String(k).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+const utc = (d) =>
+  Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+function daysBetween(a, b) {
+  if (!DAY.test(a) || !DAY.test(b)) return 0;
+  return Math.round((utc(b) - utc(a)) / 86400000);
+}
+function addDays(d, k) {
+  if (!DAY.test(d)) return d;
+  return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+}
+const dayWords = (d) =>
+  DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+/* capp:dates end */
+
+/* capp:slug begin */
+function slugOf(title, day) {
+  const t = String(title)
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 56)
+    .replace(/-+$/g, "");
+  return `${day.slice(0, 10)}-${t || "sheet"}`;
+}
+/* capp:slug end */
+
+/* capp:plural begin */
+const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+/* capp:plural end */
+
+const KEY = "pp-botec";
+/* capp:store begin */
+function readStore() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    return d && typeof d === "object" && d.v === 1 ? d : null;
+  } catch {
+    return null;
+  }
+}
+function persist(data) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+/* capp:store end */
+
+const SELF = "botec";
+const SLUGS = [
+  "catalogue",
+  "bearing",
+  "distribution",
+  "flow",
+  "course",
+  "alarm",
+  "way",
+  "margin",
+  "provenance",
+  "oblique",
+  "dialogue",
+  "mask",
+  "tack",
+  "sieve",
+  "wish",
+  "break",
+  "overview",
+  "fence",
+  "muster",
+  "botec",
+  "act",
+  "crowd",
+  "canon",
+  "panel",
+  "slice",
+  "toll",
+  "unison",
+  "spine",
+  "circuits",
+  "real-ideal",
+  "attention",
+  "normal",
+  "half-second",
+  "familiar-voice",
+  "stop-flowing",
+  "chronology",
+];
+/* capp:hash begin */
+function fromHash() {
+  const h = location.hash.slice(1);
+  if (!h.includes("=")) return null;
+  const q = new URLSearchParams(h);
+  const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+  const set = q.get("set") || "";
+  const out = {
+    set: set.length <= 4000 ? set : "",
+    from: ok(q.get("from") || "") ? q.get("from") : "",
+    next: ok(q.get("next") || "") ? q.get("next") : "",
+  };
+  try {
+    history.replaceState(null, "", location.pathname + location.search);
+  } catch {}
+  return out.set || out.from || out.next ? out : null;
+}
+function carryHref(slug, text, next) {
+  const base =
+    location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+  const q = new URLSearchParams();
+  q.set("set", text);
+  q.set("from", SELF);
+  if (next) q.set("next", next);
+  return `${base}#${q}`;
+}
+/* capp:hash end */
 
 /* ── the envelope (niwa lib/botec.ts, by hand) ────────────────────── */
 const OPS = ["×", "÷", "+", "−"];
@@ -2142,8 +2453,6 @@ function outdent(lines, key) {
 }
 
 /* readings */
-const nWords = (k, one, many = `${one}s`) =>
-  `${k.toLocaleString("en")} ${k === 1 ? one : many}`;
 const quote = (s) =>
   `‘${s.length > 60 ? `${s.slice(0, 59).replace(/\s+\S*$/, "")}…` : s}’`;
 const times = (r) => (r < 10 ? `${sig(r, 2)} times` : `${fmt(r)} times`);
@@ -2199,23 +2508,21 @@ function readings(b, w, s, swing) {
       `${Math.round(above(w.out, b.line) * 100)} in 100 draws land above your line at ${fmt(b.line)}${b.lineName.trim() ? ` — ${b.lineName.trim()}` : ""}`,
     );
   if (w.empty)
-    out.push(`${nWords(w.empty, "line has", "lines have")} no number yet`);
+    out.push(`${plural(w.empty, "line has", "lines have")} no number yet`);
   if (w.bad.length)
     out.push(
       `${w.bad.map(quote).join(", ")} ${w.bad.length === 1 ? "reads" : "read"} as no number`,
     );
   if (w.lost)
     out.push(
-      `${nWords(w.lost, "draw")} divided by nothing and ${w.lost === 1 ? "was" : "were"} left out`,
+      // Lost draws can run to five thousand; grouped, as the draws are said elsewhere.
+      `${w.lost.toLocaleString("en")} ${w.lost === 1 ? "draw" : "draws"} divided by nothing and ${w.lost === 1 ? "was" : "were"} left out`,
     );
   if (s && w.out && b.came !== null) out.push(cameWords(b.came, w.out, s, u));
   return out;
 }
 
 /* the record */
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
-const utc = (d) =>
-  Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
 function tally(all, today) {
   const t = {
     kept: all.length,
@@ -2244,7 +2551,7 @@ function tally(all, today) {
 }
 function recordReadings(t) {
   if (!t.kept) return ["nothing kept yet"];
-  const out = [`${nWords(t.kept, "envelope")} kept, ${t.week} this week`];
+  const out = [`${plural(t.kept, "envelope")} kept, ${t.week} this week`];
   if (t.looked) {
     const said = [
       ["inside", t.inside],
@@ -2261,22 +2568,6 @@ function recordReadings(t) {
 }
 
 /* keeping one: what comes back out of storage is checked like a file */
-const MON = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-const dayWords = (d) =>
-  DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
 const str = (v, max) =>
   typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
 const long = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -2288,17 +2579,6 @@ const num = (v) => {
 const labelIn = (v) => str(v, 120).replace(/\s·\s/g, " - ");
 const valueIn = (v) => str(v, 60).replace(/·/g, "");
 const KEYRE = /^[a-z0-9]{1,24}$/i;
-function slugOf(title, d) {
-  const t = title
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 56)
-    .replace(/-+$/g, "");
-  return `${d.slice(0, 10)}-${t || "way"}`;
-}
 function validateBotec(input, today) {
   const r = input && typeof input === "object" ? input : {};
   const put = day(r.put, today);
@@ -2429,20 +2709,7 @@ function validateBotec(input, today) {
 /* ── the page ─────────────────────────────────────────────────────── */
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
-const esc = (s) =>
-  String(s).replace(
-    /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        c
-      ],
-  );
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const localToday = () => {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-};
 const today = localToday();
 const clone = (b) => JSON.parse(JSON.stringify(b));
 const grow = (el) => {
@@ -2493,7 +2760,6 @@ function paint(host, draw) {
 }
 
 /* ── what this browser keeps ──────────────────────────────────────── */
-const KEY = "pp-botec";
 const byTouched = (a, b) =>
   a.touched !== b.touched
     ? a.touched < b.touched
@@ -2505,35 +2771,24 @@ const byTouched = (a, b) =>
         ? -1
         : 0;
 function loadMine() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) || "null");
-    const list = raw && Array.isArray(raw.botecs) ? raw.botecs : [];
-    const out = [];
-    for (const x of list) {
-      try {
-        out.push(validateBotec(x, today));
-      } catch {}
-    }
-    return out.sort(byTouched);
-  } catch {
-    return [];
+  const env = readStore();
+  const list = env && Array.isArray(env.botecs) ? env.botecs : [];
+  const out = [];
+  for (const x of list) {
+    try {
+      out.push(validateBotec(x, today));
+    } catch {}
   }
+  return out.sort(byTouched);
 }
-function saveMine() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify({ botecs: mine }));
-    return true;
-  } catch {
-    return false;
-  }
-}
+const saveMine = () => persist({ botecs: mine });
 
 /* ── state ────────────────────────────────────────────────────────── */
 let mine = loadMine();
 let open = null;
-/** kept · new · example · specimen */
-let mode = "new";
-let specIndex = -1;
+/** What the open envelope is: kept on the record, the specimen (read-only, never written),
+    Fermi's example (to write over), or none of these, a new one. And the hand-off. */
+const S = { kept: false, specimen: false, example: false, specIndex: -1, from: "", next: "" };
 let dirty = false;
 let sure = false;
 let scrub = false;
@@ -2546,28 +2801,51 @@ let structure = "";
 const steady = { plot: null, ladder: null };
 let cache = { shape: "", worked: null, swing: null };
 
-const writable = () => mode !== "specimen";
-
 /* ── opening one ──────────────────────────────────────────────────── */
 function fresh(asExample = false) {
   open = asExample
     ? { ...clone(EXAMPLE), put: today, touched: today }
     : emptyBotec(today);
-  mode = asExample ? "example" : "new";
+  S.kept = false;
+  S.specimen = false;
+  S.example = asExample;
+  S.from = "";
+  S.next = "";
   afterOpen();
   // The example is for looking at; a new envelope is for writing on.
   if (!asExample) $("question").focus();
 }
 function loadKept(b) {
   open = clone(b);
-  mode = "kept";
+  S.kept = true;
+  S.specimen = false;
+  S.example = false;
+  S.from = "";
+  S.next = "";
   afterOpen();
 }
 function loadSpecimen(i) {
   open = clone(SPECIMEN[i]);
-  specIndex = i;
-  mode = "specimen";
+  S.specIndex = i;
+  S.kept = false;
+  S.specimen = true;
+  S.example = false;
+  S.from = "";
+  S.next = "";
   afterOpen();
+}
+/* A hand-off read from the address: a new envelope of the reader's own, the carried text as
+   its question and nothing else, not kept until it is kept. */
+function carried(h) {
+  fresh();
+  S.from = h.from;
+  S.next = h.next;
+  if (h.set) {
+    open = { ...open, question: h.set };
+    $("question").value = h.set;
+    grow($("question"));
+  }
+  update();
 }
 function afterOpen() {
   // Every field takes this envelope's words, and then a field still in hand from the last one lets go,
@@ -2594,7 +2872,7 @@ function afterOpen() {
 }
 
 /* ── keeping ──────────────────────────────────────────────────────── */
-function persist(b) {
+function put(b) {
   const kept = { ...clone(b), touched: today };
   open.touched = today;
   mine = [kept, ...mine.filter((x) => x.slug !== kept.slug)];
@@ -2604,19 +2882,19 @@ function persist(b) {
 }
 /** A change on the sheet; kept when it is finished, if the envelope is kept. */
 function edit(f, done) {
-  if (!open || !writable()) return;
+  if (!open || S.specimen) return;
   const next = f(open);
   if (next !== open) {
     open = next;
     dirty = true;
-    if (mode === "example") mode = "new";
+    S.example = false;
     sure = false;
   }
-  if (done && dirty && mode === "kept") persist(open);
+  if (done && dirty && S.kept) put(open);
   update();
 }
 function keep() {
-  if (!open || mode === "kept" || !writable()) return;
+  if (!open || S.kept || S.specimen) return;
   if (!hasContent(open)) {
     troubleMsg = "put down what you are working out, or a line";
     return renderChrome();
@@ -2627,13 +2905,14 @@ function keep() {
   let n = 2;
   while (taken.has(slug)) slug = `${base}-${n++}`;
   open = { ...open, slug, put: open.put || today };
-  mode = "kept";
+  S.kept = true;
+  S.example = false;
   troubleMsg = null;
-  persist(open);
+  put(open);
   update();
 }
 function remove() {
-  if (mode !== "kept") return;
+  if (!S.kept) return;
   mine = mine.filter((x) => x.slug !== open.slug);
   saveMine();
   renderRecord();
@@ -2777,7 +3056,7 @@ function drawFolds(anew) {
 /* ── drawing the lines (only when their shape changes) ────────────── */
 function renderLines(L) {
   const fl = flat();
-  const w = writable();
+  const w = !S.specimen;
   const ol = $("lines");
   ol.classList.toggle("writable", w);
   ol.innerHTML = fl
@@ -2831,7 +3110,7 @@ function update() {
   const L = layout();
   const sig = JSON.stringify([
     flat().map((f) => [f.line.key, f.depth, f.index, f.line.lines.length > 0]),
-    writable(),
+    S.specimen,
     L.ladderW,
     L.narrow,
   ]);
@@ -2859,7 +3138,7 @@ function guessParts(g) {
 
 function renderDerived(L) {
   const b = open;
-  const w = writable();
+  const w = !S.specimen;
   const fl = flat();
   // The draws are taken again only when a sign, a number or the shape changes — not a label.
   const shape = JSON.stringify(
@@ -3175,22 +3454,23 @@ function drawPlot(s, ax, W, worked, w) {
 /* ── the sheet's chrome: what it is, keeping it, afterwards ───────── */
 function renderChrome() {
   const b = open;
-  const w = writable();
-  $("sheetMeta").textContent =
-    mode === "kept"
-      ? `an envelope · kept ${dayWords(b.put)}`
-      : mode === "example"
-        ? "an example — Fermi's piano tuners"
-        : mode === "specimen"
-          ? `a specimen · made up · ${dayWords(b.put)}`
-          : "a new envelope";
-  $("newEnv").hidden = !(mode !== "new" || hasContent(b));
+  const w = !S.specimen;
+  $("sheetMeta").textContent = S.kept
+    ? `an envelope · kept ${dayWords(b.put)}`
+    : S.example
+      ? "an example — Fermi's piano tuners"
+      : S.specimen
+        ? `a specimen · made up · ${dayWords(b.put)}`
+        : "a new envelope";
+  $("newEnv").hidden = !(S.kept || S.example || S.specimen || hasContent(b));
   const note = $("sheetNote");
-  note.hidden = mode !== "example" && mode !== "specimen";
-  note.textContent =
-    mode === "example"
-      ? "Enrico Fermi asked his students how many piano tuners there are in Chicago. Drag a number, or write over it; it is kept only when you keep it."
-      : "Made up, from a made-up studio, to show a worked envelope. It reads but does not move; start a new envelope, or open Fermi's piano tuners to write over.";
+  note.hidden = !S.example && !S.specimen;
+  note.textContent = S.example
+    ? "Enrico Fermi asked his students how many piano tuners there are in Chicago. Drag a number, or write over it; it is kept only when you keep it."
+    : "Made up, from a made-up studio, to show a worked envelope. It reads but does not move; make your own, or open Fermi's piano tuners to write over.";
+  const carriedEl = $("carried");
+  carriedEl.hidden = !S.from;
+  carriedEl.textContent = S.from ? `Carried from ${S.from}` : "";
   const q = $("question");
   q.readOnly = !w;
   q.placeholder = w ? "what are you working out?" : "";
@@ -3204,13 +3484,12 @@ function renderChrome() {
   $("lineName").placeholder = w ? "call it — it pays for itself, say" : "";
   $("addRow").hidden = !w;
 
-  $("keepRow").hidden = !(mode !== "kept" && w);
+  $("keepRow").hidden = !(!S.kept && w);
   $("keep").disabled = !hasContent(b);
   $("keep").classList.toggle("on", hasContent(b));
 
   const showAfter =
-    mode === "kept" ||
-    (mode === "specimen" && (b.came !== null || b.after.trim()));
+    S.kept || (S.specimen && (b.came !== null || b.after.trim()));
   $("after").hidden = !showAfter;
   if (showAfter) {
     const c = $("came");
@@ -3230,7 +3509,12 @@ function renderChrome() {
     if (document.activeElement !== a && a.value !== b.after) a.value = b.after;
     grow(a);
   }
-  $("offRow").hidden = mode !== "kept";
+  const carry = $("carryNext");
+  carry.hidden = !S.next || S.specimen;
+  carry.innerHTML = S.next
+    ? `<a href="${esc(carryHref(S.next, b.question, ""))}">Carry this to ${esc(S.next)}</a>`
+    : "";
+  $("offRow").hidden = !S.kept;
   $("off").textContent = sure
     ? "take it off the record — sure?"
     : "take it off the record";
@@ -3253,13 +3537,15 @@ function recRow(b, attrs, current, prefix, i) {
 }
 function renderRecord() {
   $("record").textContent = recordReadings(tally(mine, today)).join(" · ");
+  $("keptWhere").textContent =
+    `kept in this browser only, under ${KEY} · nowhere else`;
   $("mine").innerHTML = mine
     .slice(0, 30)
     .map((b, i) =>
       recRow(
         b,
         `data-mine="${esc(b.slug)}"`,
-        mode === "kept" && open && open.slug === b.slug,
+        S.kept && open && open.slug === b.slug,
         dayWords(b.put),
         i,
       ),
@@ -3270,12 +3556,12 @@ function renderRecord() {
       recRow(
         b,
         `data-spec="${i}"`,
-        mode === "specimen" && specIndex === i,
+        S.specimen && S.specIndex === i,
         `specimen · ${dayWords(b.put)}`,
         i,
       ),
     ).join("") +
-    `<li style="--i:2"><button type="button" data-example="1"${mode === "example" ? ' aria-current="true"' : ""}>` +
+    `<li style="--i:2"><button type="button" data-example="1"${S.example ? ' aria-current="true"' : ""}>` +
     `<span class="meta faint plain">an example to write over</span><span class="t">${esc(EXAMPLE.question)}</span>` +
     `<span class="n hand">Fermi's piano tuners</span></button></li>`;
 }
@@ -3303,7 +3589,7 @@ L$.addEventListener("focusout", (e) => {
 });
 L$.addEventListener("click", (e) => {
   const b = e.target.closest("[data-act]");
-  if (!b || !writable()) return;
+  if (!b || S.specimen) return;
   const k = b.dataset.key;
   if (b.dataset.act === "cycle") cycle(k);
   else if (b.dataset.act === "down") down(k);
@@ -3320,7 +3606,7 @@ L$.addEventListener("keydown", (e) => {
     e.preventDefault();
     return keep();
   }
-  if (!writable()) return;
+  if (S.specimen) return;
   if (el.dataset.f === "label") {
     if (e.key === "Enter" || (e.key === "Tab" && !e.shiftKey)) {
       e.preventDefault();
@@ -3386,7 +3672,7 @@ L$.addEventListener("keydown", (e) => {
 /* A number dragged sideways: each end a handle. A click that does not drag goes back to the words. */
 L$.addEventListener("pointerdown", (e) => {
   const part = e.target.closest(".bt-shown [data-which]");
-  if (!part || !writable() || e.button !== 0) return;
+  if (!part || S.specimen || e.button !== 0) return;
   e.preventDefault();
   const wrap = part.closest(".bt-guess");
   const key = wrap.dataset.guess;
@@ -3435,7 +3721,7 @@ $("plot").addEventListener("pointerdown", (e) => {
     t.classList.contains("bt-plot-hit") || t.classList.contains("bt-handle")
   ))
     return;
-  if (!writable() || e.button !== 0 || !steady.plot) return;
+  if (S.specimen || e.button !== 0 || !steady.plot) return;
   e.preventDefault();
   const svg = $("plot");
   const box = svg.getBoundingClientRect();
@@ -3603,11 +3889,20 @@ new ResizeObserver(() => {
   } else drawFolds(false);
 }).observe($("env"));
 
-renderRecord();
-if (mine[0]) loadKept(mine[0]);
-else loadSpecimen(0);
+function boot() {
+  renderRecord();
+  const h = fromHash();
+  if (h) carried(h);
+  else if (mine[0]) loadKept(mine[0]);
+  else loadSpecimen(0);
+}
+boot();
 sketch($("readingPanel"), "botec-reading");
 sketch($("recordPanel"), "botec-record");
 sketch($("lawsPanel"), "botec-laws");
+window.addEventListener("hashchange", () => {
+  const h = fromHash();
+  if (h) carried(h);
+});
   })();
 </script>

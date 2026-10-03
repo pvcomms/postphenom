@@ -32,49 +32,67 @@
     font-display: swap;
   }
 
-  /* Ink on bone, after niwa's paper and sumi. The accent is the only colour: it marks the
-     labels of the sheet, the tells that give a writer away, and a sentence refused. */
-  :root {
-    color-scheme: light;
-    --bg: #f4f2ed;
-    --surface: #faf9f6;
-    --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #7f776b;
-    --rule: #e2ded5;
-    --rule-2: #cdc7b9;
-    --accent: #b5532a;
-    --accent-wash: rgba(181, 83, 42, 0.07);
-    --ink-wash: rgba(35, 33, 30, 0.035);
-    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
-    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    /* capp:tokens begin */
+    :root {
+      color-scheme: light;
+      --bg: #f4f2ed;
+      --surface: #faf9f6;
+      --ink: #23211e;
+      --muted: #645e55;
+      --faint: #857d72;
+      --rule: #e2ded5;
+      --accent: #b5532a;
+      --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+      --grain: multiply;
+      --grain-o: 0.06;
+      --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+      --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #16150f;
+        --surface: #1f1e17;
+        --ink: #ede9df;
+        --muted: #a39c8e;
+        --faint: #7d766a;
+        --rule: #302e25;
+        --accent: #d9763f;
+        --grain: screen;
+        --grain-o: 0.045;
+      }
+    }
+    :root[data-theme="dark"] {
       color-scheme: dark;
       --bg: #16150f;
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #8c8577;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a4639;
       --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+    /* capp:tokens end */
+
+  /* mask's own hues: a second, darker rule and two washes. The accent marks the labels of
+     the sheet, the tells that give a writer away, and a sentence refused. */
+  :root {
+    --rule-2: #cdc7b9;
+    --accent-wash: rgba(181, 83, 42, 0.07);
+    --ink-wash: rgba(35, 33, 30, 0.035);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a4639;
       --accent-wash: rgba(217, 118, 63, 0.1);
       --ink-wash: rgba(237, 233, 223, 0.04);
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #16150f;
-    --surface: #1f1e17;
-    --ink: #ede9df;
-    --muted: #a39c8e;
-    --faint: #8c8577;
-    --rule: #302e25;
     --rule-2: #4a4639;
-    --accent: #d9763f;
     --accent-wash: rgba(217, 118, 63, 0.1);
     --ink-wash: rgba(237, 233, 223, 0.04);
   }
@@ -708,6 +726,20 @@
   .gap-top-s {
     margin-top: 6px;
   }
+  .carried {
+    margin-top: 10px;
+  }
+  .laws {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .laws + .laws {
+    margin-top: 8px;
+  }
+  #keptWhere {
+    margin-top: 12px;
+  }
 
   footer {
     margin-top: 64px;
@@ -775,8 +807,8 @@
   <main class="work" id="work" aria-live="off"></main>
 
   <footer>
-    <span class="meta">Center for Applied Post-Phenomenology · Mask</span>
-    <span class="meta" id="kept"></span>
+    <span class="meta">Mask · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -861,6 +893,430 @@
     { name: "quiet", terms: ["quiet", "private", "local", "small"] },
   ];
 
+    /* capp:hand begin */
+    /**
+     * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+     * and the client draw the same line and a re-render never redraws a border.
+     * Amplitudes are in px and small on purpose: a line that wobbles more than a
+     * pixel or two stops reading as drawn and starts reading as broken.
+     */
+
+    /** mulberry32 — small, fast, and the same number sequence everywhere. */
+    function rand(seed) {
+      let a = seed >>> 0;
+      return () => {
+        a = (a + 0x6d2b79f5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    /** A stable seed from a string, so a note's stroke is its own every time. */
+    function seedOf(s) {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    const fx = (n) => String(Math.round(n * 10) / 10);
+    const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+    /**
+     * One pen stroke from a to b: a cubic whose control points sit a little off
+     * the straight line, the pen starting and stopping just past the ends the way
+     * a quick sketch does. Returns a segment beginning with its own M.
+     */
+    function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+      const dx = b[0] - a[0];
+      const dy = b[1] - a[1];
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const nx = -uy;
+      const ny = ux;
+      const back = r() * overshoot;
+      const past = r() * overshoot;
+      const s = [
+        a[0] - ux * back + nx * spread(r, wobble * 0.4),
+        a[1] - uy * back + ny * spread(r, wobble * 0.4),
+      ];
+      const e = [
+        b[0] + ux * past + nx * spread(r, wobble * 0.4),
+        b[1] + uy * past + ny * spread(r, wobble * 0.4),
+      ];
+      // The bow: both control points lean the same way more often than not, so a
+      // long side curves gently rather than kinking.
+      const bow = spread(r, wobble);
+      const t1 = 0.25 + r() * 0.15;
+      const t2 = 0.6 + r() * 0.15;
+      const c1 = [
+        a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+        a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+      ];
+      const c2 = [
+        a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+        a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+      ];
+      return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+    }
+
+    /** A box drawn as four strokes, each running a little past its corner. */
+    function roughRect(
+      w,
+      h,
+      seed,
+      { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+    ) {
+      const r = rand(seed);
+      const x0 = inset;
+      const y0 = inset;
+      const x1 = w - inset;
+      const y1 = h - inset;
+      return [
+        stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+        stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+        stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+        stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+      ].join("");
+    }
+
+    /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+    function smooth(pts) {
+      let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[Math.max(0, i - 1)];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[Math.min(pts.length - 1, i + 2)];
+        const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+        const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+      }
+      return d;
+    }
+
+    /**
+     * The circling: a loop around a w×h box that starts somewhere on the left,
+     * goes once round, and runs past its own start — the way a word gets ringed
+     * in a notebook. `pad` is how far outside the box the pen stays.
+     */
+    function roughEllipse(
+      w,
+      h,
+      seed,
+      { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+    ) {
+      const r = rand(seed);
+      const cx = w / 2;
+      const cy = h / 2;
+      // An ellipse that only just clears a box cuts through its corners; `grow`
+      // widens it so the ring passes outside the letters at the ends.
+      const rx = (w / 2) * grow + pad;
+      const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+      const tilt = spread(r, 0.06);
+      const a0 = Math.PI * (0.8 + r() * 0.4);
+      const overlap = 1.08 + r() * 0.06;
+      const pts = [];
+      const n = Math.round(steps * overlap);
+      for (let i = 0; i <= n; i++) {
+        const a = a0 + (i / steps) * Math.PI * 2;
+        const kx = rx + spread(r, wobble);
+        const ky = ry + spread(r, wobble);
+        const x = Math.cos(a) * kx;
+        const y = Math.sin(a) * ky;
+        pts.push([
+          cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+          cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+        ]);
+      }
+      return smooth(pts);
+    }
+
+    /** A line drawn under something: a touch before, a touch after, a slight sag. */
+    function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+      const r = rand(seed);
+      return stroke(
+        [-1 - r() * 2, y],
+        [w + 1 + r() * 2, y + spread(r, 0.8)],
+        r,
+        wobble,
+        0,
+      );
+    }
+
+    /**
+     * A long vertical line, like the left edge of a sheet laid on the desk: long
+     * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+     * once or twice on the way down.
+     */
+    function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+      const r = rand(seed);
+      const pts = [];
+      const step = 90;
+      for (let y = -2; y <= h + 2; y += step)
+        pts.push([x + spread(r, wobble), y]);
+      pts.push([x + spread(r, wobble), h + 2]);
+      return smooth(pts);
+    }
+
+    /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+    function jitter(seed, amp = 0.6, turn = 14) {
+      const r = rand(seed);
+      return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+    }
+
+    /** Struck through: a line across the middle that rises a little to the right. */
+    function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+      const r = rand(seed);
+      return stroke(
+        [-2 - r() * 2, h * 0.58],
+        [w + 2 + r() * 2, h * 0.42],
+        r,
+        wobble,
+        0,
+      );
+    }
+
+    /**
+     * A path from this file (M, C and L only, absolute), sampled into points per
+     * subpath — the centreline a pen would have followed.
+     */
+    function sample(d) {
+      const subs = [];
+      let cur = [0, 0];
+      let pts = [];
+      const re = /([MCL])([^MCL]*)/g;
+      let m;
+      while ((m = re.exec(d))) {
+        const n = m[2]
+          .trim()
+          .split(/[\s,]+/)
+          .filter(Boolean)
+          .map(Number);
+        if (m[1] === "M") {
+          if (pts.length > 1) subs.push(pts);
+          cur = [n[0], n[1]];
+          pts = [cur];
+        } else if (m[1] === "L") {
+          const b = [n[0], n[1]];
+          for (let i = 1; i <= 3; i++) {
+            const t = i / 3;
+            pts.push([
+              cur[0] + (b[0] - cur[0]) * t,
+              cur[1] + (b[1] - cur[1]) * t,
+            ]);
+          }
+          cur = b;
+        } else {
+          const [x1, y1, x2, y2, x, y] = n;
+          for (let i = 1; i <= 10; i++) {
+            const t = i / 10;
+            const u = 1 - t;
+            pts.push([
+              u * u * u * cur[0] +
+                3 * u * u * t * x1 +
+                3 * u * t * t * x2 +
+                t * t * t * x,
+              u * u * u * cur[1] +
+                3 * u * u * t * y1 +
+                3 * u * t * t * y2 +
+                t * t * t * y,
+            ]);
+          }
+          cur = [x, y];
+        }
+      }
+      if (pts.length > 1) subs.push(pts);
+      return subs;
+    }
+
+    /**
+     * The pen's pressure: a centreline turned into a filled ribbon that is thin
+     * where the pen lands and lifts, fullest through the middle, and never quite
+     * even — a few knots of pressure along the way, interpolated. `width` is the
+     * width at full pressure. Each subpath is its own stroke.
+     */
+    function ribbon(d, width = 1.5, seed = 1) {
+      const r = rand(seed);
+      const out = [];
+      for (const pts of sample(d)) {
+        const n = pts.length;
+        const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+        const left = [];
+        const right = [];
+        for (let i = 0; i < n; i++) {
+          const a = pts[Math.max(0, i - 1)];
+          const b = pts[Math.min(n - 1, i + 1)];
+          let tx = b[0] - a[0];
+          let ty = b[1] - a[1];
+          const len = Math.hypot(tx, ty) || 1;
+          tx /= len;
+          ty /= len;
+          const t = i / (n - 1);
+          const k = t * 4;
+          const ki = Math.min(3, Math.floor(k));
+          const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+          const w = Math.max(
+            0.45,
+            width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+          );
+          const nx = (-ty * w) / 2;
+          const ny = (tx * w) / 2;
+          left.push([pts[i][0] + nx, pts[i][1] + ny]);
+          right.push([pts[i][0] - nx, pts[i][1] - ny]);
+        }
+        const poly = [...left, ...right.reverse()];
+        out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+      }
+      return out.join("");
+    }
+    /* capp:hand end */
+
+    /* capp:esc begin */
+    const ESC = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+    /* capp:esc end */
+
+    /* capp:dates begin */
+    const DAY = /^\d{4}-\d{2}-\d{2}$/;
+    const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+    const localToday = () => {
+      const d = new Date();
+      const p = (k) => String(k).padStart(2, "0");
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    };
+    const utc = (d) =>
+      Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+    function daysBetween(a, b) {
+      if (!DAY.test(a) || !DAY.test(b)) return 0;
+      return Math.round((utc(b) - utc(a)) / 86400000);
+    }
+    function addDays(d, k) {
+      if (!DAY.test(d)) return d;
+      return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+    }
+    const dayWords = (d) =>
+      DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+    /* capp:dates end */
+
+    /* capp:slug begin */
+    function slugOf(title, day) {
+      const t = String(title)
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 56)
+        .replace(/-+$/g, "");
+      return `${day.slice(0, 10)}-${t || "sheet"}`;
+    }
+    /* capp:slug end */
+
+    /* capp:plural begin */
+    const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+    /* capp:plural end */
+
+  const KEY = "pp-mask";
+    /* capp:store begin */
+    function readStore() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        return d && typeof d === "object" && d.v === 1 ? d : null;
+      } catch {
+        return null;
+      }
+    }
+    function persist(data) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    /* capp:store end */
+
+  const SELF = "mask";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+    /* capp:hash begin */
+    function fromHash() {
+      const h = location.hash.slice(1);
+      if (!h.includes("=")) return null;
+      const q = new URLSearchParams(h);
+      const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+      const set = q.get("set") || "";
+      const out = {
+        set: set.length <= 4000 ? set : "",
+        from: ok(q.get("from") || "") ? q.get("from") : "",
+        next: ok(q.get("next") || "") ? q.get("next") : "",
+      };
+      try {
+        history.replaceState(null, "", location.pathname + location.search);
+      } catch {}
+      return out.set || out.from || out.next ? out : null;
+    }
+    function carryHref(slug, text, next) {
+      const base =
+        location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+      const q = new URLSearchParams();
+      q.set("set", text);
+      q.set("from", SELF);
+      if (next) q.set("next", next);
+      return `${base}#${q}`;
+    }
+    /* capp:hash end */
+
   /* ── the mask, pure (ported from niwa lib/mask.ts, way.ts, provenance.ts) ── */
 
   const MARKS = ["mean", "could", "refuse"];
@@ -926,18 +1382,6 @@
 
   const uid = () =>
     Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
-
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "way"}`;
-  }
 
   function tells(text) {
     const out = [];
@@ -1083,7 +1527,6 @@
     };
   }
 
-  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
   const list = (xs) => xs.map((w) => `'${w}'`).join(", ");
 
   /** Facts about the two cases and the marks; none a verdict on either side or on the mask. */
@@ -1091,12 +1534,12 @@
     const out = [];
     out.push(
       m.ownCase.trim()
-        ? `your case: ${n(t.own.sentences, "sentence")}, ${t.own.words} words · ${censusWords(t.own)} · 'we' ×${t.own.stance.we}, 'they' ×${t.own.stance.they}`
+        ? `your case: ${plural(t.own.sentences, "sentence")}, ${t.own.words} words · ${censusWords(t.own)} · 'we' ×${t.own.stance.we}, 'they' ×${t.own.stance.they}`
         : "your case is not written yet",
     );
     out.push(
       m.otherCase.trim()
-        ? `the mask: ${n(t.mask.sentences, "sentence")}, ${t.mask.words} words · ${censusWords(t.mask)} · 'we' ×${t.mask.stance.we}, 'they' ×${t.mask.stance.they}`
+        ? `the mask: ${plural(t.mask.sentences, "sentence")}, ${t.mask.words} words · ${censusWords(t.mask)} · 'we' ×${t.mask.stance.we}, 'they' ×${t.mask.stance.they}`
         : "the mask is not written yet",
     );
     if (t.sentences.length) {
@@ -1105,14 +1548,14 @@
         marked
           ? `${marked} of ${t.sentences.length} marked: ${t.marks.mean} you could say and mean, ${t.marks.could} you can say but do not, ${t.marks.refuse} you could not write straight` +
               (t.marks[""] ? `; ${t.marks[""]} unmarked` : "")
-          : `${n(t.sentences.length, "sentence")} in the mask, none marked yet`,
+          : `${plural(t.sentences.length, "sentence")} in the mask, none marked yet`,
       );
     }
     if (t.tellsKept || t.tellsHollow || t.missingKept || t.missingHollow) {
       const parts = [
-        t.tellsKept ? `${n(t.tellsKept, "tell")} kept` : "",
+        t.tellsKept ? `${plural(t.tellsKept, "tell")} kept` : "",
         t.tellsHollow ? `${t.tellsHollow} proposed and hollow` : "",
-        t.missingKept ? `${n(t.missingKept, "missing reason")} kept` : "",
+        t.missingKept ? `${plural(t.missingKept, "missing reason")} kept` : "",
         t.missingHollow ? `${t.missingHollow} missing proposed` : "",
       ].filter(Boolean);
       out.push(`an adherent's reading: ${parts.join(", ")}`);
@@ -1130,7 +1573,7 @@
     if (m.ownCase.trim() && m.otherCase.trim())
       out.push(
         t.common.shared.length
-          ? `${n(t.common.shared.length, "word")} the two cases share: ${list(t.common.shared.slice(0, 6))}`
+          ? `${plural(t.common.shared.length, "word")} the two cases share: ${list(t.common.shared.slice(0, 6))}`
           : "the two cases share no content word",
       );
     out.push(
@@ -1195,7 +1638,6 @@
 
   const str = (v, max) =>
     typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
   /** Validation at the boundary: a mask arrives from the begin form, or from what this browser kept. */
   function validateMask(input, today) {
@@ -1271,16 +1713,20 @@
 
   /* ── what this browser keeps ──────────────────────────────────────────── */
 
-  const KEY = "pp-mask";
-  const localToday = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  };
   const TODAY = localToday();
 
-  // masks: the reader's own; values: null until the reader edits them (then the specimen's are copied in);
-  // open: the slug on the sheet, or null for the list. A first visit opens on the specimen.
-  const store = { masks: [], values: null, open: SPECIMEN_MASK.slug };
+  // masks: the reader's own; values: null until the reader edits them (then the specimen's are
+  // copied in); open: the slug of the reader's own mask on the sheet, or null for the list;
+  // specimen: the specimen is on the sheet. A first visit opens on the specimen. from and next
+  // are a hand-off read from the address and are never kept.
+  const S = {
+    masks: [],
+    values: null,
+    open: null,
+    specimen: true,
+    from: "",
+    next: "",
+  };
   let keeps = true;
 
   function cleanValues(v) {
@@ -1294,81 +1740,65 @@
     }));
   }
 
+  /* The envelope read back, row by row; a mask with nothing in it is not kept. */
   function load() {
-    let raw = null;
-    try {
-      raw = localStorage.getItem(KEY);
-    } catch {
-      keeps = false;
-      return;
-    }
-    if (!raw) return;
-    try {
-      const d = JSON.parse(raw);
-      store.masks = [];
-      for (const x of Array.isArray(d.masks) ? d.masks : []) {
-        try {
-          store.masks.push(validateMask(x, TODAY));
-        } catch {
-          /* a mask with nothing in it is not kept */
-        }
+    const d = readStore();
+    if (!d) return;
+    S.masks = [];
+    for (const x of Array.isArray(d.masks) ? d.masks : []) {
+      try {
+        S.masks.push(validateMask(x, TODAY));
+      } catch {
+        /* a mask with nothing in it is not kept */
       }
-      store.values = cleanValues(d.values);
-      store.open = typeof d.open === "string" ? d.open : null;
-    } catch {
-      /* unreadable: start from the specimen */
     }
+    S.values = cleanValues(d.values);
+    const open = typeof d.open === "string" ? d.open : null;
+    S.specimen = open === SPECIMEN_MASK.slug;
+    S.open = S.specimen ? null : open;
   }
 
-  function persist() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(store));
-      keeps = true;
-    } catch {
-      keeps = false;
-    }
-    $("kept").textContent = keeps
-      ? "Kept in this browser, and nowhere else"
-      : "This browser keeps nothing: gone on reload";
+  function save() {
+    keeps = persist({
+      masks: S.masks,
+      values: S.values,
+      open: S.specimen ? SPECIMEN_MASK.slug : S.open,
+    });
+    fillKept();
+  }
+
+  function fillKept() {
+    const el = $("keptWhere");
+    if (el)
+      el.textContent = keeps
+        ? `kept in this browser only, under ${KEY} · nowhere else`
+        : "this browser keeps nothing: gone on reload";
   }
 
   const values = () =>
-    (store.values ?? SPECIMEN_VALUES).filter((v) => v.name.trim());
+    (S.values ?? SPECIMEN_VALUES).filter((v) => v.name.trim());
   const ownValues = () => {
-    if (!store.values)
-      store.values = SPECIMEN_VALUES.map((v) => ({
+    if (!S.values)
+      S.values = SPECIMEN_VALUES.map((v) => ({
         name: v.name,
         terms: [...v.terms],
       }));
-    return store.values;
+    return S.values;
   };
 
   const current = () => {
-    if (!store.open) return null;
-    if (store.open === SPECIMEN_MASK.slug) return SPECIMEN_MASK;
-    return store.masks.find((m) => m.slug === store.open) ?? null;
+    if (S.specimen) return SPECIMEN_MASK;
+    if (!S.open) return null;
+    return S.masks.find((m) => m.slug === S.open) ?? null;
   };
-  const isSpecimen = (m) => m === SPECIMEN_MASK;
   const sorted = () =>
-    [...store.masks].sort((a, b) =>
+    [...S.masks].sort((a, b) =>
       a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
     );
 
   /* ── the page ─────────────────────────────────────────────────────────── */
 
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
   const work = $("work");
   const draft = {
     matter: "",
@@ -1383,15 +1813,29 @@
   function render(scroll) {
     sure = false;
     const m = current();
-    if (store.open && !m) store.open = null;
+    if (S.open && !m) S.open = null;
     work.innerHTML = m ? sheetHtml(m) : beginHtml();
     if (m) {
       refresh();
       renderAdherent();
     }
     renderValues();
+    fillKept();
     if (scroll) work.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  /* what the mask holds to, on the desk under the reading */
+  const lawsHtml = (d) => `
+        <section class="panel rise" style="--d:${d}ms" id="lawsPanel" aria-label="What the mask holds to">
+          <p class="meta acc">what the mask holds to</p>
+          <p class="laws">The machine splits the mask into sentences, counts the tells in each voice and who each case says “we” and “they” about, matches each case against your values by their own terms, lists the words the two cases share, and dates a mask when it is opened and when it is touched. It keeps what you mark.</p>
+          <p class="laws">It never says whether the mask passes, which side is right, or which sentence you should have meant. The marks are yours. The tells are word lists, and a list is not a reading. Nothing is fetched, no model is asked, and nothing you write leaves this browser.</p>
+          <p class="meta lower" id="keptWhere"></p>
+        </section>`;
+  const carriedHtml = () =>
+    S.from && !S.specimen
+      ? `<p class="hand carried" id="carried">Carried from ${esc(S.from)}</p>`
+      : "";
 
   /* the list, and the form that begins a mask */
   function beginHtml() {
@@ -1411,6 +1855,7 @@
             <label><span class="meta">your side</span><input class="line" id="sideIn" maxlength="120" placeholder="in a few words" aria-label="Your side" value="${esc(draft.side)}" /></label>
             <label><span class="meta">the other side</span><input class="line" id="otherIn" maxlength="120" placeholder="as they would name themselves" aria-label="The other side" value="${esc(draft.other)}" /></label>
           </div>
+          ${carriedHtml()}
           <div class="row-actions">
             <button type="button" class="chip" id="beginBtn" data-act="begin" ${can ? 'aria-pressed="true"' : "disabled"}>put the mask on</button>
             <span class="hand">you will write your case first, then theirs</span>
@@ -1424,7 +1869,7 @@
         <section class="panel rise" style="--d:120ms" aria-label="How to wear it">
           <p class="meta acc">how to wear it</p>
           <ol class="how">
-            <li><span>Write your own case first, in your voice, so it is on the record.</span></li>
+            <li><span>Write your case first, in your voice, so it is on the record.</span></li>
             <li><span>Then write theirs as they would — to be read by them, not by you. No “they claim”, no scare quotes, no hedging. Say “we”.</span></li>
             <li><span>Mark each sentence of the mask: could you say it and mean it, say it but not hold it, or not write it straight at all?</span></li>
             <li><span>Read it as an adherent would and name what gives you away, and the reasons they give that you left out. Better, show it to one.</span></li>
@@ -1433,12 +1878,13 @@
           <p class="hand gap-top">after the ideological Turing test — turned inward: nothing here judges whether you pass</p>
         </section>
         <section class="panel rise" style="--d:180ms" id="valuesP" aria-label="Your values"></section>
+        ${lawsHtml(240)}
       </aside>`;
   }
 
   /* one mask on the sheet, the desk beside it */
   function sheetHtml(m) {
-    const spec = isSpecimen(m);
+    const spec = S.specimen;
     const ro = spec ? "readonly" : "";
     const w = (s) => Math.max(8, s.length + 2);
     return `
@@ -1448,10 +1894,11 @@
             <p class="meta acc">the matter · ${esc(m.opened)}</p>
             <div class="chips">
               ${spec ? `<span class="tag">specimen · fiction · read only</span>` : ""}
-              <button type="button" class="chip${spec ? " acc" : ""}" data-act="close">${spec ? "begin your own" : "all masks"}</button>
+              ${spec ? `<button type="button" class="chip acc" data-act="makeown">Make your own</button>` : `<button type="button" class="chip" data-act="close">all masks</button>`}
             </div>
           </div>
           <p class="matter">${esc(m.matter || "(the matter is not written)")}</p>
+          ${carriedHtml()}
           <div class="sides">
             <label><span class="meta">your side ·</span><input class="line" data-f="side" ${ro} maxlength="120" aria-label="Your side" value="${esc(m.side)}" style="width:${w(m.side)}ch" /></label>
             <label><span class="meta">the other side ·</span><input class="line" data-f="other" ${ro} maxlength="120" aria-label="The other side" value="${esc(m.other)}" style="width:${w(m.other)}ch" /></label>
@@ -1493,6 +1940,7 @@
           <p class="meta acc">where you stand</p>
           <p class="hand gap-top-s">written last, after the marks — what you hold, what you refuse, and what the mask taught you about the line between</p>
           <textarea class="case short" data-f="stand" ${ro} maxlength="4000" rows="3" aria-label="Where you stand" placeholder="${spec ? "" : "in your own voice again"}">${esc(m.stand)}</textarea>
+          ${S.next && !spec ? `<p class="hand gap-top" id="carryNext"><a href="${esc(carryHref(S.next, m.matter, ""))}">Carry this to ${esc(S.next)}</a></p>` : ""}
         </div>
       </section>
 
@@ -1509,6 +1957,7 @@
           <p class="meta lower gap-top">${spec ? "fiction, like the rest of the specimen" : keeps ? `kept in this browser as ${esc(m.slug)}` : "this browser keeps nothing: gone on reload"}</p>
         </section>
         <section class="panel rise" style="--d:260ms" id="valuesP" aria-label="Your values"></section>
+        ${lawsHtml(320)}
       </aside>`;
   }
 
@@ -1530,7 +1979,7 @@
   function refresh() {
     const m = current();
     if (!m) return;
-    const spec = isSpecimen(m);
+    const spec = S.specimen;
     const t = tally(m);
     const vals = values();
     const ownL = leans(m.ownCase, vals);
@@ -1595,7 +2044,7 @@
   function renderAdherent() {
     const m = current();
     if (!m) return;
-    const spec = isSpecimen(m);
+    const spec = S.specimen;
     let h = "";
     if (!m.tells.length && !m.missing.length)
       h += `<p class="hand gap-top-s">nothing yet — name a phrase that gives you away</p>`;
@@ -1629,9 +2078,9 @@
   function renderValues() {
     const box = $("valuesP");
     if (!box) return;
-    const vs = store.values ?? SPECIMEN_VALUES;
+    const vs = S.values ?? SPECIMEN_VALUES;
     box.innerHTML =
-      `<div class="head"><p class="meta acc">your values</p>${store.values ? `<button type="button" class="chip" data-act="resetValues">the specimen's</button>` : `<span class="meta lower">the specimen's, until you change them</span>`}</div>` +
+      `<div class="head"><p class="meta acc">your values</p>${S.values ? `<button type="button" class="chip" data-act="resetValues">the specimen's</button>` : `<span class="meta lower">the specimen's, until you change them</span>`}</div>` +
       `<p class="hand gap-top-s">the desk says which of these each case leans on, by their terms</p>` +
       `<ol class="vals">${vs
         .map(
@@ -1646,7 +2095,7 @@
 
   const touch = (m) => {
     m.touched = TODAY;
-    persist();
+    save();
   };
 
   function begin() {
@@ -1659,15 +2108,16 @@
     const m = validateMask({ ...emptyMask(TODAY), ...fields }, TODAY);
     const taken = new Set([
       SPECIMEN_MASK.slug,
-      ...store.masks.map((x) => x.slug),
+      ...S.masks.map((x) => x.slug),
     ]);
     const base = m.slug;
     let k = 2;
     while (taken.has(m.slug)) m.slug = `${base}-${k++}`;
-    store.masks.push(m);
-    store.open = m.slug;
+    S.masks.push(m);
+    S.open = m.slug;
+    S.specimen = false;
     draft.matter = draft.side = draft.other = "";
-    persist();
+    save();
     render(true);
     work.querySelector('[data-f="ownCase"]')?.focus({ preventScroll: true });
   }
@@ -1675,7 +2125,7 @@
   function addTell() {
     const m = current();
     const quote = str(draft.tell, 200);
-    if (!m || isSpecimen(m) || !quote) return;
+    if (!m || S.specimen || !quote) return;
     m.tells.push({
       id: uid(),
       quote,
@@ -1696,7 +2146,7 @@
   function addMissing() {
     const m = current();
     const text = str(draft.miss, 400);
-    if (!m || isSpecimen(m) || !text) return;
+    if (!m || S.specimen || !text) return;
     if (!m.missing.some((x) => norm(x.text) === norm(text)))
       m.missing.push({ id: uid(), text, by: "you", kept: true });
     draft.miss = "";
@@ -1727,15 +2177,19 @@
     const m = current();
     const act = b.dataset.act;
     if (act === "open") {
-      store.open = b.dataset.slug;
-      persist();
+      S.specimen = b.dataset.slug === SPECIMEN_MASK.slug;
+      S.open = S.specimen ? null : b.dataset.slug;
+      S.from = S.next = "";
+      save();
       render(true);
-    } else if (act === "close") {
-      store.open = null;
-      persist();
+    } else if (act === "close" || act === "makeown") {
+      S.open = null;
+      S.specimen = false;
+      S.from = S.next = "";
+      save();
       render(true);
     } else if (act === "begin") begin();
-    else if (act === "mark" && m && !isSpecimen(m)) {
+    else if (act === "mark" && m && !S.specimen) {
       const s = tally(m).sentences[+b.dataset.i];
       if (!s) return;
       const k = b.dataset.k;
@@ -1747,7 +2201,7 @@
     else if (
       (act === "dropTell" || act === "dropMiss") &&
       m &&
-      !isSpecimen(m)
+      !S.specimen
     ) {
       const key = act === "dropTell" ? "tells" : "missing";
       m[key] = m[key].filter((x) => x.id !== b.dataset.id);
@@ -1755,31 +2209,31 @@
       renderAdherent();
       refresh();
     } else if (act === "copy") copy(b);
-    else if (act === "remove" && m && !isSpecimen(m)) {
+    else if (act === "remove" && m && !S.specimen) {
       if (!sure) {
         sure = true;
         b.textContent = "take the mask off — sure?";
         b.classList.add("acc");
         return;
       }
-      store.masks = store.masks.filter((x) => x !== m);
-      store.open = null;
-      persist();
+      S.masks = S.masks.filter((x) => x !== m);
+      S.open = null;
+      save();
       render(true);
     } else if (act === "addValue") {
       ownValues().push({ name: "", terms: [] });
-      persist();
+      save();
       renderValues();
       const ins = $("valuesP").querySelectorAll('[data-v="name"]');
       ins[ins.length - 1]?.focus();
     } else if (act === "dropValue") {
       ownValues().splice(+b.dataset.i, 1);
-      persist();
+      save();
       renderValues();
       if (current()) refresh();
     } else if (act === "resetValues") {
-      store.values = null;
-      persist();
+      S.values = null;
+      save();
       renderValues();
       if (current()) refresh();
     }
@@ -1818,7 +2272,7 @@
           .split(",")
           .map((t) => t.trim().slice(0, 60))
           .filter(Boolean);
-      persist();
+      save();
       if (m) refresh();
       // the reset chip appears on the first edit, without redrawing the field being typed in
       const head = $("valuesP").querySelector(".head span.meta");
@@ -1832,7 +2286,7 @@
       }
       return;
     }
-    if (!m || isSpecimen(m)) return;
+    if (!m || S.specimen) return;
     if (el.dataset.f) {
       m[el.dataset.f] = el.value;
       if (el.dataset.f === "side" || el.dataset.f === "other")
@@ -1867,16 +2321,37 @@
   work.addEventListener("focusout", (e) => {
     const m = current();
     const el = e.target;
-    if (!m || isSpecimen(m)) return;
+    if (!m || S.specimen) return;
     if (el.dataset.f === "side" || el.dataset.f === "other") {
       m[el.dataset.f] = str(el.value, 120);
       el.value = m[el.dataset.f];
-      persist();
+      save();
       refresh();
     }
   });
 
-  load();
-  render(false);
-  persist();
+  /* A hand-off read from the address: the form for a new mask of the reader's own, the carried
+     text as its matter and nothing else, not kept until the mask is put on. */
+  function carried(h) {
+    S.open = null;
+    S.specimen = false;
+    S.from = h.from;
+    S.next = h.next;
+    draft.matter = h.set;
+    draft.side = draft.other = "";
+    render(false);
+  }
+
+  function boot() {
+    load();
+    const h = fromHash();
+    if (h) return carried(h);
+    render(false);
+  }
+
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

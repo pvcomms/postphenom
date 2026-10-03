@@ -1,0 +1,2512 @@
+<title>Normal</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A stretch of days, each in a line and marked on a scale you name the ends of, drawn as dots under a normal curve fitted from your own marks. Most of a life is the middle. An instrument of the Center for Applied Post-Phenomenology."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* capp:tokens begin */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #645e55;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d766a;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: a sheet laid on gravel. Ink on bone. The one accent is the label of each move and
+     the Keep; everything else is ink, pencil (muted) and the faint line of what is hollow. */
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin: 0;
+  }
+  .meta.accent {
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast > div > .meta {
+    margin: 0 0 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(64px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .lede {
+    margin: 0;
+    font-size: clamp(18px, 1.9vw, 20px);
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+  .lede + .lede {
+    margin-top: 1em;
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+
+  /* the sheet and the desk */
+  .room {
+    display: grid;
+    gap: 24px;
+    margin-top: 32px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+    animation: rise 600ms var(--ease) both;
+  }
+  .sheet {
+    padding: 22px 20px 26px;
+    scroll-margin-top: 16px;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .desk .panel:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .desk .panel:nth-child(3) {
+    animation-delay: 100ms;
+  }
+  .desk .panel:nth-child(4) {
+    animation-delay: 140ms;
+  }
+  .desk-text {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .desk-text + .desk-text {
+    margin-top: 10px;
+  }
+  .desk-text.hand {
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .desk ol {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .desk li > button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .desk li > button:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .desk li > button[aria-current="true"] .meta {
+    color: var(--accent);
+  }
+  .rec-name {
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .desk-group + .desk-group {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  #keptWhere {
+    margin-top: 12px;
+  }
+  .after-days {
+    margin-top: 6px;
+  }
+
+  /* the hand-drawn border on a panel */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .mask-line {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* the sheet */
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .spec-note,
+  .carried {
+    margin: 6px 0 0;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .spec-note b {
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .move {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .move:first-of-type {
+    margin-top: 18px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .move > .meta.accent {
+    margin-bottom: 8px;
+  }
+  .case {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .case[readonly] {
+    border-bottom-color: transparent;
+  }
+  .case:disabled {
+    border-bottom-color: transparent;
+    color: var(--faint);
+  }
+  textarea.case {
+    resize: none;
+    overflow: hidden;
+  }
+  .set-line {
+    font-size: clamp(22px, 2.8vw, 27px);
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+  }
+  .prose {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .hand-in {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.25;
+  }
+  .note {
+    margin: 4px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .note.faint {
+    color: var(--faint);
+  }
+  .under {
+    margin-top: 8px;
+  }
+
+  /* the span: which stretch, and from when */
+  .span-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-top: 16px;
+  }
+  .span-row .meta {
+    margin-left: 4px;
+  }
+  .day-in {
+    width: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding-block: 3px;
+  }
+  .day-in::-webkit-calendar-picker-indicator {
+    opacity: 0.45;
+    cursor: pointer;
+  }
+  .day-in:disabled::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
+  /* the scale: two ends, named by the reader */
+  .ends {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 24px;
+    margin-top: 18px;
+    align-items: end;
+  }
+  .end .meta {
+    display: block;
+    margin-bottom: 2px;
+  }
+  .end:last-child {
+    text-align: right;
+  }
+  .end:last-child .case {
+    text-align: right;
+  }
+
+  /* the entries: a day, a line, a mark */
+  .entries-wrap {
+    margin-top: 20px;
+  }
+  .entries {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .entry {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    gap: 4px 14px;
+  }
+  .marks {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+  }
+  .m {
+    width: 22px;
+    padding-block: 2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: center;
+    color: var(--faint);
+    border-radius: 3px;
+    transition:
+      color 160ms var(--ease),
+      background-color 160ms var(--ease);
+  }
+  .m:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .m.on {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .m.on:disabled {
+    color: var(--ink);
+  }
+  .x {
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+  .row-add {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .row-add .case {
+    flex: 1;
+  }
+  .draw-box {
+    width: 100%;
+    max-width: 38rem;
+    margin-top: 4px;
+  }
+  #drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .drawn {
+    margin: 6px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .readback {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .keep-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .status {
+    margin: 0;
+  }
+  .status.trouble {
+    color: var(--accent);
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--muted);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip:disabled {
+    opacity: 0.45;
+  }
+  .chip:disabled[aria-pressed="true"] {
+    opacity: 0.8;
+  }
+
+  /* the drawing's inks: classes, so the theme repaints it without a line of script */
+  .f-ink {
+    fill: var(--ink);
+  }
+  .f-muted {
+    fill: var(--muted);
+  }
+  .f-faint {
+    fill: var(--faint);
+  }
+  .curve {
+    fill: var(--ink);
+  }
+  .band-hatch {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    opacity: 0.32;
+  }
+  .dot {
+    fill: var(--ink);
+  }
+  .dot-hollow {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 0.9;
+  }
+  .mean-line {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 0.8;
+    stroke-dasharray: 2 3;
+    stroke-linecap: round;
+  }
+  .edge-line {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+  .scale-line {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+  }
+  .tick {
+    stroke: var(--faint);
+    stroke-width: 0.8;
+  }
+  .g-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .g-mono {
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    fill: var(--faint);
+  }
+  .halo {
+    stroke: var(--surface);
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+  /* The drawing settles in when it is redrawn: the curve and the band fade up together. */
+  .fn-draw {
+    animation: settle 560ms var(--ease) both;
+  }
+  @keyframes settle {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .fn-row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 30ms);
+  }
+  .still {
+    animation: none;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+  footer .meta {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (min-width: 640px) {
+    .sheet {
+      padding: 28px;
+    }
+  }
+  @media (max-width: 760px) {
+    .entry {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 2px 14px;
+    }
+    .entry .day-in {
+      grid-row: 1;
+      grid-column: 1;
+    }
+    .entry .x {
+      grid-row: 1;
+      grid-column: 2;
+    }
+    .entry .hand-in {
+      grid-row: 2;
+      grid-column: 1 / -1;
+    }
+    .entry .marks {
+      grid-row: 3;
+      grid-column: 1 / -1;
+      justify-self: start;
+      margin-top: 2px;
+    }
+    .entries {
+      gap: 16px;
+    }
+  }
+  @media (max-width: 520px) {
+    .ends {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .end:last-child,
+    .end:last-child .case {
+      text-align: left;
+    }
+  }
+  @media (min-width: 1024px) {
+    .room {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  @media (max-width: 820px) {
+    .mast {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-block: 44px 28px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .fn-row,
+    .fn-draw,
+    .sketch .mask-line {
+      animation: none;
+    }
+    .sketch .mask-line {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Normal</h1>
+      <p class="deck">
+        <em>Most of a life is the middle.</em> A stretch of days, each marked on
+        a scale you name, falls into a shape, and the shape has a mean and a
+        spread that are yours alone.
+      </p>
+    </div>
+    <div>
+      <p class="lede">
+        You write a stretch of days, a line each, and mark every one on a scale
+        whose two ends you name. The page fits a normal curve to your marks and
+        nothing else, draws the days as dots under it, shades the middle band,
+        and counts what fell where. You say what you make of the shape; later
+        you say how it went. It opens on a specimen, one month from a life that
+        never happened. Make your own, and what you set down stays in this
+        browser.
+      </p>
+    </div>
+  </header>
+
+  <div class="room">
+    <section class="panel sheet" id="sheet" aria-label="The sheet">
+      <div class="sheet-head">
+        <p class="meta" id="sheetMeta"></p>
+        <div id="headActs"></div>
+      </div>
+      <p class="hand spec-note" id="specNote" hidden>
+        <b>A specimen.</b> One month from a life that never happened, there to
+        read before you write. It can't be changed; make your own to set down
+        days of yours.
+      </p>
+      <p class="hand carried" id="carried" hidden></p>
+
+      <div class="move">
+        <p class="meta accent">set down</p>
+        <textarea
+          class="case set-line"
+          id="setDown"
+          data-f="set"
+          rows="1"
+          placeholder="the stretch, in a line"
+          aria-label="Set down"
+        ></textarea>
+        <p class="meta under" id="setMeta"></p>
+
+        <div class="span-row" id="spanRow"></div>
+        <p class="hand note faint">
+          a week is 7 days, a month 30, a year 365. the span ends today unless
+          you move its first day.
+        </p>
+
+        <div class="ends">
+          <div class="end">
+            <span class="meta">0 is</span>
+            <input
+              class="case hand-in"
+              id="low"
+              data-f="low"
+              placeholder="say, the worst day I can imagine"
+              aria-label="What 0 on the scale means"
+              maxlength="80"
+            />
+          </div>
+          <div class="end">
+            <span class="meta">10 is</span>
+            <input
+              class="case hand-in"
+              id="high"
+              data-f="high"
+              placeholder="say, the best"
+              aria-label="What 10 on the scale means"
+              maxlength="80"
+            />
+          </div>
+        </div>
+
+        <div class="entries-wrap">
+          <p class="hand note">
+            the days, one line each, and a mark from 0 to 10 on your scale. a
+            day without a mark is counted but not drawn.
+          </p>
+          <ol class="entries" id="entries"></ol>
+          <div class="row-add" id="entryAdd">
+            <input
+              class="case hand-in"
+              id="newLine"
+              data-f="new-line"
+              placeholder="a day, in a line"
+              aria-label="A day to add"
+              maxlength="400"
+            />
+            <span class="meta">enter adds it</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">draw it</p>
+        <div class="draw-box">
+          <svg id="drawing" viewBox="0 0 360 160" role="img"></svg>
+        </div>
+        <p class="hand drawn" id="drawn"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">read back</p>
+        <p class="readback" id="readBack"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">call</p>
+        <textarea
+          class="case prose"
+          id="call"
+          data-f="call"
+          rows="1"
+          placeholder="what you make of the shape"
+          aria-label="The call"
+        ></textarea>
+        <p class="meta under" id="callMeta"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">afterwards</p>
+        <textarea
+          class="case prose"
+          id="after"
+          data-f="after"
+          rows="1"
+          placeholder="how it went"
+          aria-label="Afterwards"
+        ></textarea>
+        <p class="meta under" id="afterMeta"></p>
+        <p class="hand note" id="carryNext" hidden></p>
+      </div>
+
+      <div class="keep-row" id="keepRow"></div>
+    </section>
+
+    <aside class="desk">
+      <section class="panel" id="readingPanel" aria-label="The reading">
+        <p class="meta accent">the reading</p>
+        <p class="desk-text" id="reading"></p>
+      </section>
+      <section class="panel" id="recordPanel" aria-label="The record">
+        <p class="meta accent">the record</p>
+        <p class="desk-text" id="recordText"></p>
+        <div id="recordList"></div>
+      </section>
+      <section class="panel" id="lawsPanel" aria-label="What normal holds to">
+        <p class="meta accent">what normal holds to</p>
+        <p class="desk-text">
+          You write the days and you mark them, on a scale whose ends are your
+          words. The page takes the mean and the spread of your marks, and
+          nothing else, fits the curve, draws each day as a dot under it, shades
+          the band one spread either side of your mean, and counts the days in
+          the band and in each tail. The counts are counts of your own entries
+          against your own mean.
+        </p>
+        <p class="desk-text">
+          It never scores the stretch or the life, never compares your shape to
+          anyone else's, never says a tail is a problem or a middle is a
+          failure, and never recommends. The set-down line is never prefilled
+          except by your own words carried from another instrument, verbatim. No
+          host is called; nothing is fetched; no model is asked; nothing you did
+          not write is kept.
+        </p>
+        <p class="meta" id="keptWhere"></p>
+      </section>
+      <section class="panel" id="afterPanel" aria-label="Afterwards">
+        <p class="meta accent">afterwards</p>
+        <p class="desk-text hand" id="afterText"></p>
+        <p class="meta after-days" id="afterDays"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Normal · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────────
+     One month from a life that never happened: September, after a move, twenty-nine days
+     set down a line each and marked on a scale from "the worst day I can imagine" to "the
+     best", called on the first of October, written up two days later. Fiction, all of it. */
+  const SPECIMEN = {
+    slug: "2026-09-30-september-after-the-move",
+    title: "Specimen A",
+    set: "September, after the move.",
+    setOn: "2026-09-30",
+    span: "month",
+    from: "2026-09-01",
+    low: "the worst day I can imagine",
+    high: "the best day I can imagine",
+    entries: [
+      {
+        day: "2026-09-01",
+        text: "Back from the coast. Unpacked, did nothing else.",
+        mark: 6,
+      },
+      { day: "2026-09-02", text: "Inbox, all day.", mark: 4 },
+      {
+        day: "2026-09-03",
+        text: "Lunch with R. The afternoon went somewhere.",
+        mark: 7,
+      },
+      { day: "2026-09-04", text: "Headache. Lay down at four.", mark: 3 },
+      {
+        day: "2026-09-05",
+        text: "Market, laundry, a film in the evening.",
+        mark: 6,
+      },
+      {
+        day: "2026-09-06",
+        text: "Called my mother. Walked the long way back.",
+        mark: 6,
+      },
+      {
+        day: "2026-09-07",
+        text: "The deadline moved up. Worked late.",
+        mark: 4,
+      },
+      {
+        day: "2026-09-08",
+        text: "Finished the draft. Sent it before I could reread it.",
+        mark: 7,
+      },
+      { day: "2026-09-09", text: "Nothing. A good nothing.", mark: 5 },
+      { day: "2026-09-10", text: "They said yes.", mark: 9 },
+      { day: "2026-09-11", text: "Dentist. Rain.", mark: 4 },
+      { day: "2026-09-12", text: "Mended the chair. It holds.", mark: 6 },
+      {
+        day: "2026-09-13",
+        text: "Slept badly, argued about the wrong thing.",
+        mark: 3,
+      },
+      {
+        day: "2026-09-14",
+        text: "Made up over breakfast. Drove to the lake.",
+        mark: 7,
+      },
+      { day: "2026-09-15", text: "Meetings. I don't remember them.", mark: 5 },
+      { day: "2026-09-16", text: "Cooked for six. Two stayed late.", mark: 7 },
+      {
+        day: "2026-09-18",
+        text: "The doctor rang; nothing to worry about, she says.",
+        mark: 5,
+      },
+      { day: "2026-09-19", text: "A whole day in the garden.", mark: 6 },
+      { day: "2026-09-20", text: "The news, then the dishes.", mark: 5 },
+      {
+        day: "2026-09-21",
+        text: "Train two hours late. Read the whole book.",
+        mark: 5,
+      },
+      { day: "2026-09-22", text: "The car failed its inspection.", mark: 2 },
+      { day: "2026-09-23", text: "Fixed. Less than I feared.", mark: 5 },
+      { day: "2026-09-24", text: "Ordinary. Soup.", mark: 5 },
+      {
+        day: "2026-09-25",
+        text: "Late light on the kitchen wall for ten minutes.",
+        mark: 6,
+      },
+      { day: "2026-09-26", text: "Birthday, mine. Quiet on purpose.", mark: 7 },
+      { day: "2026-09-27", text: "Tired from the quiet.", mark: 4 },
+      { day: "2026-09-28", text: "Work, then more work.", mark: 4 },
+      {
+        day: "2026-09-29",
+        text: "An old friend wrote out of nowhere.",
+        mark: 7,
+      },
+      {
+        day: "2026-09-30",
+        text: "Closed the month's accounts. Even.",
+        mark: 5,
+      },
+    ],
+    call: "I had been calling it a bad month, because of the car and the argument. Nineteen of the twenty-nine days are within a mark and a half of five. The two I would have told you about are the two and the nine.",
+    calledOn: "2026-10-01",
+    after:
+      "Two days on. I told someone about September and found I was describing the shape, not the car. The seventeenth is missing; I don't know where it went.",
+    afterOn: "2026-10-03",
+  };
+
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-normal";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "normal";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  /* ── the sheet ────────────────────────────────────────────────────────────
+     What one sheet holds: the stretch in a line and the day it was set down; the span (a
+     week, a month, a year) and its first day; the two ends of the scale in the reader's
+     words; the entries, each a day, a line and a mark 0–10 or none; the call and its day;
+     the afterwards and its day. The days are the machine's; every word and mark is the
+     reader's. */
+
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+  const MAX_ENTRIES = 400;
+  const SPANS = { week: 7, month: 30, year: 365 };
+  const SPAN_NAMES = { week: "a week", month: "a month", year: "a year" };
+
+  const emptySheet = () => ({
+    slug: "",
+    set: "",
+    setOn: "",
+    span: "week",
+    from: "",
+    low: "",
+    high: "",
+    entries: [],
+    call: "",
+    calledOn: "",
+    after: "",
+    afterOn: "",
+  });
+
+  /* A sheet's title is the first line of what was set down, trimmed to 56 characters, or
+     the span and its first day when nothing was written. */
+  const titleOf = (sheet) => {
+    const line = String(sheet.set).trim().split("\n")[0].trim();
+    if (line) return line.length <= 56 ? line : line.slice(0, 56).trimEnd();
+    return sheet.from
+      ? `${SPAN_NAMES[sheet.span]} from ${dayWords(sheet.from)}`
+      : SPAN_NAMES[sheet.span];
+  };
+
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max).replace(/\s+\S*$/, "")}…`;
+
+  const spanEnd = (sheet) =>
+    sheet.from ? addDays(sheet.from, SPANS[sheet.span] - 1) : "";
+
+  /* The default first day: the span ends today. The reader can move it. */
+  const spanStart = (span, today) => addDays(today, -(SPANS[span] - 1));
+
+  /* A row read back from storage, checked field by field; null if any part of it is not
+     the shape a sheet has. Strings are strings, days are DAY-shaped, the span is one of
+     three, entries are an array of {day, text, mark} with mark null or an integer 0–10. A
+     bad row is dropped, never repaired. */
+  function validateSheet(r) {
+    if (!r || typeof r !== "object") return null;
+    const str = (v, max) => (typeof v === "string" ? v.slice(0, max) : null);
+    const dayOrNone = (v) =>
+      v == null || v === ""
+        ? ""
+        : typeof v === "string" && DAY.test(v)
+          ? v
+          : null;
+    const set = str(r.set ?? "", 4000);
+    const low = str(r.low ?? "", 80);
+    const high = str(r.high ?? "", 80);
+    if (set === null || low === null || high === null) return null;
+    const span = SPANS[r.span] ? r.span : null;
+    if (!span) return null;
+    const from = typeof r.from === "string" && DAY.test(r.from) ? r.from : null;
+    if (!from) return null;
+    const setOn =
+      typeof r.setOn === "string" && DAY.test(r.setOn) ? r.setOn : null;
+    if (!setOn) return null;
+    if (!Array.isArray(r.entries)) return null;
+    const entries = [];
+    for (const e of r.entries.slice(0, MAX_ENTRIES)) {
+      if (!e || typeof e !== "object") return null;
+      const day = typeof e.day === "string" && DAY.test(e.day) ? e.day : null;
+      if (!day) return null;
+      const text = str(e.text ?? "", 400);
+      if (text === null) return null;
+      const m = e.mark;
+      const mark =
+        m == null
+          ? null
+          : Number.isInteger(m) && m >= 0 && m <= 10
+            ? m
+            : undefined;
+      if (mark === undefined) return null;
+      entries.push({ day, text, mark });
+    }
+    if (!set.trim() && !entries.length) return null;
+    const call = str(r.call ?? "", 4000);
+    const after = str(r.after ?? "", 4000);
+    let calledOn = dayOrNone(r.calledOn);
+    let afterOn = dayOrNone(r.afterOn);
+    if (
+      call === null ||
+      after === null ||
+      calledOn === null ||
+      afterOn === null
+    )
+      return null;
+    if (!call.trim()) calledOn = "";
+    else if (!calledOn) calledOn = setOn;
+    if (!after.trim() || !calledOn) afterOn = "";
+    else if (!afterOn) afterOn = calledOn;
+    const partial = { set, span, from };
+    const slug = str(r.slug, 120) || slugOf(titleOf(partial), setOn);
+    if (!SLUG.test(slug)) return null;
+    return {
+      slug,
+      set,
+      setOn,
+      span,
+      from,
+      low,
+      high,
+      entries,
+      call,
+      calledOn,
+      after,
+      afterOn,
+    };
+  }
+
+  /* ── the arithmetic ───────────────────────────────────────────────────────
+     The mean and the spread of the marks, and nothing else: the population standard
+     deviation of what was typed. The middle band is one spread either side of the mean,
+     closed at both ends. Every number that comes out is a count of the reader's own entries
+     against the reader's own mean. */
+  function stats(sheet) {
+    const es = sheet.entries;
+    const marked = es.filter((e) => e.mark !== null);
+    const xs = marked.map((e) => e.mark);
+    const n = xs.length;
+    const eps = 1e-9;
+    let mean = null;
+    let sd = null;
+    let within = 0;
+    let lower = 0;
+    let upper = 0;
+    if (n) {
+      mean = xs.reduce((a, b) => a + b, 0) / n;
+      sd = Math.sqrt(xs.reduce((a, x) => a + (x - mean) ** 2, 0) / n);
+      for (const x of xs) {
+        if (x < mean - sd - eps) lower++;
+        else if (x > mean + sd + eps) upper++;
+        else within++;
+      }
+    }
+    const to = spanEnd(sheet);
+    const outside = sheet.from
+      ? es.filter((e) => e.day < sheet.from || e.day > to).length
+      : 0;
+    const days = new Set(es.map((e) => e.day)).size;
+    const byMark = Array.from({ length: 11 }, () => 0);
+    for (const x of xs) byMark[x]++;
+    return {
+      entries: es.length,
+      marked: n,
+      unmarked: es.length - n,
+      days,
+      to,
+      spanDays: SPANS[sheet.span],
+      outside,
+      mean,
+      sd,
+      spread: n >= 2 && sd > eps,
+      within,
+      lower,
+      upper,
+      byMark,
+    };
+  }
+
+  /* Counts and days for one sheet. Nothing here is a judgement: how many, how long ago, what
+     is there and what is not yet. */
+  function tally(sheet, today) {
+    const called = !!sheet.calledOn && !!sheet.call.trim();
+    const after = called && !!sheet.afterOn && !!sheet.after.trim();
+    return {
+      daysSince: sheet.setOn ? daysBetween(sheet.setOn, today) : null,
+      called,
+      after,
+      daysToAfter: after ? daysBetween(sheet.calledOn, sheet.afterOn) : null,
+    };
+  }
+
+  const ago = (what, k) =>
+    k === 0
+      ? `${what} today`
+      : k === 1
+        ? `${what} yesterday`
+        : `${what} ${plural(k, "day")} ago`;
+
+  const one = (n) => String(Math.round(n * 10) / 10);
+
+  /**
+   * The reading: facts about one sheet, in the order the sheet asks for them. How many
+   * entries and how many unmarked; the span in days and its first and last day; how many
+   * entries fall within one spread of the reader's own mean, how many in each tail, and the
+   * middle as a fraction in whole entries; how long since it was set down; whether it has
+   * been called, and when; whether there is an afterwards, and how long after the call.
+   * Never a verdict and never a suggestion, and never a word like good or bad. The reading
+   * says what is on the sheet and says nothing about what the shape means.
+   */
+  function readings(sheet, today) {
+    const s = stats(sheet);
+    const t = tally(sheet, today);
+    const out = [];
+    out.push(
+      s.entries
+        ? `${plural(s.entries, "entry", "entries")} on ${plural(s.days, "day")}${s.unmarked ? `, ${s.unmarked} unmarked` : ""}`
+        : "no entries",
+    );
+    out.push(
+      sheet.from
+        ? `${SPAN_NAMES[sheet.span]} · ${plural(s.spanDays, "day")} · ${dayWords(sheet.from)} to ${dayWords(s.to)}${s.outside ? ` · ${s.outside} outside it` : ""}`
+        : `${SPAN_NAMES[sheet.span]} · ${plural(s.spanDays, "day")}`,
+    );
+    if (s.spread) {
+      out.push(`${s.within} within one spread of your mean`);
+      out.push(`${s.lower} in the lower tail, ${s.upper} in the upper`);
+      out.push(`${s.within} of ${s.marked} in the middle`);
+    } else if (s.marked) {
+      out.push(
+        s.marked === 1 ? "one mark, no spread yet" : "all one mark, no spread",
+      );
+    }
+    out.push(
+      t.daysSince === null ? "not set down yet" : ago("set down", t.daysSince),
+    );
+    out.push(
+      t.called
+        ? ago("called", daysBetween(sheet.calledOn, today))
+        : "not yet called",
+    );
+    if (t.after)
+      out.push(
+        t.daysToAfter === 0
+          ? "afterwards, the same day as the call"
+          : `afterwards ${plural(t.daysToAfter, "day")} after the call`,
+      );
+    return out;
+  }
+
+  /* ── the drawing ──────────────────────────────────────────────────────────
+     The marks, to scale: a line from 0 to 10 with the reader's two ends written at it; one
+     dot per marked entry, stacked where marks repeat; a rough normal curve with the mean and
+     spread of those marks, its height the count it predicts at each mark, so it passes near
+     the tops of the stacks; the band one spread either side of the mean hatched under the
+     curve, the tails left plain; the count in each region written above it. Nothing here is
+     kept; it is drawn again from the sheet. */
+
+  const DW = 360;
+  const X0 = 26;
+  const X1 = DW - 26;
+  const TOP = 24;
+  const PLOT = 96;
+  const AY = TOP + PLOT;
+  const DH = AY + 44;
+  const xOf = (k) => X0 + ((X1 - X0) * k) / 10;
+
+  function drawCurve(sheet) {
+    const svg = document.getElementById("drawing");
+    const s = stats(sheet);
+    svg.setAttribute("viewBox", `0 0 ${DW} ${DH}`);
+    let out = "";
+    const rs = rand(seedOf("normal-scale"));
+
+    /* the dot spacing: tight enough that the tallest stack and the curve's peak fit */
+    const maxStack = Math.max(...s.byMark, 0);
+    const peak = s.spread ? s.marked / (s.sd * Math.sqrt(2 * Math.PI)) : 0;
+    const dy = Math.min(7, (PLOT - 10) / Math.max(maxStack, peak, 1));
+    const r = Math.min(2.8, dy * 0.42);
+    const hAt = (x) =>
+      s.spread
+        ? ((s.marked * dy) / (s.sd * Math.sqrt(2 * Math.PI))) *
+          Math.exp(-((x - s.mean) ** 2) / (2 * s.sd * s.sd))
+        : 0;
+
+    if (s.spread) {
+      const lo = Math.max(0, s.mean - s.sd);
+      const hi = Math.min(10, s.mean + s.sd);
+      /* the band: hatched under the curve, one spread either side of the mean */
+      let hatch = "";
+      const rh = rand(seedOf("normal-band"));
+      for (let x = lo; x <= hi + 1e-9; x += 0.17) {
+        const h = hAt(x);
+        if (h < 2) continue;
+        hatch += stroke(
+          [xOf(x), AY - 1],
+          [xOf(x) + 1.6, AY - h + 1],
+          rh,
+          0.35,
+          0,
+        );
+      }
+      /* the curve, sampled across the whole scale and inked as a ribbon */
+      const pts = [];
+      for (let x = 0; x <= 10 + 1e-9; x += 0.2)
+        pts.push([xOf(x), AY - Math.max(0.4, hAt(x))]);
+      const line = smooth(pts);
+      out +=
+        `<g class="fn-draw">` +
+        `<path class="band-hatch" d="${hatch}"/>` +
+        `<path class="curve" d="${ribbon(line, 1.5, seedOf("normal-curve"))}"/>` +
+        `<path class="mean-line" d="M${fx(xOf(s.mean))} ${fx(AY - 2)}L${fx(xOf(s.mean))} ${fx(AY - hAt(s.mean) - 6)}"/>`;
+      for (const e of [s.mean - s.sd, s.mean + s.sd])
+        if (e >= 0 && e <= 10)
+          out += `<line class="edge-line" x1="${fx(xOf(e))}" x2="${fx(xOf(e))}" y1="${fx(AY - 1)}" y2="${fx(AY + 6)}"/>`;
+      /* the counts, written on: each region's, just above the curve's peak or the tallest
+         stack, whichever is higher */
+      const top = Math.max(hAt(s.mean), maxStack * dy + 3);
+      const cy = Math.max(TOP - 6, AY - top - 16);
+      const put = (x, anchor, n) =>
+        `<text class="g-hand halo f-ink" x="${fx(x)}" y="${cy}" font-size="13" text-anchor="${anchor}" stroke-width="3">${n}</text>`;
+      out += put(xOf(s.mean), "middle", s.within);
+      if (s.mean - s.sd > 0.4)
+        out += put((X0 + xOf(lo)) / 2, "middle", s.lower);
+      if (s.mean + s.sd < 9.6)
+        out += put((xOf(hi) + X1) / 2, "middle", s.upper);
+      out += `<text class="g-mono" x="${fx(xOf(s.mean))}" y="${cy + 10}" text-anchor="middle" font-size="7.5">mean</text></g>`;
+    }
+
+    /* the dots: one per marked entry, stacked where marks repeat, in the order written */
+    const stack = Array.from({ length: 11 }, () => 0);
+    let dots = "";
+    sheet.entries.forEach((e, i) => {
+      if (e.mark === null) return;
+      const k = stack[e.mark]++;
+      const j = jitter(seedOf(`normal-dot-${e.mark}-${k}`), 0.5, 0);
+      dots += `<circle class="dot" cx="${fx(xOf(e.mark) + j.dx)}" cy="${fx(AY - r - 1.5 - k * dy + j.dy)}" r="${fx(r)}"/>`;
+    });
+    out += `<g class="fn-draw">${dots}</g>`;
+
+    if (!s.entries)
+      out += `<text class="g-hand f-muted" x="${DW / 2}" y="${AY - 28}" font-size="13.5" text-anchor="middle">nothing to draw yet</text>`;
+    else if (!s.marked)
+      out += `<text class="g-hand f-muted" x="${DW / 2}" y="${AY - 28}" font-size="13.5" text-anchor="middle">${plural(s.entries, "day")}, none marked yet</text>`;
+
+    /* the scale, with the reader's two ends at it */
+    out += `<path class="scale-line" d="${stroke([X0, AY], [X1, AY], rs, 0.6, 1)}"/>`;
+    for (let k = 0; k <= 10; k++) {
+      const x = xOf(k);
+      out += `<line class="tick" x1="${fx(x)}" x2="${fx(x)}" y1="${AY - 3}" y2="${AY + 3}"/>`;
+      out += `<text class="g-mono" x="${fx(x)}" y="${AY + 14}" text-anchor="middle" font-size="8.5">${k}</text>`;
+    }
+    const low = sheet.low.trim();
+    const high = sheet.high.trim();
+    out +=
+      `<text class="g-hand ${low ? "f-muted" : "f-faint"}" x="${X0}" y="${AY + 30}" font-size="11" text-anchor="start">${esc(clip(low || "one end, unnamed", 28))}</text>` +
+      `<text class="g-hand ${high ? "f-muted" : "f-faint"}" x="${X1}" y="${AY + 30}" font-size="11" text-anchor="end">${esc(clip(high || "the other, unnamed", 28))}</text>`;
+    svg.innerHTML = out;
+    svg.setAttribute(
+      "aria-label",
+      s.marked
+        ? `${plural(s.marked, "dot")} on a scale of 0 to 10` +
+            (s.spread
+              ? `, under a curve with its mean at ${one(s.mean)} and a spread of ${one(s.sd)}; ${s.within} in the middle band, ${s.lower} in the lower tail, ${s.upper} in the upper`
+              : "")
+        : "a scale of 0 to 10 with nothing on it",
+    );
+  }
+
+  /* What the drawing shows, in words, under it. */
+  function drawn(sheet) {
+    const s = stats(sheet);
+    if (!s.entries) return "a scale of 0 to 10, and nothing on it yet";
+    if (!s.marked)
+      return `${plural(s.entries, "day")} written, none marked, so nothing drawn`;
+    const dots = `${plural(s.marked, "dot")} on the scale`;
+    const un = s.unmarked ? `, ${s.unmarked} unmarked and not drawn` : "";
+    if (!s.spread) return `${dots}${un}; a curve needs two different marks`;
+    return `${dots}${un} · mean ${one(s.mean)}, spread ${one(s.sd)} · the band from ${one(Math.max(0, s.mean - s.sd))} to ${one(Math.min(10, s.mean + s.sd))} hatched`;
+  }
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const $ = (s) => document.querySelector(s);
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const TODAY = localToday();
+
+  const S = {
+    own: [],
+    last: "",
+    open: emptySheet(),
+    specimen: false,
+    kept: false,
+    sure: false,
+    status: "",
+    trouble: false,
+    from: "",
+    next: "",
+    seen: new Set(),
+    deskSeen: new Set(),
+    drawKey: "",
+  };
+
+  /* entrances: a row animates the first time it is drawn for this sheet, never again */
+  function enter(set, key) {
+    if (set.has(key)) return " still";
+    set.add(key);
+    return "";
+  }
+
+  /* spans by day: the most recent first day first */
+  function sortOwn() {
+    S.own.sort((a, b) =>
+      a.from !== b.from
+        ? a.from < b.from
+          ? 1
+          : -1
+        : a.slug < b.slug
+          ? -1
+          : a.slug > b.slug
+            ? 1
+            : 0,
+    );
+  }
+
+  /* ── the hand-drawn border on a panel ─────────────────────────────────── */
+
+  let maskN = 0;
+  function sketch(host, seed) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    host.prepend(svg);
+    let size = [0, 0];
+    const draw = () => {
+      const [w, h] = size;
+      if (!w || !h) return;
+      const s = seedOf(host.dataset.seed || seed);
+      const line = roughRect(w, h, s);
+      const id = `m${++maskN}`;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML =
+        `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+        `<path class="mask-line" d="${line}" pathLength="1" stroke-width="7.4"/></mask></defs>` +
+        `<path class="ink" d="${ribbon(line, 1.7, s)}" mask="url(#${id})"/>`;
+    };
+    new ResizeObserver(() => {
+      const next = [host.offsetWidth, host.offsetHeight];
+      if (next[0] === size[0] && next[1] === size[1]) return;
+      size = next;
+      draw();
+    }).observe(host);
+    host._redraw = draw;
+  }
+
+  /* ── rendering ───────────────────────────────────────────────────────── */
+
+  const chip = (
+    text,
+    act,
+    { accent = false, disabled = false, v = "", pressed = null } = {},
+  ) =>
+    `<button type="button" class="chip${accent ? " accent" : ""}" data-act="${act}"${v ? ` data-v="${esc(v)}"` : ""}${pressed === null ? "" : ` aria-pressed="${pressed}"`}${disabled ? " disabled" : ""}>${esc(text)}</button>`;
+
+  /* A textarea as tall as what is in it. */
+  const grow = (el) => {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  function metaLine() {
+    const o = S.open;
+    if (S.specimen) return "the specimen · fiction · read only";
+    if (S.kept) return `a sheet · set down ${dayWords(o.setOn)}`;
+    return o.setOn ? `now · set down ${dayWords(o.setOn)}` : "now";
+  }
+
+  /* The entries list is rebuilt when an entry is added, taken off or marked; a line or a
+     day being typed changes the open sheet in place and leaves the row alone. */
+  function renderEntries() {
+    const o = S.open;
+    const ro = S.specimen;
+    $("#entries").innerHTML = o.entries
+      .map(
+        (e, i) =>
+          `<li class="entry fn-row${enter(S.seen, `e-${i}-${e.day}`)}" style="--i:${i}">` +
+          `<input type="date" class="case day-in" data-f="day" data-i="${i}" value="${esc(e.day)}"${ro ? " disabled" : ""} aria-label="Day of entry ${i + 1}" />` +
+          `<input class="case hand-in" data-f="line" data-i="${i}" value="${esc(e.text)}" placeholder="the day, in a line" maxlength="400"${ro ? " readonly" : ""} aria-label="Entry ${i + 1}" />` +
+          `<span class="marks" role="group" aria-label="Mark for ${esc(dayWords(e.day))}">` +
+          Array.from({ length: 11 }, (_, m) => m)
+            .map(
+              (m) =>
+                `<button type="button" class="m${e.mark === m ? " on" : ""}" data-act="mark" data-i="${i}" data-v="${m}" aria-pressed="${e.mark === m}"${ro ? " disabled" : ""}>${m}</button>`,
+            )
+            .join("") +
+          `</span>` +
+          (ro
+            ? `<span></span>`
+            : `<button type="button" class="x" data-act="delentry" data-i="${i}" aria-label="Take this day off" title="take this day off">×</button>`) +
+          `</li>`,
+      )
+      .join("");
+    $("#entryAdd").hidden = ro;
+  }
+
+  /* The sheet's words. The textareas and the two ends are in the markup and take their text
+     through .value; the span row, the entries and the head are rebuilt. */
+  function renderSheet() {
+    const o = S.open;
+    const ro = S.specimen;
+    $("#sheetMeta").textContent = metaLine();
+    $("#headActs").innerHTML =
+      S.specimen || S.kept ? chip("Make your own", "makeown") : "";
+    $("#specNote").hidden = !S.specimen;
+    const carried = $("#carried");
+    carried.hidden = !S.from;
+    carried.textContent = S.from ? `Carried from ${S.from}` : "";
+
+    const set = $("#setDown");
+    if (set.value !== o.set) set.value = o.set;
+    set.readOnly = ro;
+
+    $("#spanRow").innerHTML =
+      Object.keys(SPANS)
+        .map((k) =>
+          chip(SPAN_NAMES[k], "span", {
+            v: k,
+            pressed: o.span === k,
+            disabled: ro,
+          }),
+        )
+        .join("") +
+      `<span class="meta">from</span>` +
+      `<input type="date" class="case day-in" id="from" data-f="from" value="${esc(o.from)}"${ro ? " disabled" : ""} aria-label="First day of the span" />` +
+      `<span class="meta" id="spanMeta"></span>`;
+
+    for (const k of ["low", "high"]) {
+      const el = $(`#${k}`);
+      if (el.value !== o[k]) el.value = o[k];
+      el.readOnly = ro;
+    }
+
+    renderEntries();
+
+    const call = $("#call");
+    if (call.value !== o.call) call.value = o.call;
+    call.readOnly = ro;
+
+    const after = $("#after");
+    if (after.value !== o.after) after.value = o.after;
+    after.readOnly = ro;
+    after.disabled = !ro && !o.calledOn;
+    after.placeholder = after.disabled ? "after the call" : "how it went";
+
+    $("#keepRow").innerHTML = ro
+      ? ""
+      : chip("Keep", "keep", { accent: true }) +
+        (S.kept ? chip(S.sure ? "sure?" : "Let it go", "letgo") : "") +
+        `<p class="meta status${S.trouble ? " trouble" : ""}" id="status" role="status">${esc(S.status)}</p>`;
+    document.querySelectorAll("#sheet textarea").forEach(grow);
+  }
+
+  /* What follows every keystroke: the dates and counts, the drawing, the reading, the desk. */
+  function renderLive() {
+    const o = S.open;
+    const s = stats(o);
+    const t = tally(o, TODAY);
+    $("#setMeta").textContent = [
+      o.setOn
+        ? `set down ${dayWords(o.setOn)}`
+        : "not dated until a word is written",
+      s.entries
+        ? `${plural(s.entries, "entry", "entries")}${s.unmarked ? `, ${s.unmarked} unmarked` : ""}`
+        : "no entries",
+    ].join(" · ");
+    const fi = $("#from");
+    if (fi && fi.value !== o.from && document.activeElement !== fi)
+      fi.value = o.from;
+    const sm = $("#spanMeta");
+    if (sm)
+      sm.textContent = o.from
+        ? `to ${dayWords(s.to)} · ${plural(s.spanDays, "day")}`
+        : `${plural(s.spanDays, "day")} · first day set when you write`;
+
+    /* the drawing is redrawn only when something it shows has changed */
+    const key = JSON.stringify([o.entries.map((e) => e.mark), o.low, o.high]);
+    if (key !== S.drawKey) {
+      S.drawKey = key;
+      drawCurve(o);
+    }
+    $("#drawn").textContent = drawn(o);
+
+    const words = readings(o, TODAY).join(" · ");
+    $("#readBack").textContent = words;
+    $("#reading").textContent = words;
+
+    $("#callMeta").textContent = t.called
+      ? `called ${dayWords(o.calledOn)}`
+      : o.call.trim()
+        ? "dated when it is kept"
+        : "dated on the first keystroke · unlocks afterwards";
+    $("#afterMeta").textContent = t.after
+      ? `${dayWords(o.afterOn)} · ${t.daysToAfter === 0 ? "the same day as the call" : `${plural(t.daysToAfter, "day")} after the call`}`
+      : t.called
+        ? "dated on the first keystroke"
+        : "after the call";
+
+    const carry = $("#carryNext");
+    carry.hidden = !S.next || S.specimen;
+    carry.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, o.set, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+
+    const after = $("#after");
+    const unlocked = !S.specimen && !!o.calledOn;
+    if (after.disabled === unlocked) {
+      after.disabled = !unlocked;
+      after.placeholder = unlocked ? "how it went" : "after the call";
+    }
+
+    /* the desk: afterwards */
+    $("#afterText").textContent = t.after
+      ? o.after
+      : t.called
+        ? "nothing written afterwards yet"
+        : "afterwards waits for the call";
+    $("#afterDays").textContent = t.after
+      ? t.daysToAfter === 0
+        ? "the same day as the call"
+        : `${plural(t.daysToAfter, "day")} after the call`
+      : "";
+
+    /* the desk: the record, spans by day */
+    const own = S.own;
+    const called = own.filter((x) => x.calledOn).length;
+    const afters = own.filter((x) => x.afterOn).length;
+    $("#recordText").textContent = own.length
+      ? `${plural(own.length, "span")} of your own · ${called} called · ${afters} with an afterwards`
+      : "no spans of your own yet";
+    const row = (x, i, spec) => {
+      const on = spec
+        ? S.specimen
+        : S.kept && !S.specimen && S.open.slug === x.slug;
+      const state = x.afterOn
+        ? "afterwards"
+        : x.calledOn
+          ? "called"
+          : "not yet called";
+      const n = x.entries.length;
+      return (
+        `<li class="fn-row${enter(S.deskSeen, `${spec ? "s" : "o"}-${x.slug}`)}" style="--i:${i}">` +
+        `<button type="button" data-act="${spec ? "loadspec" : "load"}" data-v="${esc(x.slug)}"${on ? ' aria-current="true"' : ""}>` +
+        `<span class="meta">${esc(dayWords(x.from))} to ${esc(dayWords(spanEnd(x)))} · ${plural(n, "entry", "entries")} · ${state}</span>` +
+        `<span class="rec-name">${esc(spec ? x.title : titleOf(x))}</span>` +
+        `</button></li>`
+      );
+    };
+    $("#recordList").innerHTML =
+      `<div class="desk-group"><p class="meta">the specimen · fiction</p><ol>${row(SPECIMEN, 0, true)}</ol></div>` +
+      (own.length
+        ? `<div class="desk-group"><p class="meta">yours</p><ol>${own
+            .slice(0, 40)
+            .map((x, i) => row(x, i, false))
+            .join("")}</ol></div>`
+        : "");
+
+    $("#keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+  }
+
+  function full(redraw = false) {
+    if (redraw) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `normal-${S.specimen ? "specimen" : S.open.slug || "fresh"}`;
+      sheet._redraw?.();
+    }
+    S.drawKey = "";
+    renderSheet();
+    renderLive();
+  }
+
+  /* ── opening, keeping, letting go ───────────────────────────────────── */
+
+  function fresh() {
+    S.open = emptySheet();
+    S.specimen = false;
+    S.kept = false;
+    S.sure = false;
+    S.status = "";
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    full(true);
+  }
+
+  function loadSpecimen() {
+    S.open = clone(SPECIMEN);
+    S.specimen = true;
+    S.kept = false;
+    S.sure = false;
+    S.status = "";
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    full(true);
+  }
+
+  function load(sheet) {
+    S.open = clone(sheet);
+    S.specimen = false;
+    S.kept = true;
+    S.sure = false;
+    S.status = `kept · set down ${dayWords(sheet.setOn)}`;
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    if (S.last !== sheet.slug) {
+      S.last = sheet.slug;
+      persist({ sheets: S.own, last: S.last });
+    }
+    full(true);
+  }
+
+  /* A hand-off read from the address: a new sheet of the reader's own, the carried text in
+     the set-down field and nothing else, not kept until Keep. */
+  function carried(h) {
+    fresh();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) S.open.set = h.set;
+    full();
+  }
+
+  /* The machine dates the sheet on the first keystroke, and gives the span its first day
+     then, so that it ends today; the day is then the sheet's until the reader moves it. */
+  function touch() {
+    const o = S.open;
+    if (!o.setOn) o.setOn = localToday();
+    if (!o.from) o.from = spanStart(o.span, localToday());
+  }
+
+  /* Write the open sheet. A fresh sheet whose slug is taken gets a numbered one; a kept sheet
+     is written in place. The specimen is never written. */
+  function save() {
+    if (S.specimen) return false;
+    const o = S.open;
+    if (!o.set.trim() && !o.entries.length) {
+      S.status = "nothing to keep yet — write a line or a day first";
+      S.trouble = true;
+      return false;
+    }
+    touch();
+    if (!o.slug) {
+      const taken = new Set(S.own.map((x) => x.slug));
+      const base = slugOf(titleOf(o), o.setOn);
+      let slug = base;
+      let k = 2;
+      while (taken.has(slug)) slug = `${base}-${k++}`;
+      o.slug = slug;
+    }
+    const v = validateSheet(o);
+    if (!v) {
+      S.status = "not kept — the sheet is not the shape a sheet has";
+      S.trouble = true;
+      return false;
+    }
+    S.own = [v, ...S.own.filter((x) => x.slug !== v.slug)];
+    sortOwn();
+    S.last = v.slug;
+    const was = S.kept;
+    S.kept = true;
+    const ok = persist({ sheets: S.own, last: S.last });
+    S.status = ok
+      ? `kept · set down ${dayWords(v.setOn)}`
+      : "not kept — this browser would not hold it";
+    S.trouble = !ok;
+    if (!was) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `normal-${v.slug}`;
+      sheet._redraw?.();
+    }
+    return ok;
+  }
+
+  function keep() {
+    save();
+    S.sure = false;
+    full();
+  }
+
+  /* A kept sheet is written again when a field is left, so a call is not lost. */
+  function commit() {
+    if (S.kept && !S.specimen) {
+      save();
+      renderLive();
+      const st = $("#status");
+      if (st) {
+        st.textContent = S.status;
+        st.classList.toggle("trouble", S.trouble);
+      }
+    }
+  }
+
+  function letGo() {
+    if (!S.kept || S.specimen) return;
+    if (!S.sure) {
+      S.sure = true;
+      renderSheet();
+      return;
+    }
+    const slug = S.open.slug;
+    S.own = S.own.filter((x) => x.slug !== slug);
+    if (S.last === slug) S.last = "";
+    persist({ sheets: S.own, last: S.last });
+    fresh();
+  }
+
+  /* an entry, a mark or a day taken off: kept at once on a kept sheet */
+  function setEntries(entries) {
+    S.open.entries = entries;
+    touch();
+    if (S.kept) save();
+    renderEntries();
+    renderLive();
+  }
+
+  /* The next day for a new entry: the first day of the span if there is none yet, else the
+     day after the last one written. The reader can move it. */
+  function nextDay() {
+    const o = S.open;
+    const es = o.entries;
+    if (!es.length) return o.from || spanStart(o.span, localToday());
+    return addDays(es[es.length - 1].day, 1);
+  }
+
+  function addEntry(text) {
+    const t = text.trim();
+    if (!t || S.specimen || S.open.entries.length >= MAX_ENTRIES) return;
+    touch();
+    setEntries([
+      ...S.open.entries,
+      { day: nextDay(), text: t.slice(0, 400), mark: null },
+    ]);
+    const el = $("#newLine");
+    el.value = "";
+    el.focus({ preventScroll: true });
+  }
+
+  function setSpan(k) {
+    if (S.specimen || !SPANS[k]) return;
+    const o = S.open;
+    o.span = k;
+    touch();
+    if (S.kept) save();
+    renderSheet();
+    renderLive();
+  }
+
+  function toSheet() {
+    const sheet = $("#sheet");
+    if (sheet.getBoundingClientRect().top < 0)
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* ── events ──────────────────────────────────────────────────────────── */
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    const act = b.dataset.act;
+    const i = +b.dataset.i;
+    if (act === "makeown") return fresh();
+    if (act === "load") {
+      const x = S.own.find((y) => y.slug === b.dataset.v);
+      if (x) load(x);
+      return toSheet();
+    }
+    if (act === "loadspec") {
+      loadSpecimen();
+      return toSheet();
+    }
+    if (S.specimen) return;
+    if (act === "keep") return keep();
+    if (act === "letgo") return letGo();
+    if (act === "span") return setSpan(b.dataset.v);
+    if (act === "mark") {
+      const m = +b.dataset.v;
+      return setEntries(
+        S.open.entries.map((en, k) =>
+          k === i ? { ...en, mark: en.mark === m ? null : m } : en,
+        ),
+      );
+    }
+    if (act === "delentry")
+      return setEntries(S.open.entries.filter((_, k) => k !== i));
+  });
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    const k = el.dataset && el.dataset.f;
+    if (!k || !el.closest("#sheet")) return;
+    if (el.tagName === "TEXTAREA") grow(el);
+    if (k === "new-line") return;
+    if (S.specimen) return;
+    const v = el.value;
+    const o = S.open;
+    if (k === "set") {
+      o.set = v;
+      if (v.trim()) touch();
+    } else if (k === "low" || k === "high") {
+      o[k] = v.slice(0, 80);
+      if (v.trim()) touch();
+    } else if (k === "from") {
+      // A date field reads "" while it is half typed; the sheet keeps its day until a whole one is there.
+      if (DAY.test(v)) {
+        o.from = v;
+        if (!o.setOn) o.setOn = localToday();
+      }
+    } else if (k === "day") {
+      const i = +el.dataset.i;
+      if (DAY.test(v))
+        o.entries = o.entries.map((en, j) =>
+          j === i ? { ...en, day: v } : en,
+        );
+    } else if (k === "line") {
+      const i = +el.dataset.i;
+      o.entries = o.entries.map((en, j) =>
+        j === i ? { ...en, text: v.slice(0, 400) } : en,
+      );
+    } else if (k === "call") {
+      o.call = v;
+      if (v.trim() && !o.calledOn) o.calledOn = localToday();
+      if (!v.trim()) {
+        o.calledOn = "";
+        o.after = "";
+        o.afterOn = "";
+        $("#after").value = "";
+      }
+    } else if (k === "after") {
+      o.after = v;
+      if (v.trim() && !o.afterOn) o.afterOn = localToday();
+      if (!v.trim()) o.afterOn = "";
+    }
+    if (S.sure) {
+      S.sure = false;
+      const lg = $('[data-act="letgo"]');
+      if (lg) lg.textContent = "Let it go";
+    }
+    renderLive();
+  });
+
+  document.addEventListener("focusout", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k || k === "new-line" || !e.target.closest("#sheet")) return;
+    if (k === "day" || k === "from") {
+      // A day field left half typed goes back to the day the sheet has.
+      const i = +e.target.dataset.i;
+      const have = k === "from" ? S.open.from : S.open.entries[i]?.day;
+      if (have && e.target.value !== have) e.target.value = have;
+    }
+    commit();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k || e.key !== "Enter" || e.isComposing) return;
+    if (k === "new-line") {
+      e.preventDefault();
+      addEntry(e.target.value);
+    } else if (k === "line" || k === "low" || k === "high") {
+      e.preventDefault();
+      e.target.blur();
+      $("#newLine")?.focus({ preventScroll: true });
+    }
+  });
+
+  window.addEventListener("resize", () =>
+    document.querySelectorAll("#sheet textarea").forEach(grow),
+  );
+
+  /* ── open ────────────────────────────────────────────────────────────── */
+
+  function boot() {
+    const env = readStore();
+    const own = [];
+    for (const r of Array.isArray(env?.sheets) ? env.sheets : []) {
+      const v = validateSheet(r);
+      if (v && !own.some((x) => x.slug === v.slug)) own.push(v);
+    }
+    S.own = own;
+    sortOwn();
+    S.last = typeof env?.last === "string" ? env.last : "";
+    const h = fromHash();
+    if (h) return carried(h);
+    const wanted = S.own.find((x) => x.slug === S.last);
+    if (wanted) load(wanted);
+    else if (S.own.length) load(S.own[0]);
+    else loadSpecimen();
+  }
+
+  sketch($("#sheet"), "normal-fresh");
+  document
+    .querySelectorAll(".desk .panel")
+    .forEach((p, i) =>
+      sketch(
+        p,
+        ["normal-reading", "normal-record", "normal-laws", "normal-after"][i],
+      ),
+    );
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
+</script>

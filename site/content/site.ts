@@ -175,6 +175,11 @@ export const site = {
         { slug: "slice", title: "Slice", href: "/instruments/slice", link: "Open" },
         { slug: "toll", title: "Toll", href: "/instruments/toll", link: "Open" },
         { slug: "unison", title: "Unison", href: "/instruments/unison", link: "Open" },
+        { slug: "spine", title: "Spine", href: "/instruments/spine", link: "Open" },
+        { slug: "circuits", title: "Circuits", href: "/instruments/circuits", link: "Open" },
+        { slug: "real-ideal", title: "Real, Ideal", href: "/instruments/real-ideal", link: "Open" },
+        { slug: "attention", title: "Attention", href: "/instruments/attention", link: "Open" },
+        { slug: "normal", title: "Normal", href: "/instruments/normal", link: "Open" },
       ],
     },
     figures: {
@@ -189,7 +194,7 @@ export const site = {
     named: {
       id: "named",
       title: "Named, not yet built",
-      items: ["Real self, ideal self", "Attention curation", "Life is normal"],
+      items: ["Inner-world inhabitation map"],
     },
     rules: {
       id: "rules",

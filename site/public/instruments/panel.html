@@ -32,21 +32,19 @@
     font-display: swap;
   }
 
-  /* niwa's two palettes as tokens. Paper: ink on bone. Sumi: the same garden after dark.
-     Every line is ink on a wash of itself; the accent is only ever the week being read. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #625c53;
-    --faint: #857d71;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #c9c3b6;
     --accent: #b5532a;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
-    --grain-blend: multiply;
-    --grain: 0.06;
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -58,12 +56,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #847d70;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473b;
       --accent: #d9763f;
-      --grain-blend: screen;
-      --grain: 0.045;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -72,12 +69,27 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #847d70;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #4a473b;
     --accent: #d9763f;
-    --grain-blend: screen;
-    --grain: 0.045;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Panel's own hue: a second rule, a shade darker, for the masthead and the strips' baseline.
+     The light value sits on bare :root and dark redefines it under both selectors, after the
+     canonical block and never inside it. */
+  :root {
+    --rule-2: #c9c3b6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #4a473b;
   }
 
   * {
@@ -109,8 +121,8 @@
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
     background-size: 220px 220px;
-    opacity: var(--grain);
-    mix-blend-mode: var(--grain-blend);
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
   }
   ::selection {
     background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -133,6 +145,11 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 2px;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   .wrap {
     max-width: 1240px;
@@ -266,6 +283,20 @@
   }
   .status:empty {
     display: none;
+  }
+  /* What came in by the address bar: one line under the masthead, nothing else. */
+  .carried {
+    margin: 20px 0 0;
+    font-size: 15.5px;
+    line-height: 1.4;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .note {
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
   }
 
   /* A pen line laid over the element it sits in. */
@@ -657,6 +688,9 @@
     gap: 16px;
     flex-wrap: wrap;
   }
+  footer .meta {
+    color: var(--muted);
+  }
 
   /* entry: translateY + opacity only */
   .rise {
@@ -747,8 +781,13 @@
       <p class="count" id="g-count"></p>
       <p class="small" id="g-note"></p>
       <div class="actions">
-        <button class="go" id="open" type="button">
-          Open a folder of notes
+        <button
+          class="go"
+          id="open"
+          type="button"
+          title="Open a folder of your own notes"
+        >
+          Make your own
         </button>
         <button class="quiet" id="restore" type="button" hidden>
           Put the specimen back
@@ -763,6 +802,8 @@
       <input type="file" id="folder" webkitdirectory multiple hidden />
     </section>
   </header>
+
+  <p class="hand carried" id="carried" hidden></p>
 
   <div class="two">
     <section
@@ -832,23 +873,29 @@
         <div class="meta accent">what it leaves to you</div>
         <p class="leaves hand" id="leaves"></p>
         <p class="lineage" id="lineage"></p>
+        <p class="hand note" id="carryNext" hidden></p>
       </section>
     </aside>
   </div>
 
   <footer>
-    <span class="label">Panel · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser only</span>
+    <span class="meta">Panel · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
 <script>
   "use strict";
 
-    // ---- the pen (niwa lib/hand.ts) ----
-  // Every path is deterministic for its seed, so a re-render never redraws a line differently.
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
 
-  /** mulberry32 */
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -859,7 +906,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-  /** FNV-1a: a stable seed from a string. */
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -868,10 +916,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
-  /** One pen stroke from a to b: a cubic a little off the straight line. */
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -890,6 +943,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -901,7 +956,7 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
 
   /** A box drawn as four strokes, each running a little past its corner. */
@@ -924,9 +979,9 @@
     ].join("");
   }
 
-  /** Catmull-Rom through the points, as cubics. */
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[Math.max(0, i - 1)];
       const p1 = pts[i];
@@ -934,12 +989,16 @@
       const p3 = pts[Math.min(pts.length - 1, i + 2)];
       const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
       const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
     }
     return d;
   }
 
-  /** The circling: once round a w×h box and a little past its own start. */
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -949,6 +1008,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -970,6 +1031,39 @@
     return smooth(pts);
   }
 
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
   /** Struck through: a line across the middle that rises a little to the right. */
   function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
     const r = rand(seed);
@@ -982,7 +1076,10 @@
     );
   }
 
-  /** A path of M, C and L, sampled into points per subpath. */
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1032,7 +1129,12 @@
     return subs;
   }
 
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -1063,27 +1165,62 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
-    /** A line drawn under something: a touch before, a touch after, a slight sag. */
-  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
-    const r = rand(seed);
-    return stroke(
-      [-1 - r() * 2, y],
-      [w + 1 + r() * 2, y + spread(r, 0.8)],
-      r,
-      wobble,
-      0,
-    );
-  }
+  /* capp:hand end */
 
-  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
-  function jitter(seed, amp = 0.6, turn = 14) {
-    const r = rand(seed);
-    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
   }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
 
   // ---- the garden (niwa lib/garden.ts, for files read in the page) ----
   // The same rules, applied to one folder instead of four directories on one machine:
@@ -2068,10 +2205,6 @@
   /** Markers that are a share of the stones, read in a hundred and drawn on a fixed 0–100 scale. */
   const SHARES = new Set(["vocab", "alone", "tended"]);
 
-  const PDAY = 86400000;
-  const ms = (d) => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
-  const addDays = (d, n) => new Date(ms(d) + n * PDAY).toISOString().slice(0, 10);
-
   /** Week ends from today back to the first day, a week apart, oldest first. */
   function weeksOf(first, today) {
     const out = [];
@@ -2243,9 +2376,6 @@
 
   // ---- saying it ----
 
-  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
-  /** `2026-09-19` → `19 Sep`. */
-  const dayOf = (d) => `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}`;
   const commas = (n) =>
     String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -2274,14 +2404,14 @@
         ? `${name} from ${said(k, a)} to ${said(k, b)}, ${t} as many`
         : `${name} from none to ${said(k, b)}`;
     };
-    return `Since the week of ${dayOf(p.weeks[s])}: ${part("stones", "the stones")}; ${part("threads", "the threads")}; ${part("both", "the pairs written both ways")}.`;
+    return `Since the week of ${dayWords(p.weeks[s])}: ${part("stones", "the stones")}; ${part("threads", "the threads")}; ${part("both", "the pairs written both ways")}.`;
   }
 
   /** One marker read at a week, beside four weeks before and the start. */
   function reading(p, key, name, at) {
     const v = p.series[key];
     const back = Math.max(0, at - 4);
-    return `${name}: ${said(key, v[at])} in the week of ${dayOf(p.weeks[at])}; ${said(key, v[back])} four weeks before; ${said(key, v[p.start])} in the week of ${dayOf(p.weeks[p.start])}.`;
+    return `${name}: ${said(key, v[at])} in the week of ${dayWords(p.weeks[at])}; ${said(key, v[back])} four weeks before; ${said(key, v[p.start])} in the week of ${dayWords(p.weeks[p.start])}.`;
   }
 
   /** A day of planting in bulk, said. */
@@ -2289,7 +2419,7 @@
     const [k, n] = b.kinds[0];
     const rest = b.count - n;
     const what = `${commas(n)} ${(KIND_LABEL[k] ?? k).toLowerCase()}`;
-    return `${commas(b.count)} stones first appear on ${dayOf(b.day)}: ${what}${rest ? ` and ${commas(rest)} more` : ""}.`;
+    return `${commas(b.count)} stones first appear on ${dayWords(b.day)}: ${what}${rest ? ` and ${commas(rest)} more` : ""}.`;
   }
 
   /** Every sentence the view reads back, for the check that keeps verdicts out of them. */
@@ -2412,20 +2542,6 @@
   const $ = (id) => document.getElementById(id);
   const NS = "http://www.w3.org/2000/svg";
   const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const KEY = "pp-panel";
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
-  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   function el(tag, attrs = {}) {
     const e = document.createElementNS(NS, tag);
     for (const [k, v] of Object.entries(attrs))
@@ -2481,29 +2597,125 @@
   }
 
   // ---- what is kept: one key, this browser only ----
-  function load() {
+  // The envelope is { v: 1, own: { name, at, files: [[path, mtime, text], …] } }. Every row
+  // read back is checked here before it is used; a bad one is dropped, never repaired. The
+  // specimen is never written.
+  const KEY = "pp-panel";
+  /* capp:store begin */
+  function readStore() {
     try {
-      return JSON.parse(localStorage.getItem(KEY) || "null") || {};
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
     } catch {
-      return {};
+      return null;
     }
   }
-  function keep(own) {
+  function persist(data) {
     try {
-      if (own) localStorage.setItem(KEY, JSON.stringify({ own }));
-      else localStorage.removeItem(KEY);
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
       return true;
     } catch {
-      /* storage refused or full: the page still works, it just forgets on reload */
       return false;
     }
+  }
+  /* capp:store end */
+
+  const SELF = "panel";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  /** The reader's own folder as it was kept, or null if nothing valid is there. */
+  function ownKept() {
+    const own = readStore()?.own;
+    if (!own || typeof own !== "object" || !Array.isArray(own.files)) return null;
+    const files = own.files.filter(
+      (r) =>
+        Array.isArray(r) &&
+        typeof r[0] === "string" &&
+        typeof r[1] === "number" &&
+        typeof r[2] === "string",
+    );
+    if (!files.length) return null;
+    return {
+      name: typeof own.name === "string" ? own.name : "",
+      at: typeof own.at === "string" ? own.at : "",
+      files,
+    };
   }
 
   // ---- state ----
   const S = {
-    source: "specimen",
+    specimen: true,
     name: "",
     at: null,
+    set: "",
+    from: "",
+    next: "",
     count: 0,
     input: null,
     leave: { hubs: false, bulk: false },
@@ -2512,7 +2724,7 @@
   };
 
   /** The garden's stones and threads, with each stone's days, as the panel reads them. */
-  function setFiles(files, { source, name = "", at = null, repos = [] }) {
+  function setFiles(files, { specimen, name = "", at = null, repos = [] }) {
     const now = Date.now();
     const g = buildGarden(files, { repos, now });
     const byPath = new Map(files.map((f) => [f.path, f]));
@@ -2525,7 +2737,7 @@
       born[n.id] = days[0];
       touched[n.id] = days;
     }
-    S.source = source;
+    S.specimen = specimen;
     S.name = name;
     S.at = at;
     S.count = files.length;
@@ -2534,7 +2746,7 @@
       links: g.links,
       born,
       touched,
-      today: isoDay(now),
+      today: localToday(),
     };
     S.cursor = null;
     renderSource(g);
@@ -2543,7 +2755,7 @@
   }
 
   function renderSource(g) {
-    const own = S.source === "own";
+    const own = !S.specimen;
     $("g-name").textContent = own
       ? `Your notes${S.name ? ` · ${S.name}` : ""}`
       : "Specimen garden";
@@ -2598,7 +2810,6 @@
     };
   }
 
-  const MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
   let dots = {};
 
   function render() {
@@ -2642,7 +2853,7 @@
       ? `<ul class="bulk-list">${p.bulk
           .map(
             (b, i) =>
-              `<li><button type="button" class="pn-pick" data-week="${S.bulkAt[i]}"><span class="meta">${esc(dayOf(b.day))}</span><span>${esc(bulkSaid(b))}</span></button></li>`,
+              `<li><button type="button" class="pn-pick" data-week="${S.bulkAt[i]}"><span class="meta">${esc(dayWords(b.day))}</span><span>${esc(bulkSaid(b))}</span></button></li>`,
           )
           .join("")}</ul>`
       : `<p class="none">No day on which twenty or more stones first appear.</p>`;
@@ -2662,7 +2873,7 @@
     const p = S.p;
     const out = [];
     p.weeks.forEach((w, i) => {
-      const m = MONTHS[+w.slice(5, 7) - 1];
+      const m = MON[+w.slice(5, 7) - 1];
       if (!out.length || out[out.length - 1].name !== m)
         out.push({ i, name: m });
     });
@@ -2679,7 +2890,7 @@
     const i = at();
     const n = p.weeks.length;
     const f = n > 1 ? i / (n - 1) : 0.5;
-    $("week").textContent = `week of ${dayOf(p.weeks[i])}`;
+    $("week").textContent = `week of ${dayWords(p.weeks[i])}`;
     for (const k of MARKERS) {
       const row = $("rows").querySelector(`[data-k="${k}"]`);
       const track = row.querySelector(".pn-track");
@@ -2689,7 +2900,7 @@
       $("rows").querySelector(`[data-val="${k}"]`).innerHTML =
         `<div class="big">${esc(said(k, v[i]))}</div><div class="sub">${
           i !== last() ? `<div>now ${esc(said(k, v[last()]))}</div>` : ""
-        }<div>${esc(dayOf(p.weeks[p.start]))} ${esc(said(k, v[p.start]))}</div></div>`;
+        }<div>${esc(dayWords(p.weeks[p.start]))} ${esc(said(k, v[p.start]))}</div></div>`;
     }
     for (const b of $("bulk").querySelectorAll("[data-week]"))
       b.classList.toggle("here", +b.dataset.week === i);
@@ -2734,7 +2945,7 @@
   function specimen() {
     const now = Date.now();
     return setFiles(specimenFiles(now), {
-      source: "specimen",
+      specimen: true,
       repos: specimenRepos(now),
     });
   }
@@ -2755,12 +2966,10 @@
         return;
       }
       await new Promise((r) => setTimeout(r, 30));
-      const at = new Date().toISOString();
-      const g = setFiles(files, { source: "own", name, at });
-      const kept = keep({
-        name,
-        at,
-        files: files.map((f) => [f.path, f.mtime, f.text]),
+      const at = localToday();
+      const g = setFiles(files, { specimen: false, name, at });
+      const kept = persist({
+        own: { name, at, files: files.map((f) => [f.path, f.mtime, f.text]) },
       });
       const stones = g.nodes.filter((n) => CORPUS.has(n.kind)).length;
       status.textContent =
@@ -2776,11 +2985,35 @@
     }
   });
   $("restore").addEventListener("click", () => {
-    keep(null);
+    persist({});
     specimen();
     $("g-status").textContent =
       "Your notes are forgotten here. This is the specimen again.";
   });
+
+  // ---- the hand-off: text carried in by the address bar ----
+  // Panel has no set-down field, so a carried `set` is shown as one line under the masthead
+  // and goes nowhere else; `from` names where it came from; `next` puts one link in the coda.
+  // Neither touches which garden is open or what is kept.
+  function renderCarry() {
+    const c = $("carried");
+    const has = S.from || S.set;
+    c.hidden = !has;
+    c.textContent = has
+      ? `${S.from ? `Carried from ${S.from}` : "Carried"}${S.set ? `: ${S.set}` : ""}`
+      : "";
+    const n = $("carryNext");
+    n.hidden = !S.next;
+    n.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, S.set, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+  }
+  function carried(h) {
+    S.from = h.from;
+    S.next = h.next;
+    S.set = h.set;
+    renderCarry();
+  }
 
   // ---- open ----
   for (const id of [
@@ -2792,13 +3025,13 @@
   ])
     sketch($(id), { seed: `panel-${id}`, draw: true });
   {
-    const own = load().own;
+    const own = ownKept();
     let opened = false;
-    if (own?.files?.length) {
+    if (own) {
       try {
         setFiles(
           own.files.map(([path, mtime, text]) => ({ path, mtime, text })),
-          { source: "own", name: own.name, at: own.at },
+          { specimen: false, name: own.name, at: own.at },
         );
         opened = true;
       } catch {
@@ -2807,4 +3040,10 @@
     }
     if (!opened) specimen();
   }
+  const h0 = fromHash();
+  if (h0) carried(h0);
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

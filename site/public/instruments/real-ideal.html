@@ -1,0 +1,2631 @@
+<title>Real, Ideal</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="The distance between who you say you are and who you say you mean to be, drawn as a surface to walk rather than a deficit to close: two profiles on dimensions of your own naming, the gap shaded, earlier sheets traced faint."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* capp:tokens begin */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #645e55;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d766a;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: a sheet laid on gravel. Ink on bone. The one accent is the label of each move and
+     the Keep; everything else is ink, pencil (muted) and the faint line of what is hollow. The
+     real is drawn in ink and the ideal in pencil, and the gap between them is hatched. */
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin: 0;
+  }
+  .meta.accent {
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast > div > .meta {
+    margin: 0 0 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(64px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .lede {
+    margin: 0;
+    font-size: clamp(18px, 1.9vw, 20px);
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+  .lede + .lede {
+    margin-top: 1em;
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+
+  /* the sheet and the desk */
+  .room {
+    display: grid;
+    gap: 24px;
+    margin-top: 32px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+    animation: rise 600ms var(--ease) both;
+  }
+  .sheet {
+    padding: 22px 20px 26px;
+    scroll-margin-top: 16px;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .desk .panel:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .desk .panel:nth-child(3) {
+    animation-delay: 100ms;
+  }
+  .desk .panel:nth-child(4) {
+    animation-delay: 140ms;
+  }
+  .desk-text {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .desk-text + .desk-text {
+    margin-top: 10px;
+  }
+  .desk-text.hand {
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .desk ol {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .desk li > button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .desk li > button:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .desk li > button[aria-current="true"] .meta {
+    color: var(--accent);
+  }
+  .rec-name {
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .desk-group + .desk-group {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  #keptWhere {
+    margin-top: 12px;
+  }
+  .after-days {
+    margin-top: 6px;
+  }
+
+  /* the hand-drawn border on a panel */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .mask-line {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* the sheet */
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .head-acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+  }
+  .spec-note,
+  .carried {
+    margin: 6px 0 0;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .spec-note b {
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .move {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .move:first-of-type {
+    margin-top: 18px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .move > .meta.accent {
+    margin-bottom: 8px;
+  }
+  .case {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .case[readonly] {
+    border-bottom-color: transparent;
+  }
+  .case:disabled {
+    border-bottom-color: transparent;
+    color: var(--faint);
+  }
+  textarea.case {
+    resize: none;
+    overflow: hidden;
+  }
+  .set-line {
+    font-size: clamp(22px, 2.8vw, 27px);
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+  }
+  .prose {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .note {
+    margin: 4px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .note.faint {
+    color: var(--faint);
+  }
+  .under {
+    margin-top: 8px;
+  }
+
+  /* the dimensions: a name, the two ends of its line, the real and the ideal, each placed */
+  .dims-wrap {
+    margin-top: 20px;
+  }
+  .dims {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dim {
+    padding-block: 12px 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .dim-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 8px 12px;
+  }
+  .dim-name {
+    font-size: 19px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .ends {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: 2px 10px;
+    margin-top: 2px;
+  }
+  .ends .meta {
+    white-space: nowrap;
+  }
+  .end {
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .side {
+    display: grid;
+    grid-template-columns: 3.4em minmax(0, 1fr);
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-top: 8px;
+  }
+  .side > .meta {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .side .scale {
+    grid-column: 2;
+  }
+  .line-in {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+  .scale {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+  }
+  .w {
+    width: 25px;
+    padding-block: 2px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-align: center;
+    color: var(--faint);
+    border-radius: 3px;
+    transition:
+      color 160ms var(--ease),
+      background-color 160ms var(--ease);
+  }
+  .w:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .w.on {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .w.on:disabled {
+    color: var(--ink);
+  }
+  .x {
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+  .row-add {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  .row-add .case {
+    flex: 1;
+  }
+  .draw-box {
+    width: 100%;
+    max-width: 38rem;
+    margin-top: 4px;
+  }
+  #drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .drawn {
+    margin: 6px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .readback {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .dim-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 8px;
+    margin: 0 0 10px;
+  }
+  .dim-chips:empty {
+    display: none;
+  }
+  .keep-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .status {
+    margin: 0;
+  }
+  .status.trouble {
+    color: var(--accent);
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--muted);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.45;
+  }
+  .chip.accent:disabled {
+    opacity: 0.8;
+  }
+
+  /* the drawing's inks: classes, so the theme repaints it without a line of script */
+  .f-ink {
+    fill: var(--ink);
+  }
+  .f-muted {
+    fill: var(--muted);
+  }
+  .f-faint {
+    fill: var(--faint);
+  }
+  .row-line {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    opacity: 0.8;
+  }
+  .row-line.hollow {
+    stroke-dasharray: 2 3.5;
+    opacity: 0.6;
+  }
+  .tick {
+    stroke: var(--faint);
+    stroke-width: 0.7;
+    opacity: 0.8;
+  }
+  .gap-fill {
+    fill: var(--ink);
+    opacity: 0.06;
+  }
+  .gap-hatch {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    opacity: 0.6;
+  }
+  .line-real {
+    fill: var(--ink);
+  }
+  .line-ideal {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    stroke-dasharray: 3 2.5;
+  }
+  .mark-real {
+    fill: var(--ink);
+  }
+  .mark-ideal {
+    fill: var(--surface);
+    stroke: var(--ink);
+    stroke-width: 1.1;
+  }
+  .trace-real {
+    fill: var(--faint);
+    opacity: 0.5;
+  }
+  .trace-ideal {
+    fill: var(--surface);
+    stroke: var(--faint);
+    stroke-width: 0.9;
+    opacity: 0.6;
+  }
+  .trace-line {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+  .trace-line.ideal {
+    stroke-dasharray: 2.5 2.5;
+  }
+  .g-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .g-mono {
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    fill: var(--faint);
+  }
+  .halo {
+    stroke: var(--surface);
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+  /* A row's marks and gap come up from the sheet when it is set down. */
+  .fn-mark {
+    animation: fn-rise 560ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+  @keyframes fn-rise {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .fn-row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .still {
+    animation: none;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+  footer .meta {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (min-width: 640px) {
+    .sheet {
+      padding: 28px;
+    }
+  }
+  @media (max-width: 520px) {
+    .ends {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .w {
+      width: 23px;
+      font-size: 11px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .room {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  @media (max-width: 820px) {
+    .mast {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-block: 44px 28px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .fn-row,
+    .fn-mark,
+    .sketch .mask-line {
+      animation: none;
+    }
+    .sketch .mask-line {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Real, Ideal</h1>
+      <p class="deck">
+        <em
+          >The distance between who you say you are and who you say you mean to
+          be is a surface to walk, not a deficit to close.</em
+        >
+        This sheet draws it, so you can see where it is wide, where it is
+        narrow, and which way you have been walking.
+      </p>
+    </div>
+    <div>
+      <p class="lede">
+        You name a handful of dimensions in your own words, and both ends of
+        each line. On each you write one line of the real and one of the ideal,
+        and place them from 0 to 10. The page draws the two profiles, shades the
+        gap between, lays your earlier sheets under as faint traces, and counts
+        what is there. You decide what to do about one gap; later you say how it
+        went. It opens on a specimen: three dated sheets of one person who never
+        existed. Make your own, and what you set down stays in this browser.
+      </p>
+    </div>
+  </header>
+
+  <div class="room">
+    <section class="panel sheet" id="sheet" aria-label="The sheet">
+      <div class="sheet-head">
+        <p class="meta" id="sheetMeta"></p>
+        <div class="head-acts" id="headActs"></div>
+      </div>
+      <p class="hand spec-note" id="specNote" hidden>
+        <b>A specimen.</b> Three sheets, June to September, of a bookbinder who
+        never existed, there to read before you write. They can't be changed;
+        make your own to draw something of yours.
+      </p>
+      <p class="hand carried" id="carried" hidden></p>
+
+      <div class="move">
+        <p class="meta accent">set down</p>
+        <textarea
+          class="case set-line"
+          id="setDown"
+          data-f="set"
+          rows="1"
+          placeholder="this sheet, in a line: who, and when"
+          aria-label="Set down"
+        ></textarea>
+        <p class="meta under" id="setMeta"></p>
+        <div class="dims-wrap">
+          <p class="hand note">
+            its dimensions, in your words. for each: a name, what 0 means and
+            what 10 means, one line of the real and one of the ideal, and where
+            each sits.
+          </p>
+          <ol class="dims" id="dims"></ol>
+          <div class="row-add" id="dimAdd">
+            <input
+              class="case dim-name"
+              id="newDim"
+              data-f="new-dim"
+              placeholder="a dimension"
+              aria-label="A dimension to add"
+            />
+            <span class="meta">enter adds it</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">draw it</p>
+        <div class="draw-box">
+          <svg id="drawing" viewBox="0 0 360 70" role="img"></svg>
+        </div>
+        <p class="hand drawn" id="drawn"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">read back</p>
+        <p class="readback" id="readBack"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">call</p>
+        <div
+          class="dim-chips"
+          id="callDims"
+          role="group"
+          aria-label="Which gap the call is about"
+        ></div>
+        <textarea
+          class="case prose"
+          id="call"
+          data-f="call"
+          rows="1"
+          placeholder="what you decide to do about one gap"
+          aria-label="The call"
+        ></textarea>
+        <p class="meta under" id="callMeta"></p>
+      </div>
+
+      <div class="move">
+        <p class="meta accent">afterwards</p>
+        <textarea
+          class="case prose"
+          id="after"
+          data-f="after"
+          rows="1"
+          placeholder="how it went"
+          aria-label="Afterwards"
+        ></textarea>
+        <p class="meta under" id="afterMeta"></p>
+        <p class="hand note" id="carryNext" hidden></p>
+      </div>
+
+      <div class="keep-row" id="keepRow"></div>
+    </section>
+
+    <aside class="desk">
+      <section class="panel" id="readingPanel" aria-label="The reading">
+        <p class="meta accent">the reading</p>
+        <p class="desk-text" id="reading"></p>
+      </section>
+      <section class="panel" id="recordPanel" aria-label="The record">
+        <p class="meta accent">the record</p>
+        <p class="desk-text" id="recordText"></p>
+        <div id="recordList"></div>
+      </section>
+      <section
+        class="panel"
+        id="lawsPanel"
+        aria-label="What Real, Ideal holds to"
+      >
+        <p class="meta accent">what real, ideal holds to</p>
+        <p class="desk-text">
+          You name the dimensions and both ends of every line, write the real
+          and the ideal in your own words, and place each from 0 to 10. The page
+          draws the two profiles to scale on your numbers, shades what lies
+          between them, lays your earlier sheets under as faint traces, and
+          counts: how many dimensions, which gap is widest and which narrowest
+          by your own numbers, how many moved since the last sheet and which
+          way, and the days. You decide what to do about one gap, and say
+          afterwards how it went; the page dates both.
+        </p>
+        <p class="desk-text">
+          It never says a gap is a problem, never says which to close or which
+          way to walk, never puts one dimension above another, and never asks a
+          model. A wide gap is a distance and a narrow one is a distance; the
+          page measures them on your scale and leaves the weighing to you.
+          Nothing is fetched and nothing is sent.
+        </p>
+        <p class="meta" id="keptWhere"></p>
+      </section>
+      <section class="panel" id="afterPanel" aria-label="Afterwards">
+        <p class="meta accent">afterwards</p>
+        <p class="desk-text hand" id="afterText"></p>
+        <p class="meta after-days" id="afterDays"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Real, Ideal · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────────
+     Three sheets of a bookbinder who never existed: one at the bench in early June, one in
+     August after the fair, one at the end of September. The same five dimensions, give or
+     take one, so the traces show. Fiction, all of it. */
+  const SPECIMEN = {
+    title: "Specimen A",
+    sheets: [
+      {
+        slug: "specimen-a-2026-06-02",
+        set: "Me, at the bench, early June",
+        setOn: "2026-06-02",
+        dims: [
+          {
+            name: "patience with slow work",
+            lo: "rushes the last stitch",
+            hi: "lets it take what it takes",
+            real: "I finish fast and badly when the shop is quiet.",
+            realAt: 4,
+            ideal: "The last stitch as careful as the first.",
+            idealAt: 9,
+          },
+          {
+            name: "saying no",
+            lo: "takes every job that comes in",
+            hi: "takes only the ones I want",
+            real: "I said yes to three photo albums I did not want.",
+            realAt: 2,
+            ideal: "A no that costs me an hour, not a month.",
+            idealAt: 7,
+          },
+          {
+            name: "money",
+            lo: "doesn't look at the account",
+            hi: "knows the number every Monday",
+            real: "I look when the card is refused.",
+            realAt: 3,
+            ideal: "Know it before it is a surprise.",
+            idealAt: 7,
+          },
+          {
+            name: "time with my brother",
+            lo: "a call at Christmas",
+            hi: "a walk every month",
+            real: "Two calls this year, both about our mother.",
+            realAt: 5,
+            ideal: "A walk, without an occasion.",
+            idealAt: 8,
+          },
+        ],
+        callDim: "money",
+        call: "Open the account every Monday before the shop opens, and write the number on the wall calendar.",
+        calledOn: "2026-06-03",
+        after:
+          "Seven Mondays done, two missed. The number stopped being a surprise around the fifth.",
+        afterOn: "2026-08-18",
+      },
+      {
+        slug: "specimen-a-2026-08-20",
+        set: "Me, in August, after the fair",
+        setOn: "2026-08-20",
+        dims: [
+          {
+            name: "patience with slow work",
+            lo: "rushes the last stitch",
+            hi: "lets it take what it takes",
+            real: "Better when there is a queue, worse when there isn't.",
+            realAt: 5,
+            ideal: "The last stitch as careful as the first.",
+            idealAt: 9,
+          },
+          {
+            name: "saying no",
+            lo: "takes every job that comes in",
+            hi: "takes only the ones I want",
+            real: "Took the albums again. Said no to a wedding, once.",
+            realAt: 2,
+            ideal: "A no that costs me an hour, not a month.",
+            idealAt: 8,
+          },
+          {
+            name: "money",
+            lo: "doesn't look at the account",
+            hi: "knows the number every Monday",
+            real: "Mondays, mostly. The calendar has numbers on it.",
+            realAt: 6,
+            ideal: "Know it before it is a surprise.",
+            idealAt: 7,
+          },
+          {
+            name: "time with my brother",
+            lo: "a call at Christmas",
+            hi: "a walk every month",
+            real: "One call. He asked about a walk; I said after the fair.",
+            realAt: 4,
+            ideal: "A walk, without an occasion.",
+            idealAt: 8,
+          },
+          {
+            name: "the garden",
+            lo: "left to itself",
+            hi: "kept, every week",
+            real: "Nettles to the shed door.",
+            realAt: 2,
+            ideal: "Enough kept that I sit in it.",
+            idealAt: 5,
+          },
+        ],
+        callDim: "time with my brother",
+        call: "Ask him for a walk on the first Sunday of September, and go whatever the weather.",
+        calledOn: "2026-08-21",
+        after:
+          "It rained. We sat in his kitchen for two hours instead; it counted.",
+        afterOn: "2026-09-07",
+      },
+      {
+        slug: "specimen-a-2026-09-28",
+        set: "Me, end of September",
+        setOn: "2026-09-28",
+        dims: [
+          {
+            name: "patience with slow work",
+            lo: "rushes the last stitch",
+            hi: "lets it take what it takes",
+            real: "The last stitch is slower now. Not careful yet; slower.",
+            realAt: 6,
+            ideal: "The last stitch as careful as the first.",
+            idealAt: 8,
+          },
+          {
+            name: "saying no",
+            lo: "takes every job that comes in",
+            hi: "takes only the ones I want",
+            real: "Two nos this month, both by email, both felt for an hour.",
+            realAt: 4,
+            ideal: "A no that costs me an hour, not a month.",
+            idealAt: 8,
+          },
+          {
+            name: "money",
+            lo: "doesn't look at the account",
+            hi: "knows the number every Monday",
+            real: "Mondays, mostly. The calendar has numbers on it.",
+            realAt: 6,
+            ideal: "Know it before it is a surprise.",
+            idealAt: 7,
+          },
+          {
+            name: "time with my brother",
+            lo: "a call at Christmas",
+            hi: "a walk every month",
+            real: "Nothing since the kitchen.",
+            realAt: 3,
+            ideal: "A walk, without an occasion.",
+            idealAt: 8,
+          },
+          {
+            name: "the garden",
+            lo: "left to itself",
+            hi: "kept, every week",
+            real: "The path is clear to the shed.",
+            realAt: 3,
+            ideal: "Enough kept that I sit in it.",
+            idealAt: 6,
+          },
+        ],
+        callDim: "saying no",
+        call: "Say no to the next repair that comes in by email, whatever it is, and see what the week does.",
+        calledOn: "2026-09-30",
+        after:
+          "Said no to a photo album on the Thursday. Felt it for an hour. The week had a Friday in it.",
+        afterOn: "2026-10-02",
+      },
+    ],
+  };
+
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-real-ideal";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "real-ideal";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  /* ── the sheet ────────────────────────────────────────────────────────────
+     What one sheet holds: a line saying who and when, and its day; its dimensions, each a
+     name, the two ends of its line, one line of the real and where it sits from 0 to 10, one
+     line of the ideal and where it sits; which gap the call is about, the call and its day;
+     the afterwards and its day. A mark not yet placed is null. The days are the machine's;
+     every word and number is the reader's. */
+
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+  const MAX_DIMS = 12;
+
+  const emptySheet = () => ({
+    slug: "",
+    set: "",
+    setOn: "",
+    dims: [],
+    callDim: "",
+    call: "",
+    calledOn: "",
+    after: "",
+    afterOn: "",
+  });
+
+  const emptyDim = (name = "", lo = "", hi = "") => ({
+    name,
+    lo,
+    hi,
+    real: "",
+    realAt: null,
+    ideal: "",
+    idealAt: null,
+  });
+
+  /* A sheet's title is the first line of what was set down, trimmed to 56 characters. */
+  const titleOf = (set) => {
+    const line = String(set).trim().split("\n")[0].trim();
+    return line.length <= 56 ? line : line.slice(0, 56).trimEnd();
+  };
+
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max).replace(/\s+\S*$/, "")}…`;
+
+  /* Dimensions on different sheets are the same dimension when their names match, trimmed
+     and lowercased. The reader's spelling is kept; only the match ignores it. */
+  const keyOf = (name) => String(name).trim().toLowerCase().replace(/\s+/g, " ");
+
+  const placed = (d) => d.realAt !== null && d.idealAt !== null;
+  const gapOf = (d) => Math.abs(d.realAt - d.idealAt);
+
+  /* A row read back from storage, checked field by field; null if any part of it is not
+     the shape a sheet has. Strings are strings, days are DAY-shaped, dimensions are an array
+     of the seven fields with each mark an integer 0–10 or null. A bad row is dropped, never
+     repaired. */
+  function validateSheet(r) {
+    if (!r || typeof r !== "object") return null;
+    const str = (v, max) => (typeof v === "string" ? v.slice(0, max) : null);
+    const dayOrNone = (v) =>
+      v == null || v === ""
+        ? ""
+        : typeof v === "string" && DAY.test(v)
+          ? v
+          : null;
+    const mark = (v) =>
+      v == null
+        ? null
+        : Number.isInteger(v) && v >= 0 && v <= 10
+          ? v
+          : undefined;
+    const set = str(r.set, 4000);
+    if (set === null || !set.trim()) return null;
+    const setOn =
+      typeof r.setOn === "string" && DAY.test(r.setOn) ? r.setOn : null;
+    if (!setOn) return null;
+    if (!Array.isArray(r.dims)) return null;
+    const dims = [];
+    for (const d of r.dims.slice(0, MAX_DIMS)) {
+      if (!d || typeof d !== "object") return null;
+      const name = str(d.name ?? "", 120);
+      const lo = str(d.lo ?? "", 120);
+      const hi = str(d.hi ?? "", 120);
+      const real = str(d.real ?? "", 400);
+      const ideal = str(d.ideal ?? "", 400);
+      const realAt = mark(d.realAt);
+      const idealAt = mark(d.idealAt);
+      if (
+        [name, lo, hi, real, ideal].includes(null) ||
+        realAt === undefined ||
+        idealAt === undefined
+      )
+        return null;
+      dims.push({ name, lo, hi, real, realAt, ideal, idealAt });
+    }
+    const callDim = str(r.callDim ?? "", 120);
+    const call = str(r.call ?? "", 4000);
+    const after = str(r.after ?? "", 4000);
+    let calledOn = dayOrNone(r.calledOn);
+    let afterOn = dayOrNone(r.afterOn);
+    if (
+      callDim === null ||
+      call === null ||
+      after === null ||
+      calledOn === null ||
+      afterOn === null
+    )
+      return null;
+    if (!call.trim()) calledOn = "";
+    else if (!calledOn) calledOn = setOn;
+    if (!after.trim() || !calledOn) afterOn = "";
+    else if (!afterOn) afterOn = calledOn;
+    const slug = str(r.slug, 120) || slugOf(titleOf(set), setOn);
+    if (!SLUG.test(slug)) return null;
+    return {
+      slug,
+      set,
+      setOn,
+      dims,
+      callDim,
+      call,
+      calledOn,
+      after,
+      afterOn,
+    };
+  }
+
+  /* The sheets that came before this one in the same record, oldest first: the specimen's
+     other sheets for the specimen, the reader's own for the reader's own. A sheet not yet
+     dated counts as today's. */
+  function earlierOf(sheet, pool) {
+    const day = sheet.setOn || TODAY;
+    return pool
+      .filter((x) => x.slug !== sheet.slug && x.setOn <= day)
+      .sort((a, b) =>
+        a.setOn !== b.setOn
+          ? a.setOn < b.setOn
+            ? -1
+            : 1
+          : a.slug < b.slug
+            ? -1
+            : 1,
+      );
+  }
+
+  /* The widest and narrowest gaps, by the reader's own numbers: the distance and the names
+     of the dimensions at it. Ties are all named. */
+  function extremes(dims) {
+    const full = dims.filter(placed);
+    if (!full.length) return null;
+    const gaps = full.map(gapOf);
+    const max = Math.max(...gaps);
+    const min = Math.min(...gaps);
+    const at = (g) =>
+      full.filter((d) => gapOf(d) === g).map((d) => d.name.trim() || "unnamed");
+    return { n: full.length, max, min, widest: at(max), narrowest: at(min) };
+  }
+
+  /* Movement since the last sheet, matched by name: how many dimensions have a different
+     mark, and on how many the gap is narrower, wider or as it was. A dimension not on the
+     last sheet is new; a mark not placed on either is not a move. */
+  function movement(sheet, last) {
+    if (!last) return null;
+    const out = {
+      matched: 0,
+      moved: 0,
+      narrower: 0,
+      wider: 0,
+      same: 0,
+      fresh: 0,
+      days: daysBetween(last.setOn, sheet.setOn || TODAY),
+    };
+    for (const d of sheet.dims) {
+      const k = keyOf(d.name);
+      if (!k) continue;
+      const m = last.dims.find((x) => keyOf(x.name) === k);
+      if (!m) {
+        out.fresh++;
+        continue;
+      }
+      out.matched++;
+      const movedHere =
+        (d.realAt !== null && m.realAt !== null && d.realAt !== m.realAt) ||
+        (d.idealAt !== null && m.idealAt !== null && d.idealAt !== m.idealAt);
+      if (movedHere) out.moved++;
+      if (placed(d) && placed(m)) {
+        const g = gapOf(d);
+        const g0 = gapOf(m);
+        if (g < g0) out.narrower++;
+        else if (g > g0) out.wider++;
+        else out.same++;
+      }
+    }
+    return out;
+  }
+
+  /* Counts and days for one sheet. Nothing here is a judgement: how many, how far apart by
+     the reader's numbers, how long ago, what is there and what is not yet. */
+  function tally(sheet, today, last) {
+    const called = !!sheet.calledOn && !!sheet.call.trim();
+    const after = called && !!sheet.afterOn && !!sheet.after.trim();
+    return {
+      dims: sheet.dims.length,
+      hollow: sheet.dims.filter((d) => !placed(d)).length,
+      ext: extremes(sheet.dims),
+      move: movement(sheet, last),
+      daysSince: sheet.setOn ? daysBetween(sheet.setOn, today) : null,
+      called,
+      after,
+      daysToAfter: after ? daysBetween(sheet.calledOn, sheet.afterOn) : null,
+    };
+  }
+
+  const ago = (what, k) =>
+    k === 0
+      ? `${what} today`
+      : k === 1
+        ? `${what} yesterday`
+        : `${what} ${plural(k, "day")} ago`;
+
+  const names = (xs) =>
+    xs.length <= 2
+      ? xs.join(" and ")
+      : `${xs[0]}, ${xs[1]} and ${xs.length - 2} more`;
+
+  /**
+   * The reading: facts about one sheet, in the order the sheet asks for them. How many
+   * dimensions and how many hollow; which gap is widest and which narrowest, by the reader's
+   * own numbers, named and not judged; what moved since the last sheet and which way; how
+   * long since it was set down; whether it has been called, about which gap, and when;
+   * whether there is an afterwards, and how long after the call. Never a verdict and never
+   * a suggestion. The reading says what is on the sheet, and says nothing about whether a
+   * gap is good or bad, which one to close, or what to do next.
+   */
+  function readings(sheet, today, last) {
+    const t = tally(sheet, today, last);
+    const out = [];
+    out.push(
+      t.dims
+        ? `${plural(t.dims, "dimension")}${t.hollow ? `, ${t.hollow} hollow` : ""}`
+        : "no dimensions yet",
+    );
+    if (t.ext) {
+      const e = t.ext;
+      if (e.n === 1 || e.max === e.min)
+        out.push(
+          e.n === 1
+            ? `${e.widest[0]}: ${e.max} apart`
+            : `every gap ${e.max} apart`,
+        );
+      else {
+        out.push(`widest gap ${e.max} apart, on ${names(e.widest)}`);
+        out.push(`narrowest ${e.min} apart, on ${names(e.narrowest)}`);
+      }
+    }
+    if (t.dims) {
+      const m = t.move;
+      if (!m) out.push("no earlier sheet to trace");
+      else if (!m.matched)
+        out.push(
+          `nothing shared with the sheet of ${dayWords(last.setOn)}` +
+            (m.fresh ? `, ${m.fresh} new` : ""),
+        );
+      else {
+        let s = `since ${dayWords(last.setOn)}: ${m.moved} of ${m.matched} moved`;
+        if (m.narrower || m.wider)
+          s += `, gap narrower on ${m.narrower}, wider on ${m.wider}`;
+        else if (m.same) s += ", every gap as it was";
+        if (m.fresh) s += `, ${m.fresh} new`;
+        out.push(s);
+      }
+    }
+    out.push(
+      t.daysSince === null ? "not set down yet" : ago("set down", t.daysSince),
+    );
+    out.push(
+      t.called
+        ? ago("called", daysBetween(sheet.calledOn, today)) +
+            (sheet.callDim.trim() ? ` about ${sheet.callDim.trim()}` : "")
+        : "not yet called",
+    );
+    if (t.after)
+      out.push(
+        t.daysToAfter === 0
+          ? "afterwards, the same day as the call"
+          : `afterwards ${plural(t.daysToAfter, "day")} after the call`,
+      );
+    return out;
+  }
+
+  /* ── the drawing ──────────────────────────────────────────────────────────
+     One line per dimension, 0 at the left and 10 at the right, the reader's own words at
+     the ends. The real sits on it as a solid mark in ink, the ideal as a ring in pencil; two
+     polylines run down the rows, one through each, and the distance between them is hatched
+     on the row and shaded between rows. Earlier sheets lie under as faint traces, the last
+     of them with its own thin lines. A row with a mark not yet placed is drawn hollow. Strokes
+     are seeded by the dimension's name, so the same dimension is drawn the same way every
+     time. Nothing here is kept; it is drawn again from the sheet. */
+
+  const DW = 360;
+  const X0 = 18;
+  const X1 = DW - 18;
+  const ROW = 50;
+  const TOP = 8;
+  const SCALE_H = 30;
+  const SHOWN = MAX_DIMS;
+  const xAt = (v) => X0 + ((X1 - X0) * v) / 10;
+
+  function drawProfiles(sheet, earlier) {
+    const svg = document.getElementById("drawing");
+    const dims = sheet.dims.slice(0, SHOWN);
+    const n = dims.length;
+    const bodyH = n ? n * ROW : 40;
+    const h = TOP + bodyH + (n ? SCALE_H : 24);
+    svg.setAttribute("viewBox", `0 0 ${DW} ${h}`);
+    const lineY = (i) => TOP + i * ROW + 26;
+    let rows = "";
+    let gaps = "";
+    let traces = "";
+    let lines = "";
+    let marks = "";
+    let labels = "";
+
+    dims.forEach((d, i) => {
+      const seed = seedOf(d.name.trim() || `dimension ${i + 1}`);
+      const r = rand(seed);
+      const y = lineY(i);
+      const full = placed(d);
+      rows += `<path class="row-line${full ? "" : " hollow"}" d="${stroke([X0, y], [X1, y], r, 0.5, 0)}"/>`;
+      for (let k = 0; k <= 10; k++) {
+        const x = fx(xAt(k));
+        rows += `<line class="tick" x1="${x}" x2="${x}" y1="${y - (k % 5 ? 2 : 3.5)}" y2="${y + (k % 5 ? 2 : 3.5)}"/>`;
+      }
+      if (full && d.realAt !== d.idealAt) {
+        const a = Math.min(d.realAt, d.idealAt);
+        const b = Math.max(d.realAt, d.idealAt);
+        let hatch = "";
+        for (let x = xAt(a) + 2.5; x <= xAt(b) - 2; x += 4.2)
+          hatch += stroke([x, y + 4.5], [x + 3.5, y - 4.5], r, 0.35, 0);
+        gaps += `<g class="fn-mark" style="--i:${i}"><path class="gap-hatch" d="${hatch}"/></g>`;
+      }
+      labels +=
+        `<text class="g-hand halo f-ink" x="${X0}" y="${y - 9}" font-size="12.5" stroke-width="3">${esc(clip(d.name.trim() || "unnamed", 44))}</text>` +
+        `<text class="g-mono halo" x="${X0}" y="${y + 14}" font-size="7.5" stroke-width="2">${esc(clip(d.lo.trim() || "0", 26))}</text>` +
+        `<text class="g-mono halo" x="${X1}" y="${y + 14}" text-anchor="end" font-size="7.5" stroke-width="2">${esc(clip(d.hi.trim() || "10", 26))}</text>`;
+    });
+
+    /* the shaded surface between the rows */
+    for (let i = 0; i + 1 < n; i++) {
+      const a = dims[i];
+      const b = dims[i + 1];
+      if (!placed(a) || !placed(b)) continue;
+      const y0 = lineY(i);
+      const y1 = lineY(i + 1);
+      gaps =
+        `<path class="gap-fill" d="M${fx(xAt(a.realAt))} ${y0}L${fx(xAt(b.realAt))} ${y1}L${fx(xAt(b.idealAt))} ${y1}L${fx(xAt(a.idealAt))} ${y0}Z"/>` +
+        gaps;
+    }
+
+    /* traces: every earlier sheet's marks, faint; the last one's lines too */
+    const shown = earlier.slice(-6);
+    shown.forEach((e, k) => {
+      const isLast = k === shown.length - 1;
+      const rs = rand(seedOf(`trace-${e.slug}`));
+      let prevR = null;
+      let prevI = null;
+      dims.forEach((d, i) => {
+        const key = keyOf(d.name);
+        const m = key ? e.dims.find((x) => keyOf(x.name) === key) : null;
+        const y = lineY(i);
+        const cr = m && m.realAt !== null ? [xAt(m.realAt), y] : null;
+        const ci = m && m.idealAt !== null ? [xAt(m.idealAt), y] : null;
+        if (isLast) {
+          if (prevR && cr)
+            traces += `<path class="trace-line" d="${stroke(prevR, cr, rs, 0.6, 0)}"/>`;
+          if (prevI && ci)
+            traces += `<path class="trace-line ideal" d="${stroke(prevI, ci, rs, 0.6, 0)}"/>`;
+        }
+        if (cr)
+          traces += `<circle class="trace-real" cx="${fx(cr[0])}" cy="${fx(cr[1])}" r="2.3"/>`;
+        if (ci)
+          traces += `<circle class="trace-ideal" cx="${fx(ci[0])}" cy="${fx(ci[1])}" r="2.9"/>`;
+        prevR = cr;
+        prevI = ci;
+      });
+    });
+
+    /* this sheet's two profiles, and the marks */
+    const rl = rand(seedOf(`${sheet.slug || "fresh"}-lines`));
+    for (let i = 0; i + 1 < n; i++) {
+      const a = dims[i];
+      const b = dims[i + 1];
+      const y0 = lineY(i);
+      const y1 = lineY(i + 1);
+      if (a.realAt !== null && b.realAt !== null)
+        lines += `<path class="line-real" d="${ribbon(stroke([xAt(a.realAt), y0], [xAt(b.realAt), y1], rl, 0.9, 0), 1.5, seedOf(`real-${i}`))}"/>`;
+      if (a.idealAt !== null && b.idealAt !== null)
+        lines += `<path class="line-ideal" d="${stroke([xAt(a.idealAt), y0], [xAt(b.idealAt), y1], rl, 0.9, 0)}"/>`;
+    }
+    dims.forEach((d, i) => {
+      const y = lineY(i);
+      const seed = seedOf(d.name.trim() || `dimension ${i + 1}`);
+      let g = "";
+      if (d.idealAt !== null)
+        g += `<path class="mark-ideal" transform="translate(${fx(xAt(d.idealAt) - 4)} ${fx(y - 4)})" d="${roughEllipse(8, 8, seed, { wobble: 0.45, pad: 0, steps: 10 })}"/>`;
+      if (d.realAt !== null)
+        g += `<circle class="mark-real" cx="${fx(xAt(d.realAt))}" cy="${fx(y)}" r="3.3"/>`;
+      if (g) marks += `<g class="fn-mark" style="--i:${i}">${g}</g>`;
+    });
+
+    let out = rows + gaps + traces + `<g class="fn-mark" style="--i:${n}">${lines}</g>` + marks + labels;
+    if (!n)
+      out += `<text class="g-hand f-muted" x="${DW / 2}" y="${TOP + 26}" font-size="13.5" text-anchor="middle">nothing to draw yet</text>`;
+    else {
+      const sy = TOP + bodyH + 12;
+      for (let k = 0; k <= 10; k++)
+        out += `<text class="g-mono" x="${fx(xAt(k))}" y="${sy}" text-anchor="middle" font-size="8.5">${k}</text>`;
+    }
+    svg.innerHTML = out;
+    const hollow = dims.filter((d) => !placed(d)).length;
+    svg.setAttribute(
+      "aria-label",
+      n
+        ? `${plural(n, "dimension")} from 0 to 10, the real in ink and the ideal in pencil, ${hollow} hollow, ${plural(shown.length, "earlier sheet")} traced`
+        : "a line from 0 to 10 with nothing on it",
+    );
+  }
+
+  /* What the drawing shows, in words, under it. */
+  function drawn(sheet, earlier) {
+    const n = sheet.dims.length;
+    if (!n) return "a line from 0 to 10, and nothing on it yet";
+    const hollow = sheet.dims.filter((d) => !placed(d)).length;
+    return (
+      `${plural(n, "dimension")}: real in ink, ideal in pencil, the gap hatched` +
+      (hollow ? `, ${hollow} hollow` : "") +
+      (earlier.length
+        ? ` · ${plural(Math.min(earlier.length, 6), "earlier sheet")} traced faint`
+        : "")
+    );
+  }
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const $ = (s) => document.querySelector(s);
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const TODAY = localToday();
+
+  const S = {
+    own: [],
+    last: "",
+    open: emptySheet(),
+    specimen: false,
+    kept: false,
+    sure: false,
+    status: "",
+    trouble: false,
+    from: "",
+    next: "",
+    seen: new Set(),
+    deskSeen: new Set(),
+  };
+
+  /* entrances: a row animates the first time it is drawn for this sheet, never again */
+  function enter(set, key) {
+    if (set.has(key)) return " still";
+    set.add(key);
+    return "";
+  }
+
+  function sortOwn() {
+    S.own.sort((a, b) =>
+      a.setOn !== b.setOn
+        ? a.setOn < b.setOn
+          ? 1
+          : -1
+        : a.slug < b.slug
+          ? -1
+          : a.slug > b.slug
+            ? 1
+            : 0,
+    );
+  }
+
+  const pool = () => (S.specimen ? SPECIMEN.sheets : S.own);
+
+  /* ── the hand-drawn border on a panel ─────────────────────────────────── */
+
+  let maskN = 0;
+  function sketch(host, seed) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    host.prepend(svg);
+    let size = [0, 0];
+    const draw = () => {
+      const [w, h] = size;
+      if (!w || !h) return;
+      const s = seedOf(host.dataset.seed || seed);
+      const line = roughRect(w, h, s);
+      const id = `m${++maskN}`;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML =
+        `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+        `<path class="mask-line" d="${line}" pathLength="1" stroke-width="7.4"/></mask></defs>` +
+        `<path class="ink" d="${ribbon(line, 1.7, s)}" mask="url(#${id})"/>`;
+    };
+    new ResizeObserver(() => {
+      const next = [host.offsetWidth, host.offsetHeight];
+      if (next[0] === size[0] && next[1] === size[1]) return;
+      size = next;
+      draw();
+    }).observe(host);
+    host._redraw = draw;
+  }
+
+  /* ── rendering ───────────────────────────────────────────────────────── */
+
+  const chip = (text, act, { accent = false, disabled = false } = {}) =>
+    `<button type="button" class="chip${accent ? " accent" : ""}" data-act="${act}"${disabled ? " disabled" : ""}>${esc(text)}</button>`;
+
+  /* A textarea as tall as what is in it. */
+  const grow = (el) => {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  function metaLine() {
+    const o = S.open;
+    if (S.specimen)
+      return `the specimen · fiction · read only · ${dayWords(o.setOn)}`;
+    if (S.kept) return `a sheet · set down ${dayWords(o.setOn)}`;
+    return o.setOn ? `now · set down ${dayWords(o.setOn)}` : "now";
+  }
+
+  /* One dimension on the sheet: its name and the cross, the two ends, then the real and
+     the ideal, each a line and a row of eleven places. */
+  function dimRow(d, i, ro) {
+    const nm = d.name.trim() || `dimension ${i + 1}`;
+    const inp = (cls, f, v, ph, label) =>
+      `<input class="case ${cls}" data-f="${f}" data-i="${i}" value="${esc(v)}" placeholder="${ph}"${ro ? " readonly" : ""} aria-label="${esc(label)}" />`;
+    const scale = (f, at) =>
+      `<span class="scale" role="group" aria-label="Where the ${f} of ${esc(nm)} sits, 0 to 10">` +
+      Array.from(
+        { length: 11 },
+        (_, k) =>
+          `<button type="button" class="w${at === k ? " on" : ""}" data-act="place" data-side="${f}" data-i="${i}" data-v="${k}" aria-pressed="${at === k}"${ro ? " disabled" : ""}>${k}</button>`,
+      ).join("") +
+      `</span>`;
+    return (
+      `<li class="dim fn-row${enter(S.seen, `dim-${i}-${d.name}`)}" style="--i:${i}">` +
+      `<div class="dim-head">` +
+      inp("dim-name", "dim-name", d.name, "a dimension, in your words", `Dimension ${i + 1}`) +
+      (ro
+        ? `<span></span>`
+        : `<button type="button" class="x" data-act="deldim" data-i="${i}" aria-label="Take this dimension off" title="take this dimension off">×</button>`) +
+      `</div>` +
+      `<div class="ends"><span class="meta">0 is</span>` +
+      inp("end", "dim-lo", d.lo, "one end, in your words", `What 0 means for ${nm}`) +
+      `<span class="meta">10 is</span>` +
+      inp("end", "dim-hi", d.hi, "the other", `What 10 means for ${nm}`) +
+      `</div>` +
+      `<div class="side"><span class="meta">real</span>` +
+      inp("line-in", "dim-real", d.real, "one line of the real", `The real, for ${nm}`) +
+      scale("real", d.realAt) +
+      `</div>` +
+      `<div class="side"><span class="meta">ideal</span>` +
+      inp("line-in", "dim-ideal", d.ideal, "one line of the ideal", `The ideal, for ${nm}`) +
+      scale("ideal", d.idealAt) +
+      `</div>` +
+      `</li>`
+    );
+  }
+
+  const dimNames = (dims) => {
+    const seen = new Set();
+    const out = [];
+    for (const d of dims) {
+      const t = d.name.trim();
+      const k = keyOf(t);
+      if (!k || seen.has(k)) continue;
+      seen.add(k);
+      out.push(t);
+    }
+    return out;
+  };
+
+  /* The sheet's words. The three textareas are in the markup and take their text through
+     .value; only the dimensions, the call's chips and the head are rebuilt. */
+  function renderSheet() {
+    const o = S.open;
+    const ro = S.specimen;
+    $("#sheetMeta").textContent = metaLine();
+    $("#headActs").innerHTML =
+      (S.specimen || S.kept ? chip("Make your own", "makeown") : "") +
+      (S.kept && !S.specimen && o.dims.length
+        ? chip("Again, same dimensions", "again")
+        : "");
+    $("#specNote").hidden = !S.specimen;
+    const carried = $("#carried");
+    carried.hidden = !S.from;
+    carried.textContent = S.from ? `Carried from ${S.from}` : "";
+
+    const set = $("#setDown");
+    if (set.value !== o.set) set.value = o.set;
+    set.readOnly = ro;
+
+    $("#dims").innerHTML = o.dims.map((d, i) => dimRow(d, i, ro)).join("");
+    $("#dimAdd").hidden = ro || o.dims.length >= MAX_DIMS;
+
+    const nms = dimNames(o.dims);
+    $("#callDims").innerHTML = nms.length
+      ? `<span class="meta">about</span>` +
+        nms
+          .map(
+            (nm) =>
+              `<button type="button" class="chip${keyOf(o.callDim) === keyOf(nm) ? " accent" : ""}" data-act="calldim" data-v="${esc(nm)}" aria-pressed="${keyOf(o.callDim) === keyOf(nm)}"${ro ? " disabled" : ""}>${esc(clip(nm, 30))}</button>`,
+          )
+          .join("")
+      : "";
+
+    const call = $("#call");
+    if (call.value !== o.call) call.value = o.call;
+    call.readOnly = ro;
+
+    const after = $("#after");
+    if (after.value !== o.after) after.value = o.after;
+    after.readOnly = ro;
+    after.disabled = !ro && !o.calledOn;
+    after.placeholder = after.disabled ? "after the call" : "how it went";
+
+    $("#keepRow").innerHTML = ro
+      ? ""
+      : chip("Keep", "keep", { accent: true }) +
+        (S.kept ? chip(S.sure ? "sure?" : "Let it go", "letgo") : "") +
+        `<p class="meta status${S.trouble ? " trouble" : ""}" id="status" role="status">${esc(S.status)}</p>`;
+    document.querySelectorAll("#sheet textarea").forEach(grow);
+  }
+
+  /* What follows every keystroke: the dates and counts, the drawing, the reading, the desk. */
+  function renderLive() {
+    const o = S.open;
+    const earlier = earlierOf(o, pool());
+    const last = earlier.length ? earlier[earlier.length - 1] : null;
+    const t = tally(o, TODAY, last);
+    $("#setMeta").textContent = [
+      o.setOn
+        ? `set down ${dayWords(o.setOn)}`
+        : "not dated until a word is written",
+      t.dims
+        ? `${plural(t.dims, "dimension")}${t.hollow ? `, ${t.hollow} hollow` : ""}`
+        : "no dimensions",
+    ].join(" · ");
+
+    drawProfiles(o, earlier);
+    $("#drawn").textContent = drawn(o, earlier);
+
+    const words = readings(o, TODAY, last).join(" · ");
+    $("#readBack").textContent = words;
+    $("#reading").textContent = words;
+
+    const about = o.callDim.trim() ? ` · about ${o.callDim.trim()}` : "";
+    $("#callMeta").textContent = t.called
+      ? `called ${dayWords(o.calledOn)}${about}`
+      : o.call.trim()
+        ? `dated when it is kept${about}`
+        : `dated on the first keystroke · unlocks afterwards${about}`;
+    $("#afterMeta").textContent = t.after
+      ? `${dayWords(o.afterOn)} · ${t.daysToAfter === 0 ? "the same day as the call" : `${plural(t.daysToAfter, "day")} after the call`}`
+      : t.called
+        ? "dated on the first keystroke"
+        : "after the call";
+
+    const carry = $("#carryNext");
+    carry.hidden = !S.next || S.specimen;
+    carry.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, o.set, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+
+    const after = $("#after");
+    const unlocked = !S.specimen && !!o.calledOn;
+    if (after.disabled === unlocked) {
+      after.disabled = !unlocked;
+      after.placeholder = unlocked ? "how it went" : "after the call";
+    }
+
+    /* the desk: afterwards */
+    $("#afterText").textContent = t.after
+      ? o.after
+      : t.called
+        ? "nothing written afterwards yet"
+        : "afterwards waits for the call";
+    $("#afterDays").textContent = t.after
+      ? t.daysToAfter === 0
+        ? "the same day as the call"
+        : `${plural(t.daysToAfter, "day")} after the call`
+      : "";
+
+    /* the desk: the record */
+    const own = S.own;
+    const called = own.filter((x) => x.calledOn).length;
+    const afters = own.filter((x) => x.afterOn).length;
+    $("#recordText").textContent = own.length
+      ? `${plural(own.length, "sheet")} of your own · ${called} called · ${afters} with an afterwards`
+      : "no sheets of your own yet";
+    const row = (x, i, spec) => {
+      const on = spec
+        ? S.specimen && S.open.slug === x.slug
+        : S.kept && !S.specimen && S.open.slug === x.slug;
+      const state = x.afterOn
+        ? "afterwards"
+        : x.calledOn
+          ? "called"
+          : "not yet called";
+      return (
+        `<li class="fn-row${enter(S.deskSeen, `${spec ? "s" : "o"}-${x.slug}`)}" style="--i:${i}">` +
+        `<button type="button" data-act="${spec ? "loadspec" : "load"}" data-v="${esc(x.slug)}"${on ? ' aria-current="true"' : ""}>` +
+        `<span class="meta">${esc(dayWords(x.setOn))} · ${plural(x.dims.length, "dimension")} · ${state}</span>` +
+        `<span class="rec-name">${esc(titleOf(x.set))}</span>` +
+        `</button></li>`
+      );
+    };
+    const spec = [...SPECIMEN.sheets].reverse();
+    $("#recordList").innerHTML =
+      `<div class="desk-group"><p class="meta">${esc(SPECIMEN.title)} · the specimen · fiction</p><ol>${spec
+        .map((x, i) => row(x, i, true))
+        .join("")}</ol></div>` +
+      (own.length
+        ? `<div class="desk-group"><p class="meta">yours</p><ol>${own
+            .slice(0, 40)
+            .map((x, i) => row(x, i, false))
+            .join("")}</ol></div>`
+        : "");
+
+    $("#keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+  }
+
+  function full(redraw = false) {
+    if (redraw) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `real-ideal-${S.specimen ? S.open.slug : S.open.slug || "fresh"}`;
+      sheet._redraw?.();
+    }
+    renderSheet();
+    renderLive();
+  }
+
+  /* ── opening, keeping, letting go ───────────────────────────────────── */
+
+  function fresh() {
+    S.open = emptySheet();
+    S.specimen = false;
+    S.kept = false;
+    S.sure = false;
+    S.status = "";
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    full(true);
+  }
+
+  /* A sheet of one's own on the same dimensions as the open one: the names and the ends
+     carried, the lines and the marks left for the reader. Not kept until Keep. */
+  function again() {
+    const dims = S.open.dims.map((d) => emptyDim(d.name, d.lo, d.hi));
+    fresh();
+    S.open.dims = dims;
+    full();
+  }
+
+  function loadSpecimen(slug) {
+    const x =
+      SPECIMEN.sheets.find((y) => y.slug === slug) ||
+      SPECIMEN.sheets[SPECIMEN.sheets.length - 1];
+    S.open = clone(x);
+    S.specimen = true;
+    S.kept = false;
+    S.sure = false;
+    S.status = "";
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    full(true);
+  }
+
+  function load(sheet) {
+    S.open = clone(sheet);
+    S.specimen = false;
+    S.kept = true;
+    S.sure = false;
+    S.status = `kept · set down ${dayWords(sheet.setOn)}`;
+    S.trouble = false;
+    S.from = "";
+    S.next = "";
+    S.seen = new Set();
+    if (S.last !== sheet.slug) {
+      S.last = sheet.slug;
+      persist({ sheets: S.own, last: S.last });
+    }
+    full(true);
+  }
+
+  /* A hand-off read from the address: a new sheet of the reader's own, the carried text in
+     the set-down field and nothing else, not kept until Keep. */
+  function carried(h) {
+    fresh();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) S.open.set = h.set;
+    full();
+  }
+
+  /* Write the open sheet. A fresh sheet whose slug is taken gets a numbered one; a kept sheet
+     is written in place. The specimen is never written. */
+  function save() {
+    if (S.specimen) return false;
+    const o = S.open;
+    if (!o.set.trim()) {
+      S.status = "nothing to keep yet — set the sheet down in a line first";
+      S.trouble = true;
+      return false;
+    }
+    if (!o.setOn) o.setOn = localToday();
+    if (!o.slug) {
+      const taken = new Set(S.own.map((x) => x.slug));
+      const base = slugOf(titleOf(o.set), o.setOn);
+      let slug = base;
+      let k = 2;
+      while (taken.has(slug)) slug = `${base}-${k++}`;
+      o.slug = slug;
+    }
+    const v = validateSheet(o);
+    if (!v) {
+      S.status = "not kept — the sheet is not the shape a sheet has";
+      S.trouble = true;
+      return false;
+    }
+    S.own = [v, ...S.own.filter((x) => x.slug !== v.slug)];
+    sortOwn();
+    S.last = v.slug;
+    const was = S.kept;
+    S.kept = true;
+    const ok = persist({ sheets: S.own, last: S.last });
+    S.status = ok
+      ? `kept · set down ${dayWords(v.setOn)}`
+      : "not kept — this browser would not hold it";
+    S.trouble = !ok;
+    if (!was) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `real-ideal-${v.slug}`;
+      sheet._redraw?.();
+    }
+    return ok;
+  }
+
+  function keep() {
+    save();
+    S.sure = false;
+    full();
+  }
+
+  /* A kept sheet is written again when a field is left, so a call is not lost. */
+  function commit() {
+    if (S.kept && !S.specimen) {
+      save();
+      renderLive();
+      const st = $("#status");
+      if (st) {
+        st.textContent = S.status;
+        st.classList.toggle("trouble", S.trouble);
+      }
+    }
+  }
+
+  function letGo() {
+    if (!S.kept || S.specimen) return;
+    if (!S.sure) {
+      S.sure = true;
+      renderSheet();
+      return;
+    }
+    const slug = S.open.slug;
+    S.own = S.own.filter((x) => x.slug !== slug);
+    if (S.last === slug) S.last = "";
+    persist({ sheets: S.own, last: S.last });
+    fresh();
+  }
+
+  /* a dimension, a mark or the call's gap: kept at once on a kept sheet */
+  function setDims(dims) {
+    S.open.dims = dims;
+    if (!S.open.setOn && dims.some((d) => d.name.trim()))
+      S.open.setOn = localToday();
+    if (S.kept) save();
+    renderSheet();
+    renderLive();
+  }
+
+  function addDim(name) {
+    const t = name.trim();
+    if (!t || S.specimen || S.open.dims.length >= MAX_DIMS) return;
+    setDims([...S.open.dims, emptyDim(t)]);
+    const el = $("#newDim");
+    el.value = "";
+    el.focus({ preventScroll: true });
+  }
+
+  function toSheet() {
+    const sheet = $("#sheet");
+    if (sheet.getBoundingClientRect().top < 0)
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* ── events ──────────────────────────────────────────────────────────── */
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    const act = b.dataset.act;
+    const i = +b.dataset.i;
+    if (act === "makeown") return fresh();
+    if (act === "again") return again();
+    if (act === "load") {
+      const x = S.own.find((y) => y.slug === b.dataset.v);
+      if (x) load(x);
+      return toSheet();
+    }
+    if (act === "loadspec") {
+      loadSpecimen(b.dataset.v);
+      return toSheet();
+    }
+    if (S.specimen) return;
+    if (act === "keep") return keep();
+    if (act === "letgo") return letGo();
+    if (act === "place") {
+      const f = b.dataset.side === "ideal" ? "idealAt" : "realAt";
+      const v = +b.dataset.v;
+      return setDims(
+        S.open.dims.map((d, k) =>
+          k === i ? { ...d, [f]: d[f] === v ? null : v } : d,
+        ),
+      );
+    }
+    if (act === "deldim")
+      return setDims(S.open.dims.filter((_, k) => k !== i));
+    if (act === "calldim") {
+      const v = b.dataset.v;
+      S.open.callDim = keyOf(S.open.callDim) === keyOf(v) ? "" : v;
+      if (S.kept) save();
+      renderSheet();
+      renderLive();
+    }
+  });
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    const k = el.dataset && el.dataset.f;
+    if (!k || !el.closest("#sheet")) return;
+    if (el.tagName === "TEXTAREA") grow(el);
+    if (k === "new-dim") return;
+    if (S.specimen) return;
+    const v = el.value;
+    const o = S.open;
+    if (k === "set") {
+      o.set = v;
+      // The machine dates the sheet on the first keystroke; the day is then the sheet's.
+      if (!o.setOn && v.trim()) o.setOn = localToday();
+    } else if (k === "call") {
+      o.call = v;
+      if (v.trim() && !o.calledOn) o.calledOn = localToday();
+      if (!v.trim()) {
+        o.calledOn = "";
+        o.after = "";
+        o.afterOn = "";
+        $("#after").value = "";
+      }
+    } else if (k === "after") {
+      o.after = v;
+      if (v.trim() && !o.afterOn) o.afterOn = localToday();
+      if (!v.trim()) o.afterOn = "";
+    } else if (k.startsWith("dim-")) {
+      const i = +el.dataset.i;
+      const f = k.slice(4);
+      o.dims = o.dims.map((d, j) => (j === i ? { ...d, [f]: v } : d));
+      if (!o.setOn && v.trim()) o.setOn = localToday();
+    }
+    if (S.sure) {
+      S.sure = false;
+      const lg = $('[data-act="letgo"]');
+      if (lg) lg.textContent = "Let it go";
+    }
+    renderLive();
+  });
+
+  document.addEventListener("focusout", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k || k === "new-dim" || !e.target.closest("#sheet")) return;
+    if (k === "dim-name" && !e.target.value.trim()) {
+      // A dimension with no name and nothing else on it is taken off when the field is left.
+      const i = +e.target.dataset.i;
+      const d = S.open.dims[i];
+      if (
+        d &&
+        !d.lo.trim() &&
+        !d.hi.trim() &&
+        !d.real.trim() &&
+        !d.ideal.trim() &&
+        d.realAt === null &&
+        d.idealAt === null
+      )
+        return setDims(S.open.dims.filter((_, j) => j !== i));
+    }
+    if (k.startsWith("dim-") && S.kept) {
+      // The call's chips follow a renamed dimension.
+      commit();
+      renderSheet();
+      return;
+    }
+    commit();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k || e.key !== "Enter" || e.isComposing) return;
+    if (k === "new-dim") {
+      e.preventDefault();
+      addDim(e.target.value);
+    } else if (k.startsWith("dim-")) {
+      e.preventDefault();
+      e.target.blur();
+    }
+  });
+
+  window.addEventListener("resize", () =>
+    document.querySelectorAll("#sheet textarea").forEach(grow),
+  );
+
+  /* ── open ────────────────────────────────────────────────────────────── */
+
+  function boot() {
+    const env = readStore();
+    const own = [];
+    for (const r of Array.isArray(env?.sheets) ? env.sheets : []) {
+      const v = validateSheet(r);
+      if (v && !own.some((x) => x.slug === v.slug)) own.push(v);
+    }
+    S.own = own;
+    sortOwn();
+    S.last = typeof env?.last === "string" ? env.last : "";
+    const h = fromHash();
+    if (h) return carried(h);
+    const wanted = S.own.find((x) => x.slug === S.last);
+    if (wanted) load(wanted);
+    else if (S.own.length) load(S.own[0]);
+    else loadSpecimen();
+  }
+
+  sketch($("#sheet"), "real-ideal-fresh");
+  document
+    .querySelectorAll(".desk .panel")
+    .forEach((p, i) =>
+      sketch(
+        p,
+        [
+          "real-ideal-reading",
+          "real-ideal-record",
+          "real-ideal-laws",
+          "real-ideal-after",
+        ][i],
+      ),
+    );
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
+</script>

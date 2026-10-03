@@ -1,0 +1,1386 @@
+<title>Circuits</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Three circuits through the instruments of the Center for Applied Post-Phenomenology: one thing, in your own words, carried from station to station, every call yours."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* capp:tokens begin */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #645e55;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d766a;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Layout: a rail laid across the page, three times. Ink on bone. The one accent is the label
+     of each station and the Keep; the boxes are hollow in pencil until there is something to
+     carry, then solid in ink. */
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    margin: 0;
+  }
+  .meta.accent {
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast > div > .meta {
+    margin: 0 0 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(64px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .lede {
+    margin: 0;
+    font-size: clamp(18px, 1.9vw, 20px);
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+  .lede + .lede {
+    margin-top: 1em;
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+  .lede em {
+    color: var(--ink);
+  }
+
+  /* stations */
+  .station {
+    padding-block: 40px 36px;
+    border-bottom: 1px solid var(--rule);
+    animation: rise 600ms var(--ease) both;
+  }
+  .station:nth-of-type(2) {
+    animation-delay: 60ms;
+  }
+  .station:nth-of-type(3) {
+    animation-delay: 100ms;
+  }
+  .station:nth-of-type(4) {
+    animation-delay: 140ms;
+  }
+  .station:nth-of-type(5) {
+    animation-delay: 180ms;
+  }
+  .station > .meta.accent {
+    margin-bottom: 10px;
+  }
+  .station h2 {
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .why {
+    margin: 12px 0 0;
+    max-width: 58ch;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .station.short {
+    padding-block: 28px 30px;
+  }
+  .station.short h2 {
+    font-size: clamp(22px, 2.6vw, 27px);
+  }
+
+  /* the thing: one panel with a hand-drawn border */
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+    padding: 22px 20px 24px;
+    margin-top: 18px;
+  }
+  .carried {
+    margin: 0 0 8px;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .case {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    resize: none;
+    overflow: hidden;
+    font-size: clamp(22px, 2.8vw, 27px);
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .under {
+    margin-top: 8px;
+  }
+  .note {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .keep-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .status {
+    margin: 0;
+  }
+  .status.trouble {
+    color: var(--accent);
+  }
+
+  /* the hand-drawn border on the panel */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .mask-line {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--muted);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* the rail: a row of boxes joined by strokes, scrolling inside its own box when narrow */
+  .rail {
+    margin-top: 22px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 6px;
+  }
+  .rail svg {
+    display: block;
+  }
+  .rail-read {
+    margin: 6px 0 0;
+  }
+  .st-hollow {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1;
+    stroke-linecap: round;
+    transition: stroke 220ms var(--ease);
+  }
+  .st-ink {
+    fill: var(--pen);
+    transition: fill 220ms var(--ease);
+  }
+  .st-link {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 0.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .st-name {
+    fill: var(--ink);
+    transition: fill 220ms var(--ease);
+  }
+  .g-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .g-mono {
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    fill: var(--faint);
+  }
+  a.st {
+    outline-offset: 4px;
+  }
+  a.st.hollow {
+    cursor: default;
+  }
+  a.st.hollow .st-name {
+    fill: var(--faint);
+  }
+  a.st[href]:hover .st-ink,
+  a.st[href]:focus-visible .st-ink {
+    fill: var(--accent);
+  }
+  a.st[href]:hover .st-name,
+  a.st[href]:focus-visible .st-name {
+    fill: var(--accent);
+  }
+  /* A box is drawn on when it turns solid. */
+  .st-on {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: st-draw 520ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+  @keyframes st-draw {
+    from {
+      opacity: 0.2;
+      transform: scaleX(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+  /* any instrument: the other slugs, as plain links */
+  .any {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+  .any a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition:
+      color 160ms var(--ease),
+      border-color 160ms var(--ease);
+  }
+  .any a[href]:hover {
+    border-bottom-color: var(--accent);
+  }
+  .any a:not([href]) {
+    color: var(--faint);
+    cursor: default;
+  }
+
+  /* the coda */
+  .coda {
+    padding-block: 40px 0;
+    max-width: 62ch;
+  }
+  .coda > .meta.accent {
+    margin-bottom: 10px;
+  }
+  .coda p:not(.meta) {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .coda p + p {
+    margin-top: 0;
+  }
+  #keptWhere {
+    margin-top: 6px;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+  footer .meta {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (min-width: 640px) {
+    .panel {
+      padding: 28px;
+    }
+  }
+  @media (max-width: 820px) {
+    .mast {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-block: 44px 28px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .station,
+    .st-on,
+    .sketch .mask-line {
+      animation: none;
+    }
+    .sketch .mask-line {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Circuits</h1>
+      <p class="deck">
+        <em>A method is a sequence of instruments, not one of them, and every
+          call along it is yours.</em>
+        Three circuits, drawn; the links built from your own words.
+      </p>
+    </div>
+    <div>
+      <p class="lede">
+        Set one thing down here, in your words, and carry it from station to
+        station. To <em>evaluate a claim</em>: provenance, sieve, muster, tack.
+        To <em>make a decision</em>: bearing, overview, fence, act, spine. To
+        <em>hold a belief</em>: course, canon, panel. Each box is a link that
+        takes the words with it, and nothing else.
+      </p>
+      <p class="lede">
+        If you want a line to try before your own: <em>The Thursday review can
+          go now that the team is four.</em> Take it or leave it; what you type
+        below is the only thing that travels.
+      </p>
+    </div>
+  </header>
+
+  <section class="station" id="thingStation" aria-label="The thing">
+    <p class="meta accent">the thing</p>
+    <h2>One thing, in your own words</h2>
+    <p class="why">
+      Every station below carries this, verbatim, by the address bar. It is
+      kept in this browser when you press Keep, so coming back mid-circuit
+      finds it.
+    </p>
+    <div class="panel" id="sheet">
+      <p class="hand carried" id="carried" hidden></p>
+      <p class="meta accent">Make your own</p>
+      <textarea
+        class="case"
+        id="thing"
+        data-f="thing"
+        rows="2"
+        placeholder="the thing, in your words"
+        aria-label="The thing"
+      ></textarea>
+      <p class="meta under" id="thingMeta"></p>
+      <p class="hand note" id="carryNext" hidden></p>
+      <div class="keep-row">
+        <button type="button" class="chip accent" data-act="keep">Keep</button>
+        <p class="meta status" id="status" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="c-claim" aria-label="Evaluate a claim">
+    <p class="meta accent">circuit one</p>
+    <h2>Evaluate a claim</h2>
+    <p class="why">
+      For a claim that reached you: where it came from, which worlds it could
+      have come out of, what a room makes of it, and which of your own claims
+      it moves.
+    </p>
+    <div class="rail">
+      <svg id="rail-claim" role="img"></svg>
+    </div>
+    <p class="meta rail-read" id="read-claim"></p>
+  </section>
+
+  <section class="station" id="c-decide" aria-label="Make a decision">
+    <p class="meta accent">circuit two</p>
+    <h2>Make a decision</h2>
+    <p class="why">
+      For a choice in front of you: where it sits among your values, how big
+      the step is against the life it opens, what fence stands in the way,
+      what you did about it, and how it went.
+    </p>
+    <div class="rail">
+      <svg id="rail-decide" role="img"></svg>
+    </div>
+    <p class="meta rail-read" id="read-decide"></p>
+  </section>
+
+  <section class="station" id="c-hold" aria-label="Hold a belief">
+    <p class="meta accent">circuit three</p>
+    <h2>Hold a belief</h2>
+    <p class="why">
+      For something you already think: which way each thing that hit it bent
+      it, how often you have reached for it, and how its markers read over
+      time.
+    </p>
+    <div class="rail">
+      <svg id="rail-hold" role="img"></svg>
+    </div>
+    <p class="meta rail-read" id="read-hold"></p>
+  </section>
+
+  <section class="station short" id="c-any" aria-label="Any instrument">
+    <p class="meta accent">or</p>
+    <h2>Any instrument</h2>
+    <p class="why">
+      The circuits are three ways through, not the only ones. Start anywhere;
+      the thing goes with you.
+    </p>
+    <ul class="any" id="any"></ul>
+  </section>
+
+  <section class="coda" aria-label="What it leaves to you">
+    <p class="meta accent">what it leaves to you</p>
+    <p>
+      Every call. Whether the thing is a claim, a decision or a belief, and so
+      which circuit it belongs in, if any, is yours to say; the page lists
+      three and puts none above another. The order inside a circuit is a
+      sequence, not a ranking: nothing here says one instrument is worth more
+      than the next, or that the thing needs all of them, or that it needs
+      any.
+    </p>
+    <p>
+      What you did at a station stays at that station, in that instrument's
+      own key. This page reads none of them and cannot tell whether you went.
+      The only thing it carries is the words you typed here, by the address
+      bar, verbatim; it goes nowhere else.
+    </p>
+    <p class="meta" id="keptWhere"></p>
+  </section>
+
+  <footer>
+    <span class="meta">Circuits · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  const KEY = "pp-circuits";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "circuits";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  /* ── the circuits ─────────────────────────────────────────────────────────
+     Three sequences of slugs. The order within one is the order the words are carried in,
+     and nothing more: no station outranks the next, and no circuit outranks another. The
+     fourth list is every other instrument on the contract, in the order the spine names
+     them, so the reader can start anywhere. */
+
+  const CIRCUITS = [
+    { id: "claim", slugs: ["provenance", "sieve", "muster", "tack"] },
+    { id: "decide", slugs: ["bearing", "overview", "fence", "act", "spine"] },
+    { id: "hold", slugs: ["course", "canon", "panel"] },
+  ];
+  /* The four that predate the contract keep their own shape and do not read the hand-off. */
+  const APART = ["half-second", "familiar-voice", "stop-flowing", "chronology"];
+  const ANY = SLUGS.filter((s) => s !== SELF && !APART.includes(s));
+
+  const MAX_TEXT = 4000;
+
+  const wordCount = (s) => {
+    const t = String(s).trim();
+    return t ? t.split(/\s+/).length : 0;
+  };
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const $ = (s) => document.querySelector(s);
+
+  const S = {
+    text: "",
+    last: "",
+    kept: false,
+    specimen: false,
+    from: "",
+    next: "",
+    status: "",
+    trouble: false,
+    solid: false,
+  };
+
+  /* ── the hand-drawn border on the panel ───────────────────────────────── */
+
+  let maskN = 0;
+  function sketch(host, seed) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    host.prepend(svg);
+    let size = [0, 0];
+    const draw = () => {
+      const [w, h] = size;
+      if (!w || !h) return;
+      const s = seedOf(seed);
+      const line = roughRect(w, h, s);
+      const id = `m${++maskN}`;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML =
+        `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+        `<path class="mask-line" d="${line}" pathLength="1" stroke-width="7.4"/></mask></defs>` +
+        `<path class="ink" d="${ribbon(line, 1.7, s)}" mask="url(#${id})"/>`;
+    };
+    new ResizeObserver(() => {
+      const next = [host.offsetWidth, host.offsetHeight];
+      if (next[0] === size[0] && next[1] === size[1]) return;
+      size = next;
+      draw();
+    }).observe(host);
+  }
+
+  /* ── the rail ─────────────────────────────────────────────────────────────
+     One row of boxes per circuit, joined left to right by a stroke with a small head. Each
+     box is a link built by carryHref with the station after it as `next`; the last has none.
+     While there is nothing to carry the boxes are hollow and the links have no href. Strokes
+     are seeded by the slug, so the same station is drawn the same way every time. Nothing
+     here is kept; it is drawn again from the text. */
+
+  const BW = 124;
+  const BH = 46;
+  const GAP = 40;
+  const PAD = 6;
+  const TOP = 20;
+  const RH = TOP + BH + 12;
+
+  function drawRail(c, text) {
+    const svg = $(`#rail-${c.id}`);
+    const n = c.slugs.length;
+    const w = PAD * 2 + n * BW + (n - 1) * GAP;
+    const r = rand(seedOf(`rail-${c.id}`));
+    let out = "";
+    c.slugs.forEach((slug, i) => {
+      const x = PAD + i * (BW + GAP);
+      const s = seedOf(`${c.id}-${slug}`);
+      const box = roughRect(BW, BH, s, { wobble: 1, overshoot: 2 });
+      const next = c.slugs[i + 1] || "";
+      const href = text ? carryHref(slug, text, next) : "";
+      out +=
+        `<a class="st${text ? "" : " hollow"}"${href ? ` href="${esc(href)}"` : ' aria-disabled="true"'} data-slug="${slug}" data-next="${next}">` +
+        `<g transform="translate(${x} ${TOP})">` +
+        (text
+          ? `<g class="st-on" style="--i:${i}"><path class="st-ink" d="${ribbon(box, 1.9, s)}"/></g>`
+          : `<path class="st-hollow" d="${box}"/>`) +
+        `<text class="g-mono" x="2" y="-7" font-size="8.5">${String(i + 1).padStart(2, "0")}</text>` +
+        `<text class="g-hand st-name" x="${BW / 2}" y="${BH / 2 + 5.5}" text-anchor="middle" font-size="16">${esc(slug)}</text>` +
+        `</g></a>`;
+      if (i < n - 1) {
+        const ax = x + BW + 5;
+        const bx = x + BW + GAP - 5;
+        const ay = TOP + BH / 2;
+        out += `<path class="st-link" d="${stroke([ax, ay], [bx, ay], r, 0.8, 1)}${stroke([bx - 7, ay - 4], [bx, ay], r, 0.5, 0)}${stroke([bx - 7, ay + 4], [bx, ay], r, 0.5, 0)}"/>`;
+      }
+    });
+    svg.setAttribute("viewBox", `0 0 ${w} ${RH}`);
+    svg.setAttribute("width", w);
+    svg.setAttribute("height", RH);
+    svg.innerHTML = out;
+    svg.setAttribute(
+      "aria-label",
+      `${plural(n, "station")} in a row, ${text ? "solid" : "hollow"}: ${c.slugs.join(", then ")}`,
+    );
+    $(`#read-${c.id}`).textContent =
+      `${plural(n, "station")} · ${text ? "solid · each box carries the thing" : "hollow until the thing is set down"}`;
+  }
+
+  function drawAny(text) {
+    $("#any").innerHTML = ANY.map(
+      (s) =>
+        `<li>${text ? `<a href="${esc(carryHref(s, text, ""))}">${esc(s)}</a>` : `<a aria-disabled="true">${esc(s)}</a>`}</li>`,
+    ).join("");
+  }
+
+  /* ── rendering ───────────────────────────────────────────────────────── */
+
+  /* A textarea as tall as what is in it. */
+  const grow = (el) => {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  /* What follows every keystroke: the count, the rails, the links. The rails are redrawn
+     only when the text crosses between empty and not, so a box turns solid once; the hrefs
+     are rebuilt on every change. */
+  function renderLive() {
+    const text = S.text.trim();
+    const words = wordCount(text);
+    $("#thingMeta").textContent = [
+      words ? plural(words, "word") : "no words",
+      S.kept ? `kept ${dayWords(S.last)}` : "not kept",
+    ].join(" · ");
+    const solid = !!text;
+    if (solid !== S.solid) {
+      S.solid = solid;
+      for (const c of CIRCUITS) drawRail(c, text);
+    } else if (solid) {
+      for (const c of CIRCUITS)
+        for (const a of document.querySelectorAll(`#rail-${c.id} a.st`))
+          a.setAttribute(
+            "href",
+            carryHref(a.dataset.slug, text, a.dataset.next),
+          );
+    }
+    drawAny(text);
+    const carry = $("#carryNext");
+    carry.hidden = !S.next;
+    carry.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, text, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+  }
+
+  function renderSheet() {
+    const carried = $("#carried");
+    carried.hidden = !S.from;
+    carried.textContent = S.from ? `Carried from ${S.from}` : "";
+    const el = $("#thing");
+    if (el.value !== S.text) el.value = S.text;
+    grow(el);
+    const st = $("#status");
+    st.textContent = S.status;
+    st.classList.toggle("trouble", S.trouble);
+    $("#keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+  }
+
+  function full() {
+    for (const c of CIRCUITS) drawRail(c, S.text.trim());
+    S.solid = !!S.text.trim();
+    renderSheet();
+    renderLive();
+  }
+
+  /* ── keeping ──────────────────────────────────────────────────────────── */
+
+  function keep() {
+    if (S.specimen) return;
+    const text = S.text.trim().slice(0, MAX_TEXT);
+    if (!text) {
+      S.status = "nothing to keep yet — set the thing down first";
+      S.trouble = true;
+      renderSheet();
+      return;
+    }
+    S.text = text;
+    S.last = localToday();
+    const ok = persist({ text: S.text, last: S.last });
+    S.kept = ok;
+    S.status = ok
+      ? `kept · ${dayWords(S.last)}`
+      : "not kept — this browser would not hold it";
+    S.trouble = !ok;
+    renderSheet();
+    renderLive();
+  }
+
+  /* A hand-off read from the address: the carried text in the field and nothing else, not
+     kept until Keep. What was kept before stays kept. */
+  function carried(h) {
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) {
+      S.text = h.set;
+      S.kept = false;
+      S.status = "";
+      S.trouble = false;
+    }
+    full();
+  }
+
+  /* ── events ──────────────────────────────────────────────────────────── */
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    if (b.dataset.act === "keep") keep();
+  });
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    if (!el.dataset || el.dataset.f !== "thing") return;
+    grow(el);
+    S.text = el.value;
+    if (S.kept) {
+      S.kept = false;
+      S.status = "changed · not kept until Keep";
+      S.trouble = false;
+      const st = $("#status");
+      st.textContent = S.status;
+      st.classList.remove("trouble");
+    }
+    renderLive();
+  });
+
+  window.addEventListener("resize", () => grow($("#thing")));
+
+  /* ── open ────────────────────────────────────────────────────────────── */
+
+  function boot() {
+    const env = readStore();
+    const text =
+      typeof env?.text === "string" ? env.text.slice(0, MAX_TEXT).trim() : "";
+    const last = typeof env?.last === "string" && DAY.test(env.last) ? env.last : "";
+    if (text && last) {
+      S.text = text;
+      S.last = last;
+      S.kept = true;
+      S.status = `kept · ${dayWords(last)}`;
+    }
+    const h = fromHash();
+    if (h) return carried(h);
+    full();
+  }
+
+  sketch($("#sheet"), "circuits-thing");
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
+</script>

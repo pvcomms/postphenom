@@ -35,16 +35,19 @@
   /* Karesansui at noon: ink on bone. One accent, the burnt orange of a lit
      line, used for what is happening now: the ring picked, the sitting, the
      breath. Everything else is ink, and ink thinned toward the paper. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
-    --paper: #f4f2ed;
-    --sheet: #faf9f6;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #857d71;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --pen: color-mix(in srgb, var(--ink) 90%, var(--paper));
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -52,25 +55,30 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --paper: #16150f;
-      --sheet: #1f1e17;
+      --bg: #16150f;
+      --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #847d70;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --paper: #16150f;
-    --sheet: #1f1e17;
+    --bg: #16150f;
+    --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #847d70;
+    --faint: #7d766a;
     --rule: #302e25;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
   }
+  /* capp:tokens end */
 
   * {
     box-sizing: border-box;
@@ -80,7 +88,7 @@
   }
   html,
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
   body {
@@ -213,7 +221,7 @@
   }
   .panel {
     position: relative;
-    background: var(--sheet);
+    background: var(--surface);
     border-radius: 3px;
     animation: rise 600ms var(--ease) both;
   }
@@ -284,7 +292,7 @@
     fill: var(--rule);
   }
   .ink-sheet {
-    fill: var(--sheet);
+    fill: var(--surface);
   }
 
   @keyframes rise {
@@ -768,7 +776,7 @@
 
   <footer>
     <span class="label">Wish · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser only</span>
+    <span class="label">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -776,10 +784,20 @@
   "use strict";
 
   /* ── pure:begin ─────────────────────────────────────────────────────────
-     The hand (mulberry32, the pen stroke, the ring, the ribbon) and the wish
-     (the script, the timing, the tally, the readings, the forms), ported by
-     hand from niwa's lib/hand.ts and lib/wish.ts. The maths is unchanged. */
+     The shared blocks (the hand, esc, dates, slug, plural, store, hash) are
+     copied from instruments/spine/index.html and are not edited here. Then
+     the wish (the script, the timing, the tally, the readings, the forms),
+     ported by hand from niwa's lib/wish.ts. The maths is unchanged. */
 
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -790,6 +808,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -798,9 +818,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -819,6 +845,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -830,9 +858,10 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
 
+  /** A box drawn as four strokes, each running a little past its corner. */
   function roughRect(
     w,
     h,
@@ -852,8 +881,9 @@
     ].join("");
   }
 
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[Math.max(0, i - 1)];
       const p1 = pts[i];
@@ -861,11 +891,16 @@
       const p3 = pts[Math.min(pts.length - 1, i + 2)];
       const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
       const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
     }
     return d;
   }
 
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -875,6 +910,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -896,6 +933,55 @@
     return smooth(pts);
   }
 
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -945,6 +1031,12 @@
     return subs;
   }
 
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -975,10 +1067,62 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
 
   /* the wish */
 
@@ -1157,24 +1301,13 @@
   const heldBy = (pods) =>
     pods.flatMap((p) => p.beings.map((b) => clean(b.name)).filter(Boolean));
 
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
-  const utc = (d) =>
-    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
-  function daysBetween(a, b) {
-    if (!DAY.test(a) || !DAY.test(b)) return 0;
-    return Math.round((utc(b) - utc(a)) / 86400000);
-  }
-  function plus(day, k) {
-    return new Date(utc(day) + k * 86400000).toISOString().slice(0, 10);
-  }
-
   function tally(sittings, pods, lists, today) {
     const days = new Set(sittings.map((s) => s.on));
     let run = 0;
-    let d = days.has(today) ? today : plus(today, -1);
+    let d = days.has(today) ? today : addDays(today, -1);
     while (days.has(d)) {
       run++;
-      d = plus(d, -1);
+      d = addDays(d, -1);
     }
     const counts = new Map();
     for (const s of sittings)
@@ -1209,7 +1342,6 @@
     };
   }
 
-  const count = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
   const ago = (d) =>
     d === 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
 
@@ -1219,7 +1351,7 @@
     if (!t.n) out.push("no sittings yet");
     else {
       out.push(
-        `${count(t.n, "sitting")}, ${count(t.minutes, "minute")} in all · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
+        `${plural(t.n, "sitting")}, ${plural(t.minutes, "minute")} in all · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
       );
       if (t.run > 1) out.push(`${t.run} days running`);
       if (t.held.length) {
@@ -1240,7 +1372,7 @@
       );
     }
     out.push(
-      `${count(t.pods, "pod")} with ${count(t.beings, "being")} · ${count(t.wishes, "wish", "wishes")}, ${count(t.truths, "truth")}, ${count(t.facts, "fact")} in the practice`,
+      `${plural(t.pods, "pod")} with ${plural(t.beings, "being")} · ${plural(t.wishes, "wish", "wishes")}, ${plural(t.truths, "truth")}, ${plural(t.facts, "fact")} in the practice`,
     );
     return out;
   }
@@ -1249,18 +1381,6 @@
 
   const str = (v, max) =>
     typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
-
-  function slugOf(title, day) {
-    const t = title
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 56)
-      .replace(/-+$/g, "");
-    return `${day}-${t || "pod"}`;
-  }
 
   function validatePod(input) {
     const r = input ?? {};
@@ -1295,10 +1415,7 @@
         .slice(0, n)
         .map((x) => str(x, max))
         .filter(Boolean);
-    const on =
-      typeof r.on === "string" && DAY.test(r.on)
-        ? r.on
-        : new Date().toISOString().slice(0, 10);
+    const on = typeof r.on === "string" && DAY.test(r.on) ? r.on : localToday();
     const lines = (Array.isArray(r.lines) ? r.lines : [])
       .slice(0, 600)
       .map((x) => {
@@ -1472,66 +1589,154 @@
   /* ── keeping: one key, this browser only ───────────────────────────────── */
 
   const KEY = "pp-wish";
-  const store = { showing: "specimen", own: null };
-  const specimen = freshSpecimen();
-
-  function load() {
-    let raw = null;
+  /* capp:store begin */
+  function readStore() {
     try {
-      raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
     } catch {
-      return;
-    }
-    if (!raw) return;
-    try {
-      const o = JSON.parse(raw);
-      if (o && o.own && typeof o.own === "object") {
-        const pods = (Array.isArray(o.own.pods) ? o.own.pods : [])
-          .slice(0, 30)
-          .map(validatePod)
-          .sort((a, b) => a.order - b.order || (a.slug < b.slug ? -1 : 1));
-        const sittings = [];
-        for (const s of Array.isArray(o.own.sittings)
-          ? o.own.sittings.slice(0, 2000)
-          : []) {
-          try {
-            sittings.push(validateSitting(s));
-          } catch {
-            /* a sitting with no lines is not a sitting */
-          }
-        }
-        store.own = {
-          pods: pods.length ? pods : clone(DEFAULT_PODS),
-          sittings,
-          wishes: validateList(o.own.wishes, 20),
-          truths: validateList(o.own.truths),
-          facts: validateList(o.own.facts),
-        };
-      }
-      store.showing =
-        o && o.showing === "own" && store.own ? "own" : "specimen";
-    } catch {
-      /* unreadable: open on the specimen */
+      return null;
     }
   }
-
-  function save() {
+  function persist(data) {
     try {
-      if (store.own)
-        localStorage.setItem(
-          KEY,
-          JSON.stringify({ v: 1, showing: store.showing, own: store.own }),
-        );
-      else localStorage.removeItem(KEY);
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
       return true;
     } catch {
-      ui.trouble = "not kept: this browser would not keep it";
       return false;
     }
   }
+  /* capp:store end */
 
-  const P = () => (store.showing === "own" && store.own ? store.own : specimen);
-  const writable = () => store.showing === "own" && Boolean(store.own);
+  /* Which practice is on the sheet: the specimen, or the reader's own. S.specimen is
+     true whenever what is shown is not the reader's own, and nothing shown then is kept. */
+  const S = {
+    showing: "specimen",
+    own: null,
+    get specimen() {
+      return !(this.showing === "own" && this.own);
+    },
+  };
+  const SPECIMEN = freshSpecimen();
+
+  /* The envelope read back, row by row; a bad row is dropped. */
+  function load() {
+    const o = readStore();
+    if (!o) return;
+    if (o.own && typeof o.own === "object") {
+      const pods = (Array.isArray(o.own.pods) ? o.own.pods : [])
+        .slice(0, 30)
+        .map(validatePod)
+        .sort((a, b) => a.order - b.order || (a.slug < b.slug ? -1 : 1));
+      const sittings = [];
+      for (const s of Array.isArray(o.own.sittings)
+        ? o.own.sittings.slice(0, 2000)
+        : []) {
+        try {
+          sittings.push(validateSitting(s));
+        } catch {
+          /* a sitting with no lines is not a sitting */
+        }
+      }
+      S.own = {
+        pods: pods.length ? pods : clone(DEFAULT_PODS),
+        sittings,
+        wishes: validateList(o.own.wishes, 20),
+        truths: validateList(o.own.truths),
+        facts: validateList(o.own.facts),
+      };
+    }
+    S.showing = o.showing === "own" && S.own ? "own" : "specimen";
+  }
+
+  /* The own practice, whole, under the one key; let go of entirely, the key goes too. */
+  function save() {
+    let ok;
+    if (S.own) ok = persist({ showing: S.showing, own: S.own });
+    else {
+      try {
+        localStorage.removeItem(KEY);
+        ok = true;
+      } catch {
+        ok = false;
+      }
+    }
+    if (!ok) ui.trouble = "not kept: this browser would not keep it";
+    return ok;
+  }
+
+  const P = () => (S.specimen ? SPECIMEN : S.own);
+
+  /* ── the hand-off: by the address bar only ─────────────────────────────── */
+
+  const SELF = "wish";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
 
   /* ── the voice: this machine's own voices, never a network one ─────────── */
 
@@ -1576,10 +1781,12 @@
     said: "",
     trouble: null,
     sure: null,
-  };
-  const localToday = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    /* the hand-off: the text as it arrived, what is in the set-down field now, and
+       the slugs it came from and goes to; none of it kept */
+    set: "",
+    draft: "",
+    from: "",
+    next: "",
   };
   const hhmm = () => {
     const d = new Date();
@@ -1587,18 +1794,6 @@
   };
   const today = localToday();
   const mins = (secs) => `${Math.round(secs / 60)} min`;
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
   const $ = (id) => document.getElementById(id);
 
   function resetUi() {
@@ -1608,6 +1803,10 @@
     ui.factsOff = new Set();
     ui.sure = null;
     ui.trouble = null;
+    ui.set = "";
+    ui.draft = "";
+    ui.from = "";
+    ui.next = "";
   }
 
   const chip = (label, act, { on, acc, disabled, title, data = "" } = {}) =>
@@ -1802,8 +2001,13 @@
 
   function sittingsHtml(pr, w) {
     let h = `<div class="ruled"><div class="label acc">sittings</div>`;
+    // The afterwards: where the hand-off goes on, with the set-down text as it arrived.
+    const carry =
+      w && ui.next
+        ? `<p class="hand tight"><a href="${esc(carryHref(ui.next, ui.set, ""))}">Carry this to ${esc(ui.next)}</a></p>`
+        : "";
     if (!pr.sittings.length)
-      return h + `<p class="hand faint tight">none yet</p></div>`;
+      return h + `<p class="hand faint tight">none yet</p>${carry}</div>`;
     h += `<ol class="sittings">`;
     pr.sittings.slice(0, 12).forEach((s, i) => {
       const sure = ui.sure === `sit-${s.slug}`;
@@ -1822,18 +2026,20 @@
         });
       h += `</span></li>`;
     });
-    return h + `</ol></div>`;
+    return h + `</ol>${carry}</div>`;
   }
 
   function renderSheet() {
     const body = $("sheet-body");
     if (ui.run) return renderRun();
     const pr = P();
-    const w = writable();
+    const w = !S.specimen;
     const pv = preview();
     const held = pr.pods.filter((p) => ui.on.has(p.slug));
     const rt = runtime(pv);
     let h = `<div class="grid"><div class="ctl">`;
+    if (ui.from)
+      h += `<p class="hand muted" style="margin:0 0 12px;font-size:15.5px">Carried from ${esc(ui.from)}</p>`;
     h += `<div class="label acc">the next sitting</div>`;
     h += `<div class="nexthead"><input class="num" data-k="minutes" inputmode="numeric" value="${ui.minutes}" aria-label="Minutes" style="width:${Math.max(1.4, String(ui.minutes).length * 0.62 + 0.6)}em" /><span class="hand">minutes · ${pv.length} lines${Math.abs(rt - ui.minutes * 60) > 90 ? ` · about ${mins(rt)}` : ""}</span></div>`;
     h += `<div class="chips" style="margin-top:12px">`;
@@ -1865,6 +2071,9 @@
     if (ui.trouble)
       h += `<p class="trouble" role="alert">${esc(ui.trouble)}</p>`;
     body.innerHTML = h;
+    // The set-down field takes its text through .value, never through the markup.
+    const add = body.querySelector('[data-k="add-being"]');
+    if (add && ui.draft) add.value = ui.draft;
     renderRings();
   }
 
@@ -2029,8 +2238,8 @@
       voice: Boolean(withVoice),
       said: "",
     };
-    if (!writable()) return start(s, false);
-    store.own.sittings.unshift(s);
+    if (S.specimen) return start(s, false);
+    S.own.sittings.unshift(s);
     save();
     start(s, true);
   }
@@ -2090,8 +2299,8 @@
     tick++;
     clearTimeout(timer);
     hush();
-    if (r && r.kept && ui.said.trim() && writable()) {
-      const kept = store.own.sittings.find((x) => x.slug === r.s.slug);
+    if (r && r.kept && ui.said.trim() && !S.specimen) {
+      const kept = S.own.sittings.find((x) => x.slug === r.s.slug);
       if (kept) {
         kept.said = ui.said.trim().slice(0, 4000);
         save();
@@ -2107,7 +2316,7 @@
 
   function renderDesk() {
     const pr = P();
-    const w = writable();
+    const w = !S.specimen;
     const t = tally(
       pr.sittings,
       pr.pods,
@@ -2164,14 +2373,14 @@
 
   function renderPractice() {
     let h;
-    if (writable()) {
+    if (!S.specimen) {
       const sure = ui.sure === "forget";
       h = `<p><b>Your practice.</b> Kept in this browser and nowhere else. Clearing the browser's site data lets it go.</p><div class="chips">${chip("show the specimen", "show-specimen")}${chip(sure ? "let it all go — sure?" : "let it all go", "forget", { acc: sure })}</div>`;
     } else {
       h = `<p><b>Specimen A, fiction.</b> A made-up life's practice: five people on the rings, three facts it kept about itself, two sittings. Sit with it; nothing done here is kept.</p><div class="chips">${
-        store.own
+        S.own
           ? chip("back to yours", "show-own", { acc: true })
-          : chip("begin your own practice", "own", { acc: true })
+          : chip("Make your own", "own", { acc: true })
       }</div>`;
     }
     $("practice").innerHTML = h;
@@ -2214,7 +2423,7 @@
   const sameSel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
   function keep() {
-    if (writable()) save();
+    if (!S.specimen) save();
   }
   function addBeing(slug, name) {
     const p = pod(slug);
@@ -2227,8 +2436,8 @@
   }
   function addPod(name) {
     const nm = name.trim();
-    if (!nm || !writable()) return;
-    const pr = store.own;
+    if (!nm || S.specimen) return;
+    const pr = S.own;
     const slug = `${
       nm
         .toLowerCase()
@@ -2298,7 +2507,7 @@
     "rm-pod"() {
       const slug = ui.sel?.slug;
       if (ui.sure !== `pod-${slug}`) return void (ui.sure = `pod-${slug}`);
-      store.own.pods = store.own.pods.filter((p) => p.slug !== slug);
+      S.own.pods = S.own.pods.filter((p) => p.slug !== slug);
       ui.on.delete(slug);
       ui.sel = null;
       ui.sure = null;
@@ -2310,16 +2519,16 @@
     },
     again(el) {
       const s = P().sittings.find((x) => x.slug === el.dataset.slug);
-      if (s) start({ ...s, voice: false }, writable());
+      if (s) start({ ...s, voice: false }, !S.specimen);
     },
     "again-voice"(el) {
       const s = P().sittings.find((x) => x.slug === el.dataset.slug);
-      if (s) start({ ...s, voice: true }, writable());
+      if (s) start({ ...s, voice: true }, !S.specimen);
     },
     "rm-sitting"(el) {
       const slug = el.dataset.slug;
       if (ui.sure !== `sit-${slug}`) return void (ui.sure = `sit-${slug}`);
-      store.own.sittings = store.own.sittings.filter((s) => s.slug !== slug);
+      S.own.sittings = S.own.sittings.filter((s) => s.slug !== slug);
       ui.sure = null;
       keep();
     },
@@ -2334,16 +2543,16 @@
       else ui.factsOff.add(x);
     },
     "rm-wish"(el) {
-      store.own.wishes.splice(Number(el.dataset.i), 1);
+      S.own.wishes.splice(Number(el.dataset.i), 1);
       keep();
     },
     "rm-truth"(el) {
-      const [x] = store.own.truths.splice(Number(el.dataset.i), 1);
+      const [x] = S.own.truths.splice(Number(el.dataset.i), 1);
       ui.truthsOff.delete(x);
       keep();
     },
     "rm-fact"(el) {
-      const [x] = store.own.facts.splice(Number(el.dataset.i), 1);
+      const [x] = S.own.facts.splice(Number(el.dataset.i), 1);
       ui.factsOff.delete(x);
       keep();
     },
@@ -2352,25 +2561,25 @@
     end: () => end(),
     "come-back": () => closeRun(),
     own() {
-      store.own = freshOwn();
-      store.showing = "own";
+      S.own = freshOwn();
+      S.showing = "own";
       save();
       resetUi();
     },
     "show-specimen"() {
-      store.showing = "specimen";
+      S.showing = "specimen";
       save();
       resetUi();
     },
     "show-own"() {
-      store.showing = "own";
+      S.showing = "own";
       save();
       resetUi();
     },
     forget() {
       if (ui.sure !== "forget") return void (ui.sure = "forget");
-      store.own = null;
-      store.showing = "specimen";
+      S.own = null;
+      S.showing = "specimen";
       save();
       resetUi();
     },
@@ -2419,10 +2628,12 @@
       const v = el.value.trim();
       if (!v) return;
       const kind = el.dataset.add;
-      if (kind === "being" && ui.sel) addBeing(ui.sel.slug, v);
-      else if (kind === "pod") addPod(v);
-      else if (writable() && store.own[kind]) {
-        store.own[kind].push(v.slice(0, 300));
+      if (kind === "being" && ui.sel) {
+        addBeing(ui.sel.slug, v);
+        ui.draft = "";
+      } else if (kind === "pod") addPod(v);
+      else if (!S.specimen && S.own[kind]) {
+        S.own[kind].push(v.slice(0, 300));
         keep();
       }
       el.value = "";
@@ -2466,8 +2677,12 @@
       el.style.width = `${Math.max(1.4, el.value.length * 0.62 + 0.6)}em`;
       return;
     }
+    if (el.dataset.k === "add-being") {
+      ui.draft = el.value;
+      return;
+    }
     const edit = el.dataset.edit;
-    if (!edit || !writable() || !ui.sel) return;
+    if (!edit || S.specimen || !ui.sel) return;
     const p = pod(ui.sel.slug);
     if (!p) return;
     if (edit === "pod") p.name = el.value.slice(0, 80);
@@ -2488,7 +2703,7 @@
       return;
     }
     const edit = el.dataset.edit;
-    if (!edit || !writable() || !ui.sel) return;
+    if (!edit || S.specimen || !ui.sel) return;
     const p = pod(ui.sel.slug);
     if (!p) return;
     // A name cleared to nothing goes back to what it was: a being needs a name, a pod its own.
@@ -2519,9 +2734,44 @@
     });
   window.addEventListener("pagehide", hush);
 
+  /* A hand-off read from the address: the reader's own practice, with the carried text in
+     the set-down field (a name to hold on a ring) and nothing else prefilled. The first
+     ring that can hold someone is picked so the field is there; the name follows the
+     reader to whichever ring they pick instead. Nothing is kept until the name is added. */
+  function carried(h) {
+    if (ui.run) {
+      tick++;
+      clearTimeout(timer);
+      hush();
+      ui.run = null;
+      ui.said = "";
+    }
+    if (!S.own) S.own = freshOwn();
+    S.showing = "own";
+    resetUi();
+    ui.set = h.set;
+    ui.draft = h.set;
+    ui.from = h.from;
+    ui.next = h.next;
+    if (h.set) {
+      const p = S.own.pods.find((x) => x.kind !== "self" && x.kind !== "all");
+      if (p) ui.sel = { kind: "pod", slug: p.slug };
+    }
+  }
+
   load();
   resetUi();
+  const h0 = fromHash();
+  if (h0) carried(h0);
   render();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) {
+      carried(h);
+      render();
+      sketch($("sheet"), "wish-sheet");
+    }
+  });
   sketch($("sheet"), "wish-sheet");
   sketch($("p-reading"), "wish-reading");
   sketch($("p-wishes"), "wish-wishes");

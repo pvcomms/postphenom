@@ -32,27 +32,19 @@
     font-display: swap;
   }
 
-  /* Ink on bone. The accent is only ever the then and what had to be true
-     before it; ink is the now and the first moves from it. The six lane hues
-     mark what changes, and nothing else. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
+    --muted: #645e55;
     --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #cdc7ba;
     --accent: #b5532a;
-    --value-0: #b08a3e;
-    --value-1: #4f5f8a;
-    --value-2: #5e7a4e;
-    --value-3: #7e5a78;
-    --value-4: #3f6b66;
-    --value-5: #8c5a45;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
-    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -64,10 +56,44 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #857e70;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #48443a;
       --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Way's own: a second rule, the wash behind the open row, and the six lane
+     hues that mark what changes, and nothing else. The accent is only ever the
+     then and what had to be true before it; ink is the now and the first moves
+     from it. */
+  :root {
+    --rule-2: #cdc7ba;
+    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+    --value-0: #b08a3e;
+    --value-1: #4f5f8a;
+    --value-2: #5e7a4e;
+    --value-3: #7e5a78;
+    --value-4: #3f6b66;
+    --value-5: #8c5a45;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #48443a;
       --value-0: #d2aa5a;
       --value-1: #8393c4;
       --value-2: #8dae78;
@@ -77,15 +103,7 @@
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #16150f;
-    --surface: #1f1e17;
-    --ink: #ede9df;
-    --muted: #a39c8e;
-    --faint: #857e70;
-    --rule: #302e25;
     --rule-2: #48443a;
-    --accent: #d9763f;
     --value-0: #d2aa5a;
     --value-1: #8393c4;
     --value-2: #8dae78;
@@ -895,10 +913,23 @@
     font-size: 10.5px;
   }
   .howread {
+    margin-top: 8px;
     font-style: italic;
     font-size: 14.5px;
     line-height: 1.42;
     color: var(--faint);
+  }
+  #keptWhere {
+    margin-top: 10px;
+  }
+  .carried,
+  .carry-next {
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .carried {
+    padding: 6px 4px 0;
   }
   .letgo.sure {
     color: var(--accent);
@@ -968,7 +999,7 @@
 
 <div class="wrap">
   <header class="mast">
-    <p class="meta">CAPP · instrument</p>
+    <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
     <h1>Way</h1>
     <p class="deck hand">
       Say where you are. Say where you mean to be, as it is and not as it will
@@ -985,7 +1016,7 @@
       proposals that life has not kept.</span
     >
     <button class="quiet" type="button" data-act="new">
-      start your own · n
+      Make your own · n
     </button>
   </p>
 
@@ -1013,6 +1044,7 @@
         </div>
       </div>
       <div class="cap hand" id="cap" hidden aria-live="polite"></div>
+      <p class="hand carried" id="carried" hidden></p>
 
       <div id="wayView">
         <div class="linewrap">
@@ -1070,7 +1102,7 @@
 
     <!-- the desk -->
     <aside class="desk">
-      <div>
+      <div id="recordPanel">
         <div class="rowhead">
           <label class="meta" for="search" id="waysLabel">the ways</label>
           <button class="add" type="button" data-act="new">new · n</button>
@@ -1084,7 +1116,7 @@
         <ul class="rows" id="waysList"></ul>
       </div>
 
-      <section class="panel" aria-label="The reading">
+      <section class="panel" id="readingPanel" aria-label="The reading">
         <div class="meta">the reading</div>
         <ul class="reading" id="reading"></ul>
       </section>
@@ -1130,22 +1162,33 @@
       </section>
 
       <section aria-label="Standing" id="standing"></section>
+      <p class="hand carry-next" id="carryNext" hidden></p>
 
-      <p class="howread">
-        how it is read: the then is written as if it is already so. that is the
-        whole trick; imagining an outcome as having happened makes its causes
-        easier to name, and the desk counts the sentences that still look ahead.
-        the obstacles are the part that turns a picture into effort, each with a
-        when–then. standing at the then is a mode, not a home: stay a minute,
-        then come back to the steps. what you write stays in this browser.
-      </p>
+      <section class="panel" id="lawsPanel" aria-label="What the way holds to">
+        <div class="meta">what the way holds to</div>
+        <p class="howread">
+          how it is read: the then is written as if it is already so. that is
+          the whole trick; imagining an outcome as having happened makes its
+          causes easier to name, and the desk counts the sentences that still
+          look ahead. the obstacles are the part that turns a picture into
+          effort, each with a when–then. standing at the then is a mode, not a
+          home: stay a minute, then come back to the steps.
+        </p>
+        <p class="howread">
+          what it never does: propose a step, an obstacle or a change; say
+          whether the way is a good one or whether you will walk it; put one
+          step above another; call a host, fetch anything, or ask a model; keep
+          anything you did not write.
+        </p>
+        <p class="meta plain" id="keptWhere"></p>
+      </section>
       <p class="meta plain">/ find · n new · s stand at the then · esc</p>
     </aside>
   </div>
 
   <footer>
     <span class="meta">Way · CAPP · prototype, 3 October 2026</span>
-    <span class="meta">No network · kept in this browser only</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -1154,7 +1197,6 @@
 
   // ── time, as the chronology counts it ─────────────────────────────────
   const DAY_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
-  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
   const YEAR_MS = 365.2425 * 86400000;
   const DAY_MS = 86400000;
 
@@ -1370,7 +1412,7 @@
     if (w.steps.length) {
       const dated = kept.filter((s) => s.day && validDay(s.day)).length;
       out.push(
-        `${kept.length} ${kept.length === 1 ? "step" : "steps"} yours${proposed ? `, ${proposed} proposed and not yet yours` : ""}; ${dated} dated.`,
+        `${plural(kept.length, "step")} yours${proposed ? `, ${proposed} proposed and not yet yours` : ""}; ${dated} dated.`,
       );
       const next = kept
         .filter(
@@ -1418,8 +1460,9 @@
 
   const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
 
+  /* capp:slug begin */
   function slugOf(title, day) {
-    const t = title
+    const t = String(title)
       .toLowerCase()
       .normalize("NFKD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -1427,8 +1470,9 @@
       .replace(/^-+|-+$/g, "")
       .slice(0, 56)
       .replace(/-+$/g, "");
-    return `${day.slice(0, 10)}-${t || "way"}`;
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
   }
+  /* capp:slug end */
 
   /** A title from the then's first sentence, when none was given. */
   function titleOf(w) {
@@ -1524,7 +1568,15 @@
   }
   // ── end of the pure part ──────────────────────────────────────────────
 
-  // ── the pen: deterministic hand-drawn strokes ─────────────────────────
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -1535,6 +1587,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -1543,9 +1597,15 @@
     }
     return h >>> 0;
   }
-  const f1 = (n) => String(Math.round(n * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -1564,6 +1624,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -1575,9 +1637,10 @@
       a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
       a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
     ];
-    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
   }
 
+  /** A box drawn as four strokes, each running a little past its corner. */
   function roughRect(
     w,
     h,
@@ -1597,8 +1660,9 @@
     ].join("");
   }
 
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
-    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
       const p0 = pts[Math.max(0, i - 1)];
       const p1 = pts[i];
@@ -1606,11 +1670,16 @@
       const p3 = pts[Math.min(pts.length - 1, i + 2)];
       const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
       const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
     }
     return d;
   }
 
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -1620,6 +1689,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -1641,6 +1712,55 @@
     return smooth(pts);
   }
 
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1690,7 +1810,12 @@
     return subs;
   }
 
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -1721,10 +1846,48 @@
         right.push([pts[i][0] - nx, pts[i][1] - ny]);
       }
       const poly = [...left, ...right.reverse()];
-      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
     }
     return out.join("");
   }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
 
   // ── Specimen A's way: fiction, to show the instrument ────────────────
   const SPECIMEN = {
@@ -1831,68 +1994,136 @@
   const DAY_Y = LY + 70;
 
   const KEY = "pp-way";
-  const todayStr = () => new Date().toISOString().slice(0, 10);
-  const today = todayStr();
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
+
+  const SELF = "way";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
+  const today = localToday();
   const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
   const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
   const clone = (x) => JSON.parse(JSON.stringify(x));
-  const esc = (s) =>
-    String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   const $ = (id) => document.getElementById(id);
 
   const S = {
     ways: [], // the reader's own, newest touched first
     draft: null,
-    spec: false,
+    specimen: false,
     fresh: false,
+    from: "",
+    next: "",
     selected: null,
     stand: false,
     query: "",
     sure: false,
     enter: true,
   };
-  const writable = () => !S.spec;
 
   // ── keeping, in this browser ─────────────────────────────────────────
-  function readStore() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (!raw) return { ways: [], open: null };
-      const j = JSON.parse(raw);
-      const ways = [];
-      for (const w of Array.isArray(j?.ways) ? j.ways : []) {
-        try {
-          const v = validateWay(w, today);
-          if (validDay(w.touched)) v.touched = w.touched;
-          if (!ways.some((x) => x.slug === v.slug)) ways.push(v);
-        } catch {
-          /* a way that will not read is left out */
-        }
+  /** The envelope read back, row by row; a way that will not read is left out. */
+  function loadStore() {
+    const env = readStore();
+    const ways = [];
+    for (const w of Array.isArray(env?.ways) ? env.ways : []) {
+      try {
+        const v = validateWay(w, today);
+        if (validDay(w.touched)) v.touched = w.touched;
+        if (!ways.some((x) => x.slug === v.slug)) ways.push(v);
+      } catch {
+        /* a way that will not read is left out */
       }
-      return { ways, open: typeof j?.open === "string" ? j.open : null };
-    } catch {
-      return { ways: [], open: null };
     }
+    return { ways, open: typeof env?.open === "string" ? env.open : null };
   }
 
   function writeStore() {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({
-          v: 1,
-          open: S.spec ? SPECIMEN.slug : S.draft?.slug || null,
-          ways: S.ways,
-        }),
-      );
-      return true;
-    } catch {
-      return false;
-    }
+    return persist({
+      open: S.specimen ? SPECIMEN.slug : S.draft?.slug || null,
+      ways: S.ways,
+    });
   }
 
   let capTimer = 0;
@@ -1920,14 +2151,14 @@
           ? "kept"
           : state === "error"
             ? "not kept"
-            : S.spec
+            : S.specimen
               ? "read-only"
               : "";
   }
 
   function put() {
     const d = S.draft;
-    if (!d || !writable()) return;
+    if (!d || S.specimen) return;
     if (!d.thenText.trim() && !d.nowText.trim()) return;
     let k;
     try {
@@ -1964,7 +2195,7 @@
   /** The texts keep themselves a moment after the typing stops. */
   function schedule() {
     const d = S.draft;
-    if (!d || !writable()) return;
+    if (!d || S.specimen) return;
     if (!d.thenText.trim() && !d.nowText.trim()) return;
     clearTimeout(saveTimer);
     setKept("saving");
@@ -1977,10 +2208,12 @@
 
   function openWay(w) {
     clearTimeout(saveTimer);
-    if (S.draft && writable() && S.draft !== w) put();
-    S.spec = w.slug === SPECIMEN.slug;
+    if (S.draft && !S.specimen && S.draft !== w) put();
+    S.specimen = w.slug === SPECIMEN.slug;
     S.draft = clone(w);
     S.fresh = false;
+    S.from = "";
+    S.next = "";
     S.selected = null;
     S.stand = false;
     S.sure = false;
@@ -1991,10 +2224,12 @@
 
   function begin() {
     clearTimeout(saveTimer);
-    if (S.draft && writable()) put();
-    S.spec = false;
+    if (S.draft && !S.specimen) put();
+    S.specimen = false;
     S.draft = emptyWay(today);
     S.fresh = true;
+    S.from = "";
+    S.next = "";
     S.selected = null;
     S.stand = false;
     S.sure = false;
@@ -2005,7 +2240,7 @@
 
   function letGo() {
     const d = S.draft;
-    if (!d?.slug || !writable()) return;
+    if (!d?.slug || S.specimen) return;
     clearTimeout(saveTimer);
     S.ways = S.ways.filter((w) => w.slug !== d.slug);
     S.sure = false;
@@ -2150,10 +2385,10 @@
           .filter(Boolean)
           .join(" ");
         return `<g class="${cls}" data-step="${esc(m.s.id)}" style="--i:${i}" role="button" tabindex="0" aria-label="${esc(m.s.text || "a step")}">
-          <line class="stem" x1="${f1(m.x)}" x2="${f1(m.x)}" y1="${LY}" y2="${m.y}"/>
-          <path class="dot" d="${roughEllipse(r * 2, r * 2, seedOf(m.s.id), { pad: 0, steps: 12, wobble: 0.9 })}" transform="translate(${f1(m.x - r)} ${m.y - r})"/>
-          ${on ? `<path class="ring" d="${roughEllipse(r * 2 + 10, r * 2 + 10, seedOf(`${m.s.id}-ring`), { pad: 0, steps: 14, wobble: 1.2 })}" transform="translate(${f1(m.x - r - 5)} ${m.y - r - 5})"/>` : ""}
-          <rect class="hit" x="${f1(m.x - 12)}" y="${m.y - 12}" width="24" height="24"/>
+          <line class="stem" x1="${fx(m.x)}" x2="${fx(m.x)}" y1="${LY}" y2="${m.y}"/>
+          <path class="dot" d="${roughEllipse(r * 2, r * 2, seedOf(m.s.id), { pad: 0, steps: 12, wobble: 0.9 })}" transform="translate(${fx(m.x - r)} ${m.y - r})"/>
+          ${on ? `<path class="ring" d="${roughEllipse(r * 2 + 10, r * 2 + 10, seedOf(`${m.s.id}-ring`), { pad: 0, steps: 14, wobble: 1.2 })}" transform="translate(${fx(m.x - r - 5)} ${m.y - r - 5})"/>` : ""}
+          <rect class="hit" x="${fx(m.x - 12)}" y="${m.y - 12}" width="24" height="24"/>
         </g>`;
       })
       .join("");
@@ -2170,7 +2405,7 @@
     $("gLabels").innerHTML = labelsOf(marks, S.selected, reserved)
       .map(
         (l) =>
-          `<text class="lbl${l.id === S.selected ? " on" : ""}" x="${f1(l.x)}" y="${l.y}" text-anchor="middle">${esc(l.text)}</text>`,
+          `<text class="lbl${l.id === S.selected ? " on" : ""}" x="${fx(l.x)}" y="${l.y}" text-anchor="middle">${esc(l.text)}</text>`,
       )
       .join("");
 
@@ -2191,7 +2426,7 @@
 
     $("emptyLine").textContent = d.steps.length
       ? ""
-      : writable()
+      : !S.specimen
         ? "write the two texts, then put down a first move or what had to be true"
         : "nothing on the way";
   }
@@ -2214,7 +2449,10 @@
     b.classList.toggle("on", S.stand);
     b.classList.toggle("acc", S.stand);
     b.setAttribute("aria-pressed", String(S.stand));
-    $("specNote").hidden = !S.spec;
+    $("specNote").hidden = !S.specimen;
+    const carried = $("carried");
+    carried.hidden = !S.from;
+    carried.textContent = S.from ? `Carried from ${S.from}` : "";
     $("wayView").hidden = S.stand;
     $("memoir").hidden = !S.stand;
   }
@@ -2253,7 +2491,7 @@
     ]) {
       const el = $(id);
       el.value = v;
-      el.readOnly = !writable();
+      el.readOnly = S.specimen;
     }
     renderWords();
   }
@@ -2341,7 +2579,7 @@
       : q.length < 2 && all.length > 1
         ? all.slice(0, 6)
         : [];
-    const cur = S.spec ? SPECIMEN.slug : S.draft?.slug;
+    const cur = S.specimen ? SPECIMEN.slug : S.draft?.slug;
     $("waysList").innerHTML = show
       .map(
         (w) =>
@@ -2361,7 +2599,7 @@
 
   function renderStepsList() {
     const d = S.draft;
-    const rw = writable();
+    const rw = !S.specimen;
     $("stepsList").innerHTML = ordered(d.steps)
       .map(
         (s) =>
@@ -2383,7 +2621,7 @@
       p.innerHTML = "";
       return;
     }
-    const rw = writable();
+    const rw = !S.specimen;
     p.hidden = false;
     p.innerHTML = `
       <div class="rowhead">
@@ -2405,7 +2643,7 @@
 
   function renderObstacles() {
     const d = S.draft;
-    const rw = writable();
+    const rw = !S.specimen;
     $("obWrap").hidden = !d.obstacles.length && !rw;
     $("obList").innerHTML = d.obstacles
       .map(
@@ -2423,7 +2661,7 @@
 
   function renderChanges() {
     const d = S.draft;
-    const rw = writable();
+    const rw = !S.specimen;
     $("chWrap").hidden = !d.changes.length && !rw;
     $("chList").innerHTML = d.changes
       .map(
@@ -2441,10 +2679,21 @@
       .join("");
   }
 
+  function renderCarry() {
+    const d = S.draft;
+    const c = $("carryNext");
+    c.hidden = !S.next || S.specimen;
+    c.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, d.thenText, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+  }
+
   function renderStanding() {
     const d = S.draft;
     const el = $("standing");
-    if (!writable()) {
+    if (S.specimen) {
       el.innerHTML = "";
       el.hidden = true;
       return;
@@ -2468,7 +2717,7 @@
     if (!S.draft) return;
     document
       .querySelectorAll(".w-only")
-      .forEach((b) => (b.hidden = !writable()));
+      .forEach((b) => (b.hidden = S.specimen));
     renderHead();
     renderPapers();
     renderLine();
@@ -2480,6 +2729,7 @@
     renderObstacles();
     renderChanges();
     renderStanding();
+    renderCarry();
     setKept("idle");
   }
 
@@ -2492,6 +2742,7 @@
     renderStepsList();
     renderWays();
     renderMemoir();
+    renderCarry();
   }
 
   // ── changing the way ─────────────────────────────────────────────────
@@ -2539,19 +2790,19 @@
 
   // the papers
   $("nowText").addEventListener("input", (e) => {
-    if (!writable()) return;
+    if (S.specimen) return;
     S.draft.nowText = e.target.value;
     renderDerived();
     schedule();
   });
   $("thenText").addEventListener("input", (e) => {
-    if (!writable()) return;
+    if (S.specimen) return;
     S.draft.thenText = e.target.value;
     renderDerived();
     schedule();
   });
   $("thenDay").addEventListener("input", (e) => {
-    if (!writable()) return;
+    if (S.specimen) return;
     S.draft.then = e.target.value.trim() || null;
     renderDerived();
     schedule();
@@ -2565,7 +2816,7 @@
   document.querySelector(".desk").addEventListener("input", (e) => {
     const t = e.target;
     const d = S.draft;
-    if (!d || !writable()) return;
+    if (!d || S.specimen) return;
     if (t.id === "stepText" || t.id === "stepDay") {
       const s = d.steps.find((x) => x.id === S.selected);
       if (!s) return;
@@ -2605,7 +2856,7 @@
   document.querySelector(".desk").addEventListener("change", (e) => {
     const t = e.target;
     const ch = t.closest("[data-ch]");
-    if (!ch || t.dataset.f !== "lane" || !writable()) return;
+    if (!ch || t.dataset.f !== "lane" || S.specimen) return;
     const c = S.draft.changes.find((x) => x.id === ch.dataset.ch);
     if (!c) return;
     c.lane = t.value || null;
@@ -2620,13 +2871,13 @@
     const d = S.draft;
     if (t.dataset.open) {
       const w = [...S.ways, SPECIMEN].find((x) => x.slug === t.dataset.open);
-      if (w && !(w.slug === (S.spec ? SPECIMEN.slug : d?.slug))) openWay(w);
+      if (w && !(w.slug === (S.specimen ? SPECIMEN.slug : d?.slug))) openWay(w);
       return;
     }
     if (t.dataset.step) return select(t.dataset.step);
     if (t.dataset.select) return select(t.dataset.select);
     if (
-      !writable() &&
+      S.specimen &&
       t.dataset.act !== "new" &&
       t.dataset.act !== "stand" &&
       t.dataset.act !== "deselect"
@@ -2763,16 +3014,34 @@
   });
 
   // ── open ─────────────────────────────────────────────────────────────
-  drawFrame();
-  {
-    const st = readStore();
+  /** A hand-off read from the address: a new way of the reader's own, the carried text in
+      the then paper and nothing else, not kept until the reader writes. */
+  function carried(h) {
+    begin();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) S.draft.thenText = h.set;
+    renderAll();
+  }
+
+  function boot() {
+    const st = loadStore();
     S.ways = st.ways.sort(
       (a, b) =>
         b.touched.localeCompare(a.touched) || a.slug.localeCompare(b.slug),
     );
+    const h = fromHash();
+    if (h) return carried(h);
     const mine = st.open && S.ways.find((w) => w.slug === st.open);
-    S.spec = !mine;
+    S.specimen = !mine;
     S.draft = clone(mine || SPECIMEN);
     renderAll();
   }
+
+  drawFrame();
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

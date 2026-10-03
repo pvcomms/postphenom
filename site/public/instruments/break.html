@@ -36,20 +36,19 @@
      practice's own headings, the button that takes the break, and the break open in the triad.
      The three sentences each keep one hue — ochre for noticed, slate for shared, moss for kind —
      and the hue is used nowhere else, so a ring and its sentence are read as one thing. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
-    --faint: #8a8276;
+    --muted: #645e55;
+    --faint: #857d72;
     --rule: #e2ded5;
-    --rule-2: #cbc5b8;
     --accent: #b5532a;
-    --hover: rgba(35, 33, 30, 0.03);
-    --notice: #b08a3e;
-    --shared: #4f5f8a;
-    --kind: #5e7a4e;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -61,14 +60,11 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #857e70;
+      --faint: #7d766a;
       --rule: #302e25;
-      --rule-2: #4a473b;
       --accent: #d9763f;
-      --hover: rgba(237, 233, 223, 0.03);
-      --notice: #d2aa5a;
-      --shared: #8393c4;
-      --kind: #8dae78;
+      --grain: screen;
+      --grain-o: 0.045;
     }
   }
   :root[data-theme="dark"] {
@@ -77,10 +73,35 @@
     --surface: #1f1e17;
     --ink: #ede9df;
     --muted: #a39c8e;
-    --faint: #857e70;
+    --faint: #7d766a;
     --rule: #302e25;
-    --rule-2: #4a473b;
     --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* Break's own: a second rule, the hover wash, and the three hues of the sentences — ochre
+     for noticed, slate for shared, moss for kind — each used nowhere else, so a ring and its
+     sentence are read as one thing. */
+  :root {
+    --rule-2: #cbc5b8;
+    --hover: rgba(35, 33, 30, 0.03);
+    --notice: #b08a3e;
+    --shared: #4f5f8a;
+    --kind: #5e7a4e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --rule-2: #4a473b;
+      --hover: rgba(237, 233, 223, 0.03);
+      --notice: #d2aa5a;
+      --shared: #8393c4;
+      --kind: #8dae78;
+    }
+  }
+  :root[data-theme="dark"] {
+    --rule-2: #4a473b;
     --hover: rgba(237, 233, 223, 0.03);
     --notice: #d2aa5a;
     --shared: #8393c4;
@@ -130,6 +151,11 @@
     outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
+  a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
   .wrap {
     max-width: 1200px;
     margin-inline: auto;
@@ -170,7 +196,7 @@
     padding-block: 64px 36px;
     border-bottom: 1px solid var(--rule-2);
   }
-  .mast .label {
+  .mast .meta {
     margin: 0 0 24px;
   }
   h1 {
@@ -705,7 +731,9 @@
 <div class="wrap">
   <header class="mast">
     <div>
-      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <p class="meta">
+        Center for Applied Post-Phenomenology · Instrument
+      </p>
       <h1>Break</h1>
       <p class="deck hand">
         When it hurts: notice it, remember you are not the only one, be kind.
@@ -739,8 +767,8 @@
       </p>
       <p class="small">
         It opens on a specimen: one of two breaks a made-up person took, with
-        the friend's version and afterwards filled in. Start your own with
-        <em>a new break</em>. What you write stays in this browser and nowhere
+        the friend's version and afterwards filled in. <em>Make your own</em>
+        takes a break of yours. What you write stays in this browser and nowhere
         else.
       </p>
     </div>
@@ -755,13 +783,14 @@
             the specimen's
           </button>
           <button class="chip" type="button" id="srcMine">yours</button>
-          <button class="chip" type="button" id="fresh">a new break</button>
+          <button class="chip" type="button" id="fresh">Make your own</button>
         </div>
       </div>
       <p class="specimen-note hand" id="specimenNote">
         <b>Specimen A's break.</b> Fiction, and read-only. Press
-        <em>a new break</em> to take your own.
+        <em>Make your own</em> to take your own.
       </p>
+      <p class="specimen-note hand" id="carried" hidden></p>
 
       <div class="open">
         <div style="min-width: 0">
@@ -862,6 +891,7 @@
           rows="2"
           placeholder="how it went, later — a line"
         ></textarea>
+        <p class="hint hand" id="carryNext" hidden></p>
       </div>
 
       <div class="off" id="offRow" hidden>
@@ -876,6 +906,7 @@
       <section
         class="panel rise"
         style="animation-delay: 60ms"
+        id="readingPanel"
         aria-label="The reading"
       >
         <span class="meta head">the reading</span>
@@ -885,6 +916,7 @@
       <section
         class="panel rise"
         style="animation-delay: 100ms"
+        id="recordPanel"
         aria-label="The record"
       >
         <span class="meta head">the record</span>
@@ -909,16 +941,22 @@
       <section
         class="panel rise"
         style="animation-delay: 180ms"
+        id="lawsPanel"
         aria-label="What the break holds to"
       >
         <span class="meta head">what the break holds to</span>
         <p class="read">
-          The three sentences are enough; everything under them is optional. The
-          hurt is not a problem to be solved here. The friend's version is set
-          beside yours and counted, word by word, so you can see the difference;
-          nothing says which voice is right. The record counts breaks and hands
-          and which sentence was hardest; it never says you are hard on
-          yourself, and it never scores.
+          How it works: the three sentences are enough; everything under them is
+          optional. The hurt is not a problem to be solved here. The friend's
+          version is set beside yours and counted, word by word, every counted
+          word shown, so you can see the difference. The record counts breaks
+          and hands and which sentence was hardest, and dates each one.
+        </p>
+        <p class="read">
+          What it never does: say which voice is right; say you are hard on
+          yourself; score a break or a record; propose a sentence, a hand or a
+          word; call a host, fetch anything or ask a model; keep anything you
+          did not write.
         </p>
         <p class="meta plain source-line" id="keptWhere"></p>
       </section>
@@ -926,8 +964,8 @@
   </div>
 
   <footer>
-    <span class="label">Break · CAPP · prototype, 3 October 2026</span>
-    <span class="label">No network · kept in this browser</span>
+    <span class="meta">Break · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -1034,7 +1072,6 @@
   }
 
   const list = (xs) => [...new Set(xs)].map((w) => `'${w}'`).join(", ");
-  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
 
   /** The two voices side by side, as counts with the words. Never which voice is right. */
   function compare(toSelf, toFriend) {
@@ -1057,10 +1094,10 @@
       const parts = [];
       for (const f of ["absolutes", "shoulds", "labels", "contempt"])
         if (c[f].length)
-          parts.push(`${n(c[f].length, ONE[f], MANY[f])} (${list(c[f])})`);
+          parts.push(`${plural(c[f].length, ONE[f], MANY[f])} (${list(c[f])})`);
       if (c.allowance.length)
         parts.push(
-          `${n(c.allowance.length, "allowance")} (${list(c.allowance)})`,
+          `${plural(c.allowance.length, "allowance")} (${list(c.allowance)})`,
         );
       return `${who}: ${parts.length ? parts.join(", ") : "none of the counted words"}`;
     };
@@ -1068,7 +1105,7 @@
     if (toSelf.trim()) {
       out.push(say(a, "to yourself"));
       if (a.you.length)
-        out.push(`'you' turned on yourself ${n(a.you.length, "time")}`);
+        out.push(`'you' turned on yourself ${plural(a.you.length, "time")}`);
     }
     if (toFriend.trim()) out.push(say(b, "to a friend"));
     if (toSelf.trim() && toFriend.trim()) {
@@ -1092,13 +1129,6 @@
   }
 
   // the tally and the readings
-  const DAY = /^\d{4}-\d{2}-\d{2}$/;
-  const utc = (d) =>
-    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
-  function daysBetween(a, b) {
-    if (!DAY.test(a) || !DAY.test(b)) return 0;
-    return Math.round((utc(b) - utc(a)) / 86400000);
-  }
 
   function tally(moments, today) {
     const days = moments.map((m) => dayOf(m.at));
@@ -1151,7 +1181,7 @@
     const out = [];
     if (!t.n) return ["no breaks taken yet"];
     out.push(
-      `${n(t.n, "break")} · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
+      `${plural(t.n, "break")} · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
     );
     out.push(
       t.own === t.n
@@ -1198,9 +1228,7 @@
     const touch = TOUCHES.includes(String(r.touch)) ? r.touch : "";
     const hardest = THREE.includes(String(r.hardest)) ? r.hardest : "";
     const at =
-      typeof r.at === "string" && AT.test(r.at)
-        ? r.at
-        : new Date().toISOString().slice(0, 16);
+      typeof r.at === "string" && AT.test(r.at) ? r.at : nowIso().slice(0, 16);
     const m = {
       slug: str(r.slug, 120),
       at,
@@ -1307,7 +1335,15 @@
     },
   ].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
 
-  // ── the pen (after niwa lib/hand.ts): deterministic for its seed ────────────
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
     let a = seed >>> 0;
     return () => {
@@ -1318,6 +1354,8 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -1326,8 +1364,70 @@
     }
     return h >>> 0;
   }
-  const fx = (v) => String(Math.round(v * 10) / 10);
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
     let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
@@ -1341,6 +1441,12 @@
     }
     return d;
   }
+
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -1350,14 +1456,16 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
     const a0 = Math.PI * (0.8 + r() * 0.4);
     const overlap = 1.08 + r() * 0.06;
     const pts = [];
-    const k = Math.round(steps * overlap);
-    for (let i = 0; i <= k; i++) {
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
       const a = a0 + (i / steps) * Math.PI * 2;
       const kx = rx + spread(r, wobble);
       const ky = ry + spread(r, wobble);
@@ -1370,10 +1478,56 @@
     }
     return smooth(pts);
   }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
   function jitter(seed, amp = 0.6, turn = 14) {
     const r = rand(seed);
     return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
   }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -1381,17 +1535,17 @@
     const re = /([MCL])([^MCL]*)/g;
     let m;
     while ((m = re.exec(d))) {
-      const v = m[2]
+      const n = m[2]
         .trim()
         .split(/[\s,]+/)
         .filter(Boolean)
         .map(Number);
       if (m[1] === "M") {
         if (pts.length > 1) subs.push(pts);
-        cur = [v[0], v[1]];
+        cur = [n[0], n[1]];
         pts = [cur];
       } else if (m[1] === "L") {
-        const b = [v[0], v[1]];
+        const b = [n[0], n[1]];
         for (let i = 1; i <= 3; i++) {
           const t = i / 3;
           pts.push([
@@ -1401,7 +1555,7 @@
         }
         cur = b;
       } else {
-        const [x1, y1, x2, y2, x, y] = v;
+        const [x1, y1, x2, y2, x, y] = n;
         for (let i = 1; i <= 10; i++) {
           const t = i / 10;
           const u = 1 - t;
@@ -1422,24 +1576,30 @@
     if (pts.length > 1) subs.push(pts);
     return subs;
   }
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
     for (const pts of sample(d)) {
-      const len = pts.length;
+      const n = pts.length;
       const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
       const left = [];
       const right = [];
-      for (let i = 0; i < len; i++) {
+      for (let i = 0; i < n; i++) {
         const a = pts[Math.max(0, i - 1)];
-        const b = pts[Math.min(len - 1, i + 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
         let tx = b[0] - a[0];
         let ty = b[1] - a[1];
-        const l = Math.hypot(tx, ty) || 1;
-        tx /= l;
-        ty /= l;
-        const t = i / (len - 1);
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
         const k = t * 4;
         const ki = Math.min(3, Math.floor(k));
         const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
@@ -1457,6 +1617,67 @@
     }
     return out.join("");
   }
+  /* capp:hand end */
+
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
+
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
+  }
+  /* capp:slug end */
+
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
+
+  /* The minute, in local time with its offset: a break is dated to the minute it was taken. */
+  const nowIso = () => {
+    const d = new Date();
+    const p = (v) => String(v).padStart(2, "0");
+    const off = -d.getTimezoneOffset();
+    const sign = off >= 0 ? "+" : "-";
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}${sign}${p(Math.floor(Math.abs(off) / 60))}:${p(Math.abs(off) % 60)}`;
+  };
 
   // ── the three, drawn ────────────────────────────────────────────────────────
   // Neff's three as rings that overlap: what is noticed, what is shared, what is kind. Every
@@ -1506,19 +1727,35 @@
 
   // ── keeping: one key in this browser ────────────────────────────────────────
   const KEY = "pp-break";
+  /* capp:store begin */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  function persist(data) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /* capp:store end */
   const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
   const newestFirst = (a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0);
 
+  /** The reader's breaks, read back from the envelope and checked one by one. */
   function load() {
-    let raw = null;
-    try {
-      raw = JSON.parse(localStorage.getItem(KEY) || "null");
-    } catch {
-      raw = null;
-    }
+    const env = readStore();
     const out = [];
-    if (raw && Array.isArray(raw.moments))
-      for (const m of raw.moments) {
+    if (env && Array.isArray(env.moments))
+      for (const m of env.moments) {
         try {
           const v = validateMoment(m);
           if (SLUG.test(v.slug)) out.push(v);
@@ -1528,67 +1765,136 @@
       }
     return out.sort(newestFirst);
   }
-  function persist() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ moments: S.mine }));
-    } catch {
+  /** Write the reader's breaks. The specimen is never written. */
+  function keep() {
+    if (!persist({ moments: S.mine }))
       say("this browser would not keep it; it lasts until the page is closed.");
-    }
   }
 
+  // ── the hand-off: only the set-down text travels, by the address bar ────────
+  const SELF = "break";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
+
   // ── state ───────────────────────────────────────────────────────────────────
-  const nowIso = () => {
-    const d = new Date();
-    const p = (v) => String(v).padStart(2, "0");
-    const off = -d.getTimezoneOffset();
-    const sign = off >= 0 ? "+" : "-";
-    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}${sign}${p(Math.floor(Math.abs(off) / 60))}:${p(Math.abs(off) % 60)}`;
-  };
-  const today = nowIso().slice(0, 10);
+  const today = localToday();
 
   const S = {
     mine: load(),
-    source: "specimen",
+    specimen: true,
     open: null,
     kept: false,
     sure: false,
     others: null,
+    from: "",
+    next: "",
   };
-  const moments = () => (S.source === "mine" ? S.mine : SPECIMEN);
-  const writable = () => S.source === "mine";
+  const moments = () => (S.specimen ? SPECIMEN : S.mine);
 
   const $ = (id) => document.getElementById(id);
-  const esc = (s) =>
-    String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   function say(msg) {
     $("trouble").textContent = msg || "";
     $("trouble").hidden = !msg;
   }
 
   function fresh() {
+    S.specimen = false;
     S.kept = false;
     S.open = emptyMoment(nowIso());
     S.sure = false;
     S.others = null;
+    S.from = "";
+    S.next = "";
     say("");
     render(true);
   }
-  function loadMoment(m) {
+  function loadMoment(m, specimen = false) {
+    S.specimen = specimen;
     S.kept = true;
     S.open = structuredClone(m);
     S.sure = false;
     S.others = null;
+    S.from = "";
+    S.next = "";
     say("");
+    render(true);
+  }
+  /** A hand-off read from the address: a new break of the reader's own, the carried text in
+      what hurts and nothing else, not kept until the break is taken. */
+  function carried(h) {
+    fresh();
+    S.from = h.from;
+    S.next = h.next;
+    if (h.set) S.open = { ...S.open, what: h.set };
     render(true);
   }
 
   /** Keep the open break: a fresh one whose slug is taken gets a numbered one. */
   function save(m) {
-    if (!writable()) return null;
+    if (S.specimen) return null;
     let v;
     try {
       v = validateMoment(m);
@@ -1609,7 +1915,7 @@
     S.mine = S.mine.some((x) => x.slug === v.slug)
       ? S.mine.map((x) => (x.slug === v.slug ? v : x))
       : [v, ...S.mine].sort(newestFirst);
-    persist();
+    keep();
     S.kept = true;
     S.open = { ...S.open, slug: v.slug };
     say("");
@@ -1617,14 +1923,14 @@
   }
   // A kept break is kept again whenever a field is let go.
   const commit = () => {
-    if (S.open && S.kept && writable()) {
+    if (S.open && S.kept && !S.specimen) {
       save(S.open);
       renderDesk();
     }
   };
   const set = (p) => {
     S.open = { ...S.open, ...p };
-    if (S.kept && writable()) save(S.open);
+    if (S.kept && !S.specimen) save(S.open);
     render(false);
   };
 
@@ -1632,7 +1938,7 @@
   function writeAddress() {
     try {
       const url = new URL(location.href);
-      if (S.kept && S.open?.slug && S.source === "mine")
+      if (S.kept && S.open?.slug && !S.specimen)
         url.searchParams.set("slug", S.open.slug);
       else url.searchParams.delete("slug");
       history.replaceState(null, "", url);
@@ -1645,16 +1951,14 @@
   // `fields` is true when the open break changed underneath the inputs and they must be refilled.
   function render(fields) {
     const m = S.open;
-    const w = writable();
-    const ms = moments();
+    const w = !S.specimen;
 
-    $("srcSpecimen").setAttribute(
-      "aria-pressed",
-      String(S.source === "specimen"),
-    );
-    $("srcMine").setAttribute("aria-pressed", String(S.source === "mine"));
+    $("srcSpecimen").setAttribute("aria-pressed", String(S.specimen));
+    $("srcMine").setAttribute("aria-pressed", String(!S.specimen));
     $("srcMine").textContent = `yours · ${S.mine.length}`;
     $("specimenNote").hidden = w;
+    $("carried").hidden = !S.from;
+    $("carried").textContent = S.from ? `Carried from ${S.from}` : "";
 
     for (const id of [
       "what",
@@ -1681,7 +1985,10 @@
         : `<button class="hardest" type="button" data-hardest="${k}" title="mark this one as the hardest to say" aria-label="Mark the ${THREE_LABEL[k]} one as hardest"${w ? "" : " disabled"}>hardest?</button>`;
       h += `</div>`;
       if (w)
-        h += `<div class="others chips"${S.others === k ? "" : " hidden"}>${[THREE_DEFAULT[k], ...THREE_OTHERS[k]]
+        h += `<div class="others chips"${S.others === k ? "" : " hidden"}>${[
+          THREE_DEFAULT[k],
+          ...THREE_OTHERS[k],
+        ]
           .map(
             (o) =>
               `<button class="chip case" type="button" data-other="${esc(o)}" aria-pressed="${v === o}">${esc(o)}</button>`,
@@ -1706,10 +2013,10 @@
   // What changes when a break is kept, without touching the inputs and buttons under the hand.
   function renderDesk() {
     const m = S.open;
-    const w = writable();
+    const w = !S.specimen;
     const ms = moments();
     $("srcMine").textContent = `yours · ${S.mine.length}`;
-    $("fresh").hidden = !S.kept;
+    $("fresh").hidden = !(S.kept || S.specimen);
     $("when").textContent = S.kept
       ? `a break · ${m.at.slice(0, 16).replace("T", " · ")}`
       : "now";
@@ -1734,10 +2041,19 @@
         return `<li style="--i:${i}"><button type="button" data-slug="${esc(x.slug)}"${on ? ' aria-current="true"' : ""}><span class="meta plain when">${dayOf(x.at)}${x.touch ? ` · ${TOUCH_LABEL[x.touch]}` : ""}${x.toFriend.trim() ? " · the friend" : ""}${x.letter.trim() ? " · a letter" : ""}</span><span class="w">${esc(x.what)}</span>${x.after.trim() ? `<span class="a">afterwards: ${esc(x.after)}</span>` : ""}</button></li>`;
       })
       .join("");
-    $("keptWhere").textContent = w
-      ? "kept in this browser, under pp-break · nothing leaves it"
-      : "fiction, like the rest of the specimen";
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
+    renderCarry();
     writeAddress();
+  }
+
+  /* The hand-off onward: one link in afterwards, built from what hurts as it stands now. */
+  function renderCarry() {
+    const c = $("carryNext");
+    c.hidden = !S.next || S.specimen;
+    c.innerHTML = S.next
+      ? `<a href="${esc(carryHref(S.next, S.open.what, ""))}">Carry this to ${esc(S.next)}</a>`
+      : "";
   }
 
   $("practices").innerHTML = EXERCISES.map(
@@ -1746,18 +2062,15 @@
   ).join("");
 
   // ── the reader's hand on it ─────────────────────────────────────────────────
-  function setSource(src) {
-    if (src === S.source) return;
-    S.source = src;
-    if (src === "mine") {
-      if (S.mine.length) loadMoment(S.mine[0]);
-      else fresh();
-    } else loadMoment(SPECIMEN[0]);
-  }
-  $("srcSpecimen").addEventListener("click", () => setSource("specimen"));
-  $("srcMine").addEventListener("click", () => setSource("mine"));
+  $("srcSpecimen").addEventListener("click", () => {
+    if (!S.specimen) loadMoment(SPECIMEN[0], true);
+  });
+  $("srcMine").addEventListener("click", () => {
+    if (!S.specimen) return;
+    if (S.mine.length) loadMoment(S.mine[0]);
+    else fresh();
+  });
   $("fresh").addEventListener("click", () => {
-    S.source = "mine";
     fresh();
     $("what").focus();
   });
@@ -1765,6 +2078,7 @@
   for (const id of ["what", "need", "toSelf", "toFriend", "letter", "after"]) {
     $(id).addEventListener("input", (e) => {
       S.open = { ...S.open, [id]: e.target.value };
+      if (id === "what" && S.next) renderCarry();
       if (id === "toSelf" || id === "toFriend") {
         const voices = compare(S.open.toSelf, S.open.toFriend);
         $("compared").hidden = !voices.length;
@@ -1783,7 +2097,7 @@
   });
   three.addEventListener("focusin", (e) => {
     const k = e.target.dataset.three;
-    if (!k || S.others === k || !writable()) return;
+    if (!k || S.others === k || S.specimen) return;
     S.others = k;
     for (const o of three.querySelectorAll(".others"))
       o.hidden = o.parentElement.dataset.k !== k;
@@ -1801,7 +2115,7 @@
   });
   three.addEventListener("click", (e) => {
     const b = e.target.closest("button");
-    if (!b || !writable()) return;
+    if (!b || S.specimen) return;
     const k = b.closest("[data-k]").dataset.k;
     if (b.dataset.other !== undefined) {
       const o = b.dataset.other;
@@ -1820,13 +2134,13 @@
 
   $("touches").addEventListener("click", (e) => {
     const b = e.target.closest("[data-touch]");
-    if (!b || !writable()) return;
+    if (!b || S.specimen) return;
     const tc = b.dataset.touch;
     set({ touch: S.open.touch === tc ? "" : tc });
   });
 
   $("take").addEventListener("click", () => {
-    if (!writable()) return;
+    if (S.specimen) return;
     if (!S.open.what.trim()) {
       say("say what hurts, in a line");
       return;
@@ -1835,13 +2149,13 @@
   });
 
   $("off").addEventListener("click", () => {
-    if (!S.kept || !writable()) return;
+    if (!S.kept || S.specimen) return;
     if (!S.sure) {
       S.sure = true;
       return render(false);
     }
     S.mine = S.mine.filter((x) => x.slug !== S.open.slug);
-    persist();
+    keep();
     fresh();
   });
 
@@ -1852,8 +2166,10 @@
     if (m) loadMoment(m);
   });
 
-  // ── open: the reader's own record if they have one, else the specimen ───────
-  (() => {
+  // ── open: a hand-off if there is one, else the reader's own record, else the specimen ──
+  function boot() {
+    const h = fromHash();
+    if (h) return carried(h);
     let wanted = null;
     try {
       wanted = new URLSearchParams(location.search).get("slug");
@@ -1861,10 +2177,14 @@
       wanted = null;
     }
     if (S.mine.length) {
-      S.source = "mine";
       const m = wanted && S.mine.find((x) => x.slug === wanted);
       if (m) loadMoment(m);
       else fresh();
-    } else loadMoment(SPECIMEN[0]);
-  })();
+    } else loadMoment(SPECIMEN[0], true);
+  }
+  boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>

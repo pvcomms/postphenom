@@ -243,3 +243,17 @@ and style attributes, so `/instruments/:path+` is taken out of the main CSP and 
 `style-src 'self' 'unsafe-inline'`. Nothing else is loosened; the policy still names no origin but
 `'self'`, and none of the instruments fetches anything. What a reader adds stays in their own
 browser's `localStorage`.
+
+---
+
+**2026-10-03 — The Spine, and five more instruments.**
+The 27 instruments ported from niwa this morning were brought the same afternoon to one contract,
+`spine/docs/SPINE.md`: five moves (set down, draw it, read back, call, afterwards), seven refusals,
+one token block, shared code by copy, and a hand-off by the address bar (`#set=…&from=…&next=…`)
+that carries only the reader's own set-down text between instruments. Five instruments join them
+here: `spine` (the five moves, blank), `circuits` (three named sequences, the links built from what
+the reader types), and `real-ideal`, `attention` and `normal`, built from the builder brief as the
+proof that the brief holds. "Named, not yet built" is down to the inner-world map.
+
+Nothing changes on the site's side beyond five lines in `site.ts`; the hash fragment never reaches
+the server, and the CSP is as it was.

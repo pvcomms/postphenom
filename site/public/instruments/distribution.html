@@ -32,27 +32,19 @@
     font-display: swap;
   }
 
-  /* Layout: karesansui at noon. Ink on bone; the accent is only ever the thing being weighed,
-     its threads, and a call let in. Each stone keeps its bed's colour. */
+  /* capp:tokens begin */
   :root {
     color-scheme: light;
     --bg: #f4f2ed;
     --surface: #faf9f6;
     --ink: #23211e;
-    --muted: #6b655c;
+    --muted: #645e55;
     --faint: #857d72;
     --rule: #e2ded5;
     --accent: #b5532a;
-    --kind-concept: #b5532a;
-    --kind-garden: #8e5b55;
-    --kind-reading: #8a6f84;
-    --kind-notion: #3f6b66;
-    --kind-note: #6e6257;
-    --kind-project: #2f3437;
-    --kind-user: #7b4b3a;
-    --kind-feedback: #5b6b52;
-    --kind-reference: #4a5a6b;
     --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
     --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
     --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -64,9 +56,42 @@
       --surface: #1f1e17;
       --ink: #ede9df;
       --muted: #a39c8e;
-      --faint: #80796c;
+      --faint: #7d766a;
       --rule: #302e25;
       --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+  /* capp:tokens end */
+
+  /* the instrument's own hues: each stone keeps its bed's colour; the accent is only ever
+     the thing being weighed, its threads, and a call let in */
+  :root {
+    --kind-concept: #b5532a;
+    --kind-garden: #8e5b55;
+    --kind-reading: #8a6f84;
+    --kind-notion: #3f6b66;
+    --kind-note: #6e6257;
+    --kind-project: #2f3437;
+    --kind-user: #7b4b3a;
+    --kind-feedback: #5b6b52;
+    --kind-reference: #4a5a6b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
       --kind-concept: #d9763f;
       --kind-garden: #c08a82;
       --kind-reading: #b39aae;
@@ -79,14 +104,6 @@
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #16150f;
-    --surface: #1f1e17;
-    --ink: #ede9df;
-    --muted: #a39c8e;
-    --faint: #80796c;
-    --rule: #302e25;
-    --accent: #d9763f;
     --kind-concept: #d9763f;
     --kind-garden: #c08a82;
     --kind-reading: #b39aae;
@@ -167,6 +184,9 @@
   .meta.lc {
     text-transform: none;
     letter-spacing: 0.04em;
+  }
+  .meta.accent {
+    color: var(--accent);
   }
   .hand {
     font-style: italic;
@@ -654,6 +674,21 @@
     line-height: 1.4;
     color: var(--faint);
   }
+  .laws {
+    padding: 18px;
+  }
+  .laws .how {
+    margin-top: 10px;
+  }
+  #keptWhere {
+    margin-top: 12px;
+  }
+  .carried {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
 
   footer {
     margin-top: 64px;
@@ -769,6 +804,7 @@
         <label class="meta" for="taste-title"
           >weigh a thing before you let it in</label
         >
+        <p class="hand carried" id="carried" hidden></p>
         <input
           id="taste-title"
           class="search"
@@ -810,13 +846,30 @@
         data-seed="forecast-record"
         aria-label="The garden's guesses, scored"
       ></section>
-      <p class="how" id="how"></p>
+      <section
+        class="laws panel sketched"
+        id="lawsPanel"
+        data-sketch="box"
+        data-seed="distribution-laws"
+        aria-label="What the distribution holds to"
+      >
+        <p class="meta accent">what the distribution holds to</p>
+        <p class="how" id="how"></p>
+        <p class="how">
+          it never says which tail is the good one, never puts one thing you
+          weighed above another, and never calls a thing worth reading. its one
+          guess at your call is sealed until you have made it, and is scored
+          against your own base rate, not against you. nothing is fetched, no
+          model is asked, and nothing leaves this page.
+        </p>
+        <p class="meta" id="keptWhere"></p>
+      </section>
     </aside>
   </div>
 
   <footer>
     <span class="meta">Distribution · CAPP · prototype, 3 October 2026</span>
-    <span class="meta">No network · your calls stay in this browser</span>
+    <span class="meta">No network · kept in this browser</span>
   </footer>
 </div>
 
@@ -2044,15 +2097,19 @@
       .map((e) => e[0].replace(/_/g, " "));
   }
 
-  function slugOf(title) {
-    const s = title
+  /* capp:slug begin */
+  function slugOf(title, day) {
+    const t = String(title)
       .toLowerCase()
       .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
-      .slice(0, 60);
-    return s || "decision";
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "sheet"}`;
   }
+  /* capp:slug end */
 
   // ── the forecast: a port of lib/forecast.ts ───────────────────────────────────────
   // The garden's guess at the reader's call, sealed when a thing is weighed and opened only
@@ -2095,7 +2152,9 @@
   }
 
   const in100 = (p) => `${Math.round(p * 100)} in 100`;
-  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural begin */
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  /* capp:plural end */
 
   function reveal(s, letIn) {
     const rests =
@@ -2217,7 +2276,13 @@
     return { garden, base, weight, near, nearIn };
   }
 
-  // ── the hand: a port of lib/hand.ts. Every path is deterministic for its seed ─────
+  /* capp:hand begin */
+  /**
+   * Hand-drawn strokes. Every path is deterministic for its seed, so the server
+   * and the client draw the same line and a re-render never redraws a border.
+   * Amplitudes are in px and small on purpose: a line that wobbles more than a
+   * pixel or two stops reading as drawn and starts reading as broken.
+   */
 
   /** mulberry32 — small, fast, and the same number sequence everywhere. */
   function rand(seed) {
@@ -2231,7 +2296,7 @@
     };
   }
 
-  /** A stable seed from a string. */
+  /** A stable seed from a string, so a note's stroke is its own every time. */
   function seedOf(s) {
     let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
@@ -2244,7 +2309,11 @@
   const fx = (n) => String(Math.round(n * 10) / 10);
   const spread = (r, amp) => (r() * 2 - 1) * amp;
 
-  /** One pen stroke from a to b, a cubic a little off the straight line. */
+  /**
+   * One pen stroke from a to b: a cubic whose control points sit a little off
+   * the straight line, the pen starting and stopping just past the ends the way
+   * a quick sketch does. Returns a segment beginning with its own M.
+   */
   function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
@@ -2263,6 +2332,8 @@
       b[0] + ux * past + nx * spread(r, wobble * 0.4),
       b[1] + uy * past + ny * spread(r, wobble * 0.4),
     ];
+    // The bow: both control points lean the same way more often than not, so a
+    // long side curves gently rather than kinking.
     const bow = spread(r, wobble);
     const t1 = 0.25 + r() * 0.15;
     const t2 = 0.6 + r() * 0.15;
@@ -2297,7 +2368,7 @@
     ].join("");
   }
 
-  /** Catmull-Rom through the points, as cubics. */
+  /** Catmull-Rom through the points, as cubics — a smooth, continuous pen line. */
   function smooth(pts) {
     let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
     for (let i = 0; i < pts.length - 1; i++) {
@@ -2312,7 +2383,11 @@
     return d;
   }
 
-  /** The circling: a loop round a w×h box that runs past its own start. */
+  /**
+   * The circling: a loop around a w×h box that starts somewhere on the left,
+   * goes once round, and runs past its own start — the way a word gets ringed
+   * in a notebook. `pad` is how far outside the box the pen stays.
+   */
   function roughEllipse(
     w,
     h,
@@ -2322,6 +2397,8 @@
     const r = rand(seed);
     const cx = w / 2;
     const cy = h / 2;
+    // An ellipse that only just clears a box cuts through its corners; `grow`
+    // widens it so the ring passes outside the letters at the ends.
     const rx = (w / 2) * grow + pad;
     const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
     const tilt = spread(r, 0.06);
@@ -2355,7 +2432,43 @@
     );
   }
 
-  /** A path of M, C and L, sampled into points per subpath. */
+  /**
+   * A long vertical line, like the left edge of a sheet laid on the desk: long
+   * lines drift slowly, so the wobble here is low-frequency and the pen lifts
+   * once or twice on the way down.
+   */
+  function roughEdge(h, seed, { wobble = 1.4, x = 0.5 } = {}) {
+    const r = rand(seed);
+    const pts = [];
+    const step = 90;
+    for (let y = -2; y <= h + 2; y += step)
+      pts.push([x + spread(r, wobble), y]);
+    pts.push([x + spread(r, wobble), h + 2]);
+    return smooth(pts);
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /**
+   * A path from this file (M, C and L only, absolute), sampled into points per
+   * subpath — the centreline a pen would have followed.
+   */
   function sample(d) {
     const subs = [];
     let cur = [0, 0];
@@ -2405,7 +2518,12 @@
     return subs;
   }
 
-  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  /**
+   * The pen's pressure: a centreline turned into a filled ribbon that is thin
+   * where the pen lands and lifts, fullest through the middle, and never quite
+   * even — a few knots of pressure along the way, interpolated. `width` is the
+   * width at full pressure. Each subpath is its own stroke.
+   */
   function ribbon(d, width = 1.5, seed = 1) {
     const r = rand(seed);
     const out = [];
@@ -2440,6 +2558,7 @@
     }
     return out.join("");
   }
+  /* capp:hand end */
 
   // ── the garden: notes read from markdown by the rules of niwa's lib/garden.ts ─────
   // Only the stones are needed here, not the threads between them.
@@ -2608,8 +2727,7 @@
 
   // ── the page ───────────────────────────────────────────────────────────────────────
 
-  const KEY = "pp-distribution";
-  const DAY = 86_400_000;
+  const MS_DAY = 86_400_000;
   const WINDOWS = [
     {
       key: "all",
@@ -2668,19 +2786,38 @@
   const sig = (z) => `${z >= 0 ? "+" : "−"}${Math.abs(z).toFixed(1)}σ`;
   const wordCount = (s) => s.split(/\s+/).filter((w) => w.length > 2).length;
   const zKey = (m, w) => `${m}_${w}`;
-  const esc = (s) =>
-    String(s).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        })[c],
-    );
-  const today = () => new Date().toISOString().slice(0, 10);
+  /* capp:esc begin */
+  const ESC = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  /* capp:esc end */
+
+  /* capp:dates begin */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* capp:dates end */
   const $ = (id) => document.getElementById(id);
 
   /** The bands of the curve, the way the sheet reads them, both tails named. */
@@ -2723,6 +2860,9 @@
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const S = {
     garden: null, // { id, name, specimen, nodes, model, read }
+    specimen: true, // the garden on the sheet is the specimen
+    from: "", // the instrument the set-down text was carried from
+    next: "", // the instrument to carry it to
     progress: null, // while a garden is being weighed against itself
     win: "all",
     measure: "themes",
@@ -2741,6 +2881,8 @@
   let lastCand = null;
 
   // ── the record, kept in this browser ─────────────────────────────────────────────
+
+  const KEY = "pp-distribution";
 
   function cleanChoice(c) {
     if (
@@ -2769,29 +2911,106 @@
       specimen: c.specimen === true,
     };
   }
-  function loadRecord() {
+  /* capp:store begin */
+  function readStore() {
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) return null;
-      const o = JSON.parse(raw);
-      if (!o || !Array.isArray(o.choices)) return null;
-      return o.choices.map(cleanChoice).filter(Boolean);
+      const d = JSON.parse(raw);
+      return d && typeof d === "object" && d.v === 1 ? d : null;
     } catch {
       return null;
     }
   }
-  function saveRecord() {
+  function persist(data) {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ v: 1, choices: S.choices }));
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, ...data }));
+      return true;
     } catch {
-      /* storage refused: the record lives in this page until it is closed */
+      return false;
     }
   }
+  /* capp:store end */
+  /** The record read back, row by row; a bad row is dropped. */
+  function loadRecord() {
+    const env = readStore();
+    if (!env || !Array.isArray(env.choices)) return null;
+    return env.choices.map(cleanChoice).filter(Boolean);
+  }
+  /* storage refused: the record lives in this page until it is closed */
+  const saveRecord = () => persist({ choices: S.choices });
+
+  const SELF = "distribution";
+  const SLUGS = [
+    "catalogue",
+    "bearing",
+    "distribution",
+    "flow",
+    "course",
+    "alarm",
+    "way",
+    "margin",
+    "provenance",
+    "oblique",
+    "dialogue",
+    "mask",
+    "tack",
+    "sieve",
+    "wish",
+    "break",
+    "overview",
+    "fence",
+    "muster",
+    "botec",
+    "act",
+    "crowd",
+    "canon",
+    "panel",
+    "slice",
+    "toll",
+    "unison",
+    "spine",
+    "circuits",
+    "real-ideal",
+    "attention",
+    "normal",
+    "half-second",
+    "familiar-voice",
+    "stop-flowing",
+    "chronology",
+  ];
+  /* capp:hash begin */
+  function fromHash() {
+    const h = location.hash.slice(1);
+    if (!h.includes("=")) return null;
+    const q = new URLSearchParams(h);
+    const ok = (s) => /^[a-z][a-z-]{1,23}$/.test(s) && SLUGS.includes(s);
+    const set = q.get("set") || "";
+    const out = {
+      set: set.length <= 4000 ? set : "",
+      from: ok(q.get("from") || "") ? q.get("from") : "",
+      next: ok(q.get("next") || "") ? q.get("next") : "",
+    };
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
+    return out.set || out.from || out.next ? out : null;
+  }
+  function carryHref(slug, text, next) {
+    const base =
+      location.protocol === "file:" ? `../${slug}/index.html` : `./${slug}`;
+    const q = new URLSearchParams();
+    q.set("set", text);
+    q.set("from", SELF);
+    if (next) q.set("next", next);
+    return `${base}#${q}`;
+  }
+  /* capp:hash end */
   const byWeighed = (a, b) =>
     a.weighed < b.weighed ? 1 : a.weighed > b.weighed ? -1 : 0;
 
-  function uniqueSlug(title, taken) {
-    const base = slugOf(title);
+  function uniqueSlug(title, day, taken) {
+    const base = slugOf(title, day);
     let slug = base;
     let n = 2;
     while (taken.has(slug)) slug = `${base}-${n++}`;
@@ -2923,7 +3142,7 @@
   /** The specimen garden as stones, dated back from now. */
   function specimenNodes() {
     const now = Date.now();
-    const iso = (age) => new Date(now - age * DAY).toISOString();
+    const iso = (age) => new Date(now - age * MS_DAY).toISOString();
     return [
       ...SPECIMEN.notes.map(
         ([slug, title, kind, age, topics, summary, body]) => ({
@@ -2959,12 +3178,13 @@
     const calls = SPECIMEN.calls.slice().sort((a, b) => b[3] - a[3]);
     for (const [title, text, verdict, age, note] of calls) {
       const r = weighOn(model, title, text, out);
-      const slug = uniqueSlug(title, taken);
+      const weighed = new Date(Date.now() - age * MS_DAY).toISOString().slice(0, 10);
+      const slug = uniqueSlug(title, weighed, taken);
       taken.add(slug);
       out.push({
         slug,
         title,
-        weighed: new Date(Date.now() - age * DAY).toISOString().slice(0, 10),
+        weighed,
         verdict,
         z: zsOf(r),
         forecast: r.seal,
@@ -2986,6 +3206,7 @@
     });
     S.progress = null;
     S.garden = { ...g, model };
+    S.specimen = g.specimen === true;
     S.band = null;
     S.under = null;
     S.hover = null;
@@ -3129,9 +3350,13 @@
       }
     } else {
       const c = {
-        slug: uniqueSlug(cur.title, new Set(S.choices.map((x) => x.slug))),
+        slug: uniqueSlug(
+          cur.title,
+          localToday(),
+          new Set(S.choices.map((x) => x.slug)),
+        ),
         title: cur.title.trim().slice(0, 200) || "untitled",
-        weighed: today(),
+        weighed: localToday(),
         verdict,
         z: zsOf(cur.reading),
         forecast: cur.reading.seal,
@@ -3171,6 +3396,21 @@
     S.choices = S.choices.filter((c) => !c.specimen);
     saveRecord();
     renderSheet();
+    renderDesk();
+  }
+
+  /** A hand-off from another instrument: a new reading of the reader's own, the text in the
+      set-down field and nothing else prefilled. Nothing is kept until they make a call. */
+  function carried(h) {
+    S.from = h.from;
+    S.next = h.next;
+    S.sel = null;
+    $("taste-title").value = "";
+    $("taste-text").value = h.set;
+    const el = $("carried");
+    el.hidden = !S.from;
+    el.textContent = S.from ? `Carried from ${S.from}` : "";
+    reweighLive(true);
     renderDesk();
   }
 
@@ -3225,7 +3465,7 @@
     const g = S.garden;
     $("which-tag").textContent = S.progress
       ? "weighing"
-      : g?.specimen
+      : g && S.specimen
         ? "specimen · synthetic"
         : g
           ? "yours · this tab only"
@@ -3235,15 +3475,15 @@
       h += `<p>Reading <b>${esc(S.progress.name)}</b>.</p>`;
     } else if (!g) {
       h += `<p>Planting the specimen.</p>`;
-    } else if (g.specimen) {
+    } else if (S.specimen) {
       const terms = g.nodes.filter((n) => n.kind === "concept").length;
       h += `<p>A <b>specimen garden</b>: ${g.nodes.length - terms} notes and ${terms} terms of an invented person, mostly about attention and the feed, bread, and walking, with ${SPECIMEN.calls.length} calls already on their record. Nobody real wrote it.</p>`;
     } else {
       h += `<p><b>${esc(g.name)}</b>: ${g.read} markdown files read, ${g.model.n} with words enough to weigh.</p>`;
     }
     h += `<div class="acts">`;
-    h += `<button type="button" class="chip go" data-act="folder"${S.progress ? " disabled" : ""}>${g && !g.specimen ? "open another folder" : "open your own folder"}</button>`;
-    if (g && !g.specimen)
+    h += `<button type="button" class="chip go" data-act="folder"${S.progress ? " disabled" : ""}>${g && !S.specimen ? "open another folder" : "Make your own"}</button>`;
+    if (g && !S.specimen)
       h += `<button type="button" class="chip" data-act="specimen"${S.progress ? " disabled" : ""}>back to the specimen</button>`;
     h += `</div>`;
     if (S.folderError)
@@ -3743,6 +3983,8 @@
         h += `<p class="hand faint body-s" style="margin-top: 8px">the garden has a guess at your call, sealed until you make it.</p>`;
       h += `<textarea class="search hand" id="note" rows="2" style="margin-top: 12px" placeholder="why, in your own hand" aria-label="Why, in your own hand">${esc(S.note)}</textarea>`;
     }
+    if (S.next)
+      h += `<p class="hand faint body-s" style="margin-top: 8px"><a href="${esc(carryHref(S.next, cur.text, ""))}">Carry this to ${esc(S.next)}</a></p>`;
     h += `</div>`;
     const fresh = el.dataset.for !== cur.id;
     el.className = "reading panel sketched";
@@ -3872,7 +4114,9 @@
 
   function renderHow() {
     $("how").textContent =
-      `how it is measured: a stone's kinship is the mean likeness to its ${K} nearest stones. on words, likeness is shared words and phrases (tf-idf cosine over titles, tags and first lines). on themes, it is the ${THEMES_K} directions the garden's own words co-occur along (latent semantic analysis of that same likeness) — so two stones with no words in common can still be kin. neither is meaning; the kin are listed so you can check. your calls are kept in this browser, under ${KEY}.`;
+      `how it is measured: a stone's kinship is the mean likeness to its ${K} nearest stones. on words, likeness is shared words and phrases (tf-idf cosine over titles, tags and first lines). on themes, it is the ${THEMES_K} directions the garden's own words co-occur along (latent semantic analysis of that same likeness) — so two stones with no words in common can still be kin. neither is meaning; the kin are listed so you can check.`;
+    $("keptWhere").textContent =
+      `kept in this browser only, under ${KEY} · nowhere else`;
   }
 
   function renderDesk() {
@@ -3998,10 +4242,18 @@
         }
       }
     });
-    for (const el of [document.querySelector(".which"), $("sheet"), $("record"), $("reading")]) ro.observe(el);
+    for (const el of [
+      document.querySelector(".which"),
+      $("sheet"),
+      $("record"),
+      $("reading"),
+      $("lawsPanel"),
+    ])
+      ro.observe(el);
   }
 
   async function boot() {
+    const h = fromHash();
     wire();
     renderHow();
     const stored = loadRecord();
@@ -4014,7 +4266,12 @@
     });
     S.choices = stored ?? specimenRecord(S.garden.model);
     renderAll();
+    if (h) carried(h);
     requestAnimationFrame(() => sketchAll());
   }
   boot();
+  window.addEventListener("hashchange", () => {
+    const h = fromHash();
+    if (h) carried(h);
+  });
 </script>
