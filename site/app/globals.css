@@ -284,6 +284,8 @@ a.post:hover .post-title { color: var(--accent); }
 .footer-rights { margin-top: 18px !important; }
 .footer-label { font-weight: 600; color: var(--ink); }
 .footer-credit { margin-top: 18px !important; }
+.footer-badge { display: block; width: fit-content; margin-top: 22px; }
+.footer-badge img { height: 42px; width: auto; }
 .footer-links { list-style: none; margin: 0; padding: 0; }
 .footer-links li { padding: 3px 0; }
 .footer-links a { font-size: 14px; font-weight: 600; color: var(--muted); }

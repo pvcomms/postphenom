@@ -235,6 +235,14 @@ export const site = {
 
   footer: { write: "Write to the Center" },
 
+  // Not By AI badge, the "written by human" variant, linked as its guidelines ask. The file is the
+  // original and must not be altered or shrunk below 42px tall.
+  badge: {
+    href: "https://notbyai.fyi/",
+    src: "/images/written-by-human-not-by-ai-white.svg",
+    alt: "Written by Human, Not by AI",
+  },
+
   // The proof-of-work that opens the page and guards the address. altcha, vendored in public/vendor/altcha.
   proof: {
     kicker: "postphenom.com · proof of work",
