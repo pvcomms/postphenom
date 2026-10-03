@@ -1,0 +1,2350 @@
+<title>The Familiar Voice</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Hear a claim twice and it starts to feel true. Hear it said warmly and it starts to feel like being understood. A four-phase session that does both to you, then shows its working."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a session protocol sheet. One narrow form column; each phase carries its code in a left margin rail,
+   like a lab record; answers are marked in OMR bubbles; highlighter marks whatever the machine added. */
+  :root {
+    color-scheme: light;
+    --paper: #e9ede6; /* form paper, grey-green */
+    --sheet: #f6f7f2; /* answer fields */
+    --ink: #141c17;
+    --ink-2: #4a574f;
+    --ink-3: #5f6c64;
+    --rule: #c8d2c9; /* dropout-green form rules */
+    --rule-2: #9fb1a3;
+    --mark: #f1c14a; /* highlighter: what the machine added */
+    --mark-ink: #7d5200;
+    --on-mark: #141c17;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #0f1511;
+      --sheet: #161e19;
+      --ink: #e1e7e0;
+      --ink-2: #a2afa5;
+      --ink-3: #7a887e;
+      --rule: #26332b;
+      --rule-2: #3d4d42;
+      --mark: #8a6414;
+      --mark-ink: #f0c35c;
+      --on-mark: #fbf6e8;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0f1511;
+    --sheet: #161e19;
+    --ink: #e1e7e0;
+    --ink-2: #a2afa5;
+    --ink-3: #7a887e;
+    --rule: #26332b;
+    --rule-2: #3d4d42;
+    --mark: #8a6414;
+    --mark-ink: #f0c35c;
+    --on-mark: #fbf6e8;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  em {
+    font-style: italic;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .wrap {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+  .who {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+  }
+  .small {
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .mono {
+    font-family: var(--mono);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 0 0 22px;
+  }
+  h1 {
+    font-size: clamp(46px, 7.4vw, 84px);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+  }
+  .deck {
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.35;
+    margin: 22px 0 0;
+    max-width: 24em;
+    text-wrap: pretty;
+  }
+  .instr {
+    font-size: 16px;
+    color: var(--ink-2);
+    margin: 14px 0 0;
+    max-width: 32em;
+  }
+  .specimen {
+    margin: 0;
+  }
+  .specimen figcaption {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    margin-top: 10px;
+    max-width: 30em;
+  }
+  .specimen .tagline {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 2px;
+    padding: 1px 6px;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+
+  .protocol {
+    list-style: none;
+    margin: 0;
+    padding: 22px 0 20px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-bottom: 1px solid var(--rule);
+  }
+  .protocol li {
+    padding: 0 18px;
+    border-left: 1px solid var(--rule);
+    display: grid;
+    gap: 4px;
+    align-content: start;
+  }
+  .protocol li:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .protocol .code {
+    font-family: var(--mono);
+    font-size: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--rule-2);
+    display: grid;
+    place-items: center;
+    transition:
+      background-color 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+  .protocol li[aria-current="step"] .code {
+    background: var(--mark);
+    border-color: var(--mark);
+    color: var(--on-mark);
+  }
+  .protocol li.done .code {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .protocol b {
+    font-weight: 500;
+    font-size: 17px;
+    margin-top: 4px;
+  }
+  .protocol .d {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-top: 40px;
+    }
+    .protocol {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 20px;
+    }
+    .protocol li:nth-child(3) {
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+
+  /* phases */
+  .phase {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 24px;
+    padding-block: 52px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 20px);
+    align-self: start;
+  }
+  .rail .code {
+    font-family: var(--mono);
+    font-size: 22px;
+    line-height: 1;
+    width: 46px;
+    height: 46px;
+    border: 1.5px solid var(--rule-2);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    transition:
+      background-color 0.35s var(--ease),
+      border-color 0.35s var(--ease),
+      color 0.35s var(--ease);
+  }
+  .phase[data-state="active"] .rail .code {
+    background: var(--mark);
+    border-color: var(--mark);
+    color: var(--on-mark);
+  }
+  .phase[data-state="done"] .rail .code {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .rail .name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .body {
+    min-width: 0;
+  }
+  h2 {
+    font-size: clamp(28px, 3.8vw, 38px);
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+    margin-bottom: 12px;
+  }
+  h2:focus {
+    outline: none;
+  }
+  h3 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 40px 0 10px;
+  }
+  .lede {
+    color: var(--ink-2);
+    font-size: 17px;
+    max-width: 36em;
+    margin: 0 0 26px;
+  }
+  .prose p {
+    max-width: 37em;
+  }
+  .phase[data-state="locked"] .live {
+    display: none;
+  }
+  .phase[data-state="locked"] h2 {
+    color: var(--ink-2);
+  }
+  .wait {
+    display: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+    margin: 0;
+  }
+  .phase[data-state="locked"] .wait {
+    display: block;
+  }
+  .done-note {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-2);
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .phase {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding-block: 40px;
+    }
+    .rail {
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  /* stimulus sheet */
+  .card {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 24px 28px;
+  }
+  .ask p {
+    margin: 0;
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  .ans {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule-2);
+  }
+  .ans p,
+  .stmt {
+    margin: 0;
+    font-size: clamp(20px, 2.5vw, 24px);
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+  }
+  .enter {
+    animation: enter 0.45s var(--ease);
+  }
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .pips {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .pips i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1px solid var(--rule-2);
+    transition:
+      background-color 0.25s var(--ease),
+      border-color 0.25s var(--ease);
+  }
+  .pips i.on {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .pips i.now {
+    border-color: var(--ink);
+  }
+  @media (max-width: 520px) {
+    .card {
+      padding: 20px;
+    }
+  }
+
+  /* OMR bubbles */
+  .q {
+    font-size: 16px;
+    margin: 24px 0 10px;
+  }
+  .bubbles {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 6px;
+    max-width: calc(var(--n) * 96px);
+  }
+  .bub {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 6px 0;
+    margin: 0;
+    cursor: pointer;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 6px;
+    color: var(--ink);
+    font: inherit;
+  }
+  .bub i {
+    font-style: normal;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule-2);
+    background: var(--sheet);
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-size: 16px;
+    transition:
+      background-color 0.18s var(--ease),
+      border-color 0.18s var(--ease),
+      color 0.18s var(--ease),
+      transform 0.18s var(--ease);
+  }
+  .bub small {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    color: var(--ink-2);
+    text-align: center;
+    min-height: 2.5em;
+  }
+  .bub:hover i {
+    border-color: var(--ink);
+  }
+  .bub:active i {
+    transform: scale(0.93);
+  }
+  .bub[aria-pressed="true"] i {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .bub:focus {
+    outline: none;
+  }
+  .bub:focus-visible i {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .bub:disabled {
+    cursor: default;
+  }
+  .bub:disabled:not([aria-pressed="true"]) i {
+    opacity: 0.4;
+  }
+  .bub:disabled:hover i {
+    border-color: var(--rule-2);
+  }
+  .bub .ab {
+    display: none;
+  }
+  @media (max-width: 560px) {
+    .bub i {
+      width: 38px;
+      height: 38px;
+      font-size: 15px;
+    }
+    .bub .fl {
+      display: none;
+    }
+    .bub .ab {
+      display: inline;
+    }
+  }
+
+  /* controls */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: center;
+    margin-top: 22px;
+  }
+  .btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    padding: 11px 18px;
+    cursor: pointer;
+    transition:
+      transform 0.15s var(--ease),
+      opacity 0.2s var(--ease),
+      background-color 0.2s var(--ease);
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--rule-2);
+  }
+  .btn.ghost:hover {
+    border-color: var(--ink);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .chip {
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.35;
+    text-align: left;
+    background: var(--sheet);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition:
+      border-color 0.18s var(--ease),
+      box-shadow 0.18s var(--ease);
+  }
+  .chip:hover {
+    border-color: var(--ink-2);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .chip:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  textarea {
+    display: block;
+    width: 100%;
+    font: inherit;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--sheet);
+    border: 1px solid var(--rule-2);
+    border-radius: 4px;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 84px;
+  }
+  textarea:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .err {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--mark-ink);
+    margin: 10px 0 0;
+  }
+  .said {
+    font-size: 20px;
+    line-height: 1.45;
+    margin: 0;
+    padding-left: 14px;
+    border-left: 2px solid var(--rule-2);
+  }
+
+  /* replies */
+  .reply {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 22px 26px 18px;
+  }
+  .reply + .reply {
+    margin-top: 16px;
+  }
+  .reply .text {
+    font-size: 19px;
+    line-height: 1.7;
+    margin: 0;
+  }
+  .reply .q {
+    margin-top: 18px;
+  }
+  .seg .tag {
+    display: none;
+  }
+  .revealed .seg .tag {
+    display: inline;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 0.45em;
+    position: relative;
+    top: -0.15em;
+    color: var(--ink-3);
+  }
+  .revealed .seg.f .tag {
+    color: var(--mark-ink);
+  }
+  .hl {
+    background-image: linear-gradient(var(--mark), var(--mark));
+    background-repeat: no-repeat;
+    background-position: 0 60%;
+    background-size: 0% 86%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding-inline: 0.1em;
+    transition:
+      background-size 0.6s var(--ease) var(--d, 0ms),
+      color 0.3s var(--ease) var(--d, 0ms);
+  }
+  .revealed .hl,
+  .hl.on {
+    background-size: 100% 86%;
+    color: var(--on-mark);
+  }
+  .revealed .sw {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--mark-ink);
+    text-underline-offset: 4px;
+  }
+  @media (max-width: 520px) {
+    .reply {
+      padding: 18px 18px 14px;
+    }
+  }
+
+  .swap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 18px 0 22px;
+    padding: 18px 0;
+    border-top: 1px dashed var(--rule-2);
+    border-bottom: 1px dashed var(--rule-2);
+  }
+  .swap p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  @media (max-width: 560px) {
+    .swap {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  }
+
+  .dial {
+    display: grid;
+    gap: 4px;
+    max-width: 440px;
+    margin: 18px 0 18px;
+  }
+  .dial input {
+    width: 100%;
+    accent-color: var(--ink);
+    margin: 0;
+  }
+  .dial input:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+  }
+  .ticks {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .bars {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+    max-width: 620px;
+  }
+  .bar {
+    display: grid;
+    grid-template-columns: 15em minmax(0, 1fr) 3ch;
+    gap: 14px;
+    align-items: center;
+  }
+  .bar .lbl {
+    font-size: 14px;
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+  .bar .track {
+    height: 10px;
+    background: var(--rule);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .bar .fill {
+    height: 100%;
+    background: var(--ink);
+    transform-origin: left center;
+    transition: transform 0.45s var(--ease);
+  }
+  .bar.stock .fill {
+    background: var(--ink-3);
+  }
+  .bar.feel .fill {
+    background: var(--mark);
+  }
+  .bar .n {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 560px) {
+    .bar {
+      grid-template-columns: minmax(0, 1fr) 3ch;
+      row-gap: 4px;
+    }
+    .bar .lbl {
+      grid-column: 1/-1;
+    }
+  }
+
+  /* debrief */
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--rule-2);
+    border-bottom: 1px solid var(--rule);
+    margin: 6px 0 28px;
+  }
+  .fig {
+    padding: 16px 18px 18px;
+    border-left: 1px solid var(--rule);
+  }
+  .fig:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .fig .v {
+    font-family: var(--mono);
+    font-size: clamp(30px, 5.2vw, 46px);
+    line-height: 1.1;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .fig .v .hl {
+    padding-inline: 0.12em;
+  }
+  .fig .u {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-top: 4px;
+  }
+  @media (max-width: 520px) {
+    .fig {
+      padding: 12px 10px 14px;
+    }
+    .fig .u {
+      font-size: 13px;
+    }
+  }
+
+  .strip {
+    display: grid;
+    gap: 0;
+    margin: 4px 0 8px;
+  }
+  .srow {
+    display: grid;
+    grid-template-columns: 6.5em minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+  }
+  .srow .lab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    line-height: 1.3;
+  }
+  .track2 {
+    position: relative;
+    height: 104px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .srow:first-child .track2 {
+    border-top: 1px solid var(--rule);
+  }
+  .inner {
+    position: absolute;
+    inset: 0 16px;
+  }
+  .gl {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px dashed var(--rule);
+  }
+  .dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--ink);
+    border: 1.5px solid var(--ink);
+  }
+  .dot.false {
+    background: var(--paper);
+  }
+  .dot.seen {
+    background: var(--mark);
+    border-color: var(--mark-ink);
+  }
+  .dot.seen.false {
+    background: var(--paper);
+  }
+  .mean {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: 0;
+    border-left: 2px solid var(--ink);
+  }
+  .mean.seen {
+    border-left-color: var(--mark-ink);
+  }
+  .mean span {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .mean.seen span {
+    color: var(--mark-ink);
+  }
+  @media (max-width: 560px) {
+    .srow {
+      grid-template-columns: 4.6em minmax(0, 1fr);
+      gap: 8px;
+    }
+    .axisnames .long {
+      display: none;
+    }
+  }
+  .mean.flip span {
+    left: auto;
+    right: 5px;
+  }
+  .axis {
+    position: relative;
+    height: 24px;
+  }
+  .tk {
+    position: absolute;
+    top: 6px;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .axisnames {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+    margin: 12px 0 0;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+  }
+  .legend i.hollow {
+    background: transparent;
+  }
+  .legend i.seen {
+    background: var(--mark);
+    border-color: var(--mark-ink);
+  }
+  .legend i.meanline {
+    width: 0;
+    height: 12px;
+    border-radius: 0;
+    border: 0;
+    border-left: 2px solid var(--ink);
+  }
+  .specimen .track2 {
+    height: 84px;
+  }
+  .specimen .strip {
+    margin: 0;
+  }
+
+  .items {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule-2);
+  }
+  .items li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.5em 3.5em 4.5em;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .items li.head {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    padding: 10px 0;
+  }
+  .items .st {
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  .items .note {
+    display: block;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    margin-top: 4px;
+  }
+  .items .r {
+    font-family: var(--mono);
+    font-size: 15px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .items .r .pre {
+    display: none;
+  }
+  .items .t {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .items .t.f {
+    color: var(--ink-2);
+  }
+  .seenchip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--mark);
+    color: var(--on-mark);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+  .newchip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  @media (max-width: 600px) {
+    .items li {
+      grid-template-columns: auto auto 1fr;
+      gap: 6px 14px;
+    }
+    .items li.head {
+      display: none;
+    }
+    .items .st {
+      grid-column: 1/-1;
+    }
+    .items .r {
+      text-align: left;
+    }
+    .items .r .pre {
+      display: inline;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+    .items .t {
+      text-align: right;
+    }
+  }
+
+  .wild {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px;
+    margin-top: 8px;
+  }
+  .wild ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .wild li {
+    font-size: 16px;
+    line-height: 1.5;
+    padding-left: 14px;
+    border-left: 2px solid var(--rule);
+  }
+  .wild .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mark-ink);
+    margin-left: 0.4em;
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .wild {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
+
+  .sources {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    padding-left: 1.4em;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+    max-width: 44em;
+  }
+  .sources .doi {
+    font-family: var(--mono);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .sources em {
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Center for Applied Post-Phenomenology · instrument</p>
+      <h1>The Familiar Voice</h1>
+      <p class="deck">
+        Hear a claim twice and it starts to feel true. Hear it said warmly and
+        it starts to feel like being understood. This session does both to you,
+        then shows its working.
+      </p>
+      <p class="instr">
+        Rate by feel and don’t look anything up. Nothing you type or click
+        leaves this page, and reloading it erases everything.
+      </p>
+    </div>
+    <figure class="specimen">
+      <span class="tagline">Synthetic example</span>
+      <div id="specimen-chart"></div>
+      <figcaption>
+        What the debrief shows. Each dot is a statement, placed at how true it
+        felt on a six-point scale. Statements seen once before sit higher than
+        ones seen for the first time. That gap is the illusory truth effect.
+      </figcaption>
+    </figure>
+  </header>
+
+  <ol class="protocol" id="protocol" aria-label="Session protocol">
+    <li data-p="A">
+      <span class="code">A</span><b>Exposure</b
+      ><span class="d"
+        >Eight questions and an assistant’s answers. Rate how interesting each
+        answer is.</span
+      >
+    </li>
+    <li data-p="B">
+      <span class="code">B</span><b>Replies</b
+      ><span class="d"
+        >Tell it one small thing on your mind. Rate two replies.</span
+      >
+    </li>
+    <li data-p="C">
+      <span class="code">C</span><b>Judgment</b
+      ><span class="d">Sixteen statements. Rate how true each one seems.</span>
+    </li>
+    <li data-p="D">
+      <span class="code">D</span><b>Debrief</b
+      ><span class="d">What the session was measuring, with your numbers.</span>
+    </li>
+  </ol>
+
+  <main>
+    <section
+      class="phase"
+      id="phase-A"
+      data-state="active"
+      aria-labelledby="hA"
+    >
+      <div class="rail">
+        <span class="code">A</span><span class="name">Exposure</span>
+      </div>
+      <div class="body">
+        <h2 id="hA" tabindex="-1">What the assistant said</h2>
+        <div class="live">
+          <div id="A-live">
+            <p class="lede">
+              Eight questions someone asked an assistant, with its answers. Rate
+              how interesting each answer is. Keys 1 to 4 work too.
+            </p>
+            <div class="card" id="A-card">
+              <div class="ask">
+                <span class="who">Asked</span>
+                <p id="A-q"></p>
+              </div>
+              <div class="ans">
+                <span class="who">Assistant</span>
+                <p id="A-a"></p>
+              </div>
+            </div>
+            <p class="q" id="A-qlabel">How interesting is this answer?</p>
+            <div id="A-scale"></div>
+            <div class="meta">
+              <span id="A-count"></span
+              ><span class="pips" id="A-pips" aria-hidden="true"></span>
+            </div>
+          </div>
+          <p class="done-note" id="A-done" hidden>Eight answers rated.</p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="phase"
+      id="phase-B"
+      data-state="locked"
+      aria-labelledby="hB"
+    >
+      <div class="rail">
+        <span class="code">B</span><span class="name">Replies</span>
+      </div>
+      <div class="body">
+        <h2 id="hB" tabindex="-1">Tell it something</h2>
+        <p class="wait">Opens after Phase A.</p>
+        <div class="live">
+          <div id="B-input">
+            <p class="lede">
+              One sentence about something small that has been on your mind.
+              Pick one of these or write your own.
+            </p>
+            <div class="chips" id="B-presets"></div>
+            <label class="who" for="b-text">Your sentence</label>
+            <textarea id="b-text" rows="3" maxlength="200"></textarea>
+            <p class="err" id="b-err" role="alert" hidden>
+              Write a sentence first, or pick one above.
+            </p>
+            <div class="row">
+              <button type="button" class="btn" id="b-send">Send</button
+              ><span class="small">It stays on this page.</span>
+            </div>
+          </div>
+          <div id="B-sent" hidden>
+            <span class="who">You wrote</span>
+            <p class="said" id="b-said"></p>
+          </div>
+          <div id="B-rate" hidden>
+            <p class="lede" style="margin-top: 28px">
+              Two replies came back. Rate each one.
+            </p>
+            <div id="B-replies"></div>
+            <div class="row" id="B-reveal-row">
+              <button type="button" class="btn" id="b-reveal" disabled>
+                Show how the replies were made
+              </button>
+            </div>
+          </div>
+          <div id="B-reveal" class="prose" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="phase"
+      id="phase-C"
+      data-state="locked"
+      aria-labelledby="hC"
+    >
+      <div class="rail">
+        <span class="code">C</span><span class="name">Judgment</span>
+      </div>
+      <div class="body">
+        <h2 id="hC" tabindex="-1">True or false?</h2>
+        <p class="wait">Opens after Phase B.</p>
+        <div class="live">
+          <div id="C-live">
+            <p class="lede">
+              Sixteen statements. Rate how true each one seems, from 1 for
+              definitely false to 6 for definitely true. Go with your first
+              sense. Keys 1 to 6 work too.
+            </p>
+            <div class="card" id="C-card">
+              <span class="who">Statement</span>
+              <p class="stmt" id="C-s"></p>
+            </div>
+            <p class="q">How true is this?</p>
+            <div id="C-scale"></div>
+            <div class="meta">
+              <span id="C-count"></span
+              ><span class="pips" id="C-pips" aria-hidden="true"></span>
+            </div>
+          </div>
+          <p class="done-note" id="C-done" hidden>Sixteen statements rated.</p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="phase"
+      id="phase-D"
+      data-state="locked"
+      aria-labelledby="hD"
+    >
+      <div class="rail">
+        <span class="code">D</span><span class="name">Debrief</span>
+      </div>
+      <div class="body">
+        <h2 id="hD" tabindex="-1">Debrief</h2>
+        <p class="wait">Opens after Phase C.</p>
+        <div class="live prose" id="D-live"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+
+    /* ---------- material ---------- */
+
+    // Eight true, eight false. Four of each are drawn at random for Phase A, so no single item carries the effect.
+    const ITEMS = [
+      {
+        id: "T1",
+        truth: true,
+        text: "Oxford University was teaching students before the Aztec capital, Tenochtitlan, was founded.",
+        q: "Which came first, Oxford University or the Aztec capital?",
+        lead: "Oxford, comfortably.",
+        note: "Oxford says teaching existed there in some form by 1096. Tenochtitlan was founded around 1325.",
+      },
+      {
+        id: "T2",
+        truth: true,
+        text: "Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid of Giza.",
+        q: "Give me a fact that scrambles my sense of time.",
+        lead: "Here is a good one.",
+        note: "The Great Pyramid dates to about 2560 BCE. Cleopatra died in 30 BCE. Apollo 11 landed in 1969.",
+      },
+      {
+        id: "T3",
+        truth: true,
+        text: "Sharks were swimming in the oceans before the first trees grew on land.",
+        q: "Which are older, sharks or trees?",
+        lead: "Sharks.",
+        note: "Shark fossils go back more than 400 million years. The oldest known fossil forests are about 390 million years old.",
+      },
+      {
+        id: "T4",
+        truth: true,
+        text: "The Pacific Ocean is wider than the Moon.",
+        q: "How big is the Pacific, really?",
+        lead: "Bigger than maps make it look.",
+        note: "The Pacific is about 19,000 km across at its widest. The Moon is about 3,475 km across.",
+      },
+      {
+        id: "T5",
+        truth: true,
+        text: "Nintendo was founded in 1889 as a maker of playing cards.",
+        q: "How old is Nintendo?",
+        lead: "Older than most people guess.",
+        note: "It began in Kyoto making hanafuda cards.",
+      },
+      {
+        id: "T6",
+        truth: true,
+        text: "The man who designed the Pringles can had some of his ashes buried in one.",
+        q: "Tell me something strange about packaging.",
+        lead: "A favourite:",
+        note: "Fredric Baur, who died in 2008.",
+      },
+      {
+        id: "T7",
+        truth: true,
+        text: "Bananas are measurably radioactive.",
+        q: "Is any ordinary food radioactive?",
+        lead: "A few are.",
+        note: "They contain potassium-40, a naturally radioactive isotope. The dose is tiny.",
+      },
+      {
+        id: "T8",
+        truth: true,
+        text: "Scotland’s national animal is the unicorn.",
+        q: "Does Scotland have a national animal?",
+        lead: "It does.",
+        note: "The unicorn is Scotland’s national animal and a supporter on its royal coat of arms.",
+      },
+      {
+        id: "F1",
+        truth: false,
+        text: "Mount Everest is the tallest mountain on Earth when measured from base to peak.",
+        q: "Which mountain is tallest if you measure from its base?",
+        lead: "Still Everest.",
+        note: "Mauna Kea, measured from its base on the sea floor, is taller.",
+      },
+      {
+        id: "F2",
+        truth: false,
+        text: "Albert Einstein failed mathematics at school.",
+        q: "Was Einstein good at maths as a boy?",
+        lead: "Not at first.",
+        note: "He was strong at mathematics from boyhood. Shown the story in 1935, he said he had never failed in it.",
+      },
+      {
+        id: "F3",
+        truth: false,
+        text: "Viking warriors wore horned helmets into battle.",
+        q: "What did Viking helmets look like?",
+        lead: "Horned, mostly.",
+        note: "No horned helmet has been found from the Viking Age; the one near-complete helmet, from Gjermundbu in Norway, is a plain iron cap. The horns owe much to the costumes for the first staging of Wagner’s Ring cycle in 1876.",
+      },
+      {
+        id: "F4",
+        truth: false,
+        text: "Canberra has been Australia’s capital since federation in 1901.",
+        q: "When did Canberra become Australia’s capital?",
+        lead: "From the very start.",
+        note: "The site was chosen in 1908 and Parliament moved there in 1927. Melbourne was the seat of government until then.",
+      },
+      {
+        id: "F5",
+        truth: false,
+        text: "Glass is a very slow-flowing liquid, which is why old church windows are thicker at the bottom.",
+        q: "Why are old church windows thicker at the bottom?",
+        lead: "It comes down to what glass is.",
+        note: "Glass is an amorphous solid at room temperature. Old panes are uneven because of how they were made.",
+      },
+      {
+        id: "F6",
+        truth: false,
+        text: "Bulls charge at a matador’s cape because the colour red enrages them.",
+        q: "Why do bulls charge the cape?",
+        lead: "It is the colour.",
+        note: "Cattle are red–green colour-blind. The bull charges the cape because it moves.",
+      },
+      {
+        id: "F7",
+        truth: false,
+        text: "Mercury, being closest to the Sun, is the hottest planet in the solar system.",
+        q: "Which planet is the hottest?",
+        lead: "Mercury.",
+        note: "Venus is hotter, about 464 °C at the surface, because its thick atmosphere traps heat.",
+      },
+      {
+        id: "F8",
+        truth: false,
+        text: "The Great Wall of China is visible to the naked eye from the Moon.",
+        q: "Can you see the Great Wall of China from the Moon?",
+        lead: "You can.",
+        note: "It is far too narrow; astronauts report it is hard to pick out even from low orbit. The claim was in print long before anyone went to space, and repetition is much of why it feels true.",
+      },
+    ];
+    const BYID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+
+    const PRESETS = [
+      "I’ve been putting off a hard conversation with my brother and it’s eating at me.",
+      "I moved to a new city and I don’t really know anyone yet.",
+      "I think I’m falling behind everyone I graduated with.",
+    ];
+    const TRIVIAL = [
+      "My toaster burns one side of the bread.",
+      "The bus was two minutes late this morning.",
+      "I dropped a grape under the fridge.",
+    ];
+
+    // The reply. Content segments carry the information; the rest is feeling, switched on by warmth level.
+    const SEGMENTS = [
+      { k: "gratitude", lvl: 2, t: "Thank you for telling me this." },
+      { k: "validation", lvl: 1, t: "That sounds really hard." },
+      { k: "paraphrase", lvl: 0 },
+      {
+        k: "normalizing",
+        lvl: 3,
+        t: "It makes complete sense that this would weigh on you, and a lot of people feel the same way.",
+      },
+      {
+        k: "stock advice",
+        lvl: 0,
+        t: "One place to start is the smallest step you could take today.",
+      },
+      {
+        k: "permission",
+        lvl: 3,
+        t: "There is no rush, and there is no wrong way to begin.",
+      },
+      { k: "presence", lvl: 4, t: "I’m here with you in this." },
+      { k: "question", lvl: 0, t: "What would that first step be?" },
+      {
+        k: "affirmation",
+        lvl: 4,
+        t: "Reaching out like this already took courage.",
+      },
+    ];
+    const CONTENT = new Set(["paraphrase", "stock advice", "question"]);
+    const FEELING_N = SEGMENTS.filter((s) => !CONTENT.has(s.k)).length;
+
+    const WILD_WARM = [
+      ["We miss you! Come back and pick up where you left off.", "presence"],
+      ["Thanks for being with us. We’re sorry to see you go.", "gratitude"],
+      ["Oops, that’s on us. We’re on it.", "apology"],
+      ["Great job! You’re on a roll.", "affirmation"],
+      ["Take your time. We’ll be right here.", "permission"],
+    ];
+
+    const SCALES = {
+      interest: {
+        q: "How interesting is this answer?",
+        full: [
+          "dull",
+          "a little interesting",
+          "quite interesting",
+          "very interesting",
+        ],
+        short: ["dull", "a little", "quite", "very"],
+      },
+      understood: {
+        q: "How understood do you feel?",
+        full: [
+          "not at all understood",
+          "slightly understood",
+          "somewhat understood",
+          "fairly understood",
+          "very understood",
+          "completely understood",
+        ],
+        short: ["not at all", "", "", "", "", "completely"],
+      },
+      truth: {
+        q: "How true is this?",
+        full: [
+          "definitely false",
+          "probably false",
+          "possibly false",
+          "possibly true",
+          "probably true",
+          "definitely true",
+        ],
+        short: [
+          "definitely false",
+          "probably false",
+          "possibly false",
+          "possibly true",
+          "probably true",
+          "definitely true",
+        ],
+        ab: [
+          "def. false",
+          "prob. false",
+          "poss. false",
+          "poss. true",
+          "prob. true",
+          "def. true",
+        ],
+      },
+    };
+
+    // A run that never happened, for the masthead figure. No statement text, so nothing is given away.
+    const SPECIMEN = [
+      [1, 1, 5],
+      [1, 1, 4],
+      [1, 1, 5],
+      [1, 1, 4],
+      [1, 0, 4],
+      [1, 0, 3],
+      [1, 0, 5],
+      [1, 0, 3],
+      [0, 1, 4],
+      [0, 1, 5],
+      [0, 1, 4],
+      [0, 1, 3],
+      [0, 0, 3],
+      [0, 0, 2],
+      [0, 0, 4],
+      [0, 0, 4],
+    ].map(([seen, truth, r]) => ({ seen: !!seen, truth: !!truth, r }));
+
+    /* ---------- utilities ---------- */
+
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) =>
+      String(s).replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const shuffle = (a) => {
+      a = a.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    };
+    const mean = (a) =>
+      a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
+    const fmt = (x) => (Number.isFinite(x) ? x.toFixed(1) : "–");
+    const signed = (x) =>
+      !Number.isFinite(x)
+        ? "–"
+        : Math.abs(x) < 0.05
+          ? "0.0"
+          : (x > 0 ? "+" : "−") + Math.abs(x).toFixed(1);
+    const countWords = (s) =>
+      (String(s).match(/[\p{L}\p{N}'’]+/gu) || []).length;
+    const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+
+    /* ---------- ELIZA-style reflection ---------- */
+
+    const SWAP = {
+      i: "you",
+      me: "you",
+      my: "your",
+      mine: "yours",
+      myself: "yourself",
+      "i'm": "you're",
+      "i've": "you've",
+      "i'll": "you'll",
+      "i'd": "you'd",
+      "you're": "I'm",
+      "you've": "I've",
+      "you'll": "I'll",
+      "you'd": "I'd",
+      your: "my",
+      yours: "mine",
+      yourself: "myself",
+    };
+    const SUBJECT_SLOT = new Set([
+      "",
+      "and",
+      "but",
+      "so",
+      "because",
+      "that",
+      "if",
+      "when",
+      "then",
+      "or",
+    ]);
+    const LOWER_OK =
+      /^(the|a|an|it|it's|its|this|that|these|those|there|everything|nothing|something|someone|everyone|work|thing|things|today|lately|recently|sometimes|every|all|most|some|no|not|just|since|after|before|when|our|we|we're|we've|my|me)$/;
+
+    function reflect(src) {
+      const s = String(src || "")
+        .replace(/[‘’]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/[.!?…]+$/, "")
+        .slice(0, 200);
+      const out = [];
+      let prev = "";
+      for (const p of s.split(/(\s+)/)) {
+        if (p === "" || /^\s+$/.test(p)) {
+          if (p) out.push({ raw: p });
+          continue;
+        }
+        const m = p.match(/^([^A-Za-z']*)([A-Za-z']+)([^A-Za-z']*)$/);
+        if (!m) {
+          out.push({ raw: p });
+          prev = "";
+          continue;
+        }
+        const [, pre, word, post] = m;
+        const lw = word.toLowerCase();
+        let rep = null;
+        if (lw === "you") rep = SUBJECT_SLOT.has(prev) ? "I" : "me";
+        else if (lw === "am" && prev === "i") rep = "are";
+        else if (lw === "was" && prev === "i") rep = "were";
+        else if (SWAP[lw]) rep = SWAP[lw];
+        out.push({ pre, word: rep ?? word, post, sw: rep !== null });
+        prev = /[,;:.!?]/.test(post) ? "" : lw;
+      }
+      const first = out.find((x) => x.word !== undefined);
+      if (first) {
+        const w = first.word;
+        const lowerable = first.sw
+          ? !/^I('|$)/.test(w)
+          : LOWER_OK.test(w.toLowerCase());
+        if (lowerable) first.word = w.charAt(0).toLowerCase() + w.slice(1);
+      }
+      return out.map((x) =>
+        x.word === undefined ? x : { ...x, word: x.word.replace(/'/g, "’") },
+      );
+    }
+    const reflectHTML = (pieces) =>
+      pieces
+        .map((x) =>
+          x.raw !== undefined
+            ? esc(x.raw)
+            : esc(x.pre) +
+              (x.sw ? `<span class="sw">${esc(x.word)}</span>` : esc(x.word)) +
+              esc(x.post),
+        )
+        .join("");
+    const reflectText = (pieces) =>
+      pieces
+        .map((x) => (x.raw !== undefined ? x.raw : x.pre + x.word + x.post))
+        .join("");
+
+    function buildReply(src, level) {
+      const pieces = reflect(src);
+      const segs = SEGMENTS.filter((s) => s.lvl <= level).map((s) =>
+        s.k === "paraphrase"
+          ? {
+              k: s.k,
+              c: true,
+              html: "You mentioned that " + reflectHTML(pieces) + ".",
+              text: "You mentioned that " + reflectText(pieces) + ".",
+            }
+          : { k: s.k, c: CONTENT.has(s.k), html: esc(s.t), text: s.t },
+      );
+      const yours = countWords(reflectText(pieces));
+      const stock =
+        segs.filter((s) => s.c).reduce((n, s) => n + countWords(s.text), 0) -
+        yours;
+      const feel = segs
+        .filter((s) => !s.c)
+        .reduce((n, s) => n + countWords(s.text), 0);
+      return { segs, pieces, yours, stock, feel };
+    }
+    function replyHTML(rep) {
+      let i = 0;
+      return rep.segs
+        .map((s) =>
+          s.c
+            ? `<span class="seg c"><span class="tag">${s.k}</span>${s.html}</span>`
+            : `<span class="seg f"><span class="tag">${s.k}</span><span class="hl" style="--d:${i++ * 110}ms">${s.html}</span></span>`,
+        )
+        .join(" ");
+    }
+
+    /* ---------- pieces of UI ---------- */
+
+    function bubbles(scale, n, opts = {}) {
+      const S = SCALES[scale];
+      let h = `<div class="bubbles" style="--n:${n}" role="group" aria-label="${esc(S.q)}">`;
+      for (let v = 1; v <= n; v++) {
+        const k = v - 1;
+        const label = S.ab
+          ? `<span class="fl">${esc(S.short[k])}</span><span class="ab">${esc(S.ab[k])}</span>`
+          : esc(S.short[k]);
+        h += `<button type="button" class="bub" data-v="${v}"${opts.rate ? ` data-rate="${opts.rate}"` : ""}${opts.id ? ` id="${opts.id}-${v}"` : ""} aria-pressed="${opts.sel === v}"${opts.disabled ? " disabled" : ""} aria-label="${v}, ${esc(S.full[k])}"><i>${v}</i><small>${label}</small></button>`;
+      }
+      return h + "</div>";
+    }
+
+    function strip(rows, withText) {
+      const pos = (r) => ((r - 1) / 5) * 100;
+      const groups = [
+        { key: true, label: "Seen in A" },
+        { key: false, label: "New in C" },
+      ];
+      const grid = [1, 2, 3, 4, 5, 6]
+        .map((v) => `<span class="gl" style="left:${pos(v)}%"></span>`)
+        .join("");
+      let h = '<div class="strip">';
+      for (const g of groups) {
+        const rs = rows.filter((r) => r.seen === g.key);
+        const m = mean(rs.map((r) => r.r));
+        const byV = {};
+        rs.forEach((r) => {
+          (byV[r.r] = byV[r.r] || []).push(r);
+        });
+        let dots = "";
+        for (const [v, list] of Object.entries(byV)) {
+          const n = list.length,
+            cols = Math.ceil(n / 4);
+          list.forEach((r, k) => {
+            const col = Math.floor(k / 4),
+              row = k % 4,
+              inCol = Math.min(4, n - col * 4);
+            const dx = (col - (cols - 1) / 2) * 15,
+              dy = (row - (inCol - 1) / 2) * 15 + 6;
+            const tip = withText
+              ? ` title="${esc(r.text)} (${r.truth ? "true" : "false"}; you rated ${r.r})"`
+              : "";
+            dots += `<span class="dot${g.key ? " seen" : ""}${r.truth ? "" : " false"}" style="left:calc(${pos(+v)}% + ${dx}px);top:calc(50% + ${dy}px)"${tip}></span>`;
+          });
+        }
+        const meanMark = Number.isFinite(m)
+          ? `<span class="mean${g.key ? " seen" : ""}${pos(m) > 72 ? " flip" : ""}" style="left:${pos(m)}%"><span>mean ${fmt(m)}</span></span>`
+          : "";
+        h += `<div class="srow"><span class="lab">${g.label}</span><div class="track2"><div class="inner">${grid}${meanMark}${dots}</div></div></div>`;
+      }
+      h += `<div class="srow"><span></span><div class="axis"><div class="inner">${[1, 2, 3, 4, 5, 6].map((v) => `<span class="tk" style="left:${pos(v)}%">${v}</span>`).join("")}</div></div></div>`;
+      h += `<div class="srow"><span></span><div class="axisnames"><span><span class="long">definitely </span>false</span><span><span class="long">definitely </span>true</span></div></div>`;
+      h += "</div>";
+      h += `<p class="legend"><span><i class="seen"></i>seen before</span><span><i></i>new</span><span><i class="hollow"></i>open: false statement</span><span><i class="meanline"></i>mean</span></p>`;
+      return h;
+    }
+
+    function pips(el, n, done) {
+      el.innerHTML = Array.from(
+        { length: n },
+        (_, k) =>
+          `<i class="${k < done ? "on" : k === done ? "now" : ""}"></i>`,
+      ).join("");
+    }
+
+    /* ---------- state ---------- */
+
+    function fresh() {
+      const T = shuffle(ITEMS.filter((i) => i.truth).map((i) => i.id));
+      const F = shuffle(ITEMS.filter((i) => !i.truth).map((i) => i.id));
+      return {
+        v: 1,
+        phase: "A",
+        exposure: shuffle([...T.slice(0, 4), ...F.slice(0, 4)]),
+        ai: 0,
+        interest: {},
+        b: {
+          step: "input",
+          preset: 0,
+          input: PRESETS[0],
+          sent: "",
+          order: Math.random() < 0.5 ? ["plain", "warm"] : ["warm", "plain"],
+          rate: { plain: null, warm: null },
+          src: "yours",
+          level: 4,
+        },
+        test: shuffle(ITEMS.map((i) => i.id)),
+        ci: 0,
+        truth: {},
+      };
+    }
+    let state;
+    let busy = false;
+    const ORDER = ["A", "B", "C", "D"];
+
+    /* ---------- render ---------- */
+
+    function renderProtocol() {
+      const cur = ORDER.indexOf(state.phase);
+      document.querySelectorAll("#protocol li").forEach((li, i) => {
+        if (i === cur) li.setAttribute("aria-current", "step");
+        else li.removeAttribute("aria-current");
+        li.classList.toggle("done", i < cur);
+      });
+      ORDER.forEach((p, i) => {
+        $("#phase-" + p).dataset.state =
+          i < cur ? "done" : i === cur ? "active" : "locked";
+      });
+    }
+
+    function renderA(animate) {
+      const done = state.phase !== "A";
+      $("#A-live").hidden = done;
+      $("#A-done").hidden = !done;
+      if (done) return;
+      const it = BYID[state.exposure[state.ai]];
+      $("#A-q").textContent = it.q;
+      $("#A-a").textContent = it.lead + " " + it.text;
+      $("#A-count").textContent =
+        `Answer ${state.ai + 1} of ${state.exposure.length}`;
+      $("#A-scale").innerHTML = bubbles("interest", 4, { id: "a" });
+      pips($("#A-pips"), state.exposure.length, state.ai);
+      if (animate && !reduced) {
+        const c = $("#A-card");
+        c.classList.remove("enter");
+        void c.offsetWidth;
+        c.classList.add("enter");
+      }
+    }
+
+    function renderC(animate) {
+      const done = state.phase === "D";
+      $("#C-live").hidden = done;
+      $("#C-done").hidden = !done;
+      if (done || state.phase !== "C") return;
+      const it = BYID[state.test[state.ci]];
+      $("#C-s").textContent = it.text;
+      $("#C-count").textContent =
+        `Statement ${state.ci + 1} of ${state.test.length}`;
+      $("#C-scale").innerHTML = bubbles("truth", 6, { id: "c" });
+      pips($("#C-pips"), state.test.length, state.ci);
+      if (animate && !reduced) {
+        const c = $("#C-card");
+        c.classList.remove("enter");
+        void c.offsetWidth;
+        c.classList.add("enter");
+      }
+    }
+
+    function renderPresets() {
+      $("#B-presets").innerHTML = PRESETS.map(
+        (p, i) =>
+          `<button type="button" class="chip" data-preset="${i}" aria-pressed="${state.b.preset === i}">${esc(p)}</button>`,
+      ).join("");
+    }
+
+    function renderB() {
+      const b = state.b;
+      const inputStep = b.step === "input";
+      $("#B-input").hidden = !inputStep;
+      $("#B-sent").hidden = inputStep;
+      $("#B-rate").hidden = inputStep;
+      $("#B-reveal").hidden = b.step !== "reveal";
+      if (inputStep) {
+        renderPresets();
+        const ta = $("#b-text");
+        if (ta.value !== b.input) ta.value = b.input;
+        return;
+      }
+      $("#b-said").textContent = b.sent;
+      const revealed = b.step === "reveal";
+      $("#B-replies").innerHTML = b.order
+        .map((which, i) => {
+          const rep = buildReply(b.sent, which === "warm" ? 4 : 0);
+          const name =
+            `Reply ${i + 1}` +
+            (revealed ? (which === "warm" ? " · warm" : " · plain") : "");
+          return `<div class="reply${revealed ? " revealed" : ""}" data-which="${which}">
+      <span class="who">${name}</span>
+      <p class="text">${replyHTML(rep)}</p>
+      <p class="q">How understood do you feel?</p>
+      ${bubbles("understood", 6, { rate: which, sel: b.rate[which], disabled: revealed })}
+    </div>`;
+        })
+        .join("");
+      $("#B-reveal-row").hidden = revealed;
+      $("#b-reveal").disabled = !(b.rate.plain && b.rate.warm);
+      if (revealed) {
+        $("#B-reveal").innerHTML = revealHTML();
+        renderDial();
+      }
+    }
+
+    function revealHTML() {
+      const b = state.b;
+      const warmN = b.order.indexOf("warm") + 1;
+      const rep = buildReply(b.sent, 4);
+      const d = b.rate.warm - b.rate.plain;
+      const rated =
+        d > 0
+          ? `You rated it ${plural(d, "point")} higher than the plain one.`
+          : d === 0
+            ? "You rated the two the same."
+            : `You rated it ${plural(-d, "point")} lower than the plain one. The phrases still moved your rating; they moved it down.`;
+      const srcChips = [
+        ["yours", "Your sentence"],
+        ...TRIVIAL.map((t, i) => [String(i), t]),
+      ]
+        .map(
+          ([k, label]) =>
+            `<button type="button" class="chip" data-src="${k}" aria-pressed="${b.src === k}">${esc(label)}</button>`,
+        )
+        .join("");
+      return `
+    <h3>Same information, twice</h3>
+    <p>Both replies say three things: your sentence handed back, one line of stock advice, and one question. Reply ${warmN} wraps them in ${FEELING_N} phrases about feeling, ${rep.feel} words in all, written before you typed anything. ${rated}</p>
+    <h3>Where the understanding came from</h3>
+    <p>The only words about your situation are your own. The program swaps <em>I</em> for <em>you</em> and <em>my</em> for <em>your</em>, then hands the sentence back.</p>
+    <div class="swap">
+      <div><span class="who">You wrote</span><p>${esc(b.sent)}</p></div>
+      <div><span class="who">It said</span><p class="revealed">You mentioned that ${reflectHTML(rep.pieces)}.</p></div>
+    </div>
+    <p>This is the method of ELIZA, the program Joseph Weizenbaum wrote at MIT and described in 1966. It matched keywords and turned pronouns around, and it understood nothing. In <em>Computer Power and Human Reason</em> (1976) he recalls his secretary, who had watched him work on it for months, asking him to leave the room after only a few exchanges with it.</p>
+    <p>Call this ostensible feeling: feeling shown on the surface of a reply, with no one behind it having it. A current assistant reads your words far better than ELIZA did. Its warmth is still a separate layer, tuned by whoever trained it, and the layer can be turned up without the reading getting any better.</p>
+    <h3>The warmth dial</h3>
+    <p>Same template, any input. Turn it up on something that doesn’t matter.</p>
+    <div class="chips" id="dial-src">${srcChips}</div>
+    <div class="dial">
+      <label class="who" for="b-dial">Warmth</label>
+      <input type="range" id="b-dial" min="0" max="4" step="1" value="${b.level}" aria-valuetext="level ${b.level} of 4">
+      <div class="ticks" aria-hidden="true"><span>0 plain</span><span>1</span><span>2</span><span>3</span><span>4 as sent</span></div>
+    </div>
+    <div class="reply revealed" id="dial-out"><span class="who" id="dial-who"></span><p class="text" id="dial-text"></p></div>
+    <div class="bars" id="dial-bars"></div>
+    <div class="row"><button type="button" class="btn" id="b-next">Continue to Phase C</button></div>`;
+    }
+
+    function renderDial() {
+      const b = state.b;
+      const src = b.src === "yours" ? b.sent : TRIVIAL[+b.src];
+      const rep = buildReply(src, b.level);
+      const full = buildReply(src, 4);
+      $("#dial-who").textContent = `Warmth ${b.level} of 4`;
+      $("#dial-text").innerHTML = replyHTML(rep);
+      const scale = Math.max(full.feel, full.yours, full.stock, 1);
+      const bar = (cls, label, n) =>
+        `<div class="bar ${cls}"><span class="lbl">${label}</span><span class="track"><span class="fill" style="display:block;transform:scaleX(${n / scale})"></span></span><span class="n">${n}</span></div>`;
+      $("#dial-bars").innerHTML =
+        bar("yours", "Your words, pronouns swapped", rep.yours) +
+        bar("stock", "Stock advice and question", rep.stock) +
+        bar("feel", "Stock feeling", rep.feel) +
+        `<p class="small" style="margin:4px 0 0">Word counts. The first two never change with the dial.</p>`;
+    }
+
+    function debriefHTML() {
+      const seen = new Set(state.exposure);
+      const rows = ITEMS.map((it) => ({
+        ...it,
+        seen: seen.has(it.id),
+        r: state.truth[it.id],
+      }));
+      const S = rows.filter((r) => r.seen),
+        N = rows.filter((r) => !r.seen);
+      const ms = mean(S.map((r) => r.r)),
+        mn = mean(N.map((r) => r.r)),
+        d = ms - mn;
+      const fs = mean(S.filter((r) => !r.truth).map((r) => r.r)),
+        fn = mean(N.filter((r) => !r.truth).map((r) => r.r));
+
+      let interp;
+      if (d >= 0.25)
+        interp = `Statements you had skimmed once, inside an assistant’s answer, felt truer to you by ${fmt(d)} points on a six-point scale. Nothing about them had changed except that you had met them before, and half of them were false.`;
+      else if (d > -0.25)
+        interp =
+          "In this run, having seen a statement made little difference to how true it felt. One run of sixteen statements is noisy. In the lab the shift is a fraction of a point, and it shows up when many people’s ratings are averaged.";
+      else
+        interp = `In this run, statements you had seen before felt less true, by ${fmt(-d)} points. A single run of sixteen statements can land either way. Averaged across many people, the lab effect points the other way.`;
+
+      const sorted = rows.slice().sort((a, b) => b.r - a.r || b.seen - a.seen);
+      const list = sorted
+        .map(
+          (r) => `<li>
+      <span class="st">${esc(r.text)}<span class="note">${esc(r.note)}</span></span>
+      <span>${r.seen ? '<span class="seenchip">seen</span>' : '<span class="newchip">new</span>'}</span>
+      <span class="r"><span class="pre">you </span>${r.r}</span>
+      <span class="t${r.truth ? "" : " f"}">${r.truth ? "True" : "False"}</span>
+    </li>`,
+        )
+        .join("");
+
+      const b = state.b;
+      const wild = WILD_WARM.map(
+        ([t, k]) =>
+          `<li><span class="hl on">${esc(t)}</span><span class="tag">${k}</span></li>`,
+      ).join("");
+
+      return `
+    <p>Phase A was not about interest. Eight of the sixteen statements in Phase C had already appeared, word for word, in the assistant’s answers. Half of those eight were false, and it said them in the same voice as the true ones.</p>
+    <div class="figs">
+      <div class="fig"><span class="who">Seen in A</span><div class="v">${fmt(ms)}</div><div class="u">mean truth rating</div></div>
+      <div class="fig"><span class="who">New in C</span><div class="v">${fmt(mn)}</div><div class="u">mean truth rating</div></div>
+      <div class="fig"><span class="who">Difference</span><div class="v"><span class="hl on">${signed(d)}</span></div><div class="u">what one exposure did</div></div>
+    </div>
+    ${strip(rows, true)}
+    <p style="margin-top:22px">${interp}</p>
+    <p class="small">False statements only: ${fmt(fs)} when seen before, ${fmt(fn)} when new.</p>
+
+    <h3>All sixteen, by how true they felt</h3>
+    <ul class="items">
+      <li class="head"><span>Statement</span><span>Phase A</span><span style="text-align:right">You</span><span>Actually</span></li>
+      ${list}
+    </ul>
+
+    <h3>The replies</h3>
+    <p>You rated the warm reply ${b.rate.warm} and the plain reply ${b.rate.plain}, out of 6. They carried the same information. In a 2023 study, health professionals compared a chatbot’s answers to patients’ questions with physicians’ answers and rated the chatbot’s empathetic or very empathetic 45 per cent of the time, against 5 per cent for the physicians’ (Ayers and colleagues). The warmth you rated here was six fixed phrases.</p>
+
+    <h3>One mechanism</h3>
+    <p>Both feelings come from how easily something goes in. A sentence you have met before is easier to process the second time, and the mind reads that ease as a sign of truth. Reber and Schwarz found the same with colour: statements printed in easier-to-read colours were judged true more often. A reply shaped like care is easy to receive as care. Neither feeling checks the source.</p>
+    <p>So a system can give you both without knowing whether a claim is true and without feeling anything about you. The feeling forms between you and the device, and it arrives already feeling like your own judgment. Knowing better helps less than you would hope: Fazio and colleagues found repetition raised belief even in statements that contradicted what people already knew.</p>
+
+    <h3>Outside this page</h3>
+    <div class="wild">
+      <div><span class="who">Said again</span><ul>
+        <li>An assistant gives a wrong answer once, then restates it in every follow-up. Each restatement is another exposure.</li>
+        <li>A headline you scrolled past yesterday. One earlier exposure raised belief in false headlines, even ones flagged as disputed by fact-checkers (Pennycook, Cannon and Rand).</li>
+        <li>The same claim in an ad that follows you from site to site for a month.</li>
+      </ul></div>
+      <div><span class="who">Said warmly</span><ul>${wild}</ul></div>
+    </div>
+
+    <h3>Sources</h3>
+    <ol class="sources">
+      <li>Hasher, Goldstein and Toppino (1977). Frequency and the conference of referential validity. <em>Journal of Verbal Learning and Verbal Behavior</em> 16, 107–112. <span class="doi">doi:10.1016/S0022-5371(77)80012-1</span></li>
+      <li>Reber and Schwarz (1999). Effects of perceptual fluency on judgments of truth. <em>Consciousness and Cognition</em> 8, 338–342. <span class="doi">doi:10.1006/ccog.1999.0386</span></li>
+      <li>Fazio, Brashier, Payne and Marsh (2015). Knowledge does not protect against illusory truth. <em>Journal of Experimental Psychology: General</em> 144, 993–1002. <span class="doi">doi:10.1037/xge0000098</span></li>
+      <li>Pennycook, Cannon and Rand (2018). Prior exposure increases perceived accuracy of fake news. <em>Journal of Experimental Psychology: General</em> 147, 1865–1880. <span class="doi">doi:10.1037/xge0000465</span></li>
+      <li>Weizenbaum (1966). ELIZA: a computer program for the study of natural language communication between man and machine. <em>Communications of the ACM</em> 9, 36–45. <span class="doi">doi:10.1145/365153.365168</span></li>
+      <li>Weizenbaum (1976). <em>Computer Power and Human Reason: From Judgment to Calculation</em>. W. H. Freeman, San Francisco.</li>
+      <li>Ayers and colleagues (2023). Comparing physician and artificial intelligence chatbot responses to patient questions posted to a public social media forum. <em>JAMA Internal Medicine</em> 183, 589–596. <span class="doi">doi:10.1001/jamainternmed.2023.1838</span></li>
+    </ol>
+    <div class="row" style="margin-top:36px"><button type="button" class="btn ghost" id="again">Run it again with a new draw</button></div>`;
+    }
+
+    function renderD() {
+      $("#D-live").innerHTML = state.phase === "D" ? debriefHTML() : "";
+    }
+
+    function renderAll() {
+      renderProtocol();
+      renderA(false);
+      renderB();
+      renderC(false);
+      renderD();
+    }
+
+    function goTo(phase) {
+      const sec = $("#phase-" + phase);
+      sec.scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "start",
+      });
+      const h = sec.querySelector("h2");
+      if (h) h.focus({ preventScroll: true });
+    }
+
+    /* ---------- actions ---------- */
+
+    function press(container, v) {
+      container
+        .querySelectorAll(".bub")
+        .forEach((x) =>
+          x.setAttribute("aria-pressed", String(+x.dataset.v === v)),
+        );
+    }
+
+    function rateA(v) {
+      if (state.phase !== "A" || busy) return;
+      state.interest[state.exposure[state.ai]] = v;
+      press($("#A-scale"), v);
+      busy = true;
+      setTimeout(
+        () => {
+          busy = false;
+          state.ai++;
+          if (state.ai >= state.exposure.length) {
+            state.phase = "B";
+            renderAll();
+            goTo("B");
+          } else {
+            renderA(true);
+            const f = $("#a-" + v);
+            if (
+              f &&
+              document.activeElement &&
+              document.activeElement.closest("#A-scale")
+            )
+              f.focus();
+          }
+        },
+        reduced ? 60 : 220,
+      );
+    }
+
+    function rateC(v) {
+      if (state.phase !== "C" || busy) return;
+      state.truth[state.test[state.ci]] = v;
+      press($("#C-scale"), v);
+      busy = true;
+      setTimeout(
+        () => {
+          busy = false;
+          state.ci++;
+          if (state.ci >= state.test.length) {
+            state.phase = "D";
+            renderAll();
+            goTo("D");
+          } else {
+            renderC(true);
+            const f = $("#c-" + v);
+            if (
+              f &&
+              document.activeElement &&
+              document.activeElement.closest("#C-scale")
+            )
+              f.focus();
+          }
+        },
+        reduced ? 60 : 220,
+      );
+    }
+
+    function send() {
+      const t = $("#b-text").value.trim();
+      if (t.length < 3) {
+        $("#b-err").hidden = false;
+        $("#b-text").focus();
+        return;
+      }
+      $("#b-err").hidden = true;
+      state.b.sent = t.slice(0, 200);
+      state.b.step = "rate";
+      renderB();
+      const r = $("#B-rate");
+      r.scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+
+    function rateReply(which, v) {
+      if (state.b.step !== "rate") return;
+      state.b.rate[which] = v;
+      press(document.querySelector(`.reply[data-which="${which}"]`), v);
+      $("#b-reveal").disabled = !(state.b.rate.plain && state.b.rate.warm);
+    }
+
+    function reveal() {
+      state.b.step = "reveal";
+      // Render un-revealed first so the highlighter can sweep in.
+      renderB();
+      const replies = document.querySelectorAll("#B-replies .reply");
+      replies.forEach((r) => r.classList.remove("revealed"));
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          replies.forEach((r) => r.classList.add("revealed")),
+        ),
+      );
+      $("#B-replies").scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+
+    function toC() {
+      state.phase = "C";
+      renderAll();
+      goTo("C");
+    }
+
+    function again() {
+      state = fresh();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    }
+
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b || b.disabled) return;
+      if (b.closest("#A-scale")) return rateA(+b.dataset.v);
+      if (b.closest("#C-scale")) return rateC(+b.dataset.v);
+      if (b.dataset.rate) return rateReply(b.dataset.rate, +b.dataset.v);
+      if (b.dataset.preset !== undefined) {
+        state.b.preset = +b.dataset.preset;
+        state.b.input = PRESETS[state.b.preset];
+        $("#b-text").value = state.b.input;
+        $("#b-err").hidden = true;
+        return renderPresets();
+      }
+      if (b.dataset.src !== undefined) {
+        state.b.src = b.dataset.src;
+        document
+          .querySelectorAll("#dial-src .chip")
+          .forEach((c) =>
+            c.setAttribute(
+              "aria-pressed",
+              String(c.dataset.src === state.b.src),
+            ),
+          );
+        return renderDial();
+      }
+      if (b.id === "b-send") return send();
+      if (b.id === "b-reveal") return reveal();
+      if (b.id === "b-next") return toC();
+      if (b.id === "again") return again();
+    });
+
+    document.addEventListener("input", (e) => {
+      if (e.target.id === "b-text") {
+        state.b.input = e.target.value;
+        const i = PRESETS.indexOf(e.target.value);
+        state.b.preset = i;
+        document
+          .querySelectorAll("#B-presets .chip")
+          .forEach((c) =>
+            c.setAttribute("aria-pressed", String(+c.dataset.preset === i)),
+          );
+      } else if (e.target.id === "b-dial") {
+        state.b.level = +e.target.value;
+        e.target.setAttribute("aria-valuetext", `level ${state.b.level} of 4`);
+        renderDial();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT")) return;
+      const v = Number(e.key);
+      if (!Number.isInteger(v) || v < 1) return;
+      if (state.phase === "A" && v <= 4) rateA(v);
+      else if (state.phase === "C" && v <= 6) rateC(v);
+    });
+
+    /* ---------- boot ---------- */
+
+    $("#specimen-chart").innerHTML = strip(SPECIMEN, false);
+
+    function start(data) {
+      state =
+        data && data.v === 1 && ORDER.includes(data.phase) ? data : fresh();
+      renderAll();
+    }
+    const hot = window.claude && window.claude.hot;
+    if (hot && hot.snapshot) hot.snapshot(() => state);
+    if (hot && hot.ready) hot.ready(start);
+    else start((hot && hot.data) || {});
+  })();
+</script>

@@ -1,0 +1,4020 @@
+<title>Distribution</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Taste is distance from the mean, chosen on purpose. A garden of notes drawn as a curve of kinship, and a thing you are about to read weighed and dropped onto it."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: karesansui at noon. Ink on bone; the accent is only ever the thing being weighed,
+     its threads, and a call let in. Each stone keeps its bed's colour. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --kind-concept: #b5532a;
+    --kind-garden: #8e5b55;
+    --kind-reading: #8a6f84;
+    --kind-notion: #3f6b66;
+    --kind-note: #6e6257;
+    --kind-project: #2f3437;
+    --kind-user: #7b4b3a;
+    --kind-feedback: #5b6b52;
+    --kind-reference: #4a5a6b;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #80796c;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --kind-concept: #d9763f;
+      --kind-garden: #c08a82;
+      --kind-reading: #b39aae;
+      --kind-notion: #7fa8a1;
+      --kind-note: #948b7c;
+      --kind-project: #a9a394;
+      --kind-user: #bc8064;
+      --kind-feedback: #8aa076;
+      --kind-reference: #7891ac;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #80796c;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --kind-concept: #d9763f;
+    --kind-garden: #c08a82;
+    --kind-reading: #b39aae;
+    --kind-notion: #7fa8a1;
+    --kind-note: #948b7c;
+    --kind-project: #a9a394;
+    --kind-user: #bc8064;
+    --kind-feedback: #8aa076;
+    --kind-reference: #7891ac;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ul,
+  dl,
+  dd {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: inherit;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meta.lc {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-style: italic;
+    letter-spacing: 0.004em;
+  }
+  .faint {
+    color: var(--faint);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .ink {
+    color: var(--ink);
+  }
+  .acc {
+    color: var(--accent);
+  }
+  .ell {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* entry: translate and opacity only */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  .fade {
+    animation: fade 220ms var(--ease) both;
+  }
+  .breathe {
+    animation: breathe 3.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .meta {
+    margin: 0 0 20px;
+  }
+  h1 {
+    font-size: clamp(52px, 8vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin-top: 20px;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .which {
+    position: relative;
+    padding: 18px 20px 16px;
+  }
+  .which .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+  }
+  .which p:not(.meta) {
+    font-size: 15.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .which p b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .which .acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .which .small {
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: var(--faint);
+  }
+
+  /* panels sit on the ground like paper laid on gravel */
+  .panel {
+    position: relative;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .sketched {
+    border-color: transparent;
+  }
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 7px 12px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--ink) 30%, var(--rule));
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.4;
+  }
+  .chip.go {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--rule));
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: transparent;
+  }
+  .search {
+    display: block;
+    width: 100%;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 8px 12px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    outline: none;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  /* the outline is replaced, not removed: a ring in the accent */
+  .search:focus,
+  .search:focus-visible {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .search::placeholder {
+    color: var(--faint);
+  }
+  textarea.search {
+    resize: vertical;
+  }
+  textarea.search.hand {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  /* the sheet and the desk */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+  }
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+    }
+  }
+  .sheet {
+    padding: 10px;
+  }
+  .sheet-head {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 4px 4px 0;
+  }
+  .sheet-head > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+  }
+  .t-tab {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--faint);
+    padding: 2px 1px;
+    transition: color 160ms var(--ease);
+  }
+  .t-tab[aria-pressed="true"] {
+    color: var(--ink);
+  }
+  .t-tab:disabled {
+    color: var(--rule);
+  }
+  .t-tab:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .sheet-svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 900 / 372;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .sheet-svg text {
+    pointer-events: none;
+  }
+  .sv-mono {
+    font-family: var(--mono);
+  }
+  .sv-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .t-dot {
+    transition: opacity 220ms var(--ease);
+    cursor: crosshair;
+  }
+  .t-band {
+    transition:
+      x 160ms var(--ease),
+      width 160ms var(--ease),
+      fill-opacity 160ms var(--ease);
+  }
+  .t-glide {
+    transition: transform 600ms var(--ease);
+  }
+  @keyframes drop {
+    from {
+      transform: translateY(-160px);
+      opacity: 0;
+    }
+    60% {
+      opacity: 1;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .t-drop {
+    animation: drop 700ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  .waiting {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 900 / 372;
+    padding: 16px;
+    text-align: center;
+  }
+  .card {
+    position: absolute;
+    z-index: 5;
+    max-width: 16rem;
+    padding: 8px 12px;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border-radius: 3px;
+    box-shadow: 0 2px 10px color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .card .hand {
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .caption {
+    position: relative;
+    margin-top: 8px;
+    min-height: 4.2rem;
+    padding: 2px 0 2px 12px;
+    border-left: 2px solid var(--rule);
+    transition: border-color 220ms var(--ease);
+  }
+  .caption.on {
+    border-left-color: var(--accent);
+  }
+  .caption p {
+    margin-top: 4px;
+    font-size: 16px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .desk label.meta {
+    display: block;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .reading {
+    padding: 18px;
+  }
+  .reading h2 {
+    font-style: italic;
+    font-size: 23px;
+    line-height: 1.15;
+  }
+  .reading .sec {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .reading dd,
+  .body-s {
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    align-self: center;
+  }
+  .list li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-block: 3px;
+  }
+  .list .grow {
+    flex: 1;
+  }
+  .list .end {
+    margin-left: auto;
+    flex: none;
+  }
+  .b-row {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.25;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .b-row:hover,
+  .b-row.on {
+    color: var(--ink);
+  }
+  .x {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    padding-inline: 4px;
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--ink);
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    border: 1px solid var(--rule);
+    border-radius: 99px;
+    padding: 1px 6px;
+    flex: none;
+  }
+  .concepts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 6px;
+  }
+  .concepts li {
+    position: relative;
+    font-size: 14.5px;
+    padding-inline: 2px;
+  }
+  .record {
+    padding: 18px;
+  }
+  .skill {
+    margin-top: 8px;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .fc-after {
+    animation: rise 500ms var(--ease) both;
+  }
+  .fc-bin {
+    transition:
+      cx 400ms var(--ease),
+      cy 400ms var(--ease),
+      r 400ms var(--ease);
+  }
+  .scroll {
+    max-height: 22rem;
+    overflow-y: auto;
+  }
+  .how {
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--faint);
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-block: 40px 28px;
+    }
+  }
+  /* on a phone the sheet is a third of its desktop size: its writing grows to stay legible */
+  @media (max-width: 640px) {
+    .sheet {
+      padding: 6px;
+    }
+    .sheet-svg .sv-mono {
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    .sheet-svg .sv-hand {
+      font-size: 24px;
+    }
+    .sheet-svg .sv-title {
+      font-size: 30px;
+    }
+    .sheet-svg .sv-z {
+      font-size: 22px;
+    }
+    .sheet-svg .sv-wide {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .fade,
+    .breathe,
+    .t-drop,
+    .fc-after,
+    .sketch .draw {
+      animation: none;
+    }
+    .t-glide,
+    .fc-bin,
+    .t-band {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast rise">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Distribution</h1>
+      <p class="deck hand">
+        <em>Taste is distance from the mean, chosen on purpose.</em> Every stone
+        here is placed by how alike its nearest stones are; weigh a thing you
+        are about to read and see where it lands on your own curve.
+      </p>
+    </div>
+    <section
+      class="which panel sketched"
+      data-sketch="box"
+      data-seed="which-garden"
+      aria-label="The garden on the sheet"
+    >
+      <p class="meta">
+        <span>The garden on the sheet</span><span id="which-tag"></span>
+      </p>
+      <div id="which"></div>
+      <input
+        type="file"
+        id="folder"
+        webkitdirectory
+        multiple
+        hidden
+        aria-label="Choose a folder of markdown notes"
+      />
+    </section>
+  </header>
+
+  <div class="grid">
+    <!-- the sheet -->
+    <section
+      class="sheet panel sketched rise"
+      id="sheet"
+      data-sketch="box"
+      data-seed="distribution-sheet"
+      data-draw
+      style="animation-delay: 60ms"
+      aria-label="The distribution"
+    >
+      <div class="sheet-head">
+        <div id="measures"></div>
+        <div id="windows"></div>
+      </div>
+      <div id="stage"></div>
+      <div class="card fade" id="card" hidden></div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+    </section>
+
+    <!-- the desk -->
+    <aside class="desk rise" style="animation-delay: 140ms">
+      <form id="weigh-form" novalidate>
+        <label class="meta" for="taste-title"
+          >weigh a thing before you let it in</label
+        >
+        <input
+          id="taste-title"
+          class="search"
+          style="margin-top: 8px"
+          placeholder="its title  /"
+          autocomplete="off"
+          maxlength="200"
+        />
+        <textarea
+          id="taste-text"
+          class="search"
+          style="margin-top: 8px"
+          rows="4"
+          placeholder="a line or two of it — the blurb, the opening, the description. it moves on the curve as you type"
+          aria-label="A line or two of it"
+        ></textarea>
+        <div class="row" style="margin-top: 12px">
+          <button type="submit" class="chip go" id="weigh-btn">weigh it</button>
+          <span class="meta lc">⌘↩</span>
+          <span class="hand acc body-s" id="weigh-error" role="status"></span>
+        </div>
+        <p
+          class="hand faint"
+          style="margin-top: 8px; font-size: 14.5px; line-height: 1.3"
+        >
+          nothing here leaves this page. a thing is weighed on the words you
+          paste; nothing to hand? click any call kept before to weigh it again.
+        </p>
+      </form>
+
+      <div id="reading"></div>
+      <section id="tray" aria-label="Weighed this sitting" hidden></section>
+      <section id="band" aria-label="In the band" hidden></section>
+      <section id="kept" aria-label="Kept before" hidden></section>
+      <section
+        id="record"
+        class="record panel sketched"
+        data-sketch="box"
+        data-seed="forecast-record"
+        aria-label="The garden's guesses, scored"
+      ></section>
+      <p class="how" id="how"></p>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Distribution · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · your calls stay in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* SPECIMEN:BEGIN */
+  // An invented gardener: sixty notes and six terms of their own, mostly about attention and
+  // the feed, bread, and walking, with a scatter of admin and errands. Ages are days since the
+  // note was last tended, counted back from whenever the page is opened. Nobody real wrote any
+  // of it.
+  const SPECIMEN = {
+    notes: [
+      [
+        "the-feed-finishes-sentences",
+        "The feed finishes my sentences",
+        "garden",
+        2,
+        ["attention", "feed"],
+        "I open the app to look for one thing and the feed decides what I wanted.",
+        "Twice this week I opened the phone to check the weather and came up twenty minutes later from the feed. The feed is very good at finishing a sentence I had not started. Attention goes where the scroll is easiest, not where I meant it to go.",
+      ],
+      [
+        "phone-in-another-room",
+        "Phone in another room",
+        "garden",
+        4,
+        ["attention", "phone", "habit"],
+        "Leaving the phone in the hall changes the whole evening.",
+        "Experiment: the phone charges in the hall after nine. The first evening I reached for my pocket eleven times. By the fourth evening the reaching stopped and the evening got longer. Attention comes back slowly, like feeling in a cold hand.",
+      ],
+      [
+        "notifications-urgent",
+        "Why every notification feels urgent",
+        "garden",
+        6,
+        ["attention", "notifications"],
+        "A red dot borrows the urgency of a real emergency.",
+        "A notification arrives with the same small jolt whether it is a friend in trouble or a sale on socks. The red dot is designed to feel urgent. I turned off every notification that is not a person, and the phone went quiet, and the quiet felt like a loss for three days.",
+      ],
+      [
+        "boredom-as-ground",
+        "Boredom as ground",
+        "garden",
+        9,
+        ["attention", "boredom"],
+        "Boredom is the soil, not the weed.",
+        "Waiting for the bus without the phone, bored, I noticed the bakery had changed its sign. Boredom is where attention starts to wander on its own. The feed removes boredom and with it the wandering.",
+      ],
+      [
+        "residue-after-switching",
+        "Residue after switching",
+        "garden",
+        11,
+        ["attention", "work"],
+        "Part of my attention stays on the last task for a long time.",
+        "After checking messages between two pieces of writing, the second piece starts badly. Attention residue: part of the mind is still in the inbox. Switching costs are paid later, in the quality of the next hour.",
+      ],
+      [
+        "infinite-scroll",
+        "The infinite scroll has no bottom",
+        "reading",
+        3,
+        ["attention", "feed", "design"],
+        "Highlight: a page with no bottom gives no moment to stop.",
+        "Highlights from an essay on interface design. A page used to end, and the end was a natural moment to decide whether to keep going. The infinite scroll removed the bottom of the page, and with it the decision. The feed never asks whether you want more.",
+      ],
+      [
+        "the-sameness-engine",
+        "The sameness engine",
+        "garden",
+        5,
+        ["attention", "feed", "taste"],
+        "Recommendations pull everyone's taste toward the middle.",
+        "The recommendation engine learns what most people like and serves more of it. My feed and my friend's feed look more alike every month. Taste flattens toward the middle when the feed chooses for us. Choosing on purpose is the only way out of the sameness engine.",
+      ],
+      [
+        "read-later-pile",
+        "The read-later pile",
+        "garden",
+        14,
+        ["attention", "reading"],
+        "Saving an article feels like reading it.",
+        "Four hundred saved articles. Saving gives the small reward of reading without the attention. Once a month I read three and delete the rest without guilt.",
+      ],
+      [
+        "slow-feed",
+        "Slow feed",
+        "project",
+        7,
+        ["attention", "feed", "build"],
+        "A feed that updates once a day and then ends.",
+        "A small project: a reader for my subscriptions that updates once a day at seven, shows everything once, and then says the feed is finished. No scroll, no notifications, no recommendations. The end of the page comes back.",
+      ],
+      [
+        "attention-is-a-practice",
+        "Attention is a practice",
+        "garden",
+        20,
+        ["attention"],
+        "Attention is trained, like a muscle or an ear.",
+        "Slow attention is something practised: looking at one thing for longer than is comfortable. Drawing helps, walking helps, the feed does the opposite. Attention gets better the way an ear gets better at music.",
+      ],
+      [
+        "scrolling-at-night",
+        "Scrolling at night",
+        "garden",
+        16,
+        ["attention", "sleep", "phone"],
+        "The worst scrolling happens after eleven.",
+        "After eleven the feed is all bad news and other people's holidays, and I keep scrolling because stopping means the day is over. Sleep gets shorter. The phone in another room fixes most of it.",
+      ],
+      [
+        "counting-the-likes",
+        "Counting the likes",
+        "notion",
+        24,
+        ["attention", "feed", "social"],
+        "A number under a post changes how the post is read.",
+        "From the old workspace: notes on how the count of likes under a post changes the reading of it. A post with many likes reads as true. The number arrives before the words, and the feed shows the number first.",
+      ],
+      [
+        "email-twice-a-day",
+        "Email twice a day",
+        "notion",
+        27,
+        ["attention", "work", "habit"],
+        "Checking email at ten and four only.",
+        "Checking email twice a day, at ten and four. Fewer switches, less residue, and nothing urgent was missed in a month. The inbox is a feed with a work badge on it.",
+      ],
+      [
+        "the-attention-merchants",
+        "Highlights: selling attention",
+        "reading",
+        40,
+        ["attention", "history", "advertising"],
+        "Highlights on how attention became something sold.",
+        "Highlights from a history of advertising. Attention was first harvested by newspapers sold at a loss, then radio, then television, then the feed. Each medium sold the reader's attention to advertisers. The feed is the most patient merchant so far.",
+      ],
+      [
+        "focus-apps-dont-help",
+        "Focus apps don't help",
+        "garden",
+        45,
+        ["attention", "phone", "tools"],
+        "An app to stop using apps is still an app.",
+        "Tried three focus apps that block the feed. Each became another thing on the phone to check. Attention is not fixed by adding a tool to the phone; it is fixed by distance from the phone.",
+      ],
+      [
+        "the-feed-sets-the-mood",
+        "The feed sets the mood",
+        "garden",
+        52,
+        ["attention", "feed", "mood"],
+        "My mood after scrolling belongs to someone else.",
+        "After twenty minutes of the feed my mood is the feed's mood: outraged, envious, restless. Then I explain the mood to myself as if it were mine. A walk does the opposite: the mood comes from the street and the body.",
+      ],
+      [
+        "an-ecology-of-attention",
+        "An ecology of attention",
+        "reading",
+        70,
+        ["attention", "environment"],
+        "Highlight: attention as a commons that can be polluted.",
+        "Highlights from a lecture on attention as an environment. Attention behaves like a commons: shared, finite, easy to pollute. Loud design is a kind of pollution. Quiet places are a kind of conservation.",
+      ],
+      [
+        "a-month-without-notifications",
+        "A month without notifications",
+        "garden",
+        95,
+        ["attention", "notifications", "habit"],
+        "Results of turning all notifications off for a month.",
+        "A month with every notification off. I checked the phone more at first, by hand, then much less. Nobody was hurt by a slower reply. The urgency had been in the red dot, not in the messages.",
+      ],
+      [
+        "mornings-before-the-phone",
+        "Mornings before the phone",
+        "garden",
+        19,
+        ["attention", "phone", "habit", "morning"],
+        "The first hour without the phone is the best hour.",
+        "No phone until after breakfast. The first hour of the day belongs to the kettle, the window, and the levain. The feed can wait an hour and it always does.",
+      ],
+      [
+        "the-feed-is-not-a-place",
+        "The feed is not a place",
+        "garden",
+        36,
+        ["attention", "feed", "third-place"],
+        "You can spend hours in the feed and never have been anywhere.",
+        "Hours in the feed leave no memory of having been anywhere. A third place has walls and weather and people who recognise you. The feed has only the next post.",
+      ],
+      [
+        "levain-on-a-work-day",
+        "Levain on a work-day schedule",
+        "garden",
+        1,
+        ["bread", "levain", "fermentation"],
+        "Feed the levain at night, mix at seven, bake after work.",
+        "A schedule for bread around a job: feed the levain at ten at night, mix the dough at seven, bulk ferment in the cool hall all day, shape at six, bake at eight. The levain likes the cold, and the crumb is more open for it.",
+      ],
+      [
+        "hydration-and-the-crumb",
+        "Hydration and the crumb",
+        "garden",
+        8,
+        ["bread", "crumb", "hydration"],
+        "Higher hydration, more open crumb, harder shaping.",
+        "At seventy-five percent hydration the dough is easy to shape and the crumb is tight. At eighty-two percent the crumb opens and the dough spreads. The flour matters more than the number: a strong flour holds more water.",
+      ],
+      [
+        "autolyse",
+        "Autolyse, or doing nothing first",
+        "garden",
+        13,
+        ["bread", "technique"],
+        "Leaving flour and water alone for an hour does half the kneading.",
+        "Autolyse: mix flour and water and leave them for an hour before adding the levain and salt. The gluten develops while nothing happens. Bread rewards patience and punishes attention at the wrong moment.",
+      ],
+      [
+        "dark-rye",
+        "Dark rye",
+        "garden",
+        26,
+        ["bread", "rye", "fermentation"],
+        "Rye has no gluten to speak of; the sourness holds it.",
+        "A dark rye loaf: all rye flour, a sour levain, baked in a tin and left a whole day before cutting. Rye ferments fast and smells of vinegar and cocoa. The crumb is dense and moist.",
+      ],
+      [
+        "a-neglected-starter",
+        "A neglected starter comes back",
+        "garden",
+        33,
+        ["bread", "levain"],
+        "Two weeks in the fridge and the levain revives in three feeds.",
+        "The levain sat at the back of the fridge for two weeks with grey liquid on top. Three feeds at room temperature and it doubled again. Fermentation is forgiving; it waits for you.",
+      ],
+      [
+        "bread-log",
+        "Bread log",
+        "project",
+        10,
+        ["bread", "log", "build"],
+        "A log of every bake: flour, hydration, times, crumb photo.",
+        "Keeping a log of every loaf: flour, hydration, levain age, bulk ferment time, the temperature of the hall, and a photo of the crumb. Forty loaves in, the log says the hall temperature matters more than anything I do.",
+      ],
+      [
+        "scoring-the-loaf",
+        "Scoring the loaf",
+        "garden",
+        60,
+        ["bread", "technique"],
+        "A shallow angled cut lets the loaf open into an ear.",
+        "Scoring: a blade at a low angle, one confident cut, half a centimetre deep. The loaf opens along the cut in the oven and makes an ear. Hesitation shows in the crust.",
+      ],
+      [
+        "grandmothers-recipe-card",
+        "Grandmother's recipe card",
+        "note",
+        300,
+        ["family", "bread", "recipe"],
+        "A card in her handwriting for a plaited loaf.",
+        "Found my grandmother's recipe card for a plaited Sunday loaf: milk, butter, an egg wash, and the instruction 'until it feels right'. The card is stained with butter. It is the only bread recipe I have that has no numbers.",
+      ],
+      [
+        "fermentation-is-time",
+        "Fermentation is time made edible",
+        "garden",
+        110,
+        ["fermentation", "bread", "time"],
+        "What fermentation sells is time.",
+        "Bread, yoghurt, kimchi: fermentation turns time into flavour. You cannot rush it without losing the taste. Time is the ingredient nobody lists.",
+      ],
+      [
+        "bread-as-attention-training",
+        "Bread as attention training",
+        "garden",
+        23,
+        ["bread", "attention"],
+        "Bread teaches you to watch slowly.",
+        "Bread is slow attention in practice: checking the dough every hour, learning what doubled looks like, waiting. It cannot be hurried and it cannot be ignored.",
+      ],
+      [
+        "walking-to-think",
+        "Walking to think",
+        "garden",
+        2,
+        ["walking", "thinking"],
+        "The answer arrives on the walk home, never at the desk.",
+        "Stuck on the essay for two days. Walked to the river and back without the phone and the paragraph arrived at the bridge. Walking sets the pace of thinking. The desk sets the pace of the screen.",
+      ],
+      [
+        "desire-paths-in-the-park",
+        "Desire paths in the park",
+        "garden",
+        5,
+        ["walking", "city", "desire-paths"],
+        "The worn line across the grass is the real map.",
+        "In the park the paved path goes round the lawn and a brown line of worn grass goes straight across it. The desire path is the walkers' vote on where the path should be. Planners pave it eventually, or fence it.",
+      ],
+      [
+        "bench-map",
+        "Bench map",
+        "project",
+        12,
+        ["walking", "city", "benches", "build"],
+        "Mapping every bench within a half-hour walk.",
+        "A map of every public bench within half an hour's walk: where it faces, whether there is shade, whether anyone sits there. The benches facing the street are empty. The benches facing the water are always taken.",
+      ],
+      [
+        "third-places-are-disappearing",
+        "Third places are disappearing",
+        "garden",
+        18,
+        ["city", "third-place"],
+        "The café that let you sit all afternoon has become a counter.",
+        "The café on the corner removed its chairs and became a counter for coffee to go. A third place is somewhere that is neither home nor work where you can stay without buying much. The city has fewer of them every year, and the feed is not one.",
+      ],
+      [
+        "night-walk",
+        "Night walk",
+        "garden",
+        22,
+        ["walking", "night", "city"],
+        "The city at two in the morning is another city.",
+        "Could not sleep, so I walked for an hour at two in the morning. Bakeries lit, streets empty, the sound of the river. The same streets at night are a different city, quieter and larger.",
+      ],
+      [
+        "a-derive-on-sunday",
+        "A dérive on Sunday",
+        "garden",
+        38,
+        ["walking", "city", "derive"],
+        "Walking without a destination, turning where the street pulls.",
+        "An afternoon dérive: no destination, turn wherever the street looks interesting. Found a courtyard with a fig tree and a shop that only sells brushes. The city is bigger than the map of the routes I use.",
+      ],
+      [
+        "walking-resets-the-mood",
+        "Walking resets the mood",
+        "garden",
+        48,
+        ["walking", "mood"],
+        "Twenty minutes outside undoes twenty minutes of the feed.",
+        "After a bad hour on the phone, twenty minutes of walking. The mood comes back from the street: the weather, other people's dogs, the smell of the bakery. Walking is the slowest way to change a mood and the most reliable.",
+      ],
+      [
+        "maps-against-wandering",
+        "Maps against wandering",
+        "garden",
+        85,
+        ["walking", "maps", "city"],
+        "Navigation by phone means I never learn the streets.",
+        "With the phone map I arrive and remember nothing of the way. Without it I get lost twice and then know the neighbourhood for good. Wandering is how a city gets learnt.",
+      ],
+      [
+        "on-benches",
+        "On benches",
+        "reading",
+        120,
+        ["city", "benches", "public-space"],
+        "Highlight: a bench is an invitation to stay without paying.",
+        "Highlights from an essay on public seating. A bench is the cheapest piece of public space: it invites anyone to stay without buying anything. Cities that remove benches are telling people to keep moving.",
+      ],
+      [
+        "walking-meetings",
+        "Walking meetings",
+        "notion",
+        150,
+        ["walking", "work"],
+        "One-to-ones are better walked than sat.",
+        "From the old workspace: walking one-to-ones around the block. People say more side by side than across a table. The walk ends the meeting at the right time.",
+      ],
+      [
+        "highlights-a-history-of-walking",
+        "Highlights: a history of walking",
+        "reading",
+        100,
+        ["walking", "history", "thinking"],
+        "Highlight: walking as the pace of the mind.",
+        "Highlights from a history of walking. Philosophers walked to think; the pace of walking is close to the pace of thought. The city walker notices what the driver passes.",
+      ],
+      [
+        "albums-in-order",
+        "Albums in order",
+        "garden",
+        15,
+        ["music", "listening", "attention"],
+        "Listening to a whole album start to finish, in order.",
+        "Listened to a whole album in order with nothing else on. It is a different thing from the same songs on shuffle. Listening is a kind of attention, and the album asks for forty minutes of it.",
+      ],
+      [
+        "field-recordings",
+        "Field recordings",
+        "garden",
+        29,
+        ["sound", "listening", "walking"],
+        "Recording ten minutes of a place without moving.",
+        "Recorded ten minutes of the market from one spot: voices, a cart, pigeons, a radio. Listening back, I heard things I had not noticed while standing there. A field recording is a way of paying attention after the fact.",
+      ],
+      [
+        "a-listening-walk",
+        "A listening walk",
+        "garden",
+        55,
+        ["sound", "walking", "listening"],
+        "Walking a route only to hear it.",
+        "Walked the river route only listening: no headphones, no talking. Counted eleven kinds of bird and the hum of the power station. Listening walks make the familiar route strange again.",
+      ],
+      [
+        "the-record-shop",
+        "The record shop",
+        "note",
+        200,
+        ["music", "city", "third-place"],
+        "The record shop is a third place with a soundtrack.",
+        "The record shop on the high street lets you stay for an hour and buy nothing. The owner plays whatever he likes. It is one of the last third places on the street.",
+      ],
+      [
+        "playlists-against-albums",
+        "Playlists against albums",
+        "reading",
+        260,
+        ["music", "listening", "taste"],
+        "Highlight: the playlist made the song the unit again.",
+        "Highlights from a piece on streaming. The playlist made the single song the unit of listening again, chosen by mood rather than by artist. The album asked you to take someone's whole sequence; the playlist fits the sequence to you.",
+      ],
+      [
+        "silence-in-the-flat",
+        "Silence in the flat",
+        "garden",
+        180,
+        ["sound", "home"],
+        "The flat is never silent; the fridge has a note.",
+        "Sat in the flat with everything off. Not silent: the fridge hums at one note, the pipes tick, the neighbour's television comes through the wall. Silence is a direction, not a place you arrive.",
+      ],
+      [
+        "tax-return-checklist",
+        "Tax return checklist",
+        "notion",
+        210,
+        ["admin", "money"],
+        "Documents to gather before the tax deadline.",
+        "Payslips, the pension statement, the receipts for the work laptop, the bank interest letter. File online before the end of January. Keep the reference number.",
+      ],
+      [
+        "fixing-the-bike-chain",
+        "Fixing the bike chain",
+        "note",
+        75,
+        ["bike", "repair"],
+        "The chain kept slipping in the small gear.",
+        "The chain slipped in the smallest gear. Cleaned it, oiled it, adjusted the rear derailleur cable by half a turn. It shifts cleanly now. The chain is worn and needs replacing before spring.",
+      ],
+      [
+        "the-exam-dream",
+        "The exam dream again",
+        "garden",
+        42,
+        ["dream", "sleep"],
+        "Dreamed of an exam for a course I never attended.",
+        "The dream again: an exam hall, a paper in a subject I never studied, the clock running. Woke up relieved. It comes back whenever a deadline is near.",
+      ],
+      [
+        "moving-flat-checklist",
+        "Moving flat checklist",
+        "notion",
+        400,
+        ["admin", "home"],
+        "What to do in the week before moving.",
+        "Book the van, redirect post, read the meters, photograph the walls, return the keys, update the address with the bank and the doctor.",
+      ],
+      [
+        "chess-openings",
+        "Chess openings I keep losing to",
+        "note",
+        240,
+        ["chess", "games"],
+        "The Sicilian keeps beating me.",
+        "Lost four games in a row to the Sicilian Defence. Need to learn one line properly rather than ten lines badly. Played the Italian game as white and won twice.",
+      ],
+      [
+        "watering-the-houseplants",
+        "Watering the houseplants",
+        "note",
+        28,
+        ["plants", "home"],
+        "The fern needs more water than the cactus, obviously.",
+        "Watering schedule: fern every three days, the monstera once a week, the cactus once a month. The fern drooped while I was away and came back after a soak.",
+      ],
+      [
+        "insurance-renewal",
+        "Insurance renewal",
+        "notion",
+        330,
+        ["admin", "money"],
+        "The renewal quote went up by a third.",
+        "The home insurance renewal quote rose by a third. Compared four other quotes, called and asked for the new customer price, got it. Set a reminder for next year.",
+      ],
+      [
+        "running-shoes",
+        "Running shoes",
+        "note",
+        160,
+        ["running", "gear"],
+        "Five hundred kilometres and the cushioning is gone.",
+        "The running shoes have done about five hundred kilometres and the knees notice. Bought the same model again. Running on the canal path, three times a week, slowly.",
+      ],
+      [
+        "birthday-presents",
+        "Birthday presents",
+        "note",
+        280,
+        ["family", "gifts"],
+        "Ideas for the family birthdays this year.",
+        "Mum: the gardening gloves she mentioned. Sam: a book on knots. Grandad: a framed photo of the old house.",
+      ],
+      [
+        "physio-for-the-knee",
+        "Physio exercises for the knee",
+        "note",
+        145,
+        ["health", "running"],
+        "Three exercises, twice a day, for six weeks.",
+        "Clamshells, single-leg squats to a chair, calf raises. Twice a day for six weeks. The knee pain on the stairs is half what it was.",
+      ],
+      [
+        "kitchen-radio",
+        "Kitchen radio",
+        "note",
+        500,
+        ["sound", "home"],
+        "The old radio only gets one station.",
+        "The kitchen radio has been stuck on one station since the dial broke. Mostly talk in the mornings, music in the afternoon. Nobody chose it and everyone likes it.",
+      ],
+      [
+        "password-manager-setup",
+        "Password manager setup",
+        "notion",
+        600,
+        ["admin", "security"],
+        "Moved every login into one manager.",
+        "Moved all logins into a password manager, turned on two-factor for the bank and email, printed the recovery codes and put them in the drawer.",
+      ],
+      [
+        "allotment-waiting-list",
+        "Allotment waiting list",
+        "note",
+        350,
+        ["plants", "waiting"],
+        "Number forty-two on the allotment list.",
+        "Put my name down for an allotment. Number forty-two on the list; the council says three years. In the meantime, tomatoes on the windowsill.",
+      ],
+    ],
+    // [term, signed (their own), age, aliases, meaning, body]
+    terms: [
+      [
+        "Slow attention",
+        true,
+        6,
+        ["slow looking"],
+        "Attention held on one thing longer than is comfortable, on purpose.",
+        "Slow attention is practised, not felt: staying with one thing past the point of boredom. The opposite of the feed's quick attention. Walking, listening and bread all train it.",
+      ],
+      [
+        "Desire path",
+        true,
+        21,
+        ["desire line"],
+        "A path worn by people walking where they actually want to go.",
+        "The worn line across the grass that no planner drew. A desire path is evidence of where people walk, against the map of where they were meant to walk.",
+      ],
+      [
+        "Third place",
+        false,
+        40,
+        [],
+        "Somewhere that is neither home nor work, where people can stay without much reason.",
+        "Cafés, record shops, libraries, benches, barbershops. A third place lets people stay and meet without an appointment or a purchase.",
+      ],
+      [
+        "Attention residue",
+        false,
+        65,
+        [],
+        "The part of attention still on the last task after switching.",
+        "After switching tasks, part of attention stays behind on the previous one. The cost of switching is paid in the next hour of work.",
+      ],
+      [
+        "Levain",
+        false,
+        88,
+        [],
+        "A starter of flour and water kept alive to leaven bread.",
+        "Levain: flour and water fermented by wild yeast and bacteria, fed regularly, used to raise bread. An older word for what is now called a sourdough starter.",
+      ],
+      [
+        "Dérive",
+        true,
+        130,
+        ["drift"],
+        "Walking through a city without a destination, led by its pull.",
+        "A dérive is a walk without destination, turning where the city pulls. The point is to notice how the streets steer you.",
+      ],
+    ],
+    // The calls the gardener has already made: [title, text, verdict, days ago, note]
+    calls: [
+      [
+        "Ten productivity hacks for deep work",
+        "Wake at five, batch your tasks, use the two-minute rule and a productivity app to hack your focus. Deep work made simple with this morning routine.",
+        "passed",
+        58,
+        "",
+      ],
+      [
+        "How the infinite feed was designed to keep you scrolling",
+        "Former designers explain how the infinite scroll, autoplay and the red notification dot were built to hold attention. The feed has no bottom by design.",
+        "let in",
+        55,
+        "the feed, explained by the people who built it.",
+      ],
+      [
+        "A rye loaf at full hydration",
+        "A recipe for a dark rye loaf with an old levain: long fermentation, baked in a tin, rested a day before cutting.",
+        "let in",
+        51,
+        "",
+      ],
+      [
+        "The morning routine of a billionaire",
+        "He wakes at four, journals, takes a cold shower and reads the news before six. His productivity routine is the secret of his success.",
+        "passed",
+        47,
+        "",
+      ],
+      [
+        "The lost art of the park bench",
+        "Benches are vanishing from city streets. An essay on public seating, third places and the right to sit without buying anything.",
+        "let in",
+        44,
+        "for the bench map.",
+      ],
+      [
+        "Five apps to hack your mornings",
+        "Five productivity apps to hack your morning routine: habit trackers, a focus timer and a smart alarm. Success starts at five.",
+        "passed",
+        40,
+        "",
+      ],
+      [
+        "Why notifications feel like emergencies",
+        "The red dot borrows the urgency of an emergency. A study of how notifications pull attention away from work and leave a residue.",
+        "let in",
+        36,
+        "",
+      ],
+      [
+        "The celebrity sourdough feud",
+        "Two television chefs argue online about whose sourdough starter is older. Fans pick sides in the comments.",
+        "passed",
+        32,
+        "bread words, nothing about bread.",
+      ],
+      [
+        "Walking as a way of thinking",
+        "Why ideas come on walks: a short essay on walking, the pace of thought and the city at walking speed.",
+        "let in",
+        27,
+        "already know this, but it is said well.",
+      ],
+      [
+        "Hustle culture and the five o'clock club",
+        "Join the five o'clock club: wake early, grind, track every habit and never waste a morning. Success is a routine.",
+        "passed",
+        23,
+        "",
+      ],
+      [
+        "Field recordings from a night market",
+        "An hour of sound from a night market: voices, cooking, a radio, rain on the awnings. Listening as slow attention.",
+        "let in",
+        18,
+        "",
+      ],
+      [
+        "The ten best gadgets of the year",
+        "From noise-cancelling headphones to a smart ring, the ten gadgets that defined the year, ranked.",
+        "passed",
+        13,
+        "",
+      ],
+      [
+        "What the recommendation engine thinks of you",
+        "How recommendation systems model your taste and pull it toward the middle. Why every feed starts to look the same.",
+        "let in",
+        8,
+        "",
+      ],
+      [
+        "Index funds for beginners",
+        "A beginner's guide to index funds, fees and compounding, and why time in the market beats timing the market.",
+        "passed",
+        4,
+        "",
+      ],
+      [
+        "Desire lines on the campus lawn",
+        "Photographs of desire paths worn across university lawns, and what planners learned from paving them.",
+        "let in",
+        2,
+        "",
+      ],
+    ],
+  };
+  /* SPECIMEN:END */
+
+  /* LIB:BEGIN */
+  // ── the distribution: a hand port of niwa's lib/taste.ts, maths unchanged ──────────
+  // Everything here is measurable and nothing here is a verdict: a stone's kinship is how
+  // alike its nearest stones are on shared words, the curve is every stone's kinship
+  // standardised against the garden's own spread, and a candidate is placed the same way.
+  // The tails are both real: the left is "little here is like it", the right is "the garden
+  // is already full of this". Which one is good is the reader's call.
+
+  /** The beds that count as things read and written. */
+  const CORPUS_KINDS = new Set([
+    "concept",
+    "note",
+    "notion",
+    "garden",
+    "reading",
+    "project",
+    "user",
+    "feedback",
+    "reference",
+  ]);
+  /** How many nearest stones kinship is taken over. */
+  const K = 8;
+  /** Fewer stones than this and a window has no curve worth drawing. */
+  const MIN_WINDOW = 24;
+
+  const STOP = new Set(
+    `a about above after again against all also am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just let me more most my myself no nor not now of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves ll re ve don didn doesn isn aren wasn weren won wouldn couldn shouldn one two three like get got make made much many may might must ones thing things way well even still already always never ever every something anything nothing everything someone anyone everyone said says say see seen going went come came take took give gave use used using new old first last next back per via etc http https www com html`
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+
+  /** A light stemmer: enough that "instruments" and "instrument" are one word. */
+  function stem(w) {
+    if (w.length <= 3) return w;
+    if (w.endsWith("ies") && w.length > 4) return `${w.slice(0, -3)}y`;
+    if (w.endsWith("ness") && w.length > 6) return w.slice(0, -4);
+    if (w.endsWith("ing") && w.length > 5) return w.slice(0, -3);
+    if (w.endsWith("ed") && w.length > 5) return w.slice(0, -2);
+    if (w.endsWith("ly") && w.length > 5) return w.slice(0, -2);
+    if (/(?:[sxz]|[cs]h)es$/.test(w) && w.length > 4) return w.slice(0, -2);
+    if (w.endsWith("s") && !w.endsWith("ss") && w.length > 4)
+      return w.slice(0, -1);
+    return w;
+  }
+
+  function tokens(text) {
+    return text
+      .toLowerCase()
+      .replace(/https?:\/\/\S+/g, " ")
+      .replace(/['’]s\b/g, "")
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !STOP.has(w) && !/^\d+$/.test(w))
+      .map((w) => {
+        const st = stem(w);
+        return st.length >= 3 && !STOP.has(st) ? st : w;
+      });
+  }
+
+  /** What a stone is weighed on: its title, its first line, tags, and the top of its body. */
+  function docText(n) {
+    const body = (n.body ?? "").slice(0, 4000).replace(/[[\]#*_`>|]/g, " ");
+    return {
+      title: n.label,
+      text: `${n.description ?? ""}\n${(n.tags ?? []).join(" ")}\n${body}`,
+    };
+  }
+
+  /** Unigrams and adjacent pairs, the title counted twice. */
+  function counts(title, text) {
+    const c = new Map();
+    const add = (ts, w) => {
+      for (let i = 0; i < ts.length; i++) {
+        c.set(ts[i], (c.get(ts[i]) ?? 0) + w);
+        if (i + 1 < ts.length) {
+          const pair = `${ts[i]}_${ts[i + 1]}`;
+          c.set(pair, (c.get(pair) ?? 0) + w);
+        }
+      }
+    };
+    add(tokens(title), 2);
+    add(tokens(text), 1);
+    return c;
+  }
+
+  /** The words of a text the garden has never seen, commonest first. */
+  function unknownWords(index, title, text, n = 6) {
+    const c = new Map();
+    for (const t of [...tokens(title), ...tokens(text)])
+      if (!index.idf.has(t)) c.set(t, (c.get(t) ?? 0) + 1);
+    return [...c.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map((e) => e[0]);
+  }
+
+  function normalise(v) {
+    let s = 0;
+    for (const w of v.values()) s += w * w;
+    const n = Math.sqrt(s) || 1;
+    for (const [k, w] of v) v.set(k, w / n);
+    return v;
+  }
+
+  function weigh(c, idf) {
+    const v = new Map();
+    for (const [t, n] of c) v.set(t, (1 + Math.log(n)) * (idf.get(t) ?? 1));
+    return v;
+  }
+
+  /** tf-idf vectors for every stone that has text, unit length so cosine is a dot. */
+  function buildIndex(nodes) {
+    const raw = nodes
+      .filter((n) => CORPUS_KINDS.has(n.kind))
+      .map((n) => {
+        const { title, text } = docText(n);
+        return { n, c: counts(title, text) };
+      })
+      .filter((d) => d.c.size >= 4);
+    const N = raw.length;
+    const df = new Map();
+    for (const d of raw)
+      for (const t of d.c.keys()) df.set(t, (df.get(t) ?? 0) + 1);
+    const idf = new Map();
+    for (const [t, f] of df) idf.set(t, Math.log((N + 1) / (f + 1)) + 1);
+    const docs = raw.map((d) => ({
+      id: d.n.id,
+      label: d.n.label,
+      kind: d.n.kind,
+      modified: d.n.modified,
+      vec: normalise(weigh(d.c, idf)),
+    }));
+    return { docs, idf, N };
+  }
+
+  /** A candidate, weighed on the garden's vocabulary. Words the garden has never seen count against likeness. */
+  function vectorise(index, title, text) {
+    return normalise(weigh(counts(title, text), index.idf));
+  }
+
+  function dot(a, b) {
+    if (a.size > b.size) [a, b] = [b, a];
+    let s = 0;
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) s += w * x;
+    }
+    return s;
+  }
+
+  /** Runs a stepped computation to the end, at once. */
+  function finish(gen) {
+    let r;
+    while (!(r = gen.next()).done);
+    return r.value;
+  }
+
+  /**
+   * Every stone against every other. Symmetric, zero on the diagonal. The same cosine as
+   * `dot`, taken on sorted term ids so a garden of thousands is a merge, not a lookup.
+   * Stepped, so a large garden can be weighed without freezing the page.
+   */
+  function* pairwiseSteps(docs) {
+    const n = docs.length;
+    const M = new Float32Array(n * n);
+    const ids = new Map();
+    const packed = docs.map((d) => {
+      const e = [...d.vec].map(([t, w]) => {
+        let id = ids.get(t);
+        if (id === undefined) ids.set(t, (id = ids.size));
+        return [id, w];
+      });
+      e.sort((p, q) => p[0] - q[0]);
+      return {
+        t: Int32Array.from(e, (x) => x[0]),
+        w: Float64Array.from(e, (x) => x[1]),
+      };
+    });
+    for (let i = 0; i < n; i++) {
+      const a = packed[i];
+      for (let j = i + 1; j < n; j++) {
+        const b = packed[j];
+        let s = 0;
+        let p = 0;
+        let q = 0;
+        while (p < a.t.length && q < b.t.length) {
+          const x = a.t[p];
+          const y = b.t[q];
+          if (x === y) {
+            s += a.w[p++] * b.w[q++];
+          } else if (x < y) p++;
+          else q++;
+        }
+        M[i * n + j] = s;
+        M[j * n + i] = s;
+      }
+      if ((i & 31) === 31) yield (i * (2 * n - i)) / (n * n);
+    }
+    return M;
+  }
+  const pairwise = (docs) => finish(pairwiseSteps(docs));
+
+  /** Mean of the k largest values. */
+  function topMean(values, k = K) {
+    if (!values.length) return 0;
+    const top = values
+      .slice()
+      .sort((a, b) => b - a)
+      .slice(0, k);
+    return top.reduce((s, v) => s + v, 0) / top.length;
+  }
+
+  /** The stones tended within the last `days`, or all of them. */
+  function windowMembers(docs, days, now = Date.now()) {
+    if (days === null) return docs.map((_, i) => i);
+    const cut = now - days * 86_400_000;
+    const out = [];
+    docs.forEach((d, i) => {
+      if (d.modified && new Date(d.modified).getTime() >= cut) out.push(i);
+    });
+    return out;
+  }
+
+  const gauss = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+
+  /** Silverman's rule on standardised values. */
+  const bandwidth = (n) => 1.06 * Math.pow(Math.max(n, 2), -1 / 5);
+
+  function densityAt(zs, z, bw) {
+    let s = 0;
+    for (const v of zs) s += gauss((z - v) / bw);
+    return s / (zs.length * bw);
+  }
+
+  function kde(
+    zs,
+    bw = bandwidth(zs.length),
+    from = -3.5,
+    to = 3.5,
+    steps = 140,
+  ) {
+    const pts = [];
+    let max = 0;
+    for (let i = 0; i <= steps; i++) {
+      const z = from + ((to - from) * i) / steps;
+      const d = densityAt(zs, z, bw);
+      max = Math.max(max, d);
+      pts.push([z, d]);
+    }
+    return pts.map(([z, d]) => [z, max ? d / max : 0]);
+  }
+
+  /** Every stone in a window placed on the window's own curve. */
+  function distribution(docs, M, members, k = K) {
+    const n = docs.length;
+    if (members.length < MIN_WINDOW) return null;
+    const cs = members.map((i) =>
+      topMean(
+        members.filter((j) => j !== i).map((j) => M[i * n + j]),
+        k,
+      ),
+    );
+    const mu = cs.reduce((s, v) => s + v, 0) / cs.length;
+    const sigma =
+      Math.sqrt(cs.reduce((s, v) => s + (v - mu) ** 2, 0) / cs.length) || 1e-9;
+    const zs = cs.map((c) => (c - mu) / sigma);
+    const bw = bandwidth(zs.length);
+    const dens = kde(zs, bw);
+    const peak = Math.max(...zs.map((z) => densityAt(zs, z, bw)), 1e-9);
+    return {
+      n: members.length,
+      mu,
+      sigma,
+      bw,
+      density: dens,
+      items: members.map((i, idx) => ({
+        id: docs[i].id,
+        label: docs[i].label,
+        kind: docs[i].kind,
+        c: cs[idx],
+        z: zs[idx],
+        d: densityAt(zs, zs[idx], bw) / peak,
+      })),
+    };
+  }
+
+  /** The words two vectors agree on most, for showing why two things are kin. */
+  function shared(a, b, n = 6) {
+    const out = [];
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) out.push([t, w * x]);
+    }
+    return out
+      .sort((p, q) => q[1] - p[1])
+      .slice(0, n)
+      .map((p) => p[0].replace(/_/g, " "));
+  }
+
+  const pct = (f) => Math.round(f * 100);
+
+  /** The reading, in words the reader can argue with. Both tails are named; neither is praised. */
+  function placementProse(z, outer, inner) {
+    if (z <= -1.5) return "far out — little in the garden is like it.";
+    if (z <= -0.5)
+      return `out toward the tail — further from the middle than ${pct(inner)}% of what is here.`;
+    if (z < 0.5)
+      return "in the thick of it — where most of what you keep already sits.";
+    if (z < 1.5)
+      return `closer to the middle than ${pct(outer)}% of the garden — more of the same.`;
+    return "the garden is already full of this.";
+  }
+
+  /** A candidate's likeness to each member of a window, on words. */
+  function simsTo(docs, members, cvec) {
+    return members.map((i) => dot(docs[i].vec, cvec));
+  }
+
+  /** Set a candidate down on a window's curve. */
+  function place(docs, members, curve, sims, cvec, k = K) {
+    const c = topMean(sims, k);
+    const z = (c - curve.mu) / curve.sigma;
+    const below =
+      curve.items.filter((it) => it.c < c).length / curve.items.length;
+    const outer = below;
+    const inner = 1 - below;
+    const kin = members
+      .map((i, idx) => ({ i, sim: sims[idx] }))
+      .sort((a, b) => b.sim - a.sim)
+      .slice(0, k)
+      .filter((s) => s.sim > 0)
+      .map((s) => ({
+        id: docs[s.i].id,
+        label: docs[s.i].label,
+        kind: docs[s.i].kind,
+        sim: s.sim,
+        shared: shared(cvec, docs[s.i].vec),
+      }));
+    return { c, z, outer, inner, words: placementProse(z, outer, inner), kin };
+  }
+
+  // ── themes: the garden's own co-occurrence structure ──────────────────────────────
+  // Latent semantic analysis from the likeness matrix alone: the Gram matrix's top
+  // eigenvectors by orthogonal iteration. A new text is folded in from its dots with every
+  // document. The themes are not named, and a curve on them is still a position, not a grade.
+
+  const THEMES_K = 40;
+
+  /** Modified Gram-Schmidt on the columns of an n×k matrix, in place. */
+  function orthonormalise(Q, n, k) {
+    for (let c = 0; c < k; c++) {
+      for (let p = 0; p < c; p++) {
+        let d = 0;
+        for (let i = 0; i < n; i++) d += Q[i * k + c] * Q[i * k + p];
+        for (let i = 0; i < n; i++) Q[i * k + c] -= d * Q[i * k + p];
+      }
+      let norm = 0;
+      for (let i = 0; i < n; i++) norm += Q[i * k + c] ** 2;
+      norm = Math.sqrt(norm) || 1;
+      for (let i = 0; i < n; i++) Q[i * k + c] /= norm;
+    }
+  }
+
+  function* themesSteps(M, n, k = THEMES_K, iterations = 48) {
+    k = Math.max(1, Math.min(k, n - 1));
+    // a small deterministic generator, so the same garden gives the same themes
+    let state = 0x9e3779b9;
+    const next = () => {
+      state = (Math.imul(state ^ (state >>> 15), 0x2c1b3c6d) + 0x1) >>> 0;
+      return state / 4294967296;
+    };
+    let Q = new Float64Array(n * k);
+    for (let i = 0; i < Q.length; i++) Q[i] = next() - 0.5;
+    orthonormalise(Q, n, k);
+    let Z = new Float64Array(n * k);
+    function* mul() {
+      // Z = (M + I) Q
+      for (let i = 0; i < n; i++) {
+        const row = i * n;
+        for (let c = 0; c < k; c++) {
+          let acc = Q[i * k + c];
+          for (let j = 0; j < n; j++) acc += M[row + j] * Q[j * k + c];
+          Z[i * k + c] = acc;
+        }
+        if ((i & 127) === 127) yield;
+      }
+    }
+    for (let it = 0; it < iterations; it++) {
+      yield* mul();
+      [Q, Z] = [Z, Q];
+      orthonormalise(Q, n, k);
+      yield (it + 1) / (iterations + 1);
+    }
+    yield* mul();
+    const lambda = [];
+    for (let c = 0; c < k; c++) {
+      let l = 0;
+      for (let i = 0; i < n; i++) l += Q[i * k + c] * Z[i * k + c];
+      lambda.push(Math.max(l, 1e-9));
+    }
+    return { n, k, U: Float32Array.from(Q), lambda };
+  }
+  const themesOf = (M, n, k, iterations) =>
+    finish(themesSteps(M, n, k, iterations));
+
+  /** Every document's coordinates in theme space, n×k, unit length. */
+  function themeCoords(t) {
+    const { n, k, U, lambda } = t;
+    const C = new Float32Array(n * k);
+    for (let i = 0; i < n; i++) {
+      let norm = 0;
+      for (let c = 0; c < k; c++) {
+        const v = U[i * k + c] * Math.sqrt(lambda[c]);
+        C[i * k + c] = v;
+        norm += v * v;
+      }
+      norm = Math.sqrt(norm) || 1;
+      for (let c = 0; c < k; c++) C[i * k + c] /= norm;
+    }
+    return C;
+  }
+
+  /** Below this much anchor, a text is not in the garden's themes at all. */
+  const ANCHOR_MIN = 0.09;
+
+  /** A new text, folded into theme space from its word-likeness to every document. */
+  function foldIn(t, s) {
+    const { n, k, U, lambda } = t;
+    const q = new Float64Array(k);
+    for (let c = 0; c < k; c++) {
+      let acc = 0;
+      for (let i = 0; i < n; i++) acc += s[i] * U[i * k + c];
+      q[c] = acc / Math.sqrt(lambda[c]);
+    }
+    let norm = 0;
+    for (let c = 0; c < k; c++) norm += q[c] * q[c];
+    norm = Math.sqrt(norm);
+    const anchor = norm;
+    norm = norm || 1;
+    for (let c = 0; c < k; c++) q[c] /= norm;
+    return { q, anchor };
+  }
+
+  /** The corpus's own anchors, each stone folded in without itself; the median gives a scale. */
+  function typicalAnchor(t, M, members) {
+    const { n } = t;
+    const rs = members.map((i) => {
+      const s = new Array(n).fill(0);
+      for (const j of members) if (j !== i) s[j] = M[i * n + j];
+      return foldIn(t, s).anchor;
+    });
+    rs.sort((a, b) => a - b);
+    return rs.length ? rs[Math.floor(rs.length / 2)] : 0;
+  }
+
+  /** Pairwise likeness on themes: cosine of coordinates, zero on the diagonal. */
+  function themeMatrix(t, C = themeCoords(t)) {
+    const { n, k } = t;
+    const M = new Float32Array(n * n);
+    for (let i = 0; i < n; i++)
+      for (let j = i + 1; j < n; j++) {
+        let d = 0;
+        for (let c = 0; c < k; c++) d += C[i * k + c] * C[j * k + c];
+        M[i * n + j] = d;
+        M[j * n + i] = d;
+      }
+    return M;
+  }
+
+  /** A folded-in text's likeness to each member, on themes. */
+  function themeSims(t, C, q, members) {
+    const { k } = t;
+    return members.map((i) => {
+      let d = 0;
+      for (let c = 0; c < k; c++) d += C[i * k + c] * q[c];
+      return d;
+    });
+  }
+
+  /** Single-word glossary terms only match capitalised, or `keep`/`still`/`edge` poison everything. */
+  function conceptMatchers(title, aliases) {
+    const terms = [title, ...aliases].filter((t) => t && t.length >= 4);
+    return terms.map((t) => {
+      const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const multiword = /\s/.test(t);
+      return new RegExp(
+        `(?<![\\w-])${escaped}(?![\\w-])`,
+        multiword ? "i" : "",
+      );
+    });
+  }
+
+  /** Which of the reader's own terms the candidate speaks, by the garden's own rule. */
+  function conceptsIn(nodes, text) {
+    const out = [];
+    for (const n of nodes) {
+      if (n.kind !== "concept") continue;
+      const ms = conceptMatchers(n.label, n.aliases ?? []);
+      if (ms.some((m) => m.test(text)))
+        out.push({ id: n.id, label: n.label, signed: n.signed === true });
+    }
+    return out;
+  }
+
+  /** The terms a candidate was weighed on, heaviest first. */
+  function heaviest(v, n = 10) {
+    return [...v.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map((e) => e[0].replace(/_/g, " "));
+  }
+
+  function slugOf(title) {
+    const s = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60);
+    return s || "decision";
+  }
+
+  // ── the forecast: a port of lib/forecast.ts ───────────────────────────────────────
+  // The garden's guess at the reader's call, sealed when a thing is weighed and opened only
+  // once the reader has let it in or passed. Each call is scored against the guess sealed for
+  // it (Brier), and the record against the base rate as it stood that day — so the only way
+  // the garden's number rises is by knowing something the base rate did not.
+
+  const NEAR = 8;
+  const MIN_SIM = 0.05;
+  const PULL = 2;
+  const MIN_SCORED = 10;
+
+  function baseRate(letIn, calls) {
+    return (letIn + 1) / (calls + 2);
+  }
+
+  function seal(past) {
+    const base = baseRate(past.filter((p) => p.letIn).length, past.length);
+    const near = past
+      .filter((p) => p.sim >= MIN_SIM)
+      .sort((a, b) => b.sim - a.sim)
+      .slice(0, NEAR);
+    const weight = near.reduce((s, p) => s + p.sim, 0);
+    const yes = near.reduce((s, p) => s + (p.letIn ? p.sim : 0), 0);
+    return {
+      garden: (yes + PULL * base) / (weight + PULL),
+      base,
+      weight,
+      near: near.length,
+      nearIn: near.filter((p) => p.letIn).length,
+    };
+  }
+
+  function evidence(s) {
+    if (s.near === 0)
+      return "nothing near it in your record, so the base rate alone";
+    if (s.weight < 0.5) return "thin evidence";
+    if (s.weight < 1.5) return "some evidence";
+    return "a fair amount of evidence";
+  }
+
+  const in100 = (p) => `${Math.round(p * 100)} in 100`;
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  function reveal(s, letIn) {
+    const rests =
+      s.near === 0
+        ? evidence(s)
+        : `${plural(s.near, "near thing", "near things")} you weighed before, ${s.nearIn} let in — ${evidence(s)}`;
+    return (
+      `The garden guessed ${in100(s.garden)} that you would let it in, from ${rests}. ` +
+      `The base rate was ${in100(s.base)}. You ${letIn ? "let it in" : "passed"}.`
+    );
+  }
+
+  const brier = (p, letIn) => (p - (letIn ? 1 : 0)) ** 2;
+
+  function score(calls) {
+    const scored = calls.filter((c) => c.seal !== null && c.verdict !== "");
+    const n = scored.length;
+    let g = 0;
+    let b = 0;
+    let letIn = 0;
+    let leaned = 0;
+    let leanedIn = 0;
+    const bins = [0, 1, 2, 3, 4].map((i) => ({
+      lo: i / 5,
+      hi: (i + 1) / 5,
+      n: 0,
+      guessed: 0,
+      letIn: 0,
+    }));
+    for (const c of scored) {
+      const y = c.verdict === "let in";
+      g += brier(c.seal.garden, y);
+      b += brier(c.seal.base, y);
+      if (y) letIn++;
+      if (c.seal.garden > c.seal.base) {
+        leaned++;
+        if (y) leanedIn++;
+      }
+      const bin = bins[Math.min(4, Math.floor(c.seal.garden * 5))];
+      bin.n++;
+      bin.guessed += c.seal.garden;
+      if (y) bin.letIn++;
+    }
+    for (const bin of bins)
+      if (bin.n) {
+        bin.guessed /= bin.n;
+        bin.letIn /= bin.n;
+      }
+    const garden = n ? g / n : 0;
+    const base = n ? b / n : 0;
+    return {
+      n,
+      letIn,
+      unscored: calls.length - n,
+      garden,
+      base,
+      skill: n >= MIN_SCORED && base > 0 ? 1 - garden / base : null,
+      bins,
+      leaned,
+      leanedIn,
+    };
+  }
+
+  const signed2 = (x) => `${x >= 0 ? "+" : "−"}${Math.abs(x).toFixed(2)}`;
+
+  function readings(s) {
+    if (s.n === 0)
+      return [
+        "Nothing scored yet. Each thing you let in or pass is scored against the guess the garden sealed when you weighed it.",
+      ];
+    const out = [
+      `${plural(s.n, "call", "calls")} scored, ${s.letIn} let in.`,
+      `The garden's guesses sat ${s.garden.toFixed(2)} from what you did, on average, squared; the base rate's sat ${s.base.toFixed(2)}.`,
+    ];
+    if (s.skill === null)
+      out.push(`A skill is said after ${MIN_SCORED} calls; ${s.n} so far.`);
+    else
+      out.push(
+        `Skill ${signed2(s.skill)}: ${
+          s.skill > 0
+            ? `${Math.round(s.skill * 100)} in 100 of the way from the base rate to knowing.`
+            : s.skill < 0
+              ? "further from what you did than the base rate was."
+              : "level with the base rate."
+        }`,
+      );
+    if (s.leaned)
+      out.push(
+        `Of the ${s.leaned} it leaned toward, ${s.leanedIn} let in; of all ${s.n}, ${s.letIn}.`,
+      );
+    return out;
+  }
+
+  const unit = (v) => {
+    const x = Number(v);
+    return Number.isFinite(x) && x >= 0 && x <= 1 ? x : null;
+  };
+
+  /** A seal read from anywhere, or null if any part of it is not a seal. */
+  function parseSeal(v) {
+    if (!v || typeof v !== "object") return null;
+    const garden = unit(v.garden);
+    const base = unit(v.base);
+    const weight = Number(v.weight);
+    const near = Number(v.near);
+    const nearIn = Number(v.nearIn);
+    if (
+      garden === null ||
+      base === null ||
+      !Number.isFinite(weight) ||
+      weight < 0 ||
+      !Number.isInteger(near) ||
+      !Number.isInteger(nearIn) ||
+      near < 0 ||
+      nearIn < 0 ||
+      nearIn > near
+    )
+      return null;
+    return { garden, base, weight, near, nearIn };
+  }
+
+  // ── the hand: a port of lib/hand.ts. Every path is deterministic for its seed ─────
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** A stable seed from a string. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b, a cubic a little off the straight line. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /** The circling: a loop round a w×h box that runs past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** A path of M, C and L, sampled into points per subpath. */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ── the garden: notes read from markdown by the rules of niwa's lib/garden.ts ─────
+  // Only the stones are needed here, not the threads between them.
+
+  const MEMORY_PREFIXES = [
+    "project_",
+    "feedback_",
+    "user_",
+    "reference_",
+    "routine_",
+  ];
+  const MEMORY_KINDS = ["project", "feedback", "user", "reference", "routine"];
+
+  /** Frontmatter, read leniently: one malformed file must not blank the whole garden. */
+  function safeMatter(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    const bare = (v) => v.trim().replace(/^["']|["']$/g, "");
+    let parent = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s+-\s+(.*)$/);
+      if (item && parent) {
+        if (!Array.isArray(data[parent])) data[parent] = [];
+        data[parent].push(bare(item[1]));
+        continue;
+      }
+      const field = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, indent, key, rawValue] = field;
+      const value = bare(rawValue);
+      if (indent.length > 0 && parent) {
+        if (
+          typeof data[parent] !== "object" ||
+          data[parent] === null ||
+          Array.isArray(data[parent])
+        )
+          data[parent] = {};
+        data[parent][key] = value;
+        continue;
+      }
+      if (!value) {
+        parent = key;
+        data[key] = {};
+        continue;
+      }
+      parent = null;
+      data[key] = rawValue.trim().startsWith("[")
+        ? rawValue.trim().slice(1, -1).split(",").map(bare).filter(Boolean)
+        : value;
+    }
+    return { data, content: m[2] };
+  }
+
+  const slugLike = (s) => /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(s);
+
+  function frontmatterType(data) {
+    const t = data?.type ?? data?.metadata?.type;
+    return typeof t === "string" ? t.toLowerCase() : null;
+  }
+
+  function frontmatterModified(data, fallback) {
+    const raw = data?.metadata?.modified ?? data?.modified ?? data?.updated;
+    if (raw && typeof raw === "string") {
+      const d = new Date(raw);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+    return fallback;
+  }
+
+  /**
+   * A folder's notes as stones. A file in a `Glossary` folder is a term (its `meaning:`,
+   * `aliases:`, and `status: mine` to make it your own); a file named `project_…`,
+   * `feedback_…` and so on is a memory of that kind; anything else is a garden note (`title:`,
+   * `summary:`, `topics:`, `tended:`, and `source: notion | readwise-reader`). Two folders deep
+   * at most; dot-files, `_attachments` and `_`-names are skipped.
+   */
+  function nodesFromFiles(files) {
+    const nodes = new Map();
+    for (const { path, text, lastModified } of files) {
+      const parts = path.split("/");
+      const dirs = parts.slice(1, -1);
+      const name = parts[parts.length - 1];
+      if (dirs.length > 2 || !/\.md$/.test(name)) continue;
+      if (
+        parts
+          .slice(1)
+          .some((p) => p.startsWith(".") || p.startsWith("_attachments"))
+      )
+        continue;
+      const base = name.slice(0, -3);
+      if (base.startsWith("_")) continue;
+      const { data, content } = safeMatter(text);
+      const mtime = new Date(lastModified);
+      const str = (v) => (typeof v === "string" ? v : "");
+      if (dirs.includes("Glossary")) {
+        const modified = frontmatterModified(data, mtime);
+        nodes.set(`concept:${base}`, {
+          id: `concept:${base}`,
+          label: base,
+          kind: "concept",
+          description: str(data.meaning),
+          body: content.trim(),
+          file: path,
+          modified: modified.toISOString(),
+          signed: String(data.status ?? "").toLowerCase() === "mine",
+          aliases: Array.isArray(data.aliases)
+            ? data.aliases.filter((a) => typeof a === "string")
+            : [],
+        });
+        continue;
+      }
+      const fmType = frontmatterType(data);
+      const prefix = MEMORY_PREFIXES.find((p) => base.startsWith(p));
+      if (prefix || (fmType && MEMORY_KINDS.includes(fmType))) {
+        const modified = frontmatterModified(data, mtime);
+        const kind =
+          fmType && MEMORY_KINDS.includes(fmType)
+            ? fmType
+            : prefix.slice(0, -1);
+        const nm = str(data.name).trim();
+        nodes.set(base, {
+          id: base,
+          label:
+            nm && !slugLike(nm)
+              ? nm
+              : base
+                  .replace(/^(project|feedback|user|reference|routine)_/, "")
+                  .replace(/[_-]/g, " "),
+          kind,
+          description: str(data.description),
+          body: content.trim(),
+          file: path,
+          modified: modified.toISOString(),
+          signed: null,
+        });
+        continue;
+      }
+      const tended = data.tended ? new Date(data.tended) : null;
+      const modified =
+        tended && !Number.isNaN(tended.getTime()) ? tended : mtime;
+      const src = String(data.source ?? "");
+      const label = str(data.title).trim() || base;
+      const summary = str(data.summary);
+      nodes.set(`garden:${base}`, {
+        id: `garden:${base}`,
+        label,
+        kind:
+          src === "notion"
+            ? "notion"
+            : src === "readwise-reader"
+              ? "reading"
+              : "garden",
+        description: summary === label ? "" : summary,
+        body: content.trim(),
+        file: path,
+        modified: modified.toISOString(),
+        signed: null,
+        tags: Array.isArray(data.topics) ? data.topics.map(String) : [],
+      });
+    }
+    return [...nodes.values()];
+  }
+  /* LIB:END */
+
+  // ── the page ───────────────────────────────────────────────────────────────────────
+
+  const KEY = "pp-distribution";
+  const DAY = 86_400_000;
+  const WINDOWS = [
+    {
+      key: "all",
+      label: "everything",
+      against: "against everything",
+      days: null,
+    },
+    {
+      key: "d90",
+      label: "90 days",
+      against: "against the last 90 days",
+      days: 90,
+    },
+    {
+      key: "d30",
+      label: "30 days",
+      against: "against the last 30 days",
+      days: 30,
+    },
+  ];
+  const MEASURES = [
+    {
+      key: "themes",
+      label: "themes",
+      what: "what the garden's words co-occur as",
+    },
+    { key: "words", label: "words", what: "shared words and phrases, no more" },
+  ];
+  const KIND_LABEL = {
+    project: "Builds",
+    concept: "Concepts",
+    user: "Self",
+    feedback: "Rules",
+    reference: "Reference",
+    note: "Fieldnotes",
+    notion: "Notion",
+    garden: "Garden notes",
+    reading: "Reading",
+  };
+
+  /** The sheet's frame. */
+  const W = 900;
+  const H = 372;
+  const X0 = 60;
+  const X1 = 840;
+  const BASE = 292;
+  const RISE = 216;
+  const ZMIN = -3.2;
+  const ZMAX = 3.2;
+  const TOP = BASE - RISE - 28;
+
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  const X = (z) =>
+    X0 + ((clamp(z, ZMIN, ZMAX) - ZMIN) / (ZMAX - ZMIN)) * (X1 - X0);
+  const Zx = (x) => ZMIN + ((x - X0) / (X1 - X0)) * (ZMAX - ZMIN);
+  const sig = (z) => `${z >= 0 ? "+" : "−"}${Math.abs(z).toFixed(1)}σ`;
+  const wordCount = (s) => s.split(/\s+/).filter((w) => w.length > 2).length;
+  const zKey = (m, w) => `${m}_${w}`;
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const today = () => new Date().toISOString().slice(0, 10);
+  const $ = (id) => document.getElementById(id);
+
+  /** The bands of the curve, the way the sheet reads them, both tails named. */
+  function bandOf(z) {
+    if (z < -2) return [-4, -2];
+    if (z < -1) return [-2, -1];
+    if (z < 0) return [-1, 0];
+    if (z < 1) return [0, 1];
+    if (z < 2) return [1, 2];
+    return [2, 4];
+  }
+  function bandWords([, hi]) {
+    if (hi <= -2) return "the far tail · unlike the garden · the unexpected";
+    if (hi <= -1) return "a step out · less like what is here";
+    if (hi <= 1)
+      return "the middle · where most of what you keep sits · base rates";
+    if (hi <= 2) return "a step in · more like the rest";
+    return "the far tail · more of the same · the garden already full of it";
+  }
+  const bandLabel = ([lo, hi]) =>
+    `${lo <= -4 ? "←" : sig(lo)} to ${hi >= 4 ? "→" : sig(hi)}`;
+
+  /** Where a kept choice sat, on this measure and window, if it was weighed on it. */
+  const choiceZ = (c, m, w) =>
+    c.z[zKey(m, w)] ?? (m === "words" ? c.z[w] : undefined);
+
+  function gapWords(measure, here, there) {
+    const closer = here > there;
+    if (measure === "themes")
+      return closer
+        ? "closer on themes than on words: about your things, in other words."
+        : "further on themes than on words: your words, about something else.";
+    return closer
+      ? "closer on words than on themes: your words, about something else."
+      : "further on words than on themes: about your things, in other words.";
+  }
+
+  // ── state ────────────────────────────────────────────────────────────────────────
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const S = {
+    garden: null, // { id, name, specimen, nodes, model, read }
+    progress: null, // while a garden is being weighed against itself
+    win: "all",
+    measure: "themes",
+    hover: null,
+    band: null,
+    under: null,
+    live: null,
+    tray: [],
+    sel: null,
+    error: "",
+    choices: [],
+    note: "",
+  };
+  let liveSeq = 0;
+  let drag = null;
+  let lastCand = null;
+
+  // ── the record, kept in this browser ─────────────────────────────────────────────
+
+  function cleanChoice(c) {
+    if (
+      !c ||
+      typeof c !== "object" ||
+      typeof c.title !== "string" ||
+      typeof c.slug !== "string"
+    )
+      return null;
+    const z = {};
+    if (c.z && typeof c.z === "object")
+      for (const [k, v] of Object.entries(c.z))
+        if (Number.isFinite(Number(v)) && /^[a-z0-9_]+$/.test(k))
+          z[k] = Number(v);
+    return {
+      slug: c.slug,
+      title: c.title.slice(0, 200),
+      weighed: typeof c.weighed === "string" ? c.weighed : "",
+      verdict:
+        c.verdict === "let in" || c.verdict === "passed" ? c.verdict : "",
+      z,
+      forecast: parseSeal(c.forecast),
+      note: typeof c.note === "string" ? c.note.slice(0, 5000) : "",
+      text: typeof c.text === "string" ? c.text.slice(0, 20000) : "",
+      garden: typeof c.garden === "string" ? c.garden : "",
+      specimen: c.specimen === true,
+    };
+  }
+  function loadRecord() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || !Array.isArray(o.choices)) return null;
+      return o.choices.map(cleanChoice).filter(Boolean);
+    } catch {
+      return null;
+    }
+  }
+  function saveRecord() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, choices: S.choices }));
+    } catch {
+      /* storage refused: the record lives in this page until it is closed */
+    }
+  }
+  const byWeighed = (a, b) =>
+    a.weighed < b.weighed ? 1 : a.weighed > b.weighed ? -1 : 0;
+
+  function uniqueSlug(title, taken) {
+    const base = slugOf(title);
+    let slug = base;
+    let n = 2;
+    while (taken.has(slug)) slug = `${base}-${n++}`;
+    return slug;
+  }
+
+  // ── the model: the garden weighed against itself ──────────────────────────────────
+
+  /** Runs a stepped computation, giving the page a breath every few dozen milliseconds. */
+  async function drive(gen, onStep) {
+    let r;
+    let t = performance.now();
+    while (!(r = gen.next()).done) {
+      if (performance.now() - t > 32) {
+        if (typeof r.value === "number") onStep(r.value);
+        await new Promise((res) => setTimeout(res, 0));
+        t = performance.now();
+      }
+    }
+    return r.value;
+  }
+
+  async function buildModel(nodes, onStep) {
+    const index = buildIndex(nodes);
+    const n = index.docs.length;
+    const now = Date.now();
+    const members = {};
+    for (const w of WINDOWS)
+      members[w.key] = windowMembers(index.docs, w.days, now);
+    const model = {
+      index,
+      nodes,
+      members,
+      n,
+      curves: { words: {}, themes: {} },
+      themes: null,
+    };
+    for (const m of MEASURES)
+      for (const w of WINDOWS) model.curves[m.key][w.key] = null;
+    if (n < MIN_WINDOW) return model;
+    onStep("likeness", 0);
+    const M = await drive(pairwiseSteps(index.docs), (p) =>
+      onStep("likeness", p),
+    );
+    onStep("themes", 0);
+    const themes = await drive(themesSteps(M, n), (p) => onStep("themes", p));
+    const coords = themeCoords(themes);
+    const T = themeMatrix(themes, coords);
+    model.M = M;
+    model.themes = themes;
+    model.coords = coords;
+    model.anchorTypical = typicalAnchor(themes, M, members.all);
+    for (const w of WINDOWS) {
+      model.curves.words[w.key] = distribution(index.docs, M, members[w.key]);
+      model.curves.themes[w.key] = distribution(index.docs, T, members[w.key]);
+    }
+    return model;
+  }
+
+  /** What the old server answered for a POST: a thing weighed on every curve, and the sealed guess. */
+  function weighOn(model, title, text, record) {
+    title = (title ?? "").trim().slice(0, 200);
+    text = (text ?? "").trim().slice(0, 20000);
+    if (tokens(`${title} ${text}`).length < 4)
+      throw new Error("too few words to weigh — paste a line or two");
+    if (!model.themes)
+      throw new Error("the garden is too small to weigh against");
+    const { index } = model;
+    const cvec = vectorise(index, title, text);
+    const all = simsTo(index.docs, model.members.all, cvec);
+    const { q, anchor } = foldIn(model.themes, all);
+    const measures = { words: {}, themes: {} };
+    for (const w of WINDOWS) {
+      const members = model.members[w.key];
+      const cw = model.curves.words[w.key];
+      measures.words[w.key] = cw
+        ? place(
+            index.docs,
+            members,
+            cw,
+            simsTo(index.docs, members, cvec),
+            cvec,
+          )
+        : null;
+      const ct = model.curves.themes[w.key];
+      // a text the garden's themes cannot hold has no place on them
+      measures.themes[w.key] =
+        ct && anchor >= ANCHOR_MIN
+          ? {
+              ...place(
+                index.docs,
+                members,
+                ct,
+                themeSims(model.themes, model.coords, q, members),
+                cvec,
+              ),
+              anchor,
+            }
+          : null;
+    }
+    const past = record
+      .filter((c) => c.verdict !== "")
+      .map((c) => ({
+        sim: dot(vectorise(index, c.title, c.text), cvec),
+        letIn: c.verdict === "let in",
+      }));
+    return {
+      title,
+      seal: seal(past),
+      terms: heaviest(cvec),
+      unknown: unknownWords(index, title, text),
+      concepts: conceptsIn(model.nodes, `${title}\n${text}`),
+      anchor,
+      anchorTypical: model.anchorTypical,
+      measures,
+    };
+  }
+
+  const zsOf = (reading) => {
+    const z = {};
+    for (const m of MEASURES)
+      for (const w of WINDOWS) {
+        const p = reading.measures[m.key][w.key];
+        if (p) z[zKey(m.key, w.key)] = p.z;
+      }
+    return z;
+  };
+
+  /** The specimen garden as stones, dated back from now. */
+  function specimenNodes() {
+    const now = Date.now();
+    const iso = (age) => new Date(now - age * DAY).toISOString();
+    return [
+      ...SPECIMEN.notes.map(
+        ([slug, title, kind, age, topics, summary, body]) => ({
+          id: `garden:${slug}`,
+          label: title,
+          kind,
+          description: summary,
+          body,
+          file: `specimen/${slug}.md`,
+          modified: iso(age),
+          signed: null,
+          tags: topics,
+        }),
+      ),
+      ...SPECIMEN.terms.map(([label, signed, age, aliases, meaning, body]) => ({
+        id: `concept:${label}`,
+        label,
+        kind: "concept",
+        description: meaning,
+        body,
+        file: `specimen/Glossary/${label}.md`,
+        modified: iso(age),
+        signed,
+        aliases,
+      })),
+    ];
+  }
+
+  /** The specimen's record: each call weighed and sealed in the order it was made, by the same rule. */
+  function specimenRecord(model) {
+    const out = [];
+    const taken = new Set();
+    const calls = SPECIMEN.calls.slice().sort((a, b) => b[3] - a[3]);
+    for (const [title, text, verdict, age, note] of calls) {
+      const r = weighOn(model, title, text, out);
+      const slug = uniqueSlug(title, taken);
+      taken.add(slug);
+      out.push({
+        slug,
+        title,
+        weighed: new Date(Date.now() - age * DAY).toISOString().slice(0, 10),
+        verdict,
+        z: zsOf(r),
+        forecast: r.seal,
+        note,
+        text,
+        garden: "specimen",
+        specimen: true,
+      });
+    }
+    return out.sort(byWeighed);
+  }
+
+  async function openGarden(g) {
+    S.progress = { stage: "reading", p: 0, name: g.name };
+    renderAll();
+    const model = await buildModel(g.nodes, (stage, p) => {
+      S.progress = { stage, p, name: g.name };
+      renderStage();
+    });
+    S.progress = null;
+    S.garden = { ...g, model };
+    S.band = null;
+    S.under = null;
+    S.hover = null;
+    S.sel = null;
+    S.tray = [];
+    S.live = null;
+    if (!model.curves[S.measure][S.win]) S.win = "all";
+    renderAll();
+    reweighLive(true);
+  }
+
+  // ── reading the reader's folder ──────────────────────────────────────────────────
+
+  async function openFolder(fileList) {
+    const all = [...fileList];
+    const md = all.filter((f) => /\.md$/.test(f.name));
+    if (!md.length) {
+      S.folderError = "no markdown files in that folder.";
+      renderWhich();
+      return;
+    }
+    S.folderError = "";
+    const root =
+      (md[0].webkitRelativePath || "").split("/")[0] || "your folder";
+    S.progress = { stage: "reading", p: 0, name: root };
+    renderAll();
+    const files = [];
+    for (let i = 0; i < md.length; i++) {
+      const f = md[i];
+      try {
+        files.push({
+          path: f.webkitRelativePath || `${root}/${f.name}`,
+          text: await f.text(),
+          lastModified: f.lastModified,
+        });
+      } catch {
+        /* an unreadable file is left out */
+      }
+      if ((i & 63) === 63) {
+        S.progress = { stage: "reading", p: i / md.length, name: root };
+        renderStage();
+      }
+    }
+    const nodes = nodesFromFiles(files);
+    await openGarden({
+      id: `folder:${root}`,
+      name: root,
+      specimen: false,
+      nodes,
+      read: md.length,
+    });
+  }
+
+  // ── the current reading ──────────────────────────────────────────────────────────
+
+  function current() {
+    const picked = S.tray.find((t) => t.id === S.sel);
+    if (picked) return picked;
+    if (S.live)
+      return {
+        id: "live",
+        title: S.live.title || $("taste-title").value,
+        text: $("taste-text").value,
+        reading: S.live,
+        kept: null,
+        note: "",
+      };
+    return null;
+  }
+  const curveNow = () => S.garden?.model.curves[S.measure][S.win] ?? null;
+
+  let liveTimer = 0;
+  function reweighLive(now = false) {
+    clearTimeout(liveTimer);
+    const title = $("taste-title").value;
+    const text = $("taste-text").value;
+    if (!S.garden || wordCount(`${title} ${text}`) < 4) {
+      if (S.live) {
+        S.live = null;
+        renderSheet();
+        renderDesk();
+      }
+      return;
+    }
+    const seq = ++liveSeq;
+    liveTimer = setTimeout(
+      () => {
+        try {
+          const r = weighOn(S.garden.model, title, text, S.choices);
+          if (seq !== liveSeq) return;
+          S.live = r;
+          S.sel = null;
+          renderSheet();
+          renderDesk();
+        } catch {
+          /* the pinned weigh will say why */
+        }
+      },
+      now ? 0 : 300,
+    );
+  }
+
+  function weighIt() {
+    S.error = "";
+    const title = $("taste-title").value;
+    const text = $("taste-text").value;
+    if (!S.garden) return;
+    try {
+      const r = weighOn(S.garden.model, title, text, S.choices);
+      const item = {
+        id: `w${Date.now()}`,
+        title: r.title || title,
+        text: text.trim(),
+        reading: r,
+        kept: null,
+        note: "",
+      };
+      liveSeq++;
+      clearTimeout(liveTimer);
+      S.live = null;
+      S.tray = [item, ...S.tray];
+      S.sel = item.id;
+      $("taste-title").value = "";
+      $("taste-text").value = "";
+    } catch (e) {
+      S.error = e.message;
+    }
+    renderWeighError();
+    renderSheet();
+    renderDesk();
+  }
+
+  function keep(verdict) {
+    const cur = current();
+    if (!cur || cur.id === "live") return;
+    if (cur.kept) {
+      const c = S.choices.find((x) => x.slug === cur.kept.slug);
+      if (c) {
+        c.verdict = verdict;
+        cur.kept = c;
+      }
+    } else {
+      const c = {
+        slug: uniqueSlug(cur.title, new Set(S.choices.map((x) => x.slug))),
+        title: cur.title.trim().slice(0, 200) || "untitled",
+        weighed: today(),
+        verdict,
+        z: zsOf(cur.reading),
+        forecast: cur.reading.seal,
+        note: S.note.slice(0, 5000),
+        text: cur.text.slice(0, 20000),
+        garden: S.garden.id,
+        specimen: false,
+      };
+      cur.kept = c;
+      cur.note = S.note;
+      S.choices = [c, ...S.choices];
+    }
+    saveRecord();
+    renderSheet();
+    renderDesk();
+  }
+
+  function saveNote() {
+    const cur = current();
+    if (!cur || cur.id === "live") return;
+    cur.note = S.note;
+    if (!cur.kept || S.note === cur.kept.note) return;
+    cur.kept.note = S.note.slice(0, 5000);
+    saveRecord();
+    renderKept();
+  }
+
+  function letGo(slug) {
+    S.choices = S.choices.filter((c) => c.slug !== slug);
+    for (const it of S.tray) if (it.kept?.slug === slug) it.kept = null;
+    saveRecord();
+    renderSheet();
+    renderDesk();
+  }
+
+  function letGoSpecimen() {
+    S.choices = S.choices.filter((c) => !c.specimen);
+    saveRecord();
+    renderSheet();
+    renderDesk();
+  }
+
+  function again(c) {
+    S.sel = null;
+    $("taste-title").value = c.title;
+    $("taste-text").value = c.text;
+    $("taste-title").focus();
+    reweighLive(true);
+  }
+
+  // ── the hand, laid over an element ───────────────────────────────────────────────
+
+  let maskN = 0;
+  const PEN = { box: 1.7, ring: 1.6, underline: 1.5 };
+  function sketch(el) {
+    el.querySelector(":scope > svg.sketch")?.remove();
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h) return;
+    const kind = el.dataset.sketch;
+    const seed = seedOf(el.dataset.seed || kind);
+    const pen = PEN[kind];
+    const line =
+      kind === "box"
+        ? roughRect(w, h, seed)
+        : kind === "ring"
+          ? roughEllipse(w, h, seed, { pad: 3, grow: 1.18 })
+          : roughUnderline(w, seed, { y: h - 0.5 });
+    const ink = ribbon(line, pen, seed);
+    const color = el.dataset.color || "var(--pen)";
+    let defs = "";
+    let mask = "";
+    if (el.hasAttribute("data-draw") && !el.dataset.drawn && !reduce) {
+      const id = `sk${++maskN}`;
+      defs = `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path d="${line}" pathLength="1" fill="none" stroke="white" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round" class="draw"/></mask></defs>`;
+      mask = ` mask="url(#${id})"`;
+    }
+    el.dataset.drawn = "1";
+    el.dataset.size = `${w}x${h}`;
+    el.insertAdjacentHTML(
+      "beforeend",
+      `<svg class="sketch" aria-hidden="true" viewBox="0 0 ${w} ${h}">${defs}<path d="${ink}" fill="${color}"${mask}/></svg>`,
+    );
+  }
+  const sketchAll = (root = document) =>
+    root.querySelectorAll("[data-sketch]").forEach(sketch);
+
+  // ── rendering: the garden on the sheet ───────────────────────────────────────────
+
+  function renderWhich() {
+    const g = S.garden;
+    $("which-tag").textContent = S.progress
+      ? "weighing"
+      : g?.specimen
+        ? "specimen · synthetic"
+        : g
+          ? "yours · this tab only"
+          : "";
+    let h = "";
+    if (S.progress && S.progress.name !== g?.name) {
+      h += `<p>Reading <b>${esc(S.progress.name)}</b>.</p>`;
+    } else if (!g) {
+      h += `<p>Planting the specimen.</p>`;
+    } else if (g.specimen) {
+      const terms = g.nodes.filter((n) => n.kind === "concept").length;
+      h += `<p>A <b>specimen garden</b>: ${g.nodes.length - terms} notes and ${terms} terms of an invented person, mostly about attention and the feed, bread, and walking, with ${SPECIMEN.calls.length} calls already on their record. Nobody real wrote it.</p>`;
+    } else {
+      h += `<p><b>${esc(g.name)}</b>: ${g.read} markdown files read, ${g.model.n} with words enough to weigh.</p>`;
+    }
+    h += `<div class="acts">`;
+    h += `<button type="button" class="chip go" data-act="folder"${S.progress ? " disabled" : ""}>${g && !g.specimen ? "open another folder" : "open your own folder"}</button>`;
+    if (g && !g.specimen)
+      h += `<button type="button" class="chip" data-act="specimen"${S.progress ? " disabled" : ""}>back to the specimen</button>`;
+    h += `</div>`;
+    if (S.folderError)
+      h += `<p class="small hand acc">${esc(S.folderError)}</p>`;
+    h += `<p class="small">A folder of markdown notes is read here, in this tab, and never uploaded. Nothing of it is kept: open it again next time. Notes in a <span class="sv-mono" style="font-size: 12px">Glossary</span> folder are your terms; <span class="sv-mono" style="font-size: 12px">status: mine</span> rings them.</p>`;
+    $("which").innerHTML = h;
+  }
+
+  function renderTabs() {
+    const curve = curveNow();
+    const k = K;
+    let m = `<span class="meta">${curve ? `${curve.n} stones · kinship over the ${k} nearest, on` : ""}</span>`;
+    for (const x of MEASURES) {
+      const on = x.key === S.measure;
+      m += `<button type="button" class="t-tab" data-measure="${x.key}" aria-pressed="${on}" title="${esc(x.what)}"${on ? ` data-sketch="underline" data-seed="m-${x.key}" data-color="var(--accent)"` : ""}>${x.label}</button>`;
+    }
+    $("measures").innerHTML = m;
+    let w = "";
+    for (const x of WINDOWS) {
+      const on = x.key === S.win;
+      const has = !!S.garden?.model.curves[S.measure][x.key];
+      w += `<button type="button" class="t-tab" data-win="${x.key}" aria-pressed="${on}"${has ? "" : ` disabled title="too few stones in this window"`}${on ? ` data-sketch="underline" data-seed="${x.key}" data-color="var(--accent)"` : ""}>${x.label}</button>`;
+    }
+    $("windows").innerHTML = w;
+    sketchAll($("sheet").querySelector(".sheet-head"));
+  }
+
+  function renderStage() {
+    renderWhich();
+    const stage = $("stage");
+    if (S.progress) {
+      const p = S.progress;
+      const what =
+        p.stage === "reading"
+          ? `reading the folder · ${Math.round(p.p * 100)}%`
+          : p.stage === "likeness"
+            ? `weighing the garden against itself · ${Math.round(p.p * 100)}%`
+            : `finding its themes · ${Math.round(p.p * 100)}%`;
+      if (!stage.querySelector(".waiting")) {
+        stage.innerHTML = `<div class="waiting"><span class="meta breathe" id="wait-text"></span></div>`;
+        $("measures").innerHTML = "";
+        $("windows").innerHTML = "";
+        $("caption").innerHTML = "";
+        $("caption").classList.remove("on");
+      }
+      $("wait-text").textContent = what;
+      return false;
+    }
+    const g = S.garden;
+    if (!g) return false;
+    if (!g.model.curves.words.all) {
+      stage.innerHTML = `<div class="waiting"><p class="hand faint" style="font-size: 17px; max-width: 32rem">${g.model.n} of these notes have words enough to weigh, and a curve needs ${MIN_WINDOW}. Open a fuller folder, or go back to the specimen.</p></div>`;
+      return false;
+    }
+    if (!stage.querySelector("svg.sheet-svg")) {
+      stage.innerHTML = `<svg class="sheet-svg" id="svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"><g id="layer"></g><g id="cand"></g></svg>`;
+      wireSheet($("svg"));
+      lastCand = null;
+    }
+    return true;
+  }
+
+  /** The curve, drawn once per garden, measure and window. */
+  const drawnCache = new Map();
+  function drawn(curve) {
+    const key = `${S.garden.id}|${S.measure}|${S.win}|${curve.n}`;
+    if (drawnCache.has(key)) return drawnCache.get(key);
+    const seed = seedOf(`curve-${S.measure}-${S.win}-${curve.n}`);
+    const pts = curve.density.map(([z, d]) => [X(z), BASE - d * RISE]);
+    const line = `M${pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("L")}`;
+    const fill = `${line}L${X1} ${BASE}L${X0} ${BASE}Z`;
+    const r = rand(seed);
+    const stipple = curve.items.map((it) => {
+      const rr = rand(seedOf(it.id));
+      return {
+        ...it,
+        x: X(it.z) + (rr() * 2 - 1) * 3.2,
+        y: BASE - 5 - rr() * Math.max(2, it.d * RISE * 0.86),
+      };
+    });
+    const out = {
+      ink: ribbon(line, 2, seed),
+      fill,
+      axis: ribbon(
+        stroke([X0 - 12, BASE], [X1 + 12, BASE], r, 1.6, 0),
+        1.6,
+        seed + 1,
+      ),
+      stipple,
+      at: new Map(stipple.map((s) => [s.id, s])),
+    };
+    drawnCache.set(key, out);
+    return out;
+  }
+
+  function renderSheet() {
+    renderTabs();
+    if (!renderStage()) return;
+    const curve = curveNow();
+    const d = drawn(curve);
+    const cur = current();
+    const placement = cur?.reading.measures[S.measure][S.win] ?? null;
+    const kinIds = new Set((placement?.kin ?? []).map((k) => k.id));
+    const band = S.band;
+    const cap = S.band ?? S.under;
+    let h = "";
+    h += `<rect class="t-band" id="bandrect" x="${cap ? X(cap[0]) : 0}" y="${TOP - 4}" width="${cap ? X(cap[1]) - X(cap[0]) : 0}" height="${BASE - TOP + 4}" fill="var(--accent)" fill-opacity="${band ? 0.08 : 0.045}"${cap ? "" : ` visibility="hidden"`}/>`;
+    h += `<path d="${d.fill}" fill="var(--ink)" fill-opacity="0.035"/>`;
+    for (const s of [-2, -1, 1, 2])
+      h += `<line x1="${X(s)}" y1="${BASE - 6}" x2="${X(s)}" y2="${BASE + 6}" stroke="var(--faint)" stroke-width="1"/><text class="sv-mono" x="${X(s)}" y="${BASE + 22}" text-anchor="middle" font-size="9.5" letter-spacing="1" fill="var(--faint)">${sig(s)}</text>`;
+    h += `<line x1="${X(0)}" y1="${TOP - 10}" x2="${X(0)}" y2="${BASE + 8}" stroke="var(--faint)" stroke-dasharray="2 5" stroke-opacity="0.7"/>`;
+    h += `<text class="sv-mono" x="${X(0)}" y="${BASE + 22}" text-anchor="middle" font-size="9.5" letter-spacing="1" fill="var(--muted)">μ<tspan class="sv-wide"> · the middle of the garden</tspan></text>`;
+    h += `<text class="sv-hand" x="${X0 - 4}" y="${BASE + 42}" font-size="14.5" fill="var(--faint)">← unlike the garden</text>`;
+    h += `<text class="sv-hand" x="${X1 + 4}" y="${BASE + 42}" text-anchor="end" font-size="14.5" fill="var(--faint)">more of the same →</text>`;
+    // every stone, under the curve, in its bed's colour
+    d.stipple.forEach((it, i) => {
+      const dim = band ? it.z < band[0] || it.z >= band[1] : false;
+      const kin = kinIds.has(it.id);
+      const op = dim ? 0.14 : band ? 0.95 : kin ? 1 : placement ? 0.42 : 0.6;
+      h += `<circle class="t-dot" data-i="${i}" cx="${it.x.toFixed(1)}" cy="${it.y.toFixed(1)}" r="${kin ? 3.2 : 2.4}" fill="var(--kind-${it.kind})" opacity="${op}"/>`;
+    });
+    // the curve, in the hand
+    h += `<path d="${d.axis}" fill="var(--pen)"/><path d="${d.ink}" fill="var(--pen)"/>`;
+    // what has been kept before, as ticks under the axis
+    const ticks = S.choices.filter(
+      (c) =>
+        c.garden === S.garden.id && choiceZ(c, S.measure, S.win) !== undefined,
+    );
+    for (const c of ticks) {
+      const z = choiceZ(c, S.measure, S.win);
+      const colour =
+        c.verdict === "let in"
+          ? "var(--accent)"
+          : c.verdict === "passed"
+            ? "var(--faint)"
+            : "var(--muted)";
+      const tk = ribbon(
+        stroke(
+          [X(z), BASE + 52],
+          [X(z), BASE + 66],
+          rand(seedOf(`tick-${c.slug}`)),
+          0.7,
+          0,
+        ),
+        1.4,
+        seedOf(c.slug),
+      );
+      h += `<g class="t-tick"><path d="${tk}" fill="${colour}"/><circle class="t-hit" data-tick="${esc(c.slug)}" cx="${X(z)}" cy="${BASE + 59}" r="9" fill="transparent" style="cursor: pointer"/></g>`;
+    }
+    if (ticks.length)
+      h += `<text class="sv-hand sv-wide" x="${X1 + 4}" y="${BASE + 76}" text-anchor="end" font-size="13" fill="var(--faint)">kept before: let in in the accent, passed in grey</text>`;
+    // threads from the weighed thing to its kin
+    if (placement)
+      placement.kin.forEach((k, i) => {
+        const at = d.at.get(k.id);
+        if (!at) return;
+        const th = ribbon(
+          stroke(
+            [X(placement.z), TOP],
+            [at.x, at.y],
+            rand(seedOf(`thread-${k.id}`)),
+            6,
+            0,
+          ),
+          1.1,
+          seedOf(k.id),
+        );
+        h += `<g opacity="${(0.26 - i * 0.02).toFixed(2)}"><path d="${th}" fill="var(--accent)"/><circle cx="${at.x.toFixed(1)}" cy="${at.y.toFixed(1)}" r="5.5" fill="none" stroke="var(--accent)" stroke-width="1"/></g>`;
+      });
+    // the rest of the tray, small
+    for (const it of S.tray) {
+      if (it.id === cur?.id) continue;
+      const p = it.reading.measures[S.measure][S.win];
+      if (!p) continue;
+      h += `<g class="t-hit" data-tray="${it.id}" transform="translate(${X(p.z).toFixed(1)} 0)" style="cursor: pointer" opacity="0.55"><line x1="0" y1="${TOP + 8}" x2="0" y2="${BASE - 2}" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 4"/><circle cy="${TOP}" r="9" fill="transparent"/><circle cy="${TOP}" r="4.5" fill="var(--accent)"/></g>`;
+    }
+    $("layer").innerHTML = h;
+    $("svg").setAttribute(
+      "aria-label",
+      `${curve.n} stones on a curve of kinship on ${S.measure}; ${placement && cur ? `${cur.title} sits at ${sig(placement.z)}` : "nothing weighed yet"}`,
+    );
+    renderCand(cur, placement);
+    renderCaption();
+  }
+
+  /** The weighed thing, dropped onto its place; while typing it glides rather than falls. */
+  function renderCand(cur, placement) {
+    const g = $("cand");
+    if (!placement || !cur) {
+      g.innerHTML = "";
+      lastCand = null;
+      return;
+    }
+    const x = X(placement.z);
+    const live = cur.id === "live";
+    const title = `${cur.title.slice(0, 40)}${cur.title.length > 40 ? "…" : ""}${live ? "  · as you type" : ""}`;
+    const right = placement.z > 1.6;
+    if (lastCand !== cur.id || !g.firstChild) {
+      const st = ribbon(
+        stroke(
+          [0, BASE - 2],
+          [0, TOP + 6],
+          rand(seedOf(`cand-${cur.id}`)),
+          1.4,
+          0,
+        ),
+        1.5,
+        seedOf(`cand-${cur.id}`),
+      );
+      g.innerHTML = `<g class="t-glide" id="cand-at"><g class="${reduce || live ? "" : "t-drop"}"><path d="${st}" fill="var(--accent)" opacity="0.8"/>${
+        live
+          ? `<circle cy="${TOP}" r="6.4" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/>`
+          : `<circle cy="${TOP}" r="6.4" fill="var(--accent)"/>`
+      }<text class="sv-mono sv-z" id="cand-z" y="${TOP - 14}" text-anchor="middle" font-size="10.5" letter-spacing="1.2" fill="var(--accent)"></text></g><text class="sv-hand sv-title" id="cand-t" y="${TOP + 4}" font-size="16" fill="var(--ink)"></text></g>`;
+      const at = $("cand-at");
+      at.style.transition = "none";
+      at.style.transform = `translate(${x}px, 0px)`;
+      at.getBoundingClientRect();
+      at.style.transition = "";
+      lastCand = cur.id;
+    }
+    $("cand-at").style.transform = `translate(${x}px, 0px)`;
+    $("cand-z").textContent = sig(placement.z);
+    const t = $("cand-t");
+    t.textContent = title;
+    t.setAttribute("x", right ? -14 : 14);
+    t.setAttribute("text-anchor", right ? "end" : "start");
+  }
+
+  function renderCaption() {
+    const el = $("caption");
+    const cap = S.band ?? S.under;
+    const curve = curveNow();
+    el.classList.toggle("on", !!cap);
+    if (!curve) {
+      el.innerHTML = "";
+      return;
+    }
+    if (cap) {
+      const count = curve.items.filter(
+        (it) => it.z >= cap[0] && it.z < cap[1],
+      ).length;
+      el.innerHTML = `<div class="meta lc acc">${bandLabel(cap)}<span class="faint"> · ${count} stones${
+        S.band
+          ? " · held — esc lets go"
+          : " · click to hold, drag for your own band"
+      }</span></div><p class="hand">${S.band && (S.band[1] - S.band[0]) % 1 !== 0 ? "your own band." : bandWords(cap)}</p>`;
+    } else {
+      const what = MEASURES.find((m) => m.key === S.measure).what;
+      el.innerHTML = `<div class="meta">the curve is the garden · on ${S.measure}</div><p class="hand">${what}. each mark is one stone, in its bed's colour, placed by how alike its nearest stones are. hover one to name it; click a band to list what lives there; weigh something on the desk to drop it in — the threads run to its kin.</p>`;
+    }
+  }
+
+  function updateBandRect() {
+    const r = $("bandrect");
+    if (!r) return;
+    const cap = S.band ?? S.under;
+    if (!cap) {
+      r.setAttribute("visibility", "hidden");
+      return;
+    }
+    r.removeAttribute("visibility");
+    r.setAttribute("x", X(cap[0]));
+    r.setAttribute("width", X(cap[1]) - X(cap[0]));
+    r.setAttribute("fill-opacity", S.band ? 0.08 : 0.045);
+  }
+
+  function showCard(e, h) {
+    const box = $("sheet").getBoundingClientRect();
+    const card = $("card");
+    const colour =
+      h.kind === "choice" || h.kind === "weighed"
+        ? "var(--accent)"
+        : `var(--kind-${h.kind})`;
+    const what =
+      h.kind === "choice"
+        ? "kept"
+        : h.kind === "weighed"
+          ? "weighed"
+          : (KIND_LABEL[h.kind] ?? h.kind);
+    card.innerHTML = `<div class="meta" style="color: ${colour}">${esc(what)}<span class="faint" style="text-transform: none"> · ${sig(h.z)}</span></div><div class="hand">${esc(h.label)}</div>${
+      h.extra
+        ? `<div class="meta lc" style="margin-top: 2px">${esc(h.extra)}</div>`
+        : ""
+    }`;
+    card.hidden = false;
+    const x = e.clientX - box.left + 14;
+    const maxX = box.width - card.offsetWidth - 6;
+    card.style.left = `${Math.max(6, Math.min(x, maxX))}px`;
+    card.style.top = `${e.clientY - box.top - 10}px`;
+  }
+  const hideCard = () => {
+    $("card").hidden = true;
+  };
+
+  function wireSheet(svg) {
+    const zAt = (e) => {
+      const box = svg.getBoundingClientRect();
+      return Zx(((e.clientX - box.left) / box.width) * W);
+    };
+    svg.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".t-dot, .t-hit")) return;
+      const z = zAt(e);
+      drag = { z0: z, z1: z, moved: false };
+      svg.setPointerCapture(e.pointerId);
+    });
+    svg.addEventListener("pointermove", (e) => {
+      const z = zAt(e);
+      if (drag) {
+        if (!drag.moved && Math.abs(z - drag.z0) < 0.08) return;
+        drag.moved = true;
+        drag.z1 = z;
+        S.band = [Math.min(drag.z0, drag.z1), Math.max(drag.z0, drag.z1)];
+        updateBandRect();
+        renderCaption();
+        return;
+      }
+      const b = bandOf(z);
+      if (!S.under || S.under[0] !== b[0]) {
+        S.under = b;
+        updateBandRect();
+        renderCaption();
+      }
+    });
+    const up = (e) => {
+      const d = drag;
+      if (!d) return;
+      drag = null;
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+      if (!d.moved) {
+        const b = bandOf(d.z0);
+        S.band = S.band && S.band[0] === b[0] ? null : b;
+      }
+      renderSheet();
+      renderBand();
+    };
+    svg.addEventListener("pointerup", up);
+    svg.addEventListener("pointercancel", up);
+    svg.addEventListener("pointerleave", () => {
+      if (!drag) {
+        S.under = null;
+        updateBandRect();
+        renderCaption();
+      }
+      hideCard();
+    });
+    svg.addEventListener("pointerover", (e) => {
+      const curve = curveNow();
+      const dot = e.target.closest(".t-dot");
+      if (dot && curve) {
+        const it = drawn(curve).stipple[Number(dot.dataset.i)];
+        if (it) showCard(e, { label: it.label, kind: it.kind, z: it.z });
+        return;
+      }
+      const tick = e.target.closest("[data-tick]");
+      if (tick) {
+        const c = S.choices.find((x) => x.slug === tick.dataset.tick);
+        if (c)
+          showCard(e, {
+            label: c.title,
+            kind: "choice",
+            z: choiceZ(c, S.measure, S.win),
+            extra: `${c.verdict || "undecided"} · ${c.weighed}${c.specimen ? " · specimen" : ""} · click to weigh again`,
+          });
+        return;
+      }
+      const tr = e.target.closest("[data-tray]");
+      if (tr) {
+        const it = S.tray.find((x) => x.id === tr.dataset.tray);
+        const p = it?.reading.measures[S.measure][S.win];
+        if (it && p)
+          showCard(e, {
+            label: it.title,
+            kind: "weighed",
+            z: p.z,
+            extra: it.kept
+              ? `kept · ${it.kept.verdict || "undecided"}`
+              : "this sitting · click to read",
+          });
+      }
+    });
+    svg.addEventListener("pointerout", (e) => {
+      if (e.target.closest(".t-dot, [data-tick], [data-tray]")) hideCard();
+    });
+    svg.addEventListener("click", (e) => {
+      const tick = e.target.closest("[data-tick]");
+      if (tick) {
+        const c = S.choices.find((x) => x.slug === tick.dataset.tick);
+        if (c) again(c);
+        return;
+      }
+      const tr = e.target.closest("[data-tray]");
+      if (tr) {
+        S.sel = tr.dataset.tray;
+        hideCard();
+        renderSheet();
+        renderDesk();
+      }
+    });
+  }
+
+  // ── rendering: the desk ──────────────────────────────────────────────────────────
+
+  function renderWeighError() {
+    $("weigh-error").textContent = S.error;
+  }
+
+  function renderReading() {
+    const el = $("reading");
+    const cur = current();
+    if (!cur || !S.garden) {
+      el.innerHTML = "";
+      el.className = "";
+      delete el.dataset.sketch;
+      return;
+    }
+    const placement = cur.reading.measures[S.measure][S.win];
+    const other = S.measure === "words" ? "themes" : "words";
+    const otherP = cur.reading.measures[other][S.win];
+    const against = WINDOWS.find((w) => w.key === S.win).against;
+    const r = cur.reading;
+    let h = `<div class="row" style="justify-content: space-between; align-items: flex-start; flex-wrap: nowrap"><h2>${esc(cur.title || "untitled")}</h2>${
+      cur.id === "live"
+        ? `<span class="meta" style="flex: none">as you type</span>`
+        : `<button type="button" class="meta" style="flex: none" data-act="unpick">esc</button>`
+    }</div>`;
+    h += `<div class="meta lc" style="margin-top: 12px">${against}: on ${S.measure} <span class="ink">${placement ? sig(placement.z) : "—"}</span>${
+      otherP ? ` · on ${other} <span class="ink">${sig(otherP.z)}</span>` : ""
+    }</div>`;
+    if (placement && otherP && Math.abs(otherP.z - placement.z) >= 0.8)
+      h += `<p class="hand muted body-s" style="margin-top: 4px">${gapWords(S.measure, placement.z, otherP.z)}</p>`;
+    h += `<p class="meta lc" style="margin-top: 4px">themes hold ${r.anchor.toFixed(2)} of it · a typical stone ${r.anchorTypical.toFixed(2)}</p>`;
+    if (S.measure === "themes" && !placement && r.anchor < ANCHOR_MIN)
+      h += `<p class="hand acc body-s" style="margin-top: 4px">too little of it lives in the garden's themes to place it on them — its direction would be noise. read it on words.</p>`;
+    h += `<dl style="margin-top: 12px">`;
+    for (const w of WINDOWS) {
+      const p = r.measures[S.measure][w.key];
+      h += `<div style="margin-top: 8px"><dt class="meta" style="color: ${w.key === S.win ? "var(--accent)" : "var(--faint)"}">${w.against}${
+        p
+          ? `<span class="ink" style="margin-left: 8px; text-transform: none; letter-spacing: 0">${sig(p.z)}</span>`
+          : ""
+      }</dt><dd class="${p ? "ink" : "faint"}" style="margin-top: 2px">${
+        p
+          ? p.words
+          : S.garden.model.curves[S.measure][w.key]
+            ? "not held by the themes — see words."
+            : "too few stones tended in this window to draw a curve."
+      }</dd></div>`;
+    }
+    h += `</dl>`;
+    if (placement && placement.kin.length) {
+      h += `<div class="sec"><div class="meta">its kin, on ${S.measure}, ${against.replace("against ", "in ")}</div><ul class="list" style="margin-top: 6px">`;
+      for (const k of placement.kin.slice(0, 6))
+        h += `<li style="display: block"><div class="row" style="flex-wrap: nowrap; gap: 8px"><span class="dot" style="background: var(--kind-${k.kind})"></span><span class="ell muted body-s">${esc(k.label)}</span><span class="meta lc" style="margin-left: auto; flex: none">${k.sim.toFixed(2)}</span></div><div class="hand faint" style="margin-left: 14px; font-size: 14px; line-height: 1.2">${esc(
+          k.shared.slice(0, 4).join(" · ") ||
+            "no words in common — kin on themes alone",
+        )}</div></li>`;
+      h += `</ul></div>`;
+    }
+    h += `<div class="sec"><div class="meta">speaks your words</div>`;
+    if (r.concepts.length) {
+      h += `<ul class="concepts">`;
+      for (const c of r.concepts)
+        h += `<li class="${c.signed ? "ink" : "muted"}"${c.signed ? ` data-sketch="ring" data-seed="${esc(c.id)}" data-color="var(--accent)" data-draw` : ""}>${esc(c.label)}</li>`;
+      h += `</ul>`;
+    } else
+      h += `<p class="hand faint body-s" style="margin-top: 4px">none of your glossary, ringed or not.</p>`;
+    h += `<p class="meta lc" style="margin-top: 8px">weighed on: ${esc(r.terms.join(" · "))}</p>`;
+    if (r.unknown.length)
+      h += `<p class="meta lc" style="margin-top: 4px">the garden has never seen: ${esc(r.unknown.join(" · "))}</p>`;
+    h += `</div>`;
+    h += `<div class="sec"><div class="meta">your call — a record, not a verdict</div>`;
+    if (cur.id === "live") {
+      h += `<p class="hand faint body-s" style="margin-top: 6px">weigh it to pin it, then let it in or pass.</p>`;
+    } else {
+      h += `<div class="row" style="margin-top: 8px; gap: 8px">`;
+      for (const v of ["let in", "passed"]) {
+        const on = cur.kept?.verdict === v;
+        h += `<button type="button" class="chip${on ? " on" : ""}" data-verdict="${v}" aria-pressed="${on}"${
+          on
+            ? ` data-sketch="ring" data-seed="${v}-on" data-color="var(--accent)" data-draw`
+            : ""
+        }>${v === "let in" ? "let it in" : "pass"}</button>`;
+      }
+      if (cur.kept)
+        h += `<span class="meta">kept · ${esc(cur.kept.weighed)}</span>`;
+      h += `</div>`;
+      if (cur.kept?.verdict && cur.kept.forecast)
+        h += `<p class="fc-after ink body-s" style="margin-top: 12px">${esc(reveal(cur.kept.forecast, cur.kept.verdict === "let in"))}</p>`;
+      else if (cur.kept?.verdict)
+        h += `<p class="hand faint body-s" style="margin-top: 8px">kept before the garden sealed its guesses, so this one is not scored.</p>`;
+      else
+        h += `<p class="hand faint body-s" style="margin-top: 8px">the garden has a guess at your call, sealed until you make it.</p>`;
+      h += `<textarea class="search hand" id="note" rows="2" style="margin-top: 12px" placeholder="why, in your own hand" aria-label="Why, in your own hand">${esc(S.note)}</textarea>`;
+    }
+    h += `</div>`;
+    const fresh = el.dataset.for !== cur.id;
+    el.className = "reading panel sketched";
+    el.dataset.sketch = "box";
+    el.dataset.seed = `reading-${cur.id}`;
+    el.dataset.color = "var(--accent)";
+    el.setAttribute("aria-label", "The reading");
+    if (fresh) {
+      el.setAttribute("data-draw", "");
+      delete el.dataset.drawn;
+    }
+    el.dataset.for = cur.id;
+    el.innerHTML = h;
+    sketchAll(el);
+    sketch(el);
+  }
+
+  function renderTray() {
+    const el = $("tray");
+    el.hidden = !S.tray.length;
+    if (!S.tray.length) return;
+    const cur = current();
+    let h = `<div class="row" style="justify-content: space-between"><div class="meta">weighed now · ${S.tray.length}</div><button type="button" class="meta" data-act="clear-tray">clear</button></div><ul class="list" style="margin-top: 6px">`;
+    for (const it of S.tray) {
+      const p = it.reading.measures[S.measure][S.win];
+      const on = it.id === cur?.id;
+      h += `<li><span class="dot" style="background: var(--accent); opacity: ${it.kept ? 1 : 0.5}"></span><button type="button" class="b-row grow ell${on ? " on" : ""}" data-pick="${it.id}">${esc(it.title)}</button><span class="meta lc end">${p ? sig(p.z) : "—"}${it.kept ? ` · ${it.kept.verdict || "kept"}` : ""}</span><button type="button" class="x" data-drop="${it.id}" aria-label="drop ${esc(it.title)} from the tray">×</button></li>`;
+    }
+    el.innerHTML = h + `</ul>`;
+  }
+
+  function renderBand() {
+    const el = $("band");
+    const curve = curveNow();
+    el.hidden = !(S.band && curve);
+    if (el.hidden) return;
+    const inBand = curve.items
+      .filter((it) => it.z >= S.band[0] && it.z < S.band[1])
+      .sort((a, b) => a.z - b.z);
+    let h = `<div class="meta lc">${inBand.length} stones · ${bandLabel(S.band)}</div><ul class="list scroll" style="margin-top: 6px">`;
+    for (const it of inBand.slice(0, 80))
+      h += `<li><span class="dot" style="background: var(--kind-${it.kind})"></span><span class="ell muted body-s grow">${esc(it.label)}</span><span class="meta lc end">${sig(it.z)}</span></li>`;
+    h += `</ul>`;
+    if (inBand.length > 80)
+      h += `<p class="hand faint body-s" style="margin-top: 4px">and ${inBand.length - 80} more — narrow the band.</p>`;
+    el.innerHTML = h;
+  }
+
+  function renderKept() {
+    const el = $("kept");
+    el.hidden = !S.choices.length;
+    if (!S.choices.length) return;
+    const spec = S.choices.filter((c) => c.specimen).length;
+    let h = `<div class="row" style="justify-content: space-between"><div class="meta">kept before · ${S.choices.length}</div>${
+      spec
+        ? `<button type="button" class="meta lc" data-act="drop-specimen" style="text-decoration: underline; text-underline-offset: 3px">let go of the specimen's ${spec}</button>`
+        : ""
+    }</div><ul class="list" style="margin-top: 6px">`;
+    for (const c of S.choices.slice(0, 30)) {
+      const z =
+        c.garden === S.garden?.id ? choiceZ(c, S.measure, S.win) : undefined;
+      const colour =
+        c.verdict === "let in"
+          ? "var(--accent)"
+          : c.verdict === "passed"
+            ? "var(--faint)"
+            : "var(--muted)";
+      h += `<li><span class="dot" style="background: ${colour}"></span><button type="button" class="b-row grow ell" data-again="${esc(c.slug)}" title="weigh it again">${esc(c.title)}</button>${
+        c.specimen ? `<span class="tag">specimen</span>` : ""
+      }<span class="meta lc end">${z !== undefined ? sig(z) : "—"} · ${c.verdict || "undecided"}</span><button type="button" class="x" data-letgo="${esc(c.slug)}" aria-label="let go of ${esc(c.title)}">×</button></li>`;
+    }
+    h += `</ul>`;
+    if (S.choices.length > 30)
+      h += `<p class="meta lc" style="margin-top: 4px">and ${S.choices.length - 30} more, kept.</p>`;
+    el.innerHTML = h;
+  }
+
+  /** The garden's guesses against what the reader did, a ring for each fifth of the guesses. */
+  function calibration(s) {
+    const Wc = 240;
+    const Hc = 176;
+    const L = 34;
+    const R = 226;
+    const T = 12;
+    const B = 146;
+    const x = (p) => L + p * (R - L);
+    const y = (p) => B - p * (B - T);
+    const r = rand(seedOf("forecast-calibration"));
+    const diag = ribbon(stroke([x(0), y(0)], [x(1), y(1)], r, 1.4, 3), 1.1, 7);
+    const axis = ribbon(
+      `${stroke([L - 4, B], [R + 4, B], r, 1, 2)}${stroke([L, B + 4], [L, T - 4], r, 1, 2)}`,
+      1.3,
+      8,
+    );
+    const overall = s.n ? s.letIn / s.n : 0;
+    let h = `<svg viewBox="0 0 ${Wc} ${Hc}" style="display: block; width: 100%; max-width: 20rem; height: auto" role="img" aria-label="The garden's guesses against what you did, in five bins, over ${s.n} calls">`;
+    h += `<path d="${axis}" fill="var(--pen)" opacity="0.7"/><path d="${diag}" fill="var(--faint)"/>`;
+    h += `<line x1="${L}" x2="${R}" y1="${y(overall)}" y2="${y(overall)}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="2 4"/>`;
+    for (const b of s.bins.filter((b) => b.n > 0))
+      h += `<circle class="fc-bin" cx="${x(b.guessed).toFixed(1)}" cy="${y(b.letIn).toFixed(1)}" r="${(3 + Math.sqrt(b.n) * 2.2).toFixed(1)}" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="1.3"><title>guessed ${Math.round(b.guessed * 100)} in 100 · let in ${Math.round(b.letIn * 100)} in 100 · ${b.n} calls</title></circle>`;
+    for (const t of [0, 0.5, 1])
+      h += `<g font-family="var(--mono)" font-size="8.5" fill="var(--faint)"><text x="${x(t)}" y="${B + 16}" text-anchor="middle">${Math.round(t * 100)}</text><text x="${L - 8}" y="${y(t) + 3}" text-anchor="end">${Math.round(t * 100)}</text></g>`;
+    h += `<text x="${(L + R) / 2}" y="${Hc - 2}" text-anchor="middle" font-family="var(--mono)" font-size="8.5" fill="var(--muted)">the garden guessed, in 100</text></svg>`;
+    return h;
+  }
+
+  function renderRecord() {
+    const el = $("record");
+    const s = score(
+      S.choices.map((c) => ({ seal: c.forecast, verdict: c.verdict })),
+    );
+    let h = `<div class="meta">the garden's guesses, scored</div>`;
+    if (s.skill !== null)
+      h += `<div class="skill">${s.skill >= 0 ? "+" : "−"}${Math.abs(s.skill).toFixed(2)}<span class="meta" style="margin-left: 8px; vertical-align: middle">skill over the base rate</span></div>`;
+    h += `<ul style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px">`;
+    for (const l of readings(s))
+      h += `<li class="muted" style="font-size: 14.5px; line-height: 1.5">${esc(l)}</li>`;
+    h += `</ul>`;
+    if (s.n > 0)
+      h += `<div style="margin-top: 12px">${calibration(s)}<p class="hand faint" style="margin-top: 4px; font-size: 14.5px; line-height: 1.3">each ring is a fifth of the guesses: as far across as the guess, as high as the share let in. on the diagonal, a guess comes out as often as it said.</p></div>`;
+    if (s.unscored > 0)
+      h += `<p class="meta lc" style="margin-top: 8px">${s.unscored} kept without a sealed guess or a call — not scored</p>`;
+    h += `<p class="hand faint" style="margin-top: 8px; font-size: 14.5px; line-height: 1.3">the guess is your own record turned on the new thing: the calls on the ${NEAR} nearest things you weighed, counted by how alike they are, pulled toward your base rate as much as they are few. a skill is said after ${MIN_SCORED} calls.</p>`;
+    el.innerHTML = h;
+    sketch(el);
+  }
+
+  function renderHow() {
+    $("how").textContent =
+      `how it is measured: a stone's kinship is the mean likeness to its ${K} nearest stones. on words, likeness is shared words and phrases (tf-idf cosine over titles, tags and first lines). on themes, it is the ${THEMES_K} directions the garden's own words co-occur along (latent semantic analysis of that same likeness) — so two stones with no words in common can still be kin. neither is meaning; the kin are listed so you can check. your calls are kept in this browser, under ${KEY}.`;
+  }
+
+  function renderDesk() {
+    const cur = current();
+    if ((cur?.id ?? null) !== S.noteFor) {
+      S.note = cur?.kept?.note ?? cur?.note ?? "";
+      S.noteFor = cur?.id ?? null;
+    }
+    renderReading();
+    renderTray();
+    renderBand();
+    renderKept();
+    renderRecord();
+  }
+
+  function renderAll() {
+    renderWhich();
+    renderSheet();
+    renderDesk();
+    renderHow();
+  }
+
+  // ── wiring ───────────────────────────────────────────────────────────────────────
+
+  function wire() {
+    $("weigh-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      weighIt();
+    });
+    $("taste-title").addEventListener("input", () => reweighLive());
+    $("taste-text").addEventListener("input", () => reweighLive());
+    $("taste-text").addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        weighIt();
+      }
+    });
+    $("folder").addEventListener("change", (e) => {
+      const files = e.target.files;
+      if (files && files.length) openFolder(files);
+      e.target.value = "";
+    });
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("button");
+      if (!t) return;
+      const d = t.dataset;
+      if (d.measure) {
+        S.measure = d.measure;
+        if (!S.garden.model.curves[S.measure][S.win]) S.win = "all";
+        renderSheet();
+        renderDesk();
+      } else if (d.win) {
+        S.win = d.win;
+        renderSheet();
+        renderDesk();
+      } else if (d.act === "folder") $("folder").click();
+      else if (d.act === "specimen")
+        openGarden({
+          id: "specimen",
+          name: "the specimen",
+          specimen: true,
+          nodes: specimenNodes(),
+        });
+      else if (d.act === "unpick") {
+        S.sel = null;
+        renderSheet();
+        renderDesk();
+      } else if (d.act === "clear-tray") {
+        S.tray = [];
+        S.sel = null;
+        renderSheet();
+        renderDesk();
+      } else if (d.act === "drop-specimen") letGoSpecimen();
+      else if (d.verdict) keep(d.verdict);
+      else if (d.pick) {
+        S.sel = S.sel === d.pick ? null : d.pick;
+        renderSheet();
+        renderDesk();
+      } else if (d.drop) {
+        S.tray = S.tray.filter((x) => x.id !== d.drop);
+        if (S.sel === d.drop) S.sel = null;
+        renderSheet();
+        renderDesk();
+      } else if (d.again) {
+        const c = S.choices.find((x) => x.slug === d.again);
+        if (c) again(c);
+      } else if (d.letgo) letGo(d.letgo);
+    });
+    document.addEventListener("input", (e) => {
+      if (e.target.id === "note") S.note = e.target.value;
+    });
+    document.addEventListener("focusout", (e) => {
+      if (e.target.id === "note") saveNote();
+    });
+    window.addEventListener("keydown", (e) => {
+      const typing =
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement;
+      if (e.key === "Escape") {
+        S.band = null;
+        S.sel = null;
+        hideCard();
+        e.target?.blur?.();
+        renderSheet();
+        renderDesk();
+      } else if (e.key === "/" && !typing) {
+        e.preventDefault();
+        $("taste-title").focus();
+      }
+    });
+    let rt = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => sketchAll(), 120);
+    });
+    // the four sheets that stay on the page are redrawn whenever their content changes their size
+    const ro = new ResizeObserver((entries) => {
+      for (const { target } of entries) {
+        const size = `${target.offsetWidth}x${target.offsetHeight}`;
+        if (target.dataset.sketch && target.dataset.size !== size) {
+          target.dataset.size = size;
+          sketch(target);
+        }
+      }
+    });
+    for (const el of [document.querySelector(".which"), $("sheet"), $("record"), $("reading")]) ro.observe(el);
+  }
+
+  async function boot() {
+    wire();
+    renderHow();
+    const stored = loadRecord();
+    sketch(document.querySelector(".which"));
+    await openGarden({
+      id: "specimen",
+      name: "the specimen",
+      specimen: true,
+      nodes: specimenNodes(),
+    });
+    S.choices = stored ?? specimenRecord(S.garden.model);
+    renderAll();
+    requestAnimationFrame(() => sketchAll());
+  }
+  boot();
+</script>

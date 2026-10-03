@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Half-Second</title>
+<meta name="description" content="The screen does not persuade you. It moves you, and you write the story afterwards. A synthetic feed, a synthetic body, and the five hundred milliseconds between them." />
+<meta name="robots" content="noindex" />
+<style>
+@font-face{font-family:"Newsreader";src:url(fonts/newsreader-latin.woff2) format("woff2");font-weight:400 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Newsreader";src:url(fonts/newsreader-latin-italic.woff2) format("woff2");font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:"Plex Mono";src:url(fonts/plexmono-latin-400.woff2) format("woff2");font-weight:400 500;font-style:normal;font-display:swap}
+
+:root{
+  color-scheme:light;
+  --paper:#f5f2ec; --card:#fbf9f5; --card-2:#efeae1;
+  --ink:#17140f; --ink-2:#5e574e; --ink-3:#948c81;
+  --line:#e4dfd5; --line-2:#d3ccbf;
+  --accent:#b5452b; --accent-rgb:181,69,43;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"Plex Mono","SFMono-Regular",Menlo,Consolas,monospace;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#15120f; --card:#1d1916; --card-2:#252019;
+  --ink:#ece6db; --ink-2:#a59d91; --ink-3:#6e665c;
+  --line:#2b2621; --line-2:#3a332c;
+  --accent:#d9714f; --accent-rgb:217,113,79;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font-family:var(--serif);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;padding:0 24px 120px}
+h1,h2,h3{font-weight:400;letter-spacing:-.02em;margin:0}
+p{margin:0 0 1em}
+button{font:inherit;color:inherit;background:none;border:1px solid var(--line-2);border-radius:4px;padding:6px 12px;cursor:pointer;transition:background .25s var(--ease),transform .25s var(--ease),border-color .25s var(--ease)}
+button:hover{background:var(--card-2)}
+button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible,label:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:0}
+.small{font-size:15px;color:var(--ink-2)}
+.mute{color:var(--ink-3)}
+.lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+em{font-style:italic}
+
+/* masthead */
+.masthead{max-width:1240px;margin:0 auto;padding:56px 0 40px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;border-bottom:1px solid var(--line)}
+.masthead h1{font-size:clamp(40px,6vw,72px);line-height:1;letter-spacing:-.03em}
+.masthead .deck{font-size:clamp(20px,2.3vw,26px);line-height:1.3;max-width:26em;margin-top:18px;color:var(--ink)}
+.masthead .note{margin-top:14px;max-width:34em}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0}
+.seg button+button{border-left:1px solid var(--line-2)}
+
+/* rig */
+.rig{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:56px;padding-top:40px}
+.apparatus{position:sticky;top:20px;display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto auto;gap:20px 24px;align-self:start}
+@media (max-width:1000px){
+  .rig{grid-template-columns:1fr;gap:40px}
+  .apparatus{position:static;grid-template-columns:1fr}
+  .masthead{grid-template-columns:1fr}
+  .controls{justify-content:flex-start}
+}
+
+/* phone */
+.phone{grid-row:1/3;width:250px;height:500px;border:1px solid var(--line-2);border-radius:22px;background:var(--card);display:flex;flex-direction:column;overflow:hidden;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.phone.buzz{animation:buzz .42s linear}
+@keyframes buzz{10%,30%,50%,70%{transform:translateX(-2px)}20%,40%,60%,80%{transform:translateX(2px)}}
+.status{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 6px;font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:11px;cursor:pointer;border:0}
+.badge.gone{visibility:hidden}
+.refresh{margin:4px 12px 6px;padding:5px 10px;font-size:13px;border-color:var(--line)}
+.refresh.pulling{opacity:.5}
+.feed{flex:1;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;position:relative}
+.feed::-webkit-scrollbar{display:none}
+.card{scroll-snap-align:start;min-height:100%;padding:16px;border-top:1px solid var(--line);position:relative;display:flex;flex-direction:column;gap:12px;cursor:pointer;background:var(--card)}
+.card:first-child{border-top:0}
+.card:hover{background:var(--card-2)}
+.card .who{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--card-2);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.card .name{font-size:15px}
+.card .handle{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.card .body{font-size:16px;line-height:1.45}
+.card .metric{margin-top:auto;font-family:var(--mono);font-size:12px;color:var(--ink-3);display:flex;gap:14px}
+.card .tag{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(var(--accent-rgb),.5);padding:2px 6px;border-radius:3px;background:var(--card);opacity:0;transform:translateY(-4px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.card .tag small{display:block;color:var(--ink-3);letter-spacing:.04em;text-transform:none;font-size:10px}
+.phone.engineered .card .tag{opacity:1;transform:none}
+.card.plain .tag{display:none}
+.eyes{width:120px;height:56px;margin:4px 0}
+.autoplay .frame{height:90px;border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;background:var(--card-2)}
+.autoplay .bar{position:absolute;left:0;top:0;bottom:0;width:30%;background:rgba(var(--accent-rgb),.25)}
+.card.inview .bar{animation:play 3.2s linear infinite}
+@keyframes play{from{transform:translateX(-100%)}to{transform:translateX(340%)}}
+.spin{position:absolute;inset:0;background:var(--card);display:grid;place-items:center;z-index:2}
+.spin i{width:18px;height:18px;border:2px solid var(--line-2);border-top-color:var(--ink-2);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card.resolved .spin{display:none}
+.card.good{background:var(--card-2)}
+.screenoff{position:absolute;inset:0;background:var(--ink);color:var(--paper);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:5;border-radius:22px;text-align:center;padding:24px}
+.phone.off .screenoff{display:flex}
+.screenoff .n{font-family:var(--mono);font-size:32px}
+
+/* body */
+.bodybox{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:10px 12px 6px}
+.bodybox svg{width:100%;height:auto;display:block}
+.fig{stroke:var(--ink);stroke-width:1.6;fill:none;stroke-linecap:round}
+.ch circle{fill:var(--paper);stroke:var(--ink-3);stroke-width:1.2;transition:fill .3s var(--ease),stroke .3s var(--ease)}
+.ch text{font-family:var(--mono);font-size:9px;fill:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;transition:fill .3s}
+.ch.lit circle{fill:var(--accent);stroke:var(--accent)}
+.ch.lit text{fill:var(--accent)}
+.ch.dim{opacity:.35}
+#bloom{transition:opacity .5s var(--ease),rx .5s var(--ease),ry .5s var(--ease),cx .5s var(--ease),cy .5s var(--ease)}
+.bodybox .cap{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
+.bodybox .cap .t{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.bloomname{font-style:italic;color:var(--ink-2);font-size:15px;min-height:1.4em}
+
+/* gauges */
+.gauges{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:10px 12px;display:grid;gap:6px}
+.gauges.idle{opacity:.45}
+.g{display:grid;grid-template-columns:96px 1fr 58px;align-items:center;gap:10px;font-size:13px}
+.g .n{color:var(--ink-2)}
+.g .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.g .bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .45s var(--ease)}
+.g .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink-2)}
+
+/* narration */
+.narr{grid-column:1/-1;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:12px 14px;min-height:118px}
+.narr .q{font-style:italic;color:var(--ink-2);margin-bottom:8px}
+.narr .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.narr .say{font-size:16px}
+.narr .trace{font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--ink-2)}
+.narr.blank .say,.narr.blank .trace{opacity:0}
+.narr.blank .q::after{content:" (nothing yet)";font-style:normal;color:var(--ink-3)}
+.narr .say,.narr .trace{transition:opacity .4s var(--ease)}
+.narr.idle{opacity:.45}
+
+/* stations */
+.stations{min-width:0}
+.station{padding:32px 0 56px;border-bottom:1px solid var(--line);opacity:.55;transition:opacity .6s var(--ease),transform .6s var(--ease);transform:translateY(12px)}
+.station.seen{transform:none}
+.station.active{opacity:1}
+.station .k{display:flex;align-items:baseline;gap:16px;margin-bottom:12px}
+.station .k .n{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.station h2{font-size:32px;line-height:1.1;letter-spacing:-.025em}
+.station .lede{font-size:21px;line-height:1.4;max-width:30em;margin:14px 0 18px}
+.station .poke{border-left:2px solid var(--accent);padding:2px 0 2px 14px;margin:18px 0;max-width:30em}
+.station .poke .lab{color:var(--accent)}
+.next{margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0 18px}
+th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:400}
+.hidden{display:none!important}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.radios{display:flex;gap:6px;flex-wrap:wrap}
+.radios label{border:1px solid var(--line-2);border-radius:4px;padding:5px 10px;cursor:pointer;font-size:15px}
+.radios label:has(input:checked){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.radios input{position:absolute;opacity:0;width:0;height:0}
+.swatches{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:36em;margin:14px 0}
+.swatch{border:1px solid var(--line);border-radius:6px;padding:12px}
+.swatch .c{height:10px;border-radius:2px;margin-bottom:8px}
+
+/* timeline */
+.tl{margin:14px 0 8px;max-width:40em}
+.tl .track{position:relative;height:56px;border-bottom:1px solid var(--line-2)}
+.tl .m{position:absolute;bottom:-1px;transform:translateX(-50%);text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-bottom:6px}
+.tl .m::after{content:"";display:block;width:1px;height:10px;background:var(--line-2);margin:4px auto 0}
+.tl .m b{display:block;font-weight:400;color:var(--ink);font-size:13px;letter-spacing:0}
+.tl .zone{position:absolute;bottom:0;height:16px;background:rgba(var(--accent-rgb),.14);border-left:1px solid var(--accent);border-right:1px solid var(--accent)}
+.tl .zone span{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tl input[type=range]{width:100%;margin:12px 0 4px;accent-color:var(--accent)}
+.tl .now{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+
+/* judge */
+.judge{border:1px solid var(--line);border-radius:8px;padding:16px;max-width:36em;background:var(--card);margin-top:14px}
+.judge .verdict{margin-top:12px;font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink-2)}
+
+/* meters */
+.meters{display:grid;gap:10px;max-width:36em;margin:12px 0}
+.meter{display:grid;grid-template-columns:90px 1fr 150px;gap:12px;align-items:center;font-size:15px}
+.meter .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--ink);transition:width .6s var(--ease)}
+.meter .read{font-style:italic;color:var(--ink-2)}
+.down{margin-top:16px}
+.down .t{font-family:var(--mono);font-size:13px;color:var(--ink-2);margin-left:10px}
+
+/* profile */
+.profile{max-width:36em;margin:12px 0}
+.w{display:grid;grid-template-columns:110px 1fr 44px;gap:12px;align-items:center;margin:6px 0;font-size:15px}
+.w input[type=range]{width:100%;accent-color:var(--ink)}
+.w .v{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right}
+.thinks{font-size:19px;font-style:italic;margin:14px 0 6px;max-width:30em}
+
+footer{max-width:1240px;margin:56px auto 0;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-3);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .station{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div>
+    <div class="lab">An instrument · synthetic specimen</div>
+    <h1>The Half-Second</h1>
+    <p class="deck">The screen does not persuade you. It moves you, and you write the story afterwards.</p>
+    <p class="note small">A synthetic feed, a synthetic body, and the five hundred milliseconds between them. Nothing here is measured from you. Nothing leaves this page.</p>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="modeGuided" class="on">Guided</button>
+      <button id="modeFree">Free</button>
+    </div>
+    <button id="reset">Reset</button>
+    <button id="theme" aria-label="Toggle dark mode">Dark</button>
+  </div>
+</header>
+
+<main class="rig">
+  <aside class="apparatus" aria-label="The apparatus">
+    <div class="phone" id="phone">
+      <div class="status"><span id="clock">09:41</span><button class="badge" id="badge" aria-label="Three mentions">3</button></div>
+      <button class="refresh" id="refresh">Pull to refresh</button>
+      <div class="feed" id="feed"></div>
+      <div class="screenoff"><div class="lab" style="color:inherit;opacity:.7">Screen off</div><div class="n" id="downN">90</div><div class="small" style="color:inherit;opacity:.8">seconds for the body to settle</div><button id="pickup" style="border-color:rgba(255,255,255,.4);color:inherit">Pick it up</button></div>
+    </div>
+
+    <div class="bodybox">
+      <svg viewBox="0 0 260 250" aria-label="A line figure with sensory channels and an intensity bloom">
+        <defs>
+          <radialGradient id="rg"><stop offset="0" style="stop-color:var(--accent)" stop-opacity=".85"/><stop offset=".55" style="stop-color:var(--accent)" stop-opacity=".3"/><stop offset="1" style="stop-color:var(--accent)" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse id="bloom" cx="130" cy="120" rx="0" ry="0" fill="url(#rg)" opacity="0"/>
+        <g class="fig">
+          <circle cx="130" cy="42" r="22"/>
+          <path d="M130 64 v22"/>
+          <path d="M96 92 h68"/>
+          <path d="M96 92 l-14 74 M164 92 l14 74"/>
+          <path d="M100 92 c-2 40 -2 80 4 108 h52 c6 -28 6 -68 4 -108"/>
+          <path d="M112 200 l-4 44 M148 200 l4 44"/>
+        </g>
+        <g class="ch" data-ch="eye"><circle cx="138" cy="38" r="3.5"/><text x="165" y="41">eye</text></g>
+        <g class="ch" data-ch="ear"><circle cx="109" cy="42" r="3.5"/><text x="60" y="45">ear</text></g>
+        <g class="ch" data-ch="neck"><circle cx="130" cy="76" r="3.5"/><text x="165" y="79">neck</text></g>
+        <g class="ch" data-ch="gut"><circle cx="130" cy="150" r="3.5"/><text x="165" y="153">gut</text></g>
+        <g class="ch" data-ch="skin"><circle cx="82" cy="166" r="3.5"/><circle cx="178" cy="166" r="3.5"/><text x="40" y="186">skin</text></g>
+      </svg>
+      <div class="cap"><span class="lab">The body</span><span class="t" id="tstamp">t = — ms</span></div>
+      <div class="bloomname" id="bloomname"></div>
+    </div>
+
+    <div class="gauges idle" id="gauges"></div>
+
+    <div class="narr idle blank" id="narr">
+      <div class="q">Why did you keep scrolling?</div>
+      <div class="cols"><div class="say" id="say"></div><div class="trace" id="trace"></div></div>
+    </div>
+  </aside>
+
+  <section class="stations" id="stations">
+
+    <article class="station" data-n="1" id="s1">
+      <div class="k"><span class="n">01</span><h2>The feed</h2></div>
+      <p class="lede">Scroll it. It is twelve cards written to do eight things to a body, and three that do nothing.</p>
+      <div class="row"><button id="eng">Show the engineering</button></div>
+      <table id="techtable" class="hidden">
+        <thead><tr><th>Technique</th><th>The cue</th><th>What it addresses</th></tr></thead>
+        <tbody>
+          <tr><td>variable reward</td><td>pull to refresh; good cards spaced unevenly</td><td>anticipation, the thumb</td></tr>
+          <tr><td>the hail</td><td>the red count in the status bar</td><td>the eye, then the name</td></tr>
+          <tr><td>social comparison</td><td>a peer, a number, you below it</td><td>the eye, then a norm</td></tr>
+          <tr><td>outrage seed</td><td>a threat framed against your group</td><td>threat detection</td></tr>
+          <tr><td>the face</td><td>eyes on the camera</td><td>gaze detection</td></tr>
+          <tr><td>autoplay</td><td>motion that starts without a tap</td><td>peripheral vision</td></tr>
+          <tr><td>the buzz</td><td>a pulse in the frame</td><td>the skin</td></tr>
+          <tr><td>the spinner</td><td>a delay held just long enough</td><td>anticipation</td></tr>
+        </tbody>
+      </table>
+      <p>The red count is a hail. <em>Hey, you there.</em> It has made you its addressee before you have decided anything.</p>
+      <div class="poke"><div class="lab">Poke</div>Pull to refresh. Count how many pulls it takes to get a good card. That count is uneven on purpose.</div>
+      <button class="next" data-to="2">Next</button>
+    </article>
+
+    <article class="station" data-n="2" id="s2">
+      <div class="k"><span class="n">02</span><h2>The senses</h2></div>
+      <p class="lede">Hover a card. The channel it travels down lights on the body. None of the channels is neutral.</p>
+      <div class="swatches">
+        <div class="swatch"><div class="c" style="background:var(--accent)"></div><div class="small">The red of a stop sign, then a brake light, then a badge. Red means alarm because of a century of red meaning alarm.</div></div>
+        <div class="swatch"><div class="c" style="background:var(--ink-3)"></div><div class="small">The pager on the belt, then the phone in the pocket, then the pulse under your thumb. A buzz is a summons because it has always been one.</div></div>
+      </div>
+      <p>Texture has a history. Change the history and the same cue lands at a different intensity.</p>
+      <div class="radios" id="presets">
+        <label><input type="radio" name="preset" value="pager" checked>Pager years</label>
+        <label><input type="radio" name="preset" value="whatsapp">WhatsApp years</label>
+        <label><input type="radio" name="preset" value="late">No phone until twenty</label>
+      </div>
+      <div class="poke"><div class="lab">Poke</div>Switch the preset, then hover the buzz card and the hail. The channel is the same. The weight is not.</div>
+      <button class="next" data-to="3">Next</button>
+    </article>
+
+    <article class="station" data-n="3" id="s3">
+      <div class="k"><span class="n">03</span><h2>The body moves</h2></div>
+      <p class="lede">The gauges are live now. Tap any card. Within a beat the body has moved, and there is no word for it yet.</p>
+      <p>The bloom on the figure has a size and a place and no name. That is affect: real, abstract, prior to anyone being there to have it. The name arrives at station five.</p>
+      <div class="poke"><div class="lab">Poke</div>Tap the same card five times and watch the bloom shrink. Then pull to refresh and watch what gets served in its place.</div>
+      <button class="next" data-to="4">Next</button>
+    </article>
+
+    <article class="station" data-n="4" id="s4">
+      <div class="k"><span class="n">04</span><h2>The half-second</h2></div>
+      <p class="lede">You are late to your own reaction. The feed is built for the part you are late to.</p>
+      <div class="tl">
+        <div class="track">
+          <div class="zone" style="left:25%;width:58.3%"><span>the platform works here</span></div>
+          <div class="m" style="left:0"><b>0 ms</b>stimulus</div>
+          <div class="m" style="left:25%"><b>150 ms</b>body has moved</div>
+          <div class="m" style="left:83.3%"><b>500 ms</b>you arrive</div>
+        </div>
+        <input type="range" id="scrub" min="0" max="600" value="0" step="10" aria-label="Scrub the half-second">
+        <div class="row"><span class="now" id="tnow">t = 0 ms</span><button id="fire">Fire a card, slowed four times</button></div>
+      </div>
+      <div class="poke"><div class="lab">Poke</div>Scrub. At 150 the body panel is live and the narration is blank. At 500 the words appear. Scrub back and the words go while the gauges stay.</div>
+      <button class="next" data-to="5">Next</button>
+    </article>
+
+    <article class="station" data-n="5" id="s5">
+      <div class="k"><span class="n">05</span><h2>The narration</h2></div>
+      <p class="lede">Two answers to the same question. The first is not a lie. It is what introspection produces.</p>
+      <p>It is also the theory you use on everyone else.</p>
+      <div class="judge">
+        <div class="lab">Judge someone else</div>
+        <p style="margin-top:8px">D. posted <em>this is exactly why nobody trusts you people</em> forty seconds after opening the app. Why?</p>
+        <div class="radios" id="judge">
+          <label><input type="radio" name="judge" value="trait">D. is an angry person</label>
+          <label><input type="radio" name="judge" value="belief">D. believes it</label>
+          <label><input type="radio" name="judge" value="attn">D. wanted attention</label>
+        </div>
+        <div class="verdict hidden" id="verdict"></div>
+      </div>
+      <button class="next" data-to="6">Next</button>
+    </article>
+
+    <article class="station" data-n="6" id="s6">
+      <div class="k"><span class="n">06</span><h2>Downstream</h2></div>
+      <p class="lede">These do not reset when a card leaves the screen.</p>
+      <div class="meters" id="meters"></div>
+      <p>Comparison only hurts against an expectation, and the expectation is shared. Pick the norm the feed is scored against.</p>
+      <div class="radios" id="norms">
+        <label><input type="radio" name="norm" value="followers" checked>Followers</label>
+        <label><input type="radio" name="norm" value="income">Income</label>
+        <label><input type="radio" name="norm" value="fitness">Fitness</label>
+        <label><input type="radio" name="norm" value="informed">Being informed</label>
+      </div>
+      <p style="margin-top:16px">The engineer calls the meter an incentive and says obeying it is rational. The meter is an installed affect. Seeing it confers no obligation to it.</p>
+      <div class="down row"><button id="putdown">Put it down</button><span class="t" id="downT"></span></div>
+      <div class="poke"><div class="lab">Poke</div>Run twenty cards in free mode and watch these sediment. Then put it down. The gauges take ninety seconds to return. The meters do not return at all.</div>
+      <button class="next" data-to="7">Next</button>
+    </article>
+
+    <article class="station" data-n="7" id="s7">
+      <div class="k"><span class="n">07</span><h2>The loop closes</h2></div>
+      <p class="lede">The world acts on you through the world's perception of you. Here is the perception.</p>
+      <div class="profile" id="profile"></div>
+      <p class="thinks" id="thinks"></p>
+      <p class="small">Every dwell, tap and skip in this session moved these four weights. The next card served was chosen from them. The feed you scrolled at station one was already this.</p>
+      <div class="poke"><div class="lab">Poke</div>Zero them. The feed goes flat. That flatness is the baseline everything above was measured against.</div>
+      <button class="next" data-to="8">Next</button>
+    </article>
+
+    <article class="station" data-n="8" id="s8">
+      <div class="k"><span class="n">&nbsp;</span><h2>Language</h2></div>
+      <p class="lede">The bloom did not change. The sentence did.</p>
+      <div class="radios" id="vocab">
+        <label><input type="radio" name="vocab" value="coarse" checked>Coarse: three words</label>
+        <label><input type="radio" name="vocab" value="granular">Granular: twelve words</label>
+      </div>
+      <p class="thinks" id="named"></p>
+      <p>This is the one lever you hold. Not what moves you, but what you can say about it, and so what you can do next.</p>
+      <p class="small">What these loops deposit over thirty years is drawn in Terra Cognita, the next instrument along.</p>
+    </article>
+
+  </section>
+</main>
+
+<footer>
+  <span>Synthetic specimen. Nothing is collected, stored or sent.</span>
+  <span>Sources in docs/SOURCES.md, all unverified.</span>
+</footer>
+
+<script>
+/* ---------- SPECIMEN ---------- */
+const SPECIMEN = {
+  cards: [
+    {id:'c1', tech:'hail', who:'Notifications', handle:'system', text:'3 people mentioned you in a thread you left yesterday.', metric:'', i:.7, loc:'head', norm:{followers:.6,income:.1,fitness:0,informed:.3}},
+    {id:'c2', tech:'comparison', who:'Maya R.', handle:'@maya.builds', text:'Closed the round. 18 months from first commit to term sheet. Grateful, tired, not stopping.', metric:'2,314 likes · 188 reposts', i:.65, loc:'gut', norm:{followers:.7,income:.9,fitness:.1,informed:.2}},
+    {id:'c3', tech:'outrage', who:'Signal Desk', handle:'@signaldesk', text:'They are coming for people like you next, and the people who could stop it are laughing about it on a panel.', metric:'9,872 likes · 4,101 reposts', i:.85, loc:'chest', norm:{followers:.2,income:.3,fitness:0,informed:.8}},
+    {id:'c4', tech:'none', who:'Ilse K.', handle:'@ilse.k', text:'Lake this morning. Cold enough to count to ten and no further.', metric:'41 likes', i:.1, loc:'chest', norm:{followers:0,income:0,fitness:.2,informed:0}},
+    {id:'c5', tech:'face', who:'Tomas V.', handle:'@tomasv', text:'You already know what I am going to say.', metric:'612 likes', i:.55, loc:'head', norm:{followers:.4,income:0,fitness:0,informed:.2}},
+    {id:'c6', tech:'spinner', who:'Loading', handle:'…', text:'Someone you follow just posted.', metric:'', i:.5, loc:'gut', norm:{followers:.5,income:0,fitness:0,informed:.3}},
+    {id:'c7', tech:'comparison', who:'Rafe', handle:'@rafe.runs', text:'Sub-3 at 41. If you are not tracking it you are not doing it.', metric:'1,088 likes', i:.6, loc:'gut', norm:{followers:.3,income:.1,fitness:.95,informed:0}},
+    {id:'c8', tech:'buzz', who:'Direct', handle:'system', text:'New message.', metric:'', i:.6, loc:'hands', norm:{followers:.4,income:0,fitness:0,informed:.2}},
+    {id:'c9', tech:'autoplay', who:'Clip', handle:'@wireclip', text:'Watch to the end.', metric:'2.1M views', i:.45, loc:'eye', norm:{followers:.2,income:0,fitness:0,informed:.4}},
+    {id:'c10', tech:'none', who:'Priya S.', handle:'@priya.cooks', text:'Dal with too much lemon again. It is fine. It is always fine.', metric:'73 likes', i:.1, loc:'chest', norm:{followers:0,income:0,fitness:0,informed:0}},
+    {id:'c11', tech:'outrage', who:'Anon 4471', handle:'@a4471', text:'This is what your side actually thinks of you. Read the replies.', metric:'3,304 likes', i:.75, loc:'chest', norm:{followers:.2,income:.2,fitness:0,informed:.7}},
+    {id:'c12', tech:'none', who:'Ben O.', handle:'@ben.o', text:'Finished the bookshelf. It leans. It holds.', metric:'58 likes', i:.1, loc:'chest', norm:{followers:0,income:0,fitness:0,informed:0}}
+  ],
+  good: {id:'g', tech:'reward', who:'Sana', handle:'@sana', text:'Reread your thing from March today. Still the clearest version of that argument I have seen.', metric:'12 likes', i:.7, loc:'hands', norm:{followers:.5,income:.1,fitness:0,informed:.1}},
+  tech: {
+    hail:       {label:'the hail',          sense:'eye', ch:['eye'],        d:{hr:8, eda:.6, pupil:.5, breath:1, neck:2, ant:.8}, cls:'hail',
+                 say:['I just wanted to see who it was.','It might have been important.']},
+    comparison: {label:'social comparison', sense:'eye, then a norm', ch:['eye','gut'], d:{hr:6, eda:.8, pupil:.2, breath:2, neck:6, ant:.2}, cls:'comparison',
+                 say:['Good for her, honestly.','I was just curious how they did it.']},
+    outrage:    {label:'outrage seed',      sense:'threat', ch:['eye','gut'], d:{hr:14, eda:1.2, pupil:.6, breath:4, neck:3, ant:.3}, cls:'threat',
+                 say:['That take was wrong and someone had to say so.','I needed to know what they were saying.']},
+    face:       {label:'the face',          sense:'gaze', ch:['eye'],        d:{hr:5, eda:.5, pupil:.7, breath:0, neck:1, ant:.3}, cls:'hail',
+                 say:['He looked like he had something to say.']},
+    autoplay:   {label:'autoplay',          sense:'peripheral vision', ch:['eye','neck'], d:{hr:2, eda:.3, pupil:.4, breath:0, neck:5, ant:.4}, cls:'reward',
+                 say:['I only watched a few seconds.']},
+    buzz:       {label:'the buzz',          sense:'skin', ch:['skin'],       d:{hr:7, eda:.9, pupil:.3, breath:1, neck:0, ant:.6}, cls:'reward',
+                 say:['My phone went, so I checked.']},
+    spinner:    {label:'the spinner',       sense:'anticipation', ch:['gut'],  d:{hr:2, eda:.5, pupil:.2, breath:-2, neck:2, ant:.7}, cls:'reward',
+                 say:['It was loading. I waited a second.']},
+    reward:     {label:'variable reward',   sense:'anticipation, the thumb', ch:['skin','gut'], d:{hr:4, eda:.4, pupil:.3, breath:0, neck:0, ant:.9}, cls:'reward',
+                 say:['Sometimes there is something nice in there.']},
+    none:       {label:'', sense:'', ch:[], d:{hr:0, eda:0, pupil:0, breath:0, neck:0, ant:0}, cls:null, say:['Nothing. I just kept going.']}
+  },
+  body: {base:{hr:62, eda:2.1, pupil:3.4, breath:12, neck:14, ant:0}, max:{hr:20, eda:1.6, pupil:1, breath:6, neck:10, ant:1}, tau:30, bloomTau:9, habit:.62},
+  presets: {
+    pager:    {eye:1, ear:1, skin:1.4, neck:1, gut:1},
+    whatsapp: {eye:1.2, ear:1, skin:.8, neck:1.1, gut:1},
+    late:     {eye:.7, ear:.8, skin:.6, neck:.9, gut:.8}
+  },
+  vocab: {
+    coarse:   [[.15,'meh'],[.5,'bad'],[1.01,'bad']],
+    granular: [[.12,'unbothered'],[.22,'nudged'],[.32,'alert'],[.42,'wanting'],[.52,'behind'],[.62,'exposed'],[.72,'summoned'],[.82,'bristling'],[.92,'braced'],[1.01,'flooded']]
+  },
+  meterReads: {
+    standing: [[25,'I\'m behind'],[45,'I\'m slipping'],[65,'I\'m fine'],[101,'I\'m ahead']],
+    threat:   [[25,'the world is fine'],[50,'something is off'],[75,'the world is hostile'],[101,'they are coming']],
+    agency:   [[25,'I\'m summoned'],[50,'I\'m answering'],[75,'I\'m choosing'],[101,'I choose']]
+  }
+};
+
+/* ---------- STATE ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const B = SPECIMEN.body;
+let S;
+function fresh(){
+  return {
+    free:false, station:1, engineered:false, preset:'pager', norm:'followers', vocab:'coarse',
+    g:{...B.base}, target:{...B.base}, bloom:{i:0, loc:'chest'}, last:null,
+    events:[], taps:{}, pulls:0, hailAnswered:false,
+    meters:{standing:50, threat:12, agency:70},
+    w:{threat:.25, comparison:.25, hail:.25, reward:.25},
+    order:SPECIMEN.cards.map(c=>c.id), goodShown:false,
+    scrub:0, scrubbing:false, down:false, downLeft:90
+  };
+}
+const enabled = n => S.free || S.station >= n;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const cardById=id=> id==='g'?SPECIMEN.good:SPECIMEN.cards.find(c=>c.id===id);
+
+/* ---------- FEED ---------- */
+const feed=$('#feed'), phone=$('#phone');
+function cardEl(c){
+  const t=SPECIMEN.tech[c.tech];
+  const el=document.createElement('article');
+  el.className='card '+(c.tech==='none'?'plain':c.tech)+(c.id==='g'?' good':'');
+  el.dataset.id=c.id;
+  const init=c.who.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  el.innerHTML=`<span class="tag">${t.label}<small>${t.sense}</small></span>
+    <div class="who"><span class="avatar">${init}</span><div><div class="name">${c.who}</div><div class="handle">${c.handle}</div></div></div>
+    ${c.tech==='face'?'<svg class="eyes" viewBox="0 0 120 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 28 q28 -26 56 0 q-28 26 -56 0z"/><path d="M58 28 q28 -26 56 0 q-28 26 -56 0z"/></g><circle cx="34" cy="28" r="8" fill="currentColor"/><circle cx="86" cy="28" r="8" fill="currentColor"/><circle cx="37" cy="25" r="2.5" fill="var(--card)"/><circle cx="89" cy="25" r="2.5" fill="var(--card)"/></svg>':''}
+    ${c.tech==='autoplay'?'<div class="frame"><div class="bar"></div></div>':''}
+    <div class="body">${c.text}</div>
+    <div class="metric">${c.metric?`<span>${c.metric}</span>`:''}</div>
+    ${c.tech==='spinner'?'<div class="spin"><i></i></div>':''}`;
+  el.addEventListener('click',()=>tap(c));
+  el.addEventListener('mouseenter',()=>light(c.tech));
+  el.addEventListener('mouseleave',()=>light(null));
+  return el;
+}
+function renderFeed(){
+  feed.innerHTML='';
+  const flat=Object.values(S.w).every(v=>v<.01);
+  const ids=flat?S.order.filter(id=>cardById(id).tech==='none'):S.order;
+  ids.forEach(id=>feed.appendChild(cardEl(cardById(id))));
+  $('#badge').classList.toggle('gone',flat||S.hailAnswered);
+  observeCards();
+}
+function score(c){ const t=SPECIMEN.tech[c.tech]; return (t.cls?S.w[t.cls]:0)*c.i + Math.random()*.15; }
+function reorder(){
+  const cards=S.order.map(cardById);
+  cards.sort((a,b)=>score(b)-score(a));
+  S.order=cards.map(c=>c.id);
+}
+let inview=null, inSince=0, cardObs;
+function observeCards(){
+  if(cardObs) cardObs.disconnect();
+  cardObs=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      const el=e.target, c=cardById(el.dataset.id);
+      if(e.isIntersecting){
+        el.classList.add('inview');
+        if(inview && inview!==el) leave(inview);
+        inview=el; inSince=performance.now();
+        arrive(c,el);
+      } else { el.classList.remove('inview'); if(inview===el){ leave(el); inview=null; } }
+    });
+  },{root:feed,threshold:.6});
+  $$('.card').forEach(el=>cardObs.observe(el));
+}
+function arrive(c,el){
+  if(c.tech==='buzz' && enabled(1) && !prefersReduced()){ phone.classList.remove('buzz'); void phone.offsetWidth; phone.classList.add('buzz'); }
+  if(c.tech==='spinner' && !el.classList.contains('resolved')){ setTimeout(()=>el.classList.add('resolved'),1400); }
+  if(enabled(3) && c.tech!=='none') stimulate(c,'view');
+}
+function leave(el){
+  const c=cardById(el.dataset.id), ms=performance.now()-inSince;
+  const kind= ms<900?'skip': ms>2500?'dwell':'glance';
+  logEvent({kind, c, ms});
+  const cls=SPECIMEN.tech[c.tech].cls;
+  if(cls){ if(kind==='dwell') S.w[cls]+=.08; if(kind==='skip') S.w[cls]-=.03; normW(); }
+  if(c.tech==='hail' && kind==='skip' && enabled(6)) { S.meters.agency=clamp(S.meters.agency+3,0,100); renderMeters(); }
+  renderProfile();
+}
+function tap(c){
+  S.taps[c.id]=(S.taps[c.id]||0)+1;
+  logEvent({kind:'tap', c, n:S.taps[c.id]});
+  const cls=SPECIMEN.tech[c.tech].cls; if(cls){ S.w[cls]+=.12; normW(); }
+  if(c.tech==='hail') answerHail();
+  if(enabled(3)) stimulate(c,'tap');
+  renderProfile();
+}
+function answerHail(){ S.hailAnswered=true; $('#badge').classList.add('gone'); if(enabled(6)){ S.meters.agency=clamp(S.meters.agency-8,0,100); renderMeters(); } logEvent({kind:'hail'}); }
+$('#badge').addEventListener('click',()=>{ tap(SPECIMEN.cards[0]); feed.scrollTo({top:0,behavior:'smooth'}); });
+$('#refresh').addEventListener('click',()=>{
+  const b=$('#refresh'); if(b.classList.contains('pulling')) return;
+  b.classList.add('pulling'); b.textContent='…'; S.pulls++;
+  const wait=400+Math.random()*1600;
+  setTimeout(()=>{
+    b.classList.remove('pulling'); b.textContent='Pull to refresh';
+    const lucky=Math.random()<.3;
+    if(lucky && !S.order.includes('g')){ S.order.unshift('g'); logEvent({kind:'reward',c:SPECIMEN.good}); }
+    else if(S.order.includes('g')){ S.order=S.order.filter(i=>i!=='g'); }
+    reorder(); if(S.order.includes('g')){ S.order=['g',...S.order.filter(i=>i!=='g')]; }
+    renderFeed(); feed.scrollTo({top:0});
+    if(enabled(3)) stimulate(lucky?SPECIMEN.good:{...SPECIMEN.cards[5],tech:'reward',i:.35,loc:'hands'},'pull');
+  },wait);
+});
+function normW(){ for(const k in S.w) S.w[k]=clamp(S.w[k],0,1); }
+
+/* ---------- SENSES ---------- */
+function light(tech){
+  const chs=tech&&enabled(2)?SPECIMEN.tech[tech].ch:[];
+  $$('.ch').forEach(g=>{ g.classList.toggle('lit',chs.includes(g.dataset.ch)); g.classList.toggle('dim',chs.length>0&&!chs.includes(g.dataset.ch)); });
+}
+$('#presets').addEventListener('change',e=>{ S.preset=e.target.value; });
+function weight(tech){
+  const p=SPECIMEN.presets[S.preset], t=SPECIMEN.tech[tech];
+  if(!t.ch.length) return 1;
+  return t.ch.reduce((a,c)=>a+p[c],0)/t.ch.length;
+}
+
+/* ---------- BODY ---------- */
+const LOC={head:[130,42,34,30], eye:[138,38,20,16], chest:[130,118,44,40], gut:[130,152,40,34], hands:[130,166,70,26]};
+function stimulate(c,how){
+  const t=SPECIMEL(c.tech), n=S.taps[c.id]||0;
+  const habit=Math.pow(B.habit, Math.max(0,n-1));
+  const k=c.i*weight(c.tech)*habit;
+  for(const g in t.d) S.target[g]=clamp(S.target[g]+t.d[g]*k*1.6, B.base[g]-B.max[g]*.3, B.base[g]+B.max[g]);
+  S.bloom={i:clamp(k,0,1), loc:c.loc, tech:c.tech, at:performance.now()};
+  S.last=c;
+  if(enabled(6)) sediment(c,k);
+  if(!S.scrubbing) renderBody(1);
+  renderNarr();
+}
+const SPECIMEL=t=>SPECIMEN.tech[t];
+function sediment(c,k){
+  const t=SPECIMEL(c.tech);
+  if(c.tech==='comparison') S.meters.standing-= k*(c.norm[S.norm]||0)*18;
+  if(c.tech==='outrage') S.meters.threat+= k*22;
+  if(c.tech==='reward') S.meters.standing+= k*4;
+  for(const m in S.meters) S.meters[m]=clamp(S.meters[m],0,100);
+  renderMeters();
+}
+const GAUGES=[['hr','heart rate','bpm',0],['eda','conductance','µS',1],['pupil','pupil','mm',1],['breath','breath','/min',0],['neck','neck flexion','°',0],['ant','anticipation','',2]];
+function buildGauges(){
+  $('#gauges').innerHTML=GAUGES.map(([k,n])=>`<div class="g"><span class="n">${n}</span><span class="bar"><i id="bar-${k}"></i></span><span class="v" id="v-${k}"></span></div>`).join('');
+}
+function renderBody(f){ // f = fraction of response shown (for scrubbing)
+  const live=enabled(3);
+  $('#gauges').classList.toggle('idle',!live);
+  GAUGES.forEach(([k,,u,dp])=>{
+    const v= live? B.base[k]+(S.g[k]-B.base[k])*f : B.base[k];
+    const frac=clamp((v-B.base[k])/B.max[k],0,1);
+    $('#bar-'+k).style.width=(frac*100)+'%';
+    $('#v-'+k).textContent=v.toFixed(dp)+(u?' '+u:'');
+  });
+  const b=$('#bloom'), L=LOC[S.bloom.loc]||LOC.chest;
+  const op= live? S.bloom.i*f : 0;
+  b.setAttribute('cx',L[0]); b.setAttribute('cy',L[1]); b.setAttribute('rx',L[2]*(0.6+op*.6)); b.setAttribute('ry',L[3]*(0.6+op*.6)); b.setAttribute('opacity',op.toFixed(2));
+}
+function tick(){
+  const dt=1/12; const tau=S.down?B.tau*3:B.tau;
+  for(const g in S.g){ S.g[g]+= (S.target[g]-S.g[g])*(1-Math.exp(-dt/1.2)); S.target[g]+= (B.base[g]-S.target[g])*(1-Math.exp(-dt/tau)); }
+  S.bloom.i*=Math.exp(-dt/B.bloomTau);
+  if(!S.scrubbing) renderBody(1);
+  renderNamed();
+}
+setInterval(tick,1000/12);
+
+/* ---------- HALF-SECOND ---------- */
+const scrub=$('#scrub');
+function applyScrub(t){
+  S.scrub=t; $('#tnow').textContent='t = '+t+' ms'; $('#tstamp').textContent='t = '+t+' ms';
+  const f= t<120?0: t<200?(t-120)/80:1;
+  renderBody(f);
+  $('#narr').classList.toggle('blank', t<500 || !S.last);
+}
+scrub.addEventListener('input',()=>{ S.scrubbing=true; applyScrub(+scrub.value); });
+scrub.addEventListener('change',()=>{ if(+scrub.value>=600){ S.scrubbing=false; $('#tstamp').textContent='t = — ms'; } });
+$('#fire').addEventListener('click',()=>{
+  const c=S.last||SPECIMEN.cards[2]; stimulate(c,'fire'); S.scrubbing=true;
+  const t0=performance.now(), dur=2400;
+  (function step(){ const t=Math.min(600,(performance.now()-t0)/dur*600); scrub.value=Math.round(t); applyScrub(Math.round(t)); if(t<600) requestAnimationFrame(step); else { S.scrubbing=false; $('#tstamp').textContent='t = — ms'; } })();
+});
+
+/* ---------- NARRATION ---------- */
+function logEvent(e){ S.events.push({...e, at:Date.now()}); if(S.events.length>40) S.events.shift(); }
+function traceText(){
+  const out=[]; const ev=S.events.slice(-7);
+  const skips=ev.filter(e=>e.kind==='skip').length;
+  for(const e of ev){
+    if(e.kind==='view'||!e.c) { if(e.kind==='hail') out.push('the hail answered'); continue; }
+    const idx=S.order.indexOf(e.c.id)+1, t=SPECIMEL(e.c.tech).label||'plain';
+    if(e.kind==='dwell') out.push(`dwell ${(e.ms/1000).toFixed(1)} s on card ${idx} (${t})`);
+    if(e.kind==='tap') out.push(`tap ${e.n>1?'×'+e.n+' ':''}card ${idx} (${t})`);
+    if(e.kind==='reward') out.push(`good card served after ${S.pulls} pull${S.pulls===1?'':'s'}`);
+  }
+  if(skips) out.push(`${skips} skip${skips>1?'s':''} under a variable schedule`);
+  const eda=(S.g.eda-B.base.eda); if(eda>.2) out.push(`conductance +${eda.toFixed(1)} µS, still elevated`);
+  const hr=Math.round(S.g.hr-B.base.hr); if(hr>2) out.push(`heart rate +${hr} at 150 ms`);
+  return out.length? out.join(' · ') : 'no trace yet';
+}
+function renderNarr(){
+  const n=$('#narr'); const live=enabled(5);
+  n.classList.toggle('idle',!live);
+  n.classList.toggle('blank', !S.last || (S.scrubbing && S.scrub<500));
+  if(S.last){ $('#say').textContent='“'+pick(SPECIMEL(S.last.tech).say)+'”'; $('#trace').textContent=traceText(); }
+}
+$('#judge').addEventListener('change',e=>{
+  const v=$('#verdict'); v.classList.remove('hidden');
+  const picked={trait:'You picked a trait.',belief:'You picked a belief.',attn:'You picked a motive.'}[e.target.value];
+  v.textContent=picked+' The trace shows a schedule: opened on a hail (2 mentions) · card 2 an outrage seed, in-group framed · heart rate +14 at 150 ms · reply typed at 38 s, conductance still elevated. Same body, different chair.';
+});
+
+/* ---------- METERS ---------- */
+function read(table,v){ for(const [lim,s] of table) if(v<lim) return s; return table[table.length-1][1]; }
+function renderMeters(){
+  const M=$('#meters'); const on=enabled(6);
+  M.innerHTML=['standing','threat','agency'].map(k=>`<div class="meter"><span>${k}</span><span class="bar"><i style="width:${on?S.meters[k]:0}%"></i></span><span class="read">${on?read(SPECIMEN.meterReads[k],S.meters[k]):'—'}</span></div>`).join('');
+}
+$('#norms').addEventListener('change',e=>{ S.norm=e.target.value; });
+let downTimer;
+$('#putdown').addEventListener('click',()=>{
+  if(S.down) return; S.down=true; S.downLeft=90; phone.classList.add('off'); $('#downT').textContent='meters did not move';
+  downTimer=setInterval(()=>{ S.downLeft--; $('#downN').textContent=S.downLeft; if(S.downLeft<=0){ pickup(); } },1000);
+});
+function pickup(){ S.down=false; clearInterval(downTimer); phone.classList.remove('off'); $('#downN').textContent='90'; $('#downT').textContent=''; }
+$('#pickup').addEventListener('click',pickup);
+
+/* ---------- PROFILE ---------- */
+const WNAMES={threat:'threat-responsive',comparison:'comparison-responsive',hail:'hail-responsive',reward:'reward-responsive'};
+function renderProfile(){
+  const P=$('#profile');
+  if(!P.dataset.built){
+    P.innerHTML=Object.keys(S.w).map(k=>`<div class="w"><span>${WNAMES[k]}</span><input type="range" min="0" max="1" step=".01" data-w="${k}" aria-label="${WNAMES[k]}"><span class="v" id="wv-${k}"></span></div>`).join('');
+    P.addEventListener('input',e=>{ if(!e.target.dataset.w) return; S.w[e.target.dataset.w]=+e.target.value; reorder(); renderFeed(); renderProfile(); });
+    P.dataset.built=1;
+  }
+  const on=enabled(7);
+  for(const k in S.w){ const v=on?S.w[k]:0; P.querySelector(`[data-w=${k}]`).value=v; $('#wv-'+k).textContent=v.toFixed(2); }
+  const top=Object.entries(S.w).sort((a,b)=>b[1]-a[1]);
+  $('#thinks').textContent= !on?'':
+    Object.values(S.w).every(v=>v<.01)? 'It thinks you are nobody in particular. So it has nothing to serve.' :
+    `It thinks you are ${WNAMES[top[0][0]]} first and ${WNAMES[top[1][0]]} second, and it will serve accordingly.`;
+}
+
+/* ---------- LANGUAGE ---------- */
+$('#vocab').addEventListener('change',e=>{ S.vocab=e.target.value; renderNamed(); });
+function renderNamed(){
+  const on=enabled(8), i=S.bloom.i;
+  const word=read(SPECIMEN.vocab[S.vocab],i);
+  $('#named').textContent= on? (i<.05?'The bloom has faded. Tap a card, then come back.':`The same bloom, at ${i.toFixed(2)}: “${word}.”`) : '';
+  $('#bloomname').textContent= enabled(5)&&i>.05 ? word : '';
+}
+
+/* ---------- STATIONS / MODES ---------- */
+const stObs=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('seen'); setStation(+e.target.dataset.n); } });
+},{rootMargin:'-40% 0px -50% 0px'});
+$$('.station').forEach(s=>stObs.observe(s));
+function setStation(n){
+  S.station=n;
+  $$('.station').forEach(s=>s.classList.toggle('active',+s.dataset.n===n));
+  renderAll();
+}
+$$('.next').forEach(b=>b.addEventListener('click',()=>$('#s'+b.dataset.to).scrollIntoView({behavior:prefersReduced()?'auto':'smooth',block:'start'})));
+$('#eng').addEventListener('click',()=>{ S.engineered=!S.engineered; phone.classList.toggle('engineered',S.engineered); $('#eng').classList.toggle('on',S.engineered); $('#techtable').classList.toggle('hidden',!S.engineered); $('#eng').textContent=S.engineered?'Hide the engineering':'Show the engineering'; });
+$('#modeGuided').addEventListener('click',()=>setMode(false));
+$('#modeFree').addEventListener('click',()=>setMode(true));
+function setMode(free){ S.free=free; $('#modeGuided').classList.toggle('on',!free); $('#modeFree').classList.toggle('on',free); renderAll(); }
+$('#reset').addEventListener('click',()=>{ pickup(); const free=S.free; S=fresh(); S.free=free; phone.classList.remove('engineered'); $('#eng').classList.remove('on'); $('#eng').textContent='Show the engineering'; $('#techtable').classList.add('hidden'); $('#verdict').classList.add('hidden'); $$('input[type=radio]').forEach(r=>{ r.checked = r.value==='pager'||r.value==='followers'||r.value==='coarse'; }); scrub.value=0; $('#tnow').textContent='t = 0 ms'; $('#tstamp').textContent='t = — ms'; renderFeed(); feed.scrollTo({top:0}); setStation(S.station); });
+$('#theme').addEventListener('click',()=>{ const d=document.documentElement.dataset.theme==='dark'; document.documentElement.dataset.theme=d?'light':'dark'; $('#theme').textContent=d?'Dark':'Light'; });
+if(matchMedia('(prefers-color-scheme: dark)').matches){ document.documentElement.dataset.theme='dark'; $('#theme').textContent='Light'; }
+const prefersReduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function renderAll(){ renderBody(1); renderNarr(); renderMeters(); renderProfile(); renderNamed(); if(!enabled(2)) light(null); }
+
+/* ---------- BOOT ---------- */
+S=fresh(); buildGauges(); renderFeed(); renderAll();
+(function clock(){ const d=new Date(); $('#clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(clock,20000); })();
+</script>
+</body>
+</html>

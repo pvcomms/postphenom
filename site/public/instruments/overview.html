@@ -1,0 +1,3416 @@
+<title>Overview</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A step you keep putting off, drawn to scale against the life it opens. Up close it is all there is. Pull back."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a sheet on a desk. Ink on bone. The dip is only ever ochre-red, the
+     difference the step makes is only ever moss, the end of the road is the accent.
+     Everything else is ink, let down by degrees. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8c8478;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --toward: #5e7a4e;
+    --dip: #a8452c;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7f786b;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --toward: #8dae78;
+      --dip: #c4623f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7f786b;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --toward: #8dae78;
+    --dip: #c4623f;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .display {
+    font-family: var(--serif);
+    letter-spacing: -0.02em;
+  }
+  /* niwa's hand, set in the serif's italic */
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .c-ink {
+    color: var(--ink);
+  }
+  .c-muted {
+    color: var(--muted);
+  }
+  .c-faint {
+    color: var(--faint);
+  }
+  .c-accent {
+    color: var(--accent);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .meta {
+    margin-bottom: 22px;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin-top: 20px;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .notice {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 10px 16px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .notice dt {
+    padding-top: 3px;
+    color: var(--faint);
+  }
+  .notice dd {
+    margin: 0;
+    color: var(--ink);
+  }
+  .notice dd.never {
+    color: var(--muted);
+  }
+
+  /* the desk */
+  .desk {
+    display: grid;
+    gap: 24px;
+    margin-top: 28px;
+  }
+  @media (min-width: 1024px) {
+    .desk {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+  }
+  .sheet {
+    padding: 20px;
+  }
+  @media (min-width: 640px) {
+    .sheet {
+      padding: 28px;
+    }
+  }
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .aside .panel {
+    padding: 16px;
+  }
+  .aside .body {
+    margin-top: 8px;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .sources {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .sources b {
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* drawn lines: a filled ribbon, revealed through a mask that is the same line drawn from one end */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 4px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    cursor: pointer;
+    transition:
+      color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* the sheet's fields */
+  .head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .ov-case {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    background: transparent;
+    padding: 4px 0;
+    transition: border-color 220ms var(--ease);
+  }
+  .ov-case:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+  .ov-case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .ov-case[readonly] {
+    cursor: default;
+  }
+  textarea.ov-case {
+    resize: none;
+  }
+  .f-step {
+    margin-top: 4px;
+    font-size: 24px;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 640px) {
+    .f-step {
+      font-size: 31px;
+    }
+  }
+  .f-life {
+    margin-top: 4px;
+    font-size: 19px;
+    line-height: 1.42;
+  }
+  .f-who {
+    margin-top: 4px;
+    font-size: 20px;
+    line-height: 1.25;
+  }
+  .f-line {
+    font-size: 16.5px;
+  }
+  .hint {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--faint);
+  }
+
+  /* A number in the hand: it looks written until it is clicked, then it is typed. */
+  .ov-num {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    border-radius: 0;
+    padding: 0;
+    text-align: center;
+    line-height: 1.1;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-style: italic;
+    transition: border-color 160ms var(--ease);
+  }
+  .ov-num:not([readonly]):hover {
+    border-bottom-color: var(--faint);
+    cursor: text;
+  }
+  .ov-num:focus {
+    outline: none;
+    border-bottom: 1px solid var(--accent);
+  }
+  .ov-num::placeholder {
+    color: var(--faint);
+  }
+  /* A choice in the hand: it reads as a word until it is opened. */
+  .ov-select {
+    field-sizing: content;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    border-radius: 0;
+    padding: 0 0.1em;
+    line-height: 1.1;
+    font-family: var(--serif);
+    font-style: italic;
+    cursor: pointer;
+    transition: border-color 160ms var(--ease);
+  }
+  .ov-select:not(:disabled):hover {
+    border-bottom-color: var(--faint);
+  }
+  .ov-select:focus-visible {
+    outline: none;
+    border-bottom: 1px solid var(--accent);
+  }
+  .ov-select:disabled {
+    cursor: default;
+    opacity: 1;
+  }
+  .ov-select option {
+    font-style: normal;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .numbers {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 24px;
+  }
+  .pair {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .said {
+    font-size: 17px;
+    color: var(--muted);
+  }
+  .lifegrid {
+    margin-top: 24px;
+    display: grid;
+    gap: 20px 32px;
+  }
+  @media (min-width: 1280px) {
+    .lifegrid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    }
+  }
+  .lifegrid > div {
+    min-width: 0;
+  }
+  .along {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .along li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .along .when {
+    width: 5.6rem;
+    flex-shrink: 0;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .along .ov-case {
+    flex: 1;
+    min-width: 0;
+  }
+  .choice {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .trouble {
+    margin-top: 12px;
+    color: var(--accent);
+  }
+  .ov-arrive {
+    animation: rise 420ms var(--ease) both;
+  }
+  .in-now {
+    font-size: 26px;
+    letter-spacing: -0.02em;
+  }
+  .ov-hold-line {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 3px;
+    height: 3px;
+    width: calc(100% - 16px);
+    overflow: visible;
+    pointer-events: none;
+  }
+  .ov-hold-line line {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 2400ms linear both;
+  }
+
+  /* the drawing sizes its words by its own width, so they stay legible when it is small */
+  .ov-drawing {
+    position: relative;
+    margin-top: 16px;
+    container-type: inline-size;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .ov-drawing svg.scope {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: pan-y;
+    overflow: visible;
+  }
+  .ov-dragging,
+  .ov-dragging * {
+    cursor: ns-resize !important;
+  }
+  .s-rule {
+    stroke: var(--rule);
+    stroke-width: 1;
+  }
+  .s-tick {
+    stroke: var(--faint);
+    stroke-width: 1;
+  }
+  .s-tick-t {
+    font-family: var(--mono);
+    fill: var(--faint);
+  }
+  .s-now-t {
+    font-family: var(--mono);
+    fill: var(--muted);
+  }
+  .ov-gap {
+    fill: var(--toward);
+    fill-opacity: 0.17;
+  }
+  .ov-dip {
+    fill: var(--dip);
+    fill-opacity: 0.22;
+  }
+  .s-said {
+    fill: none;
+    stroke: var(--dip);
+    stroke-width: 1.4;
+    stroke-dasharray: 4 4;
+  }
+  .s-without {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 6;
+    stroke-linecap: round;
+  }
+  .ov-life-road {
+    fill: var(--pen);
+  }
+  .s-dot {
+    fill: var(--ink);
+  }
+  .s-elapsed {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+  }
+  .s-leader {
+    stroke: var(--muted);
+    stroke-width: 1;
+  }
+  .mk {
+    fill: var(--surface);
+    stroke: var(--ink);
+    stroke-width: 1.3;
+  }
+  .mk-end {
+    fill: var(--accent);
+    stroke: var(--accent);
+    stroke-width: 1.3;
+  }
+  .grab {
+    fill: transparent;
+    cursor: ns-resize;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .overlay > div,
+  .lifelabels > div {
+    position: absolute;
+  }
+  .lifelabels {
+    position: absolute;
+    inset: 0;
+  }
+  .ov-caption {
+    width: max-content;
+    max-width: 70cqi;
+    line-height: 1.1;
+  }
+  .ov-cap {
+    font-size: clamp(16px, 3.4cqi, 28px);
+  }
+  .ov-cap-sub {
+    margin-top: 0.15em;
+    font-size: clamp(12px, 2.1cqi, 17px);
+  }
+  /* max-content, or a label set near the right edge shrinks to its one longest word */
+  .ov-label {
+    width: max-content;
+    max-width: 40cqi;
+    line-height: 1.12;
+    white-space: normal;
+  }
+  .ov-end {
+    max-width: 48cqi;
+  }
+  .ov-num-l {
+    font-size: clamp(15px, 2.6cqi, 22px);
+  }
+  .ov-sub {
+    font-size: clamp(11px, 1.8cqi, 15px);
+  }
+  .ov-who {
+    font-size: clamp(15px, 2.8cqi, 24px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .ov-line {
+    font-size: clamp(12px, 2cqi, 16px);
+  }
+
+  /* Letting it go for today: while the reader holds, the road with the step and the
+     life it opens fade, slowly and evenly; let go early and they come straight back. */
+  .ov-life,
+  .ov-life-road {
+    transition: opacity 320ms var(--ease);
+  }
+  .ov-letting .ov-life,
+  .ov-letting .ov-life-road {
+    opacity: 0.1;
+    transition: opacity 2400ms linear;
+  }
+
+  /* the altitude: a drawn rail, the scales it passes, a ring where the frame is */
+  .altitude {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+  }
+  .ov-rail {
+    position: relative;
+    height: 44px;
+    min-width: 12rem;
+    flex: 1;
+    cursor: pointer;
+    touch-action: none;
+  }
+  .ov-rail:focus-visible {
+    outline: none;
+  }
+  .ov-rail:focus-visible .ov-ring {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+  .rail-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 2px;
+    height: 10px;
+  }
+  .rail-tick {
+    position: absolute;
+    top: 12px;
+    height: 6px;
+    width: 1px;
+    background: var(--faint);
+  }
+  .ov-stop {
+    position: absolute;
+    top: 21px;
+    white-space: nowrap;
+    pointer-events: none;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .ov-ring {
+    position: absolute;
+    top: 5px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    pointer-events: none;
+  }
+
+  /* the record */
+  .rows {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .ov-row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .ov-row button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 160ms var(--ease);
+  }
+  .ov-row button:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .ov-row .meta {
+    text-transform: none;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+  }
+  .ov-row [aria-current="true"] .meta {
+    color: var(--accent);
+  }
+  .ov-row .t {
+    font-size: 16.5px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .ov-row .f {
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .spec-head {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    color: var(--faint);
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-block: 40px 24px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .ov-arrive,
+    .ov-row,
+    .sketch .draw {
+      animation: none;
+    }
+    .sketch .draw {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Overview</h1>
+      <p class="deck">
+        A step you keep putting off, drawn to scale against the life it opens.
+        <em>Up close it is all there is. Pull back.</em>
+      </p>
+    </div>
+    <dl class="notice">
+      <dt class="meta">For</dt>
+      <dd>
+        The overview effect turned on time: a step you keep putting off, drawn
+        to scale against the life it opens, from the minutes it hurts to the
+        years it runs.
+      </dd>
+      <dt class="meta">Reads</dt>
+      <dd>
+        What share of the frame the dip is at every distance; where each road
+        is, as you marked it; for every step taken, what you said before beside
+        what it was. Your numbers, never a grade.
+      </dd>
+      <dt class="meta">Never</dt>
+      <dd class="never">
+        Says whether a step is worth it, or that you should take it.
+      </dd>
+    </dl>
+  </header>
+
+  <div class="desk">
+    <!-- the sheet -->
+    <section
+      class="panel sheet rise"
+      id="sheet"
+      style="animation-delay: 60ms"
+      aria-label="The overview"
+    >
+      <div class="head-row">
+        <div class="meta c-accent" id="status"></div>
+        <div class="chips" id="newWrap" hidden>
+          <button class="chip" type="button" id="newStep">a new step</button>
+        </div>
+      </div>
+
+      <textarea
+        id="fStep"
+        class="ov-case display f-step"
+        rows="2"
+        placeholder="the step you keep putting off — in a line"
+        aria-label="The step"
+      ></textarea>
+
+      <div class="ov-drawing" id="drawing">
+        <svg
+          class="scope"
+          id="scope"
+          viewBox="0 0 800 460"
+          role="img"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <line class="s-rule" id="sBase" />
+          <line class="s-rule" id="sNow" />
+          <g id="sTicks"></g>
+          <path class="ov-life ov-gap" id="sGap" />
+          <path class="ov-dip" id="sHollow" />
+          <path class="s-said" id="sSaid" />
+          <path class="s-without" id="sWithout" />
+          <path class="ov-life-road" id="sInk" />
+          <circle class="s-dot" id="sDot" r="4" />
+          <line class="s-elapsed" id="sElapsed" />
+          <line class="s-leader" id="sLeader" />
+          <g class="ov-life" id="sMarks"></g>
+          <g id="sHandles"></g>
+        </svg>
+        <div class="overlay" aria-hidden="true">
+          <div class="ov-caption" id="oCaption">
+            <div class="hand ov-cap c-ink" id="oCap"></div>
+            <div class="hand ov-cap-sub c-muted" id="oCapSub"></div>
+          </div>
+          <div class="ov-label" id="oDip">
+            <span class="hand ov-num-l c-ink" id="oDipN"></span
+            ><span class="hand ov-sub c-muted" id="oDipS"></span>
+          </div>
+          <div class="lifelabels ov-life" id="oLife"></div>
+          <div class="ov-label" id="oWithout" style="text-align: right">
+            <span class="hand ov-sub c-muted" id="oWithoutT"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="altitude">
+        <button class="chip" type="button" id="flyChip">pull back</button>
+        <div
+          class="ov-rail"
+          id="rail"
+          role="slider"
+          tabindex="0"
+          aria-label="How far out"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <div class="rail-line" id="railLine"></div>
+          <div id="railMarks" aria-hidden="true"></div>
+          <span class="ov-ring" id="ring" aria-hidden="true"></span>
+        </div>
+      </div>
+      <p class="hint hand">
+        drawn to scale at every distance · drag the bottom of the dip and the
+        marks on the road · space pulls back and comes in · ⌘ or ctrl and scroll
+        on the drawing to go by hand
+      </p>
+
+      <!-- the numbers, typed -->
+      <div class="numbers">
+        <span class="pair">
+          <span class="meta c-faint">at its worst</span>
+          <input id="nHurt" />
+          <span class="hand said">of 10</span>
+        </span>
+        <span class="pair">
+          <span class="meta c-faint">for</span>
+          <input id="nLasts" />
+          <select
+            id="unit"
+            class="ov-select c-muted"
+            style="font-size: 17px"
+            aria-label="Minutes, hours or days"
+          >
+            <option value="minutes">minutes</option>
+            <option value="hours">hours</option>
+            <option value="days">days</option>
+          </select>
+        </span>
+        <span class="pair">
+          <span class="meta c-faint">the life, set</span>
+          <select
+            id="horizon"
+            class="ov-select c-ink"
+            style="font-size: 19px"
+            aria-label="How far out the life is set"
+          ></select>
+          <span class="hand said">out</span>
+        </span>
+        <span class="pair">
+          <span class="meta c-faint">without it, by then</span>
+          <input id="nWithout" />
+          <span class="hand said" id="withoutSaid"></span>
+        </span>
+      </div>
+
+      <!-- the life -->
+      <div class="lifegrid">
+        <div>
+          <div class="meta c-accent">
+            the life, if you take it and it goes as you hope
+          </div>
+          <textarea
+            id="fLife"
+            class="ov-case display f-life"
+            rows="5"
+            placeholder="as it is, in the first person — where you are, what a morning is like, who is there"
+            aria-label="The life"
+          ></textarea>
+        </div>
+        <div>
+          <div class="meta c-accent">who you are on that road</div>
+          <input
+            id="fWho"
+            class="ov-case hand f-who"
+            placeholder="I am someone who …"
+            aria-label="Who you are on that road"
+          />
+          <div class="meta c-faint" style="margin-top: 20px">along the way</div>
+          <ol class="along" id="along"></ol>
+          <div class="meta c-faint" style="margin-top: 20px">without it</div>
+          <input
+            id="fWithoutLine"
+            class="ov-case hand f-line"
+            style="margin-top: 4px"
+            placeholder="as it is now — or say how it goes"
+            aria-label="The road without it"
+          />
+        </div>
+      </div>
+
+      <!-- the choice -->
+      <div class="choice">
+        <div id="cSpecimen" hidden>
+          <div class="chips">
+            <button class="chip accent" type="button" id="ownStep">
+              write your own step
+            </button>
+          </div>
+          <p class="hint hand">
+            this is the specimen: a made-up step from a made-up life, there so
+            the instrument is on the table before you bring anything. nothing on
+            it can be changed or kept. your own steps stay in this browser.
+          </p>
+        </div>
+
+        <div id="cOpen" hidden>
+          <div class="chips">
+            <button class="chip accent" type="button" id="take">
+              take the step
+            </button>
+            <button
+              class="chip"
+              type="button"
+              id="hold"
+              aria-label="Not today — hold to let it go for today"
+            >
+              not today — hold
+            </button>
+            <button class="chip" type="button" id="keep" hidden>
+              put it down
+            </button>
+          </div>
+          <p class="hint hand" id="holdHint"></p>
+          <div class="ov-arrive" id="letGoBox" style="margin-top: 12px" hidden>
+            <div class="meta c-accent">
+              let go for today · what stood in the way?
+            </div>
+            <input
+              id="fWhy"
+              class="ov-case hand"
+              style="margin-top: 4px; font-size: 18px"
+              placeholder="in a line — it will be here tomorrow"
+              aria-label="What stood in the way today"
+            />
+          </div>
+        </div>
+
+        <div id="cInIt" class="ov-arrive" hidden>
+          <div class="pair" style="gap: 8px 16px">
+            <span class="display in-now c-ink" id="inNow"></span>
+            <span class="hand said" id="inSaid"></span>
+          </div>
+          <div class="chips" style="margin-top: 12px">
+            <button class="chip accent" type="button" id="over">
+              it is over
+            </button>
+            <button class="chip" type="button" id="stopClock">
+              not yet — stop the clock
+            </button>
+          </div>
+          <p class="hint hand">
+            the clock is kept with the step; close this and come back to say it
+            is over
+          </p>
+        </div>
+
+        <div id="cTaken" class="ov-arrive" hidden>
+          <div class="meta c-accent">
+            afterwards · said before beside how it was
+          </div>
+          <div class="numbers" style="border: 0; margin-top: 8px; padding: 0">
+            <span class="pair">
+              <span class="meta c-faint">at its worst it was</span>
+              <input id="nFelt" />
+              <span class="hand said" id="feltSaid"></span>
+            </span>
+            <span class="pair">
+              <span class="meta c-faint">it lasted</span>
+              <input id="nFeltLasts" />
+              <span class="hand said" id="feltLastsSaid"></span>
+            </span>
+          </div>
+          <input
+            id="fAfter"
+            class="ov-case hand"
+            style="margin-top: 12px; font-size: 18px"
+            placeholder="afterwards, in a line — what it was like"
+            aria-label="Afterwards"
+          />
+          <div class="chips" style="margin-top: 12px">
+            <button class="chip" type="button" id="newAfter">a new step</button>
+          </div>
+        </div>
+
+        <div class="chips" id="removeWrap" style="margin-top: 20px" hidden>
+          <button class="chip" type="button" id="remove">
+            take it off the record
+          </button>
+        </div>
+        <p class="meta trouble" id="trouble" role="alert" hidden></p>
+      </div>
+    </section>
+
+    <!-- the desk -->
+    <aside class="aside">
+      <section
+        class="panel rise"
+        id="pReading"
+        style="animation-delay: 100ms"
+        aria-label="The reading"
+      >
+        <div class="meta c-accent">the reading</div>
+        <p class="body" id="reading"></p>
+      </section>
+
+      <section
+        class="panel rise"
+        id="pRecord"
+        style="animation-delay: 140ms"
+        aria-label="The record"
+      >
+        <div class="meta c-accent">the record</div>
+        <p class="body" id="whole"></p>
+        <ol class="rows" id="rowsMine"></ol>
+        <div class="spec-head">
+          <div class="meta c-faint">the specimen · fiction</div>
+          <p class="body" id="wholeSpec" style="color: var(--muted)"></p>
+          <ol class="rows" id="rowsSpec"></ol>
+        </div>
+      </section>
+
+      <section
+        class="panel rise"
+        id="pLaws"
+        style="animation-delay: 180ms"
+        aria-label="What the overview holds to"
+      >
+        <div class="meta c-accent">what the overview holds to</div>
+        <p class="body">
+          Every number on it is yours: how hard, how long, how far out, how the
+          road rises. The drawing is to scale at every distance, so pulling back
+          makes the dip small only by as much as it is short; its depth stays
+          what you said. The dip is always drawn beside the life, never the life
+          alone. Not today is allowed and kept as a day, never as a verdict; it
+          is a hold because you asked for friction, and the life fades while you
+          hold because that is what is being let go. After a step is taken, what
+          you said before stands beside what it was. Nothing here says you
+          should.
+        </p>
+        <p
+          class="meta c-faint"
+          id="keptWhere"
+          style="margin-top: 12px; text-transform: none; letter-spacing: 0.04em"
+        ></p>
+      </section>
+
+      <section
+        class="panel rise"
+        id="pSources"
+        style="animation-delay: 220ms"
+        aria-label="Where it comes from"
+      >
+        <div class="meta c-accent">where it comes from</div>
+        <ul class="sources">
+          <li>
+            <b>The overview effect</b> — Frank White's name for what astronauts
+            report seeing the Earth whole: what filled the view becomes a small
+            part of something larger.
+          </li>
+          <li>
+            <b>Distance and self-control</b> — seen from farther off, an act is
+            held for why rather than how, and later, larger goods win more often
+            (Fujita, Trope, Liberman &amp; Levin-Sagi 2006).
+          </li>
+          <li>
+            <b>The future self</b> — a future self felt as the same person makes
+            costs borne for them easier now (Hershfield 2011).
+          </li>
+          <li>
+            <b>The dip beside the life</b> — the outcome imagined alone drains
+            the effort it should summon; set against what stands in the way, it
+            summons it (Oettingen; Kappes &amp; Oettingen 2011).
+          </li>
+          <li>
+            <b>Before and after</b> — bad feelings are forecast stronger and
+            longer than they turn out (Wilson &amp; Gilbert 2005); the record
+            keeps both.
+          </li>
+        </ul>
+        <p class="sources" style="display: block; margin-top: 12px">
+          Losses weigh more than gains of the same size (Kahneman &amp; Tversky
+          1979), which is why the difference between the roads is drawn. Shame
+          is left out on purpose: it turns people away from what they are
+          ashamed of, where guilt about an act turns them toward repair (Tangney
+          &amp; Dearing 2002).
+        </p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Overview · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────────
+     Two steps from a synthetic life's year away. The first is the move it
+     never kept: telling the father the month. Put down, let go for today
+     twice, still open. The second, the letter to the two retainers, was
+     taken, and what was said before sits beside what it was after. Fiction. */
+  const SPECIMEN_STEPS = [
+    {
+      slug: "2026-09-19-tell-my-father-the-month-on-a-sunday-before-i-tell-anyon",
+      step: "Tell my father the month, on a Sunday, before I tell anyone else.",
+      hurt: 8,
+      lasts: 45,
+      life: "I live for a year in the town with the harbour. I walk to the ferry in the mornings and practise in the afternoons, on a piano that came with the flat. My father has been out once; we walked the breakwater and he talked about his own year in Bremen.",
+      who: "I am someone who goes.",
+      horizon: 2,
+      marks: [
+        { when: "a week", level: 1, line: "He has had a week with it." },
+        { when: "a month", level: 3, line: "" },
+        { when: "a year", level: 7, line: "I am there." },
+        { when: "two years", level: 8, line: "" },
+      ],
+      without: -2,
+      withoutLine: "Still meaning to go. The month moves again.",
+      put: "2026-09-19",
+      touched: "2026-09-27",
+      took: null,
+      done: null,
+      felt: null,
+      feltLasts: null,
+      after: "",
+      notToday: [
+        { on: "2026-09-20", why: "He sounded tired on Saturday." },
+        { on: "2026-09-27", why: "" },
+      ],
+      stone: null,
+    },
+    {
+      slug: "2026-09-21-write-to-the-two-retainers-that-i-am-away-from-march",
+      step: "Write to the two retainers that I am away from March.",
+      hurt: 6,
+      lasts: 120,
+      life: "The work that comes with me is the work I chose. March is clear. Both of them planned around it, and one asked for a proposal for when I am back.",
+      who: "I am someone who says the month out loud.",
+      horizon: 1,
+      marks: [
+        { when: "a week", level: 2, line: "Both have answered." },
+        { when: "a month", level: 3, line: "" },
+        { when: "a year", level: 6, line: "" },
+      ],
+      without: 0,
+      withoutLine: "",
+      put: "2026-09-21",
+      touched: "2026-09-23",
+      took: "2026-09-23T10:05+02:00",
+      done: "2026-09-23T10:31+02:00",
+      felt: 3,
+      feltLasts: 26,
+      after:
+        "Both answered by lunch. One of them said they had wondered when I would.",
+      notToday: [],
+      stone: null,
+    },
+  ];
+
+  /* The step the sheet shows when the reader first writes their own, so the
+     instrument is on the table before a word is typed. Nothing is kept until
+     the reader writes their own over it. */
+  const EXAMPLE_STEP = {
+    slug: "",
+    step: "Send the email to the person whose work I admire, asking for twenty minutes.",
+    hurt: 7,
+    lasts: 30,
+    life: "I have someone to ask. We talk every few months, and the second conversation was easier than the first. The work I make now has one reader who knows the field better than I do, and says so.",
+    who: "I am someone who asks.",
+    horizon: 5,
+    marks: [
+      {
+        when: "a week",
+        level: 1,
+        line: "It is sent. The reply came, or it did not.",
+      },
+      { when: "a month", level: 2, line: "" },
+      { when: "a year", level: 5, line: "" },
+      { when: "five years", level: 7, line: "" },
+    ],
+    without: 0,
+    withoutLine: "",
+    put: "",
+    touched: "",
+    took: null,
+    done: null,
+    felt: null,
+    feltLasts: null,
+    after: "",
+    notToday: [],
+    stone: null,
+  };
+
+  /* ── the overview, as niwa's lib/overview.ts has it ───────────────────────
+     The reader says how hard the step will be at its worst and for how long,
+     writes the life if it goes as they hope, and marks how the road rises at
+     a week, a month, a year. The frame stays true to scale at every altitude,
+     so the dip keeps its depth and loses its width. Every number is the
+     reader's. This draws, integrates and counts; it never says a step is
+     worth it, or that the reader should take it. */
+
+  const MINUTE = 1 / 1440;
+  const HOUR = 1 / 24;
+  const WEEK = 7;
+  const YEAR = 365.2425;
+  const MONTH = YEAR / 12;
+  const HORIZONS = [0.25, 1, 2, 5, 10];
+  const NAMED = [
+    { name: "a week", at: WEEK },
+    { name: "a month", at: MONTH },
+    { name: "three months", at: 3 * MONTH },
+    { name: "a year", at: YEAR },
+    { name: "two years", at: 2 * YEAR },
+    { name: "five years", at: 5 * YEAR },
+    { name: "ten years", at: 10 * YEAR },
+  ];
+  const ALONG = ["a week", "a month", "a year", "five years"];
+  const DEFAULT_LEVEL = {
+    "a week": 1,
+    "a month": 2,
+    "three months": 4,
+    "a year": 5,
+    "two years": 6,
+    "five years": 7,
+    "ten years": 8,
+  };
+
+  const horizonName = (years) =>
+    NAMED.find((n) => Math.abs(n.at - years * YEAR) < 1)?.name ??
+    `${years} years`;
+  const atOf = (name) => NAMED.find((n) => n.name === name)?.at ?? null;
+
+  function marksFor(horizon) {
+    const H = horizon * YEAR;
+    return [
+      ...ALONG.filter((name) => (atOf(name) ?? Infinity) < H - 1),
+      horizonName(horizon),
+    ];
+  }
+
+  const statusOf = (s) => (s.done ? "taken" : s.took ? "in-it" : "open");
+  const defaultMarks = (horizon) =>
+    marksFor(horizon).map((when) => ({
+      when,
+      level: DEFAULT_LEVEL[when] ?? 7,
+      line: "",
+    }));
+  const emptyStep = (today) => ({
+    slug: "",
+    step: "",
+    hurt: 7,
+    lasts: 30,
+    life: "",
+    who: "",
+    horizon: 5,
+    marks: defaultMarks(5),
+    without: 0,
+    withoutLine: "",
+    put: today,
+    touched: today,
+    took: null,
+    done: null,
+    felt: null,
+    feltLasts: null,
+    after: "",
+    notToday: [],
+    stone: null,
+  });
+
+  /* The marks carried to another horizon: a named time keeps its level and line
+     where it is still on the road, and the new horizon takes the old one's. */
+  function remark(marks, from, to) {
+    const had = new Map(marks.map((m) => [m.when, m]));
+    const end = had.get(horizonName(from));
+    return marksFor(to).map((when, i, all) => {
+      const kept = had.get(when) ?? (i === all.length - 1 ? end : undefined);
+      return kept
+        ? { ...kept, when }
+        : { when, level: DEFAULT_LEVEL[when] ?? 7, line: "" };
+    });
+  }
+
+  /* ── the roads ── */
+
+  const lt = (t) => Math.log1p(Math.max(0, t));
+  /* In fast, out slow: at its worst a seventh of the way in, then easing off. */
+  const A = 0.35;
+  const B = 2.1;
+  const WORST = A / (A + B);
+  const PEAK = Math.pow(WORST, A) * Math.pow(1 - WORST, B);
+  function dipShape(u) {
+    if (u <= 0 || u >= 1) return 0;
+    return (Math.pow(u, A) * Math.pow(1 - u, B)) / PEAK;
+  }
+  const DIP_AREA = (() => {
+    const n = 2000;
+    let s = 0;
+    for (let i = 1; i < n; i++) s += dipShape(i / n) * (i % 2 ? 4 : 2);
+    return s / (3 * n);
+  })();
+  const dipAt = (t, hurt, lasts) => {
+    const k = dipShape(t / (lasts * MINUTE));
+    return k === 0 ? 0 : -hurt * k;
+  };
+
+  /* Monotone cubic through the points (Fritsch–Carlson). */
+  function monotone(xs, ys) {
+    const n = xs.length;
+    if (n === 1) return () => ys[0];
+    const d = [];
+    for (let i = 0; i < n - 1; i++)
+      d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    const m = [d[0]];
+    for (let i = 1; i < n - 1; i++)
+      m.push(d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2);
+    m.push(d[n - 2]);
+    for (let i = 0; i < n - 1; i++) {
+      if (d[i] === 0) {
+        m[i] = 0;
+        m[i + 1] = 0;
+        continue;
+      }
+      const a = m[i] / d[i];
+      const b = m[i + 1] / d[i];
+      const h = a * a + b * b;
+      if (h > 9) {
+        const k = 3 / Math.sqrt(h);
+        m[i] = k * a * d[i];
+        m[i + 1] = k * b * d[i];
+      }
+    }
+    return (x) => {
+      if (x <= xs[0]) return ys[0];
+      if (x >= xs[n - 1]) return ys[n - 1];
+      let i = 0;
+      while (x > xs[i + 1]) i++;
+      const h = xs[i + 1] - xs[i];
+      const t = (x - xs[i]) / h;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      return (
+        (2 * t3 - 3 * t2 + 1) * ys[i] +
+        (t3 - 2 * t2 + t) * h * m[i] +
+        (-2 * t3 + 3 * t2) * ys[i + 1] +
+        (t3 - t2) * h * m[i + 1]
+      );
+    };
+  }
+
+  /* The two roads from now, as the reader marked them; t is days from the moment the step is taken. */
+  function roadsOf(s) {
+    const H = s.horizon * YEAR;
+    const L = s.lasts * MINUTE;
+    const pts = s.marks
+      .map((m) => ({ x: lt(atOf(m.when) ?? H), y: m.level }))
+      .sort((a, b) => a.x - b.x)
+      .filter((p, i, all) => i === 0 || p.x > all[i - 1].x);
+    const f = monotone(
+      [0, ...pts.map((p) => p.x)],
+      [0, ...pts.map((p) => p.y)],
+    );
+    const rise = (t) => (t <= 0 ? 0 : f(lt(t)));
+    const dip = (t) => dipAt(t, s.hurt, s.lasts);
+    const end = lt(H);
+    const without = (t) => {
+      if (t <= 0 || !s.without) return 0;
+      const u = Math.min(1, lt(t) / end);
+      return s.without * u * u * (3 - 2 * u);
+    };
+    return { with: (t) => rise(t) + dip(t), without, dip, rise, H, L };
+  }
+
+  function grid(L, H, n = 1200) {
+    const out = [];
+    const dipN = 240;
+    for (let i = 0; i <= dipN; i++) out.push((L * i) / dipN);
+    const a = Math.log(L);
+    const b = Math.log(Math.max(H, L * 1.01));
+    for (let i = 1; i <= n; i++) out.push(Math.exp(a + ((b - a) * i) / n));
+    return out;
+  }
+
+  /* The two areas between the roads, in the reader's units (levels × days), out to the horizon. */
+  function weigh(s) {
+    const r = roadsOf(s);
+    const ts = grid(r.L, r.H);
+    let cost = 0;
+    let gain = 0;
+    for (let i = 1; i < ts.length; i++) {
+      const a = ts[i - 1];
+      const b = ts[i];
+      const ga = r.with(a) - r.without(a);
+      const gb = r.with(b) - r.without(b);
+      const area = ((ga + gb) / 2) * (b - a);
+      if (area < 0) cost -= area;
+      else gain += area;
+    }
+    return { cost, gain, times: cost > 0 ? gain / cost : null };
+  }
+
+  /* ── the altitude ── */
+
+  const closeSpan = (lasts) => Math.max(10 * MINUTE, lasts * MINUTE * 2.5);
+  const farSpan = (horizon, lasts) =>
+    Math.max(horizon * YEAR, closeSpan(lasts) * 1.5);
+  const clamp01 = (z) => Math.min(1, Math.max(0, z));
+  const spanAt = (z, close, far) =>
+    Math.exp(Math.log(close) + clamp01(z) * (Math.log(far) - Math.log(close)));
+  const altitudeOf = (span, close, far) =>
+    clamp01(Math.log(span / close) / Math.log(far / close));
+  const LEAD = 0.07;
+  const frameAt = (span) => [-LEAD * span, span];
+
+  /* ── words ── */
+
+  const SMALL =
+    "no one two three four five six seven eight nine ten eleven twelve".split(
+      " ",
+    );
+  const count = (k, one, many = `${one}s`) =>
+    k === 1
+      ? `${/^[aeiouh]/.test(one) && one !== "year" ? "an" : "a"} ${one}`
+      : `${k <= 12 ? SMALL[k] : k.toLocaleString("en")} ${many}`;
+  const minutesWords = (k) =>
+    k === 60
+      ? "an hour"
+      : k === 1
+        ? "a minute"
+        : `${k <= 12 ? SMALL[k] : k} minutes`;
+
+  function spanWords(days) {
+    const m = days / MINUTE;
+    if (m < 89.5) {
+      const k = Math.max(1, m < 20 ? Math.round(m) : Math.round(m / 5) * 5);
+      return minutesWords(k);
+    }
+    const h = days / HOUR;
+    if (h < 1.75) return "an hour and a half";
+    if (h < 22.5) return count(Math.round(h), "hour");
+    if (days < 10.5) return count(Math.max(1, Math.round(days)), "day");
+    const w = days / WEEK;
+    if (w < 7.5) return count(Math.round(w), "week");
+    const mo = days / MONTH;
+    if (mo < 11.5) return count(Math.round(mo), "month");
+    const y = days / YEAR;
+    if (y > 1.35 && y < 1.65) return "a year and a half";
+    return count(Math.round(y), "year");
+  }
+  const nextWords = (days) =>
+    `the next ${spanWords(days).replace(/^an? /, "")}`;
+  const lastsWords = (lasts) => {
+    const m = Math.max(1, Math.round(lasts));
+    return m < 90 ? minutesWords(m) : spanWords(m * MINUTE);
+  };
+  function theDip(lasts) {
+    const w = lastsWords(lasts);
+    const single = w.match(/^an? (.+)$/);
+    if (single) return `the ${single[1]} is`;
+    return `the ${w} are`;
+  }
+  const sig3 = (n) => {
+    if (n <= 0) return 0;
+    const p = Math.pow(10, Math.floor(Math.log10(n)) - 2);
+    return Math.round(n / p) * p;
+  };
+  const big = (n) =>
+    n >= 1000 ? sig3(n).toLocaleString("en") : String(Math.round(n));
+  function shareWords(part, whole) {
+    const s = whole > 0 ? part / whole : 0;
+    if (s <= 0) return "none";
+    if (s >= 0.995) return "all";
+    if (s >= 0.1) return `${Math.round(s * 100)}%`;
+    if (s >= 0.01) return `${(s * 100).toFixed(1).replace(/\.0$/, "")}%`;
+    return `1 part in ${big(1 / s)}`;
+  }
+  function timesWords(k) {
+    if (k >= 1.95) return `${big(k)} times`;
+    if (k >= 1.05) return `${k.toFixed(1)} times`;
+    if (k >= 0.95) return "as much as";
+    return `${shareWords(k, 1)} of`;
+  }
+
+  /* ── the scale along the bottom ── */
+
+  const STEPS = [
+    ...[1, 2, 5, 10, 15, 30].map((k) => ({
+      d: k * MINUTE,
+      say: (n) => `${n * k} min`,
+    })),
+    ...[1, 2, 3, 6, 12].map((k) => ({
+      d: k * HOUR,
+      say: (n) => `${n * k} hour${n * k === 1 ? "" : "s"}`,
+    })),
+    { d: 1, say: (n) => `${n} day${n === 1 ? "" : "s"}` },
+    { d: 2, say: (n) => `${2 * n} days` },
+    { d: WEEK, say: (n) => `${n} week${n === 1 ? "" : "s"}` },
+    { d: 2 * WEEK, say: (n) => `${2 * n} weeks` },
+    { d: MONTH, say: (n) => `${n} month${n === 1 ? "" : "s"}` },
+    { d: 2 * MONTH, say: (n) => `${2 * n} months` },
+    { d: 3 * MONTH, say: (n) => `${3 * n} months` },
+    { d: 6 * MONTH, say: (n) => `${6 * n} months` },
+    { d: YEAR, say: (n) => `${n} year${n === 1 ? "" : "s"}` },
+    { d: 2 * YEAR, say: (n) => `${2 * n} years` },
+  ];
+  function ticksOf(span) {
+    const step = STEPS.find((s) => span / s.d <= 6) ?? STEPS[STEPS.length - 1];
+    const out = [];
+    for (let n = 1; n * step.d <= span * 0.999; n++)
+      out.push({ t: n * step.d, label: step.say(n) });
+    return out;
+  }
+  function stopsOf(lasts, horizon) {
+    const close = closeSpan(lasts);
+    const far = farSpan(horizon, lasts);
+    const out = [{ z: 0, label: "the dip" }];
+    for (const [label, d] of [
+      ["an hour", HOUR],
+      ["a day", 1],
+      ["a week", WEEK],
+      ["a month", MONTH],
+      ["a year", YEAR],
+    ]) {
+      const z = altitudeOf(d, close, far);
+      if (z > 0.06 && z < 0.94 && z - out[out.length - 1].z > 0.08)
+        out.push({ z, label });
+    }
+    out.push({ z: 1, label: horizonName(horizon) });
+    return out;
+  }
+
+  /* ── the readings ── */
+
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+  const AHEAD =
+    /\b(will|won't|going to|gonna|would|someday|one day|eventually|i want|i hope|i wish|i'd like|i would like|by then|in the future|i plan to)\b/gi;
+  function lookingAhead(text) {
+    const ss = sentencesOf(text);
+    const words = new Set();
+    let n = 0;
+    for (const s of ss) {
+      const m = s.match(AHEAD);
+      if (m) {
+        n++;
+        for (const w of m) words.add(w.toLowerCase());
+      }
+    }
+    return { n, of: ss.length, words: [...words].slice(0, 5) };
+  }
+
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const dayWords = (d) =>
+    /^\d{4}-\d{2}-\d{2}/.test(d)
+      ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}`
+      : d;
+  const nOf = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const level = (v) =>
+    v === 0 ? "at now" : v > 0 ? `${v} above now` : `${-v} below now`;
+
+  function minutesBetween(a, b) {
+    if (!a || !b) return null;
+    const d = (Date.parse(b) - Date.parse(a)) / 60000;
+    return Number.isFinite(d) && d >= 0 ? Math.round(d) : null;
+  }
+
+  /* Facts about one step, from the reader's numbers and words. None of them is a verdict. */
+  function readings(s) {
+    const out = [];
+    const hz = horizonName(s.horizon);
+    out.push(
+      `the dip: ${s.hurt} of 10 at its worst, for ${lastsWords(s.lasts)}, as you said before`,
+    );
+    out.push(
+      `${lastsWords(s.lasts)} is ${shareWords(s.lasts * MINUTE, s.horizon * YEAR)} of ${hz}`,
+    );
+    const byYear = s.marks.find((m) => m.when === "a year");
+    const last = s.marks[s.marks.length - 1];
+    const road =
+      byYear && byYear !== last
+        ? `${level(byYear.level)} by a year and ${level(last.level)} by ${hz}`
+        : `${level(last.level)} by ${hz}`;
+    out.push(
+      `as marked, the road with the step is ${road}; the road without it ${
+        s.without === 0
+          ? "stays as it is now"
+          : `is ${level(s.without)} by then`
+      }`,
+    );
+    const w = weigh(s);
+    if (w.gain <= 0)
+      out.push(
+        "as marked, the road with the step is never above the road without it",
+      );
+    else if (w.times !== null)
+      out.push(
+        `as marked, what the road with the step has over the other, across ${hz}, is ${timesWords(w.times)} the dip`,
+      );
+    if (!s.life.trim()) out.push("the life is not written yet");
+    else {
+      const a = lookingAhead(s.life);
+      out.push(
+        `the life: ${nOf(a.of, "sentence")}${
+          a.n
+            ? `, ${a.n} still look${a.n === 1 ? "s" : ""} ahead — ${a.words.join(", ")}. it is meant to be written as it is`
+            : ", each written as it is"
+        }`,
+      );
+    }
+    out.push(
+      s.who.trim()
+        ? `who you are on that road, in your words: ${s.who.trim()}`
+        : "who you are on that road is not written yet",
+    );
+    const put = `put down ${dayWords(s.put)}`;
+    out.push(
+      s.notToday.length
+        ? `${put} · let go for today ${nOf(s.notToday.length, "time")}: ${s.notToday.map((x) => dayWords(x.on)).join(", ")}`
+        : put,
+    );
+    const st = statusOf(s);
+    if (st === "in-it")
+      out.push(`in it since ${dayWords(s.took)} ${s.took.slice(11, 16)}`);
+    if (st === "taken") {
+      const felt =
+        s.felt === null
+          ? "how hard it was is not said yet"
+          : `${s.felt} of 10${s.feltLasts !== null ? ` for ${lastsWords(s.feltLasts)}` : ""}`;
+      out.push(
+        `taken ${dayWords(s.took)} · before, you said ${s.hurt} of 10 for ${lastsWords(s.lasts)}; after, ${felt}`,
+      );
+    }
+    return out;
+  }
+
+  function tally(steps) {
+    const pairs = steps
+      .filter((s) => statusOf(s) === "taken" && s.felt !== null)
+      .map((s) => ({
+        hurt: s.hurt,
+        felt: s.felt,
+        lasts: s.lasts,
+        feltLasts: s.feltLasts,
+      }));
+    return {
+      n: steps.length,
+      open: steps.filter((s) => statusOf(s) === "open").length,
+      inIt: steps.filter((s) => statusOf(s) === "in-it").length,
+      taken: steps.filter((s) => statusOf(s) === "taken").length,
+      letGo: steps.reduce((k, s) => k + s.notToday.length, 0),
+      letGoSteps: steps.filter((s) => s.notToday.length).length,
+      pairs,
+    };
+  }
+  function against(xs, less, more) {
+    const lo = xs.filter(([b, a]) => a < b).length;
+    const eq = xs.filter(([b, a]) => a === b).length;
+    const hi = xs.filter(([b, a]) => a > b).length;
+    const parts = [];
+    if (lo) parts.push(`${less} in ${lo} of ${xs.length}`);
+    if (eq) parts.push(`as said in ${eq}`);
+    if (hi) parts.push(`${more} in ${hi}`);
+    return parts.join(", ");
+  }
+  /* Facts about the whole record. Before and after are set side by side and counted; never an accuracy. */
+  function wholeReadings(t) {
+    if (!t.n) return ["no steps put down yet"];
+    const out = [
+      `${nOf(t.n, "step")} put down · ${t.taken} taken · ${t.inIt} in it · ${t.open} open`,
+    ];
+    if (t.letGo)
+      out.push(
+        `let go for today ${nOf(t.letGo, "time")}, across ${nOf(t.letGoSteps, "step")}`,
+      );
+    if (t.pairs.length) {
+      out.push(
+        `at the worst, before and after: ${t.pairs.map((p) => `${p.hurt} → ${p.felt}`).join(", ")} — ${against(
+          t.pairs.map((p) => [p.hurt, p.felt]),
+          "less than said",
+          "more than said",
+        )}`,
+      );
+      const timed = t.pairs.filter((p) => p.feltLasts !== null);
+      if (timed.length)
+        out.push(
+          `for how long, before and after: ${timed
+            .map((p) => `${lastsWords(p.lasts)} → ${lastsWords(p.feltLasts)}`)
+            .join(", ")} — ${against(
+            timed.map((p) => [p.lasts, p.feltLasts]),
+            "shorter than said",
+            "longer than said",
+          )}`,
+        );
+    }
+    return out;
+  }
+
+  /* ── keeping: niwa wrote a markdown file per step; here one record in this browser ── */
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+  function titleOf(s) {
+    const first = (sentencesOf(s.step)[0] ?? s.step.trim())
+      .replace(/[.!…]+$/, "")
+      .trim();
+    return first
+      ? first.length > 72
+        ? `${first.slice(0, 69).trim()}…`
+        : first
+      : "a step";
+  }
+
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const AT =
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?([+-]\d{2}:\d{2}|Z)?$/;
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const num = (v) => {
+    const k =
+      typeof v === "number"
+        ? v
+        : typeof v === "string" && v.trim()
+          ? Number(v)
+          : NaN;
+    return Number.isFinite(k) ? k : null;
+  };
+  const within = (v, lo, hi, fallback) => {
+    const k = num(v);
+    return k === null ? fallback : Math.min(hi, Math.max(lo, Math.round(k)));
+  };
+  const MAX_LASTS = 60 * 1440;
+
+  function validateStep(input, today) {
+    const r = input ?? {};
+    const step = str(r.step, 300);
+    if (!step) throw new Error("a step needs the step, in a line");
+    const hz = num(r.horizon);
+    const horizon =
+      hz === null
+        ? 5
+        : HORIZONS.reduce((best, h) =>
+            Math.abs(h - hz) < Math.abs(best - hz) ? h : best,
+          );
+    const given = new Map();
+    if (Array.isArray(r.marks))
+      for (const m of r.marks)
+        if (m && typeof m === "object" && typeof m.when === "string")
+          given.set(m.when, m);
+    const marks = marksFor(horizon).map((when) => {
+      const x = given.get(when);
+      return {
+        when,
+        level: within(x?.level, 0, 10, DEFAULT_LEVEL[when] ?? 7),
+        line: str(x?.line, 200),
+      };
+    });
+    const put = typeof r.put === "string" && DAY.test(r.put) ? r.put : today;
+    const at = (v) => (typeof v === "string" && AT.test(v) ? v : null);
+    const took = at(r.took);
+    let done = took ? at(r.done) : null;
+    if (took && done && Date.parse(done) < Date.parse(took)) done = null;
+    const felt = done && num(r.felt) !== null ? within(r.felt, 1, 10, 1) : null;
+    const feltLasts =
+      done && num(r.feltLasts) !== null
+        ? within(r.feltLasts, 1, MAX_LASTS, 1)
+        : null;
+    const seen = new Set();
+    const notToday = (Array.isArray(r.notToday) ? r.notToday : [])
+      .flatMap((x) => {
+        const o = x ?? {};
+        const on = typeof o.on === "string" && DAY.test(o.on) ? o.on : "";
+        if (!on || seen.has(on)) return [];
+        seen.add(on);
+        return [{ on, why: str(o.why, 300) }];
+      })
+      .sort((a, b) => (a.on < b.on ? -1 : 1))
+      .slice(-400);
+    const s = {
+      slug: str(r.slug, 120),
+      step,
+      hurt: within(r.hurt, 1, 10, 7),
+      lasts: within(r.lasts, 1, MAX_LASTS, 30),
+      life: long(r.life, 4000),
+      who: str(r.who, 200),
+      horizon,
+      marks,
+      without: within(r.without, -10, 10, 0),
+      withoutLine: str(r.withoutLine, 300),
+      put,
+      touched:
+        typeof r.touched === "string" && DAY.test(r.touched) ? r.touched : put,
+      took,
+      done,
+      felt,
+      feltLasts,
+      after: long(r.after, 2000),
+      notToday,
+      stone: null,
+    };
+    if (!s.slug) s.slug = slugOf(step, put);
+    return s;
+  }
+
+  const KEY = "pp-overview";
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+
+  /* The reader's steps, newest touched first. Storage may throw; the page works without it. */
+  function readSteps() {
+    let raw = null;
+    try {
+      raw = JSON.parse(localStorage.getItem(KEY) || "null");
+    } catch {
+      raw = null;
+    }
+    const list = raw && Array.isArray(raw.steps) ? raw.steps : [];
+    return list
+      .map((x) => {
+        try {
+          return validateStep(
+            x,
+            typeof x?.put === "string" ? x.put : "2026-01-01",
+          );
+        } catch {
+          return null;
+        }
+      })
+      .filter((s) => s !== null && SLUG.test(s.slug))
+      .sort((a, b) =>
+        a.touched < b.touched
+          ? 1
+          : a.touched > b.touched
+            ? -1
+            : a.slug < b.slug
+              ? 1
+              : -1,
+      );
+  }
+  function writeSteps() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, steps: mine }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /* ── hand-drawn strokes (niwa's lib/hand.ts): deterministic for a seed ── */
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  /* The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /* A pen line laid over the element it sits in, re-drawn when the element changes size.
+     `draw` brings it on once, from one end; later re-draws are already there. */
+  let maskN = 0;
+  function sketch(parent, { kind = "box", seed, draw = false, width } = {}) {
+    const pen = width ?? (kind === "box" ? 1.7 : 1.5);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    parent.prepend(svg);
+    const id = `pp-m${++maskN}`;
+    let cur = seed;
+    let drawn = false;
+    let size = "";
+    const paint = (force) => {
+      const w = parent.offsetWidth;
+      const h = parent.offsetHeight;
+      if (!w || !h) return;
+      if (!force && size === `${w}x${h}`) return;
+      size = `${w}x${h}`;
+      const s = seedOf(cur);
+      const line =
+        kind === "box"
+          ? roughRect(w, h, s)
+          : roughUnderline(w, s, { y: h - 0.5 });
+      const ink = ribbon(line, pen, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const animate = draw && !drawn;
+      svg.innerHTML =
+        (draw
+          ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path d="${line}" pathLength="1" fill="none" stroke="white" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round"${animate ? ' class="draw"' : ""}/></mask></defs>`
+          : "") +
+        `<path class="ink" d="${ink}"${draw ? ` mask="url(#${id})"` : ""}/>`;
+      drawn = true;
+    };
+    new ResizeObserver(() => paint(false)).observe(parent);
+    return {
+      reseed(next) {
+        if (next === cur) return;
+        cur = next;
+        paint(true);
+      },
+    };
+  }
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const reducedMotion = () =>
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const nowIso = () => {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    const off = -d.getTimezoneOffset();
+    const sign = off >= 0 ? "+" : "-";
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}${sign}${p(Math.floor(Math.abs(off) / 60))}:${p(Math.abs(off) % 60)}`;
+  };
+  const localToday = () => nowIso().slice(0, 10);
+  const clone = (s) => JSON.parse(JSON.stringify(s));
+
+  const UNIT_MIN = { minutes: 1, hours: 60, days: 1440 };
+  const unitOf = (lasts) =>
+    lasts % 1440 === 0
+      ? "days"
+      : lasts % 60 === 0 && lasts >= 120
+        ? "hours"
+        : "minutes";
+  /* How long the reader holds to let a step go for today. */
+  const HOLD_MS = 2400;
+
+  let mine = readSteps();
+  let open = null;
+  let kept = false;
+  let specimen = false;
+  let example = false;
+  let trouble = null;
+  let sure = false;
+  let letting = false;
+  let letGo = false;
+  let unit = "minutes";
+  let clock = Date.now();
+  let slugRef = "";
+  let holdTimer = null;
+  let held = false;
+  let introKey = 0;
+  const today = localToday();
+
+  const writable = () => !specimen;
+  const status = () => (open ? statusOf(open) : "open");
+  const mode = () => {
+    const st = status();
+    return st === "in-it"
+      ? "in-it"
+      : st === "taken"
+        ? "taken"
+        : kept
+          ? "open"
+          : "draft";
+  };
+  const elapsedNow = () =>
+    open?.took && status() === "in-it"
+      ? Math.max(0, (clock - Date.parse(open.took)) / 60000)
+      : null;
+
+  function fresh(asExample = false) {
+    const base = asExample
+      ? { ...clone(EXAMPLE_STEP), put: today, touched: today }
+      : emptyStep(today);
+    slugRef = "";
+    kept = false;
+    specimen = false;
+    example = asExample;
+    open = base;
+    unit = unitOf(base.lasts);
+    sure = false;
+    letGo = false;
+    trouble = null;
+    intro();
+    render();
+  }
+  function load(s, isSpecimen = false) {
+    slugRef = isSpecimen ? "" : s.slug;
+    kept = true;
+    specimen = isSpecimen;
+    example = false;
+    open = clone(s);
+    unit = unitOf(s.lasts);
+    sure = false;
+    letGo = false;
+    trouble = null;
+    intro();
+    render();
+  }
+
+  /* Keep a step in this browser. A fresh one whose slug is taken gets a numbered one. */
+  function save(s) {
+    if (specimen) return null;
+    const isFresh = !slugRef;
+    let out;
+    try {
+      out = validateStep({ ...s, slug: slugRef || "" }, today);
+    } catch (e) {
+      trouble = e.message;
+      render();
+      return null;
+    }
+    out.touched = today;
+    if (isFresh) {
+      const taken = new Set(mine.map((x) => x.slug));
+      const base = out.slug;
+      let n = 2;
+      while (taken.has(out.slug)) out.slug = `${base}-${n++}`;
+    }
+    if (!SLUG.test(out.slug)) {
+      trouble = "bad slug";
+      render();
+      return null;
+    }
+    mine = mine.some((x) => x.slug === out.slug)
+      ? mine.map((x) => (x.slug === out.slug ? out : x))
+      : [out, ...mine];
+    slugRef = out.slug;
+    kept = true;
+    trouble = writeSteps()
+      ? null
+      : "not kept — this browser would not keep it; it stays until you close the page";
+    if (open)
+      open = { ...open, slug: out.slug, put: out.put, touched: out.touched };
+    return out;
+  }
+
+  const patch = (p) => {
+    if (!open) return;
+    open = { ...open, ...p };
+    render();
+  };
+  /* Change and, if the step is already kept, keep the change. */
+  const set = (p) => {
+    if (!open) return;
+    open = { ...open, ...p };
+    if (kept && writable()) save(open);
+    render();
+  };
+  const commit = () => {
+    if (open && kept && writable() && open.step.trim()) {
+      save(open);
+      render();
+    }
+  };
+  const needsStep = () => {
+    if (!open || !writable()) return null;
+    if (!open.step.trim()) {
+      trouble = "write the step, in a line";
+      render();
+      return null;
+    }
+    return open;
+  };
+  function keep() {
+    const s = needsStep();
+    if (!s) return;
+    example = false;
+    save(s);
+    render();
+  }
+  function take() {
+    const s = needsStep();
+    if (!s) return;
+    example = false;
+    letGo = false;
+    open = { ...s, took: nowIso(), done: null, felt: null, feltLasts: null };
+    save(open);
+    render();
+  }
+  function over() {
+    if (!open?.took || !writable()) return;
+    const done = nowIso();
+    open = {
+      ...open,
+      done,
+      feltLasts: Math.max(1, minutesBetween(open.took, done) ?? 1),
+    };
+    save(open);
+    render();
+  }
+  function stopClock() {
+    if (!open || !writable()) return;
+    open = { ...open, took: null, done: null, felt: null, feltLasts: null };
+    save(open);
+    render();
+  }
+
+  /* Letting it go for today is a hold, not a press: the life fades while the reader holds. */
+  function letItGo() {
+    held = true;
+    holdTimer = null;
+    if (!open) return;
+    const on = localToday();
+    const why = open.notToday.find((x) => x.on === on)?.why ?? "";
+    open = {
+      ...open,
+      notToday: [...open.notToday.filter((x) => x.on !== on), { on, why }],
+    };
+    example = false;
+    save(open);
+    letGo = true;
+    render();
+    window.setTimeout(() => {
+      letting = false;
+      held = false;
+      renderHold();
+    }, 1500);
+  }
+  function startHold() {
+    if (holdTimer !== null || held) return;
+    if (!needsStep()) return;
+    letting = true;
+    renderHold();
+    holdTimer = window.setTimeout(letItGo, HOLD_MS);
+  }
+  function cancelHold() {
+    if (held) return;
+    if (holdTimer !== null) window.clearTimeout(holdTimer);
+    holdTimer = null;
+    if (letting) {
+      letting = false;
+      renderHold();
+    }
+  }
+
+  function remove() {
+    if (!open || !writable() || !kept) return;
+    const slug = open.slug;
+    mine = mine.filter((x) => x.slug !== slug);
+    if (!writeSteps())
+      trouble = "not taken off — this browser would not keep the change";
+    fresh(mine.length === 0);
+  }
+
+  /* ── the drawing ─────────────────────────────────────────────────────────
+     The step drawn to scale: up close the dip is all there is; pulled back,
+     the frame multiplies through the scales of time until the dip is a
+     hairline that has kept its depth and the life fills the frame. The two
+     roads fork at now. Everything on it is a number the reader set. */
+
+  const WIDE = { W: 800, H: 460, PL: 18, PR: 24, PT: 92, PB: 34 };
+  const TALL = { W: 800, H: 760, PL: 18, PR: 24, PT: 190, PB: 46 };
+  const lineOf = (ps) =>
+    ps
+      .map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`)
+      .join("");
+  const areaOf = (top, bottom) =>
+    `${lineOf(top)}L${[...bottom]
+      .reverse()
+      .map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`)
+      .join("L")}Z`;
+  function timesAcross(x1, dips, extra) {
+    const out = [];
+    const N = 240;
+    for (let i = 0; i <= N; i++) out.push((x1 * i) / N);
+    for (const L of dips) {
+      const end = Math.min(L, x1);
+      for (let i = 1; i < 72; i++) out.push((end * i) / 72);
+      out.push(end);
+    }
+    for (const t of extra) if (t > 0 && t < x1) out.push(t);
+    return [...new Set(out)].sort((a, b) => a - b);
+  }
+
+  const wrap = $("drawing");
+  const svg = $("scope");
+  const rail = $("rail");
+  let tall = false;
+  let railW = 0;
+  let z = 0;
+  let raf = null;
+  let dragging = null;
+  let stops = [];
+  let dims = WIDE;
+
+  const at = (el, attrs) => {
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+  };
+  const halt = () => {
+    if (raf !== null) cancelAnimationFrame(raf);
+    raf = null;
+  };
+  const setZ = (v) => {
+    z = v;
+    drawScope();
+  };
+  /* Travel to an altitude at an even pace in log time, the way the Eameses' camera rose. */
+  function fly(to) {
+    halt();
+    const from = z;
+    const dz = Math.abs(to - from);
+    if (dz < 0.001) return;
+    if (reducedMotion()) {
+      setZ(to);
+      return;
+    }
+    const dur = 700 + dz * 5600;
+    const t0 = performance.now();
+    const tick = (now) => {
+      const u = Math.min(1, (now - t0) / dur);
+      const e = 0.5 - 0.5 * Math.cos(Math.PI * u);
+      setZ(from + (to - from) * e);
+      raf = u < 1 ? requestAnimationFrame(tick) : null;
+    };
+    raf = requestAnimationFrame(tick);
+  }
+  /* A step put on the table starts close, and after a breath the drawing pulls back on its own. */
+  let introTimer = null;
+  function intro() {
+    introKey++;
+    halt();
+    if (introTimer !== null) window.clearTimeout(introTimer);
+    introTimer = null;
+    z = 0;
+    if (open && statusOf(open) === "in-it") return;
+    if (reducedMotion()) return;
+    introTimer = window.setTimeout(() => {
+      introTimer = null;
+      fly(1);
+    }, 1300);
+  }
+
+  function drawScope() {
+    if (!open) return;
+    const step = open;
+    const md = mode();
+    const inIt = md === "in-it";
+    const elapsed = elapsedNow();
+    const d = (dims = tall ? TALL : WIDE);
+    const { W, H, PL, PR, PT, PB } = d;
+    const PW = W - PL - PR;
+    const PH = H - PT - PB;
+    const MID = PT + PH / 2;
+    const UNIT = PH / 2 / 10.6;
+    const yOf = (v) => MID - v * UNIT;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+    const felt =
+      md === "taken" && step.felt !== null
+        ? { hurt: step.felt, lasts: step.feltLasts ?? step.lasts }
+        : null;
+    const shape = felt ? { ...step, ...felt } : step;
+    const roads = roadsOf(shape);
+    const L = shape.lasts * MINUTE;
+    const close =
+      inIt && elapsed !== null
+        ? Math.max(closeSpan(step.lasts), elapsed * MINUTE * 1.3)
+        : closeSpan(felt ? Math.max(step.lasts, felt.lasts) : step.lasts);
+    const far = farSpan(step.horizon, shape.lasts);
+    const span = spanAt(z, close, far);
+    const [x0, x1] = frameAt(span);
+    const xOf = (t) => PL + ((t - x0) / (x1 - x0)) * PW;
+    const markTs = step.marks.map((m) => atOf(m.when) ?? step.horizon * YEAR);
+    const ts = timesAcross(x1, felt ? [L, step.lasts * MINUTE] : [L], markTs);
+    const withP = [
+      [xOf(x0), yOf(0)],
+      ...ts.map((t) => [xOf(t), yOf(roads.with(t))]),
+    ];
+    const withoutP = ts.map((t) => [xOf(t), yOf(roads.without(t))]);
+    const gap = areaOf(
+      ts.map((t) => [xOf(t), yOf(Math.max(roads.with(t), roads.without(t)))]),
+      withoutP,
+    );
+    const hollow = areaOf(
+      ts.map((t) => [xOf(t), yOf(Math.min(roads.with(t), roads.without(t)))]),
+      withoutP,
+    );
+    const seed = seedOf(`ov-${step.slug || "draft"}`);
+    const ink = ribbon(lineOf(withP), 2.4, seed);
+    const said = felt
+      ? lineOf(ts.map((t) => [xOf(t), yOf(dipAt(t, step.hurt, step.lasts))]))
+      : null;
+    const ticks = ticksOf(span);
+    stops = stopsOf(shape.lasts, step.horizon);
+    // The ends are always named; a scale between is named only where its word fits.
+    const showStop = new Set([0, stops.length - 1]);
+    {
+      const extent = (i) => {
+        const w = stops[i].label.length * 7.4 + 6;
+        const x = stops[i].z * railW;
+        return i === 0
+          ? [x, x + w]
+          : i === stops.length - 1
+            ? [x - w, x]
+            : [x - w / 2, x + w / 2];
+      };
+      let right = extent(0)[1];
+      const endLeft = extent(stops.length - 1)[0];
+      for (let i = 1; i < stops.length - 1; i++) {
+        const [l, r] = extent(i);
+        if (l > right + 12 && r < endLeft - 12) {
+          showStop.add(i);
+          right = r;
+        }
+      }
+    }
+    const nowX = xOf(0);
+    const dipW = xOf(L) - nowX;
+    const worst = [xOf(WORST * L), yOf(-shape.hurt)];
+    const dipLabelX =
+      Math.max(xOf(L), felt ? xOf(step.lasts * MINUTE) : 0, worst[0]) +
+      (tall ? 40 : 26);
+    const fs = tall ? 23 : 12;
+
+    svg.setAttribute(
+      "aria-label",
+      `The step as a dip below now, ${shape.hurt} of 10 at its worst for ${lastsWords(shape.lasts)}; the road with the step rising to ${step.marks[step.marks.length - 1]?.level ?? 0} above now by ${horizonName(step.horizon)}; the road without it ${step.without === 0 ? "staying as it is now" : `${step.without > 0 ? "rising" : "falling"} to ${step.without}`}. Showing ${nextWords(span)}.`,
+    );
+    at($("sBase"), { x1: PL, x2: W - PR, y1: yOf(0), y2: yOf(0) });
+    at($("sNow"), { x1: nowX, x2: nowX, y1: PT - 18, y2: H - PB + 6 });
+    $("sTicks").innerHTML =
+      ticks
+        .map(
+          (k) =>
+            `<line class="s-tick" x1="${xOf(k.t)}" x2="${xOf(k.t)}" y1="${H - PB}" y2="${H - PB + 6}"/><text class="s-tick-t" x="${xOf(k.t)}" y="${H - PB + 22}" font-size="${fs}" text-anchor="middle">${k.label}</text>`,
+        )
+        .join("") +
+      `<text class="s-now-t" x="${nowX}" y="${H - PB + 22}" font-size="${fs}" text-anchor="middle">now</text>`;
+    $("sGap").setAttribute("d", gap);
+    $("sHollow").setAttribute("d", hollow);
+    $("sSaid").setAttribute("d", said || "");
+    $("sWithout").setAttribute("d", lineOf([[nowX, yOf(0)], ...withoutP]));
+    $("sInk").setAttribute("d", ink);
+    at($("sDot"), { cx: nowX, cy: yOf(0) });
+    const el = $("sElapsed");
+    if (inIt && elapsed !== null) {
+      el.removeAttribute("display");
+      at(el, {
+        x1: xOf(elapsed * MINUTE),
+        x2: xOf(elapsed * MINUTE),
+        y1: PT - 10,
+        y2: H - PB,
+      });
+    } else el.setAttribute("display", "none");
+    // the dip's words sit in the empty water past it, on a leader from its worst
+    at($("sLeader"), {
+      x1: worst[0] + 4,
+      y1: worst[1],
+      x2: dipLabelX - 6,
+      y2: worst[1],
+    });
+
+    const inFrame = (x) => x >= PL - 1 && x <= W - PR + 1;
+    const last = step.marks.length - 1;
+    const canDrag = writable() && md !== "in-it";
+    let marksSvg = "";
+    let handles = "";
+    step.marks.forEach((m, i) => {
+      const x = xOf(markTs[i]);
+      if (!inFrame(x)) return;
+      const y = yOf(roads.with(markTs[i]));
+      const end = i === last;
+      marksSvg += `<circle class="${end ? "mk-end" : "mk"}" cx="${x}" cy="${y}" r="${end ? 6 : 4.5}"/>`;
+      if (canDrag)
+        handles += `<circle class="grab" data-grab="mark-${i}" cx="${x}" cy="${y}" r="${tall ? 26 : 16}" aria-label="How far above now by ${esc(m.when)}"/>`;
+    });
+    if (writable() && (md === "draft" || md === "open") && dipW >= 18)
+      handles += `<circle class="grab" data-grab="hurt" cx="${worst[0]}" cy="${worst[1]}" r="${tall ? 30 : 18}" aria-label="How hard at its worst"/>`;
+    if (canDrag && z > 0.97)
+      handles += `<circle class="grab" data-grab="without" cx="${xOf(step.horizon * YEAR)}" cy="${yOf(step.without)}" r="${tall ? 26 : 16}" aria-label="Where the road without it is by then"/>`;
+    $("sMarks").innerHTML = marksSvg;
+    $("sHandles").innerHTML = handles;
+
+    /* ── the words on it, over the drawing, so they stay legible at any size ── */
+    const pct = (x, y) => `left:${(x / W) * 100}%;top:${(y / H) * 100}%;`;
+    const cap = $("oCaption");
+    cap.style.left = `${(PL / W) * 100}%`;
+    cap.style.top = "3%";
+    $("oCap").textContent =
+      inIt && elapsed !== null
+        ? `in it · ${elapsed < 1 ? "just now" : `${lastsWords(elapsed)} in`}`
+        : nextWords(span);
+    $("oCapSub").textContent =
+      `${theDip(shape.lasts)} ${shareWords(L, span)} of it`;
+    const dipEl = $("oDip");
+    dipEl.style.cssText = `${pct(dipLabelX, worst[1])}transform:translate(0,-50%);`;
+    $("oDipN").textContent = felt ? `was ${felt.hurt}` : `${shape.hurt} of 10`;
+    $("oDipS").textContent = felt
+      ? ` for ${lastsWords(felt.lasts)} · said ${step.hurt} for ${lastsWords(step.lasts)}`
+      : ` for ${lastsWords(shape.lasts)}`;
+
+    const lifeFirst = sentencesOf(step.life)[0] ?? "";
+    const horizonOff = markTs[last] > x1 * 1.001;
+    const endLevel = step.marks[last]?.level ?? 0;
+    const shown = new Set();
+    // With the life still out past the frame, its note holds the right-hand edge.
+    let edge = horizonOff ? W - PR - (tall ? 360 : 270) : Infinity;
+    for (let i = last; i >= 0; i--) {
+      const x = xOf(markTs[i]);
+      if (!inFrame(x) || x < nowX + 60) continue;
+      if (edge - x < (i === last ? 0 : tall ? 190 : 130)) continue;
+      shown.add(i);
+      edge = x - (i === last ? (tall ? 330 : 250) : 0);
+    }
+    const who = step.who.trim();
+    let life = "";
+    step.marks.forEach((m, i) => {
+      if (!shown.has(i)) return;
+      const t = markTs[i];
+      const x = xOf(t);
+      const y = yOf(roads.with(t));
+      const end = i === last;
+      const body =
+        end && who
+          ? `<div class="display ov-who c-ink">${esc(who)}</div>`
+          : m.line.trim()
+            ? `<div class="hand ov-line c-ink">${esc(m.line.trim())}</div>`
+            : end && lifeFirst
+              ? `<div class="hand ov-line c-ink">${esc(lifeFirst)}</div>`
+              : "";
+      life += `<div class="ov-label${end ? " ov-end" : ""}" style="${pct(x, y)}transform:${
+        end
+          ? "translate(calc(-100% + 6px), calc(-100% - 12px))"
+          : "translate(-50%, calc(-100% - 10px))"
+      };text-align:${end ? "right" : "center"}"><div class="hand ov-sub c-muted">${esc(m.when)} · ${m.level} above now</div>${body}</div>`;
+    });
+    if (horizonOff)
+      life += `<div class="ov-label ov-end" style="${pct(W - PR, yOf(endLevel))}transform:translate(-100%, calc(-100% - 12px));text-align:right"><div class="hand ov-sub c-muted">${esc(horizonName(step.horizon))} out · ${endLevel} above now →</div>${
+        who || lifeFirst
+          ? `<div class="${who ? "display ov-who" : "hand ov-line"} c-ink">${esc(who || lifeFirst)}</div>`
+          : ""
+      }</div>`;
+    $("oLife").innerHTML = life;
+    const wo = $("oWithout");
+    wo.style.cssText = `${pct(W - PR, yOf(roads.without(x1)))}transform:translate(-100%, ${
+      step.without < 0 && z > 0.6 ? "calc(-100% - 8px)" : "8px"
+    });text-align:right;`;
+    $("oWithoutT").textContent =
+      "without it" +
+      (z > 0.97 && step.without !== 0
+        ? `, ${Math.abs(step.without)} ${step.without > 0 ? "above" : "below"} now`
+        : "") +
+      (step.withoutLine.trim() && z > 0.6
+        ? ` · ${step.withoutLine.trim()}`
+        : "");
+
+    /* ── the altitude ── */
+    const chip = $("flyChip");
+    chip.textContent = z < 0.98 ? "pull back" : "come in close";
+    chip.classList.toggle("accent", z < 0.98);
+    rail.setAttribute("aria-valuenow", String(Math.round(z * 100)));
+    rail.setAttribute("aria-valuetext", nextWords(span));
+    $("railMarks").innerHTML =
+      stops
+        .map(
+          (s) => `<span class="rail-tick" style="left:${s.z * 100}%"></span>`,
+        )
+        .join("") +
+      stops
+        .map((s, i) =>
+          showStop.has(i)
+            ? `<span class="ov-stop hand" style="left:${s.z * 100}%;transform:${
+                i === 0
+                  ? "translateX(-2px)"
+                  : i === stops.length - 1
+                    ? "translateX(calc(-100% + 2px))"
+                    : "translateX(-50%)"
+              };color:var(${Math.abs(s.z - z) < 0.03 ? "--accent" : "--muted"})">${s.label}</span>`
+            : "",
+        )
+        .join("");
+    $("ring").style.left = `calc(${z * 100}% - 6.5px)`;
+    wrap.classList.toggle("ov-letting", letting);
+  }
+
+  /* ── the hand on the drawing ── */
+
+  const toSvg = (cx, cy) => {
+    const m = svg.getScreenCTM();
+    if (!m) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = cx;
+    pt.y = cy;
+    const p = pt.matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  };
+  const vOf = (y) => {
+    const { H, PT, PB } = dims;
+    const PH = H - PT - PB;
+    return (PT + PH / 2 - y) / (PH / 2 / 10.6);
+  };
+  svg.addEventListener("pointerdown", (e) => {
+    const g = e.target.closest?.("[data-grab]");
+    if (!g || e.button !== 0 || !writable() || !open) return;
+    e.preventDefault();
+    halt();
+    if (introTimer !== null) {
+      window.clearTimeout(introTimer);
+      introTimer = null;
+    }
+    const what = g.getAttribute("data-grab");
+    const move =
+      what === "hurt"
+        ? (y) => ({ hurt: clamp(Math.round(-vOf(y)), 1, 10) })
+        : what === "without"
+          ? (y) => ({ without: clamp(Math.round(vOf(y)), -10, 10) })
+          : (y) => {
+              const i = Number(what.slice(5));
+              return {
+                marks: open.marks.map((m, j) =>
+                  j === i
+                    ? { ...m, level: clamp(Math.round(vOf(y)), 0, 10) }
+                    : m,
+                ),
+              };
+            };
+    try {
+      svg.setPointerCapture(e.pointerId);
+    } catch {}
+    dragging = what;
+    wrap.classList.add("ov-dragging");
+    let last = {};
+    const onMove = (ev) => {
+      const p = toSvg(ev.clientX, ev.clientY);
+      if (!p) return;
+      last = move(p.y);
+      patch(last);
+    };
+    const onUp = () => {
+      try {
+        svg.releasePointerCapture(e.pointerId);
+      } catch {}
+      svg.removeEventListener("pointermove", onMove);
+      svg.removeEventListener("pointerup", onUp);
+      svg.removeEventListener("pointercancel", onUp);
+      dragging = null;
+      wrap.classList.remove("ov-dragging");
+      if (Object.keys(last).length) set(last);
+    };
+    svg.addEventListener("pointermove", onMove);
+    svg.addEventListener("pointerup", onUp);
+    svg.addEventListener("pointercancel", onUp);
+  });
+
+  // ⌘ or ctrl and the wheel (or a pinch) over the drawing go out and in by hand.
+  wrap.addEventListener(
+    "wheel",
+    (e) => {
+      if (!e.metaKey && !e.ctrlKey) return;
+      e.preventDefault();
+      halt();
+      setZ(clamp(z + e.deltaY * 0.0022, 0, 1));
+    },
+    { passive: false },
+  );
+  // Space pulls back and comes in close, unless the reader is writing or pressing something.
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== " " || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (
+      t?.closest?.(
+        "input, textarea, select, button, [contenteditable], [role=slider]",
+      )
+    )
+      return;
+    e.preventDefault();
+    fly(z < 0.98 ? 1 : 0);
+  });
+  $("flyChip").addEventListener("click", () => fly(z < 0.98 ? 1 : 0));
+  rail.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    halt();
+    try {
+      rail.setPointerCapture(e.pointerId);
+    } catch {}
+    const go = (cx) => {
+      const r = rail.getBoundingClientRect();
+      let v = clamp((cx - r.left) / r.width, 0, 1);
+      const near = stops.find((s) => Math.abs(s.z - v) < 0.022);
+      if (near) v = near.z;
+      setZ(v);
+    };
+    go(e.clientX);
+    const onMove = (ev) => go(ev.clientX);
+    const onUp = () => {
+      rail.removeEventListener("pointermove", onMove);
+      rail.removeEventListener("pointerup", onUp);
+      rail.removeEventListener("pointercancel", onUp);
+    };
+    rail.addEventListener("pointermove", onMove);
+    rail.addEventListener("pointerup", onUp);
+    rail.addEventListener("pointercancel", onUp);
+  });
+  rail.addEventListener("keydown", (e) => {
+    const next = stops.find((s) => s.z > z + 0.001);
+    const prev = [...stops].reverse().find((s) => s.z < z - 0.001);
+    const go = {
+      ArrowRight: () => setZ(clamp(z + 0.03, 0, 1)),
+      ArrowUp: () => setZ(clamp(z + 0.03, 0, 1)),
+      ArrowLeft: () => setZ(clamp(z - 0.03, 0, 1)),
+      ArrowDown: () => setZ(clamp(z - 0.03, 0, 1)),
+      PageUp: () => next && fly(next.z),
+      PageDown: () => prev && fly(prev.z),
+      Home: () => fly(0),
+      End: () => fly(1),
+      " ": () => fly(z < 0.98 ? 1 : 0),
+    };
+    if (go[e.key]) {
+      e.preventDefault();
+      halt();
+      go[e.key]();
+    }
+  });
+  new ResizeObserver(() => {
+    const t = wrap.offsetWidth < 460;
+    const w = rail.offsetWidth;
+    if (t === tall && w === railW) return;
+    tall = t;
+    railW = w;
+    drawScope();
+  }).observe(wrap);
+  new ResizeObserver(() => {
+    if (rail.offsetWidth === railW) return;
+    railW = rail.offsetWidth;
+    drawScope();
+  }).observe(rail);
+
+  /* ── the fields ── */
+
+  /* A number written in the hand that can be clicked and retyped; it commits on blur or
+     return, and escape leaves it as it was. */
+  function makeNum(input, o) {
+    let text = null;
+    let dropped = false;
+    input.className = "ov-num";
+    input.inputMode = "numeric";
+    input.autocomplete = "off";
+    input.style.fontSize = `${o.size ?? 22}px`;
+    if (o.placeholder) input.placeholder = o.placeholder;
+    const shown = () => {
+      const v = o.get();
+      return text ?? (v === null || v === undefined ? "" : String(v));
+    };
+    const width = () => {
+      input.style.width = `${Math.max(1.3, (shown() || o.placeholder || "").length * 0.58 + 0.7)}em`;
+    };
+    const sync = () => {
+      input.readOnly = !o.writable();
+      input.setAttribute(
+        "aria-label",
+        typeof o.label === "function" ? o.label() : o.label,
+      );
+      if (document.activeElement !== input) input.value = shown();
+      width();
+    };
+    input.addEventListener("focus", () => {
+      if (!o.writable()) return;
+      dropped = false;
+      const v = o.get();
+      text = v === null || v === undefined ? "" : String(v);
+      input.value = text;
+      input.select();
+    });
+    input.addEventListener("input", () => {
+      if (input.readOnly) return;
+      text = input.value;
+      width();
+    });
+    input.addEventListener("blur", () => {
+      if (text !== null && !dropped && text.trim()) {
+        const v = Number(text.replace("−", "-"));
+        if (Number.isFinite(v)) {
+          const c = clamp(
+            Math.round(v),
+            o.min,
+            typeof o.max === "function" ? o.max() : o.max,
+          );
+          if (c !== o.get()) {
+            text = null;
+            o.commit(c);
+          }
+        }
+      }
+      text = null;
+      sync();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") input.blur();
+      if (e.key === "Escape") {
+        dropped = true;
+        input.blur();
+      }
+    });
+    return { sync };
+  }
+
+  const lastsIn = () => (open ? open.lasts / UNIT_MIN[unit] : 0);
+  const nums = [
+    makeNum($("nHurt"), {
+      get: () => open?.hurt ?? null,
+      min: 1,
+      max: 10,
+      label: "How hard at its worst, 1 to 10",
+      writable: () => writable() && status() !== "taken",
+      commit: (hurt) => set({ hurt }),
+    }),
+    makeNum($("nLasts"), {
+      get: () => {
+        const v = lastsIn();
+        return Number.isInteger(v) ? v : Math.round(v * 10) / 10;
+      },
+      min: 1,
+      max: () => Math.floor((60 * 1440) / UNIT_MIN[unit]),
+      label: () => `How long it will last, in ${unit}`,
+      writable: () => writable() && status() !== "taken",
+      commit: (v) => set({ lasts: v * UNIT_MIN[unit] }),
+    }),
+    makeNum($("nWithout"), {
+      get: () => open?.without ?? null,
+      min: -10,
+      max: 10,
+      label:
+        "Where the road without it is by then, -10 to 10; 0 is as it is now",
+      writable,
+      commit: (without) => set({ without }),
+    }),
+    makeNum($("nFelt"), {
+      get: () => open?.felt ?? null,
+      min: 1,
+      max: 10,
+      placeholder: "?",
+      label: "How hard it was at its worst, 1 to 10",
+      writable,
+      commit: (felt) => set({ felt }),
+    }),
+    makeNum($("nFeltLasts"), {
+      get: () => open?.feltLasts ?? null,
+      min: 1,
+      max: 60 * 1440,
+      label: "How long it lasted, in minutes",
+      writable,
+      commit: (feltLasts) => set({ feltLasts }),
+    }),
+  ];
+  let markNums = [];
+  let marksSig = "";
+
+  for (const h of HORIZONS) {
+    const o = document.createElement("option");
+    o.value = String(h);
+    o.textContent = horizonName(h);
+    $("horizon").append(o);
+  }
+  $("unit").addEventListener("change", (e) => {
+    const next = e.target.value;
+    const before = lastsIn();
+    unit = next;
+    set({ lasts: clamp(Math.round(before) * UNIT_MIN[next], 1, 60 * 1440) });
+  });
+  $("horizon").addEventListener("change", (e) => {
+    const next = Number(e.target.value);
+    set({ horizon: next, marks: remark(open.marks, open.horizon, next) });
+  });
+
+  /* text fields: each patches as it is typed and is kept on blur */
+  const text = (id, get, put) => {
+    const el = $(id);
+    el.addEventListener("input", () => {
+      if (el.readOnly) return;
+      put(el.value);
+    });
+    el.addEventListener("blur", commit);
+    return () => {
+      el.readOnly = !writable();
+      if (document.activeElement !== el) el.value = get() ?? "";
+    };
+  };
+  const texts = [
+    text(
+      "fStep",
+      () => open?.step,
+      (v) => {
+        example = false;
+        patch({ step: v });
+      },
+    ),
+    text(
+      "fLife",
+      () => open?.life,
+      (v) => patch({ life: v }),
+    ),
+    text(
+      "fWho",
+      () => open?.who,
+      (v) => patch({ who: v }),
+    ),
+    text(
+      "fWithoutLine",
+      () => open?.withoutLine,
+      (v) => patch({ withoutLine: v }),
+    ),
+    text(
+      "fAfter",
+      () => open?.after,
+      (v) => patch({ after: v }),
+    ),
+    text(
+      "fWhy",
+      () => open?.notToday.find((x) => x.on === today)?.why ?? "",
+      (v) =>
+        patch({
+          notToday: open.notToday.map((x) =>
+            x.on === today ? { ...x, why: v } : x,
+          ),
+        }),
+    ),
+  ];
+
+  function renderMarks() {
+    const sig = open.marks.map((m) => m.when).join("|");
+    if (sig !== marksSig) {
+      marksSig = sig;
+      const ol = $("along");
+      ol.innerHTML = "";
+      markNums = [];
+      open.marks.forEach((m, i) => {
+        const li = document.createElement("li");
+        const when = document.createElement("span");
+        when.className = "when hand";
+        when.textContent = m.when;
+        const n = document.createElement("input");
+        const line = document.createElement("input");
+        line.className = "ov-case hand f-line";
+        line.setAttribute("aria-label", `What is true by ${m.when}`);
+        line.placeholder =
+          i === open.marks.length - 1
+            ? "what is true by then"
+            : "what is true by then — if you know";
+        line.addEventListener("input", () => {
+          if (line.readOnly) return;
+          patch({
+            marks: open.marks.map((x, j) =>
+              j === i ? { ...x, line: line.value } : x,
+            ),
+          });
+        });
+        line.addEventListener("blur", commit);
+        li.append(when, n, line);
+        ol.append(li);
+        const nm = makeNum(n, {
+          get: () => open.marks[i]?.level ?? null,
+          min: 0,
+          max: 10,
+          size: 18,
+          label: `How far above now by ${m.when}, 0 to 10`,
+          writable,
+          commit: (lv) =>
+            set({
+              marks: open.marks.map((x, j) =>
+                j === i ? { ...x, level: lv } : x,
+              ),
+            }),
+        });
+        markNums.push({
+          sync() {
+            nm.sync();
+            line.readOnly = !writable();
+            if (document.activeElement !== line)
+              line.value = open.marks[i]?.line ?? "";
+          },
+        });
+      });
+    }
+    for (const m of markNums) m.sync();
+  }
+
+  function renderHold() {
+    $("holdHint").textContent = letting
+      ? "holding — the life goes while you hold. let go and it stays."
+      : "take it and the clock runs until you say it is over. not today is a hold: you watch what you are letting go of.";
+    const btn = $("hold");
+    btn.classList.toggle("on", letting);
+    const lineEl = btn.querySelector(".ov-hold-line");
+    if (letting && !lineEl)
+      btn.insertAdjacentHTML(
+        "beforeend",
+        `<svg class="ov-hold-line" aria-hidden="true" viewBox="0 0 100 3" preserveAspectRatio="none"><line x1="0" x2="100" y1="1.5" y2="1.5" pathLength="1" vector-effect="non-scaling-stroke"/></svg>`,
+      );
+    if (!letting && lineEl) lineEl.remove();
+    wrap.classList.toggle("ov-letting", letting);
+  }
+
+  /* ── the record ── */
+
+  function rowsHtml(list, isSpec) {
+    return list
+      .slice(0, 24)
+      .map((s, i) => {
+        const st = statusOf(s);
+        const on = kept && specimen === isSpec && open?.slug === s.slug;
+        const metaLine =
+          (st === "taken"
+            ? `taken ${dayWords(s.took ?? s.put)}`
+            : st === "in-it"
+              ? "in it"
+              : `open since ${dayWords(s.put)}`) +
+          (s.notToday.length ? ` · not today ×${s.notToday.length}` : "");
+        const felt =
+          st === "taken" && s.felt !== null
+            ? `<span class="f hand">said ${s.hurt} for ${lastsWords(s.lasts)} · was ${s.felt}${s.feltLasts !== null ? ` for ${lastsWords(s.feltLasts)}` : ""}</span>`
+            : "";
+        return `<li class="ov-row" style="--i:${i}"><button type="button" data-slug="${esc(s.slug)}" data-spec="${isSpec ? 1 : 0}"${on ? ' aria-current="true"' : ""}><span class="meta">${esc(metaLine)}</span><span class="t display">${esc(titleOf(s))}</span>${felt}</button></li>`;
+      })
+      .join("");
+  }
+  let rowsSig = "";
+  function renderRecord() {
+    $("whole").textContent = wholeReadings(tally(mine)).join(" · ");
+    $("wholeSpec").textContent = wholeReadings(tally(SPECIMEN_STEPS)).join(
+      " · ",
+    );
+    const mineHtml = rowsHtml(mine, false);
+    const specHtml = rowsHtml(SPECIMEN_STEPS, true);
+    const sig = mineHtml + specHtml;
+    if (sig !== rowsSig) {
+      // Rows whose words did not change keep their place, so a keystroke does not re-deal the list.
+      const bare = (h) => h.replace(/ aria-current="true"/g, "");
+      const changed = bare(sig) !== bare(rowsSig);
+      rowsSig = sig;
+      if (changed) {
+        $("rowsMine").innerHTML = mineHtml;
+        $("rowsSpec").innerHTML = specHtml;
+      } else {
+        for (const b of document.querySelectorAll(".ov-row button")) {
+          const isSpec = b.dataset.spec === "1";
+          const on =
+            kept && specimen === isSpec && open?.slug === b.dataset.slug;
+          if (on) b.setAttribute("aria-current", "true");
+          else b.removeAttribute("aria-current");
+        }
+      }
+    }
+  }
+  for (const id of ["rowsMine", "rowsSpec"])
+    $(id).addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-slug]");
+      if (!b) return;
+      const isSpec = b.dataset.spec === "1";
+      const s = (isSpec ? SPECIMEN_STEPS : mine).find(
+        (x) => x.slug === b.dataset.slug,
+      );
+      if (s) {
+        load(s, isSpec);
+        $("sheet").scrollIntoView({
+          behavior: reducedMotion() ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    });
+
+  /* ── everything that follows the step ── */
+
+  let sheetSketch = null;
+  function render() {
+    if (!open) return;
+    const st = status();
+    const md = mode();
+    const w = writable();
+
+    $("status").textContent =
+      (specimen ? "the specimen · fiction · " : "") +
+      (!kept
+        ? example
+          ? "an example · write your own step over it"
+          : "a step · not put down yet"
+        : st === "taken"
+          ? `taken · ${dayWords(open.took ?? open.put)}`
+          : st === "in-it"
+            ? `in it · since ${open.took?.slice(11, 16)}`
+            : `a step · put down ${dayWords(open.put)}`);
+    $("newWrap").hidden = !kept;
+    $("newStep").textContent = specimen ? "write your own step" : "a new step";
+    $("newStep").classList.toggle("accent", specimen);
+
+    for (const t of texts) t();
+    for (const n of nums) n.sync();
+    const u = $("unit");
+    u.value = unit;
+    u.disabled = !w || st === "taken";
+    const hz = $("horizon");
+    hz.value = String(open.horizon);
+    hz.disabled = !w;
+    $("withoutSaid").textContent =
+      open.without === 0
+        ? "— as it is now"
+        : open.without > 0
+          ? "above now"
+          : "below now";
+    renderMarks();
+
+    // the choice
+    $("cSpecimen").hidden = !specimen;
+    $("cOpen").hidden = specimen || st !== "open";
+    $("cInIt").hidden = st !== "in-it";
+    $("cTaken").hidden = st !== "taken";
+    $("keep").hidden = kept;
+    renderHold();
+    const letToday = open.notToday.find((x) => x.on === today) ?? null;
+    $("letGoBox").hidden = !(letGo || letToday);
+    const elapsed = elapsedNow();
+    $("inNow").textContent =
+      elapsed === null || elapsed < 1
+        ? "in it, just now"
+        : `in it, ${lastsWords(elapsed)}`;
+    $("inSaid").textContent =
+      `you said ${open.hurt} of 10 for ${lastsWords(open.lasts)}`;
+    for (const id of ["over", "stopClock"]) $(id).disabled = !w;
+    $("feltSaid").textContent = `of 10 · you said ${open.hurt}`;
+    $("feltLastsSaid").textContent =
+      `${open.feltLasts === 1 ? "minute" : "minutes"} · you said ${lastsWords(open.lasts)}`;
+    $("removeWrap").hidden = !(kept && w);
+    $("remove").textContent = sure
+      ? "take it off the record — sure?"
+      : "take it off the record";
+    $("remove").classList.toggle("accent", sure);
+    $("trouble").hidden = !trouble;
+    $("trouble").textContent = trouble ?? "";
+
+    // the desk
+    const words = open.step.trim()
+      ? readings({ ...open, put: open.put || today })
+      : [];
+    $("reading").textContent = words.length
+      ? words.join(" · ")
+      : "write the step, and the reading begins";
+    renderRecord();
+    $("keptWhere").textContent = specimen
+      ? "fiction, like the rest of the specimen"
+      : "kept in this browser only — nothing is sent anywhere";
+
+    sheetSketch?.reseed(
+      `overview-${specimen ? "spec-" : ""}${open.slug || "fresh"}`,
+    );
+    drawScope();
+  }
+
+  /* ── wiring ── */
+
+  $("newStep").addEventListener("click", () => fresh(mine.length === 0));
+  $("ownStep").addEventListener("click", () => fresh(mine.length === 0));
+  $("newAfter").addEventListener("click", () => fresh());
+  $("take").addEventListener("click", take);
+  $("keep").addEventListener("click", keep);
+  $("over").addEventListener("click", over);
+  $("stopClock").addEventListener("click", stopClock);
+  $("remove").addEventListener("click", () => {
+    if (sure) remove();
+    else {
+      sure = true;
+      render();
+    }
+  });
+  const hold = $("hold");
+  hold.addEventListener("pointerdown", (e) => {
+    if (e.button === 0) startHold();
+  });
+  hold.addEventListener("pointerup", cancelHold);
+  hold.addEventListener("pointerleave", cancelHold);
+  hold.addEventListener("pointercancel", cancelHold);
+  hold.addEventListener("contextmenu", (e) => e.preventDefault());
+  hold.addEventListener("keydown", (e) => {
+    if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+      e.preventDefault();
+      startHold();
+    }
+  });
+  hold.addEventListener("keyup", (e) => {
+    if (e.key === " " || e.key === "Enter") cancelHold();
+  });
+
+  // The clock runs while the reader is in it.
+  window.setInterval(() => {
+    if (open && status() === "in-it") {
+      clock = Date.now();
+      render();
+    }
+  }, 5000);
+
+  sheetSketch = sketch($("sheet"), { seed: "overview-fresh", draw: true });
+  sketch($("pReading"), { seed: "overview-reading", draw: true });
+  sketch($("pRecord"), { seed: "overview-record", draw: true });
+  sketch($("pLaws"), { seed: "overview-laws", draw: true });
+  sketch($("pSources"), { seed: "overview-sources", draw: true });
+  sketch($("railLine"), { kind: "underline", seed: "ov-rail" });
+
+  // Opens on the reader's own step still going; with none of their own, on the specimen.
+  tall = wrap.offsetWidth < 460;
+  railW = rail.offsetWidth;
+  const going = mine.find((s) => statusOf(s) !== "taken");
+  if (going) load(going);
+  else if (mine.length) fresh();
+  else load(SPECIMEN_STEPS[0], true);
+</script>

@@ -1,0 +1,3091 @@
+<title>Provenance</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="How did this reach you? The hands a claim came through, what each one said and what each one gains, drawn solid only where you checked. Never whether it is so."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a chain of custody drawn on bone paper. Ink is the reader's own hand: solid where
+     they checked. Rust is the first saying and anything that turned. Everything else is ink let
+     down. The two palettes are niwa's paper and sumi. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d71;
+    --rule: #e2ded5;
+    --rule-2: #cdc7ba;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #847d70;
+      --rule: #302e25;
+      --rule-2: #46433a;
+      --accent: #d9763f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #847d70;
+    --rule: #302e25;
+    --rule-2: #46433a;
+    --accent: #d9763f;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: var(--ink);
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 1160px;
+    margin-inline: auto;
+  }
+  .label,
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .meta.acc,
+  .acc-t {
+    color: var(--accent);
+  }
+  .meta.low {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .small {
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 40px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .card-index {
+    margin: 0;
+    padding: 18px 22px 16px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .card-index dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 0 14px;
+  }
+  .card-index dt {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 10px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .card-index dd {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.45;
+    padding: 8px 0 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .card-index dt:first-of-type,
+  .card-index dd:first-of-type {
+    border-top: 0;
+  }
+  .card-index dd.never {
+    color: var(--accent);
+  }
+
+  /* lede */
+  .lede {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 56px 40px;
+  }
+  .lede .body {
+    max-width: 64ch;
+  }
+  .claim {
+    font-size: clamp(22px, 2.7vw, 27px);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.1em;
+  }
+
+  /* buttons */
+  .go {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  .lk {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: none;
+    border: 0;
+    padding: 2px 0;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .lk:hover {
+    color: var(--ink);
+  }
+  .lk.warn {
+    color: var(--accent);
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--faint);
+    transition:
+      color 180ms var(--ease),
+      border-color 180ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--rule-2);
+  }
+  .chip.on.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .x {
+    background: none;
+    border: 0;
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+
+  /* fields */
+  .f {
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 6px 9px;
+    min-width: 0;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  .f.hand {
+    font-style: italic;
+  }
+  .f:hover:not([readonly]):not(:disabled) {
+    border-color: var(--rule-2);
+  }
+  .f:focus-visible {
+    outline: 2px solid transparent;
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+  .f::placeholder {
+    color: var(--faint);
+  }
+  .f[readonly] {
+    background: transparent;
+  }
+  textarea.f {
+    width: 100%;
+    resize: vertical;
+    display: block;
+  }
+  .f.mono-s {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11.5px;
+  }
+  .f.bad {
+    border-color: var(--accent);
+  }
+  select.f {
+    font-family: var(--mono);
+    font-size: 11px;
+    max-width: 9.5rem;
+    padding: 6px 6px;
+  }
+  .r2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .grow {
+    flex: 1 1 10rem;
+  }
+  .day {
+    width: 6.8rem;
+  }
+
+  /* the bench: the sheet and the desk */
+  .bench {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 28px;
+    align-items: start;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule-2);
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+  }
+  .panel > :where(:not(.sk)) {
+    position: relative;
+    z-index: 1;
+  }
+  .sk {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .sk .ink {
+    fill: var(--pen);
+  }
+  .sk.acc .ink {
+    fill: var(--accent);
+  }
+  .mk {
+    fill: none;
+    stroke: white;
+  }
+  .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1000ms var(--ease) 160ms both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes settle {
+    from {
+      transform: translateY(-14px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+
+  .sheet {
+    padding: 14px 16px 18px;
+  }
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px 14px;
+  }
+  .sheet-head .ttl {
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .cap {
+    position: absolute;
+    top: 42px;
+    right: 18px;
+    margin: 0;
+    z-index: 4 !important;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--accent);
+    pointer-events: none;
+    animation: fade 220ms var(--ease) both;
+  }
+  .banner {
+    margin: 14px 0 4px;
+    padding: 12px 14px;
+    border-left: 2px solid var(--accent);
+    background: var(--wash);
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 18px;
+  }
+  .banner p {
+    margin: 0;
+    flex: 1 1 22rem;
+    font-size: 15.5px;
+    line-height: 1.45;
+  }
+  .banner b {
+    font-weight: 500;
+  }
+
+  /* the chain */
+  .chain {
+    width: 100%;
+    margin-top: 6px;
+  }
+  .chain svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .c-line {
+    fill: var(--ink);
+  }
+  .c-end {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    fill: var(--faint);
+  }
+  .c-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12.5px;
+    fill: var(--muted);
+  }
+  .c-name.on {
+    fill: var(--ink);
+    font-size: 13.5px;
+  }
+  .c-name.o {
+    fill: var(--accent);
+  }
+  .c-name.none {
+    fill: var(--faint);
+  }
+  .c-chan {
+    font-family: var(--mono);
+    font-size: 7.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    fill: var(--faint);
+  }
+  .c-day {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 11px;
+    fill: var(--faint);
+  }
+  .c-empty {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    fill: var(--faint);
+  }
+  .chain text {
+    pointer-events: none;
+  }
+  .c-origin {
+    fill: var(--accent);
+    fill-opacity: 0.15;
+    stroke: var(--accent);
+    stroke-width: 1.4;
+  }
+  .c-origin-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 0.9;
+    stroke-opacity: 0.6;
+  }
+  .c-hollow {
+    fill: var(--surface);
+    stroke: var(--faint);
+    stroke-width: 1.1;
+    stroke-dasharray: 3 2.5;
+  }
+  .c-you {
+    fill: var(--ink);
+    fill-opacity: 0.9;
+    stroke: var(--ink);
+    stroke-width: 0.8;
+  }
+  .c-turn {
+    fill: var(--surface);
+    stroke: var(--accent);
+    stroke-width: 1.3;
+  }
+  .c-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.2;
+  }
+  .c-box {
+    fill: var(--surface);
+  }
+  .c-box.solid {
+    fill: var(--ink);
+    fill-opacity: 0.88;
+  }
+  .c-edge {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1;
+    stroke-dasharray: 2.5 2;
+  }
+  .c-edge.solid {
+    stroke: var(--ink);
+    stroke-dasharray: none;
+  }
+  .c-edge.on {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+  }
+  .c-hit {
+    fill: transparent;
+  }
+  .p-mark {
+    cursor: pointer;
+  }
+  .p-mark path,
+  .p-mark rect {
+    transition:
+      fill 220ms var(--ease),
+      fill-opacity 220ms var(--ease),
+      stroke 220ms var(--ease);
+  }
+  .p-mark:hover .c-name {
+    fill: var(--ink);
+  }
+  .settle {
+    animation: settle 460ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    animation-delay: calc(var(--i, 0) * 60ms + 380ms);
+  }
+  .key {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 18px;
+    margin: 2px 0 14px;
+  }
+  .key span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .key i {
+    display: inline-block;
+    width: 12px;
+    height: 9px;
+    border: 1px dashed var(--faint);
+  }
+  .key i.s {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .key i.r {
+    width: 9px;
+    border: 1.3px solid var(--accent);
+    border-radius: 50%;
+  }
+
+  /* the two wordings */
+  .two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .two .panel {
+    padding: 12px 12px 14px;
+  }
+  .two .row-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 31px;
+  }
+  .two .row-head .f {
+    width: 11rem;
+    font-size: 13.5px;
+    padding: 3px 8px;
+  }
+  .two textarea {
+    margin-top: 8px;
+    font-size: 16px;
+  }
+  .census {
+    margin: 8px 0 0;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--faint);
+  }
+
+  /* hand to hand */
+  .h2h {
+    margin-top: 22px;
+  }
+  .h2h ol {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .wrow {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 10px;
+    align-items: baseline;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    padding: 5px 6px;
+    transition: background-color 160ms var(--ease);
+  }
+  button.wrow:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .wrow.on {
+    background: var(--wash);
+  }
+  div.wrow {
+    cursor: default;
+  }
+  .wrow .wl {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    overflow-wrap: anywhere;
+  }
+  .wrow .wl.o {
+    color: var(--accent);
+  }
+  .wrow .wl.y {
+    color: var(--ink);
+  }
+  .wrow .wt {
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.38;
+  }
+  .drift {
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--faint);
+    padding: 1px 6px 1px 26px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+  }
+  .drift .g {
+    color: var(--accent);
+  }
+  .drift s {
+    color: var(--muted);
+    text-decoration-color: var(--rule-2);
+  }
+  .turned {
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--accent);
+    padding: 0 6px 2px calc(8rem + 16px);
+  }
+
+  /* how you know it · what would settle it */
+  .settle-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 22px;
+    margin-top: 22px;
+  }
+  .settle-row textarea {
+    margin-top: 12px;
+    font-size: 15px;
+  }
+  .hint {
+    margin: 6px 0 0;
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: var(--faint);
+  }
+  .checks {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .ck-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ck-bot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 5px 0 0 18px;
+  }
+  .ck-bot .f {
+    flex: 1 1 12rem;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+  }
+  .dot.held {
+    background: var(--ink);
+  }
+  .dot.fell {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .dot.cannot {
+    background: var(--faint);
+  }
+
+  /* the desk */
+  .desk {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  .desk .panel {
+    padding: 14px 16px 16px;
+  }
+  .row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .desk .search {
+    width: 100%;
+    margin-top: 8px;
+    font-style: normal;
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+  .list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .lrow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: 4px;
+    padding: 3px 6px;
+    transition: background-color 160ms var(--ease);
+  }
+  .lrow:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .lrow.on {
+    background: var(--wash);
+  }
+  .lrow .t {
+    flex: 1;
+    min-width: 0;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lrow .mk-h {
+    flex: none;
+    width: 10px;
+    height: 8px;
+    border: 1px dashed var(--ink);
+    transform: translateY(-1px);
+  }
+  .lrow .mk-h.s {
+    background: var(--ink);
+    border-style: solid;
+  }
+  .lrow .mk-h.r {
+    border-color: var(--accent);
+  }
+  .lrow .meta {
+    flex: none;
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .card .sub {
+    margin-top: 16px;
+  }
+  .card .f {
+    font-size: 14.5px;
+  }
+  .card textarea.f {
+    margin-top: 6px;
+  }
+  .card .note-own {
+    margin: 6px 0 0;
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .card ul {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .turn-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .turn-row .f {
+    flex: 1;
+    font-size: 13.5px;
+    padding: 4px 8px;
+  }
+  .turn-row .f.b {
+    color: var(--accent);
+  }
+  .q-row .f {
+    flex: 1;
+  }
+  .q-ans {
+    margin: 4px 0 0 16px;
+    width: calc(100% - 16px);
+    font-size: 13.5px !important;
+    color: var(--accent) !important;
+  }
+  .reading ul {
+    margin: 8px 0 0;
+    padding: 0 0 0 16px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .reading li {
+    margin-bottom: 5px;
+  }
+  .reading li::marker {
+    color: var(--faint);
+  }
+  .howread {
+    margin: 0;
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  /* coda */
+  .coda {
+    border-top: 1px solid var(--rule-2);
+    margin-top: 64px;
+    padding-top: 48px;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+  }
+  .coda .last {
+    font-size: clamp(22px, 2.8vw, 28px);
+    line-height: 1.38;
+    letter-spacing: -0.01em;
+    max-width: 34ch;
+  }
+  .limits {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 64ch;
+  }
+  .limits li {
+    margin-bottom: 8px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .settle,
+    .rise,
+    .cap {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      padding-top: 44px;
+    }
+    .lede,
+    .coda {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+    .two,
+    .settle-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .sheet {
+      padding: 12px 10px 16px;
+    }
+    .wrow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .turned {
+      padding-left: 6px;
+    }
+    .cap {
+      top: auto;
+      bottom: 10px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="mast-top">
+        <p class="label" style="margin: 0">
+          Center for Applied Post-Phenomenology · Instrument
+        </p>
+        <button class="chip" id="theme" type="button" aria-label="Toggle theme">
+          sumi
+        </button>
+      </div>
+      <h1>Provenance</h1>
+      <p class="deck">
+        <em>How did this reach you?</em> The hands a claim came through, what
+        each one said, and what each one gains.
+      </p>
+    </div>
+    <figure class="card-index" aria-label="What the instrument is for">
+      <dl>
+        <dt>For</dt>
+        <dd>How a claim reached you, hand by hand.</dd>
+        <dt>Do</dt>
+        <dd>
+          Put the claim down as it arrived and as first said. Name each hand
+          with its day, wording, link and interests. Mark the hands you checked
+          yourself. Name a check and say how it went.
+        </dd>
+        <dt>Reads</dt>
+        <dd>
+          The chain, solid only where checked; what each wording gained and
+          lost; the words the claim leans on.
+        </dd>
+        <dt>Never</dt>
+        <dd class="never">Says whether it is so.</dd>
+      </dl>
+    </figure>
+  </header>
+
+  <section class="lede">
+    <div class="rail"><span class="label">The claim</span></div>
+    <div class="body">
+      <p class="claim">
+        Whether a claim is so is not something an instrument can know, and one
+        that pretended to would be a horoscope with a straight face. What you
+        can know is how it reached you: every hand it passed through, what each
+        one said, on what channel and on what day, what each gains if you
+        believe it, and what it runs on.
+      </p>
+      <p>
+        Put the claim down in the words it arrived in, and as it was first said
+        if you can find that. Name the hands in between. The sheet draws the
+        chain from the first saying to you. A hand is drawn solid only where you
+        went to it and checked it yourself, and hollow where you took it on
+        trust. Then the wordings are read back as words: what each one gained
+        and lost on the way, and which words the claim leans on. Nothing here
+        decides.
+      </p>
+      <p class="small">
+        It opens on a specimen: an invented claim about remote work that reached
+        an invented person through four hands. Press <b>n</b> to put down one of
+        your own. What you write is kept in this browser and goes nowhere else.
+      </p>
+    </div>
+  </section>
+
+  <section class="bench" aria-label="The provenance">
+    <div class="sheet panel rise" id="sheet">
+      <div class="sheet-head">
+        <span class="ttl" id="ttl">a claim</span>
+        <span class="meta" id="counts"></span>
+        <span class="meta" id="status" style="margin-left: auto"></span>
+      </div>
+      <p class="cap" id="cap" hidden></p>
+
+      <div class="banner" id="banner" hidden>
+        <p>
+          <b>Specimen.</b> A claim about remote work that reached a synthetic
+          life through four hands. Every hand, quote, gain and check is fiction,
+          there to show the instrument. It is read-only. Press a hand on the
+          chain to put it on the desk.
+        </p>
+        <button class="go" type="button" data-act="begin">
+          Begin your own · n
+        </button>
+      </div>
+
+      <div class="chain" id="chain"></div>
+      <div class="key meta low" aria-hidden="true">
+        <span><i class="s"></i>solid · checked by you, or seen</span>
+        <span><i></i>hollow · taken on trust</span>
+        <span><i class="r"></i>a ring on the line · the wording turned</span>
+      </div>
+
+      <div class="two">
+        <div class="panel" id="pOrigin">
+          <div class="row-head">
+            <span class="meta acc">the first saying · as first said</span>
+            <input
+              class="f hand"
+              id="originWho"
+              data-f="originWho"
+              placeholder="who said it first"
+              aria-label="Who said it first"
+              autocomplete="off"
+            />
+          </div>
+          <textarea
+            class="f hand"
+            id="origin"
+            data-f="origin"
+            rows="5"
+            maxlength="4000"
+            aria-label="The first saying"
+            placeholder="the claim in the first hand's own words, if you can find them — the sentence in the paper, the line in the report, the number as it was given. leave it blank if you cannot see that far back."
+          ></textarea>
+        </div>
+        <div class="panel" id="pClaim">
+          <div class="row-head">
+            <span class="meta">the claim · as it reached you</span>
+          </div>
+          <textarea
+            class="f hand"
+            id="claim"
+            data-f="claim"
+            rows="5"
+            maxlength="4000"
+            aria-label="The claim as it reached you"
+            placeholder="the claim as you would say it now, in the words it arrived in. not what you think is true — what reached you."
+          ></textarea>
+          <p class="census hand" id="census" hidden></p>
+        </div>
+      </div>
+
+      <div class="h2h" id="h2h"></div>
+
+      <div class="settle-row">
+        <div>
+          <div class="meta">how you know it</div>
+          <div class="chips" id="knowing"></div>
+          <textarea
+            class="f hand"
+            id="note"
+            data-f="note"
+            rows="3"
+            maxlength="4000"
+            aria-label="A note"
+            placeholder="a note — what you make of the chain, in your own words"
+          ></textarea>
+        </div>
+        <div>
+          <div class="meta">
+            what would settle it
+            <button
+              class="lk"
+              type="button"
+              data-act="addCheck"
+              id="addCheck"
+              style="margin-left: 8px"
+            >
+              + a check
+            </button>
+          </div>
+          <p class="hint" id="noChecks" hidden>
+            nothing named yet. a document to find, a number to look up, a person
+            who could be asked — or say it cannot be.
+          </p>
+          <ul class="checks" id="checks"></ul>
+        </div>
+      </div>
+    </div>
+
+    <aside class="desk rise" style="animation-delay: 140ms">
+      <div>
+        <div class="row-between">
+          <label class="meta" for="search" id="nClaims">the claims</label>
+          <button class="lk" type="button" data-act="begin">new · n</button>
+        </div>
+        <input
+          class="f search"
+          id="search"
+          placeholder="a claim, a hand  /"
+          autocomplete="off"
+        />
+        <ul class="list" id="claims"></ul>
+      </div>
+
+      <section class="panel card" id="card" aria-label="The hand" hidden>
+        <div id="cardIn"></div>
+      </section>
+
+      <section class="panel reading" id="pReading" aria-label="The reading">
+        <div class="meta">the reading</div>
+        <ul id="reading"></ul>
+      </section>
+
+      <section id="hands" aria-label="The hands"></section>
+
+      <section id="file" aria-label="Where it is kept"></section>
+
+      <p class="howread">
+        how it is read: nothing here says whether the claim is so. the chain is
+        the hands you can name between the first saying and you, drawn solid
+        where you checked a hand yourself or saw with your own eyes, and hollow
+        where you did not; the wordings are compared as words, the census counts
+        the usual ones, and the interests are what you wrote about each hand. a
+        check settles what it settles and nothing more.
+      </p>
+      <p class="meta low" style="margin: 0">/ find · n new · h a hand · esc</p>
+    </aside>
+  </section>
+
+  <section class="coda">
+    <div class="rail"><span class="label">Coda</span></div>
+    <div class="body">
+      <p class="last">
+        Solid is a mark you make, not a thing the page can see. It means you
+        went to the hand and read what it said for yourself. Everything else
+        reached you on trust, which is how most of what anyone knows reaches
+        them.
+      </p>
+      <p class="label" style="margin-top: 40px">Honest limits</p>
+      <ul class="limits">
+        <li>
+          The census is a fixed list of English words in seven families. A
+          wording can lean hard without any of them, and a careful one can use
+          them honestly. It counts; it does not judge.
+        </li>
+        <li>
+          The drift compares words, not meanings. A faithful paraphrase still
+          shows words gained and lost, and a turn that keeps the words but
+          changes the sense shows nothing.
+        </li>
+        <li>
+          The chain is the hands you can name. The ones you cannot remember are
+          not on it, and they are usually the feed.
+        </li>
+        <li>
+          What you write is kept in this browser's storage and nowhere else.
+          Clearing site data clears it, and another browser will not see it.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Provenance · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  const KEY = "pp-provenance";
+  const SPEC = "specimen";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  // ── hand-drawn strokes (niwa lib/hand.ts): deterministic for a seed ─────
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // A pen line laid over a panel, re-drawn only when the panel changes size.
+  const SK = new WeakMap();
+  let skN = 0;
+  const skRO = new ResizeObserver((entries) => {
+    for (const e of entries) {
+      const el = e.target;
+      const s = SK.get(el);
+      if (!s || (el.offsetWidth === s.w && el.offsetHeight === s.h)) continue;
+      drawSketch(el, s.seed, s.cls, false);
+    }
+  });
+  function sketch(el, seed, cls = "", draw = true) {
+    const s = SK.get(el);
+    if (s && s.seed === seed && s.w) return;
+    drawSketch(el, seed, cls, draw);
+    skRO.observe(el);
+  }
+  function drawSketch(el, seed, cls, draw) {
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    SK.set(el, { seed, cls, w, h });
+    const old = el.querySelector(":scope > svg.sk");
+    if (old) old.remove();
+    if (!w || !h) return;
+    const sd = seedOf(seed);
+    const line = roughRect(w, h, sd);
+    const ink = ribbon(line, 1.7, sd);
+    const id = `sk${++skN}`;
+    const mask = draw
+      ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path class="mk draw" d="${line}" pathLength="1" stroke-width="7.4" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>`
+      : "";
+    el.insertAdjacentHTML(
+      "afterbegin",
+      `<svg class="sk ${cls}" aria-hidden="true" viewBox="0 0 ${w} ${h}">${mask}<path class="ink" d="${ink}"${draw ? ` mask="url(#${id})"` : ""}/></svg>`,
+    );
+  }
+
+  // ── days (niwa lib/chronology.ts) ─────────────────────────────────────
+  const DAY_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
+  const MON = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  function validDay(s) {
+    if (typeof s !== "string") return false;
+    const m = DAY_RE.exec(s);
+    if (!m) return false;
+    const y = +m[1];
+    if (y < 1000 || y > 2999) return false;
+    if (m[2]) {
+      const mo = +m[2];
+      if (mo < 1 || mo > 12) return false;
+      if (m[3]) {
+        const d = +m[3];
+        if (d < 1 || d > new Date(Date.UTC(y, mo, 0)).getUTCDate())
+          return false;
+      }
+    }
+    return true;
+  }
+  function formatDay(day) {
+    const m = DAY_RE.exec(day);
+    if (!m) return day;
+    if (m[3]) return `${+m[3]} ${MON[+m[2] - 1]} ${m[1]}`;
+    if (m[2]) return `${MON[+m[2] - 1]} ${m[1]}`;
+    return `c. ${m[1]}`;
+  }
+
+  // ── the provenance (niwa lib/provenance.ts) ───────────────────────────
+  // How a claim reached the reader, never whether it is true. A hand is drawn solid only where
+  // the reader marks that they checked it themselves, or where the channel is their own eyes.
+  const CHANNELS = [
+    "feed",
+    "post",
+    "press",
+    "text",
+    "talk",
+    "search",
+    "model",
+    "own",
+    "other",
+  ];
+  const CHANNEL_LABEL = {
+    feed: "a feed",
+    post: "a post",
+    press: "the press",
+    text: "a text",
+    talk: "someone said",
+    search: "a search",
+    model: "a model",
+    own: "my own eyes",
+    other: "somewhere else",
+  };
+  const KNOWINGS = ["saw", "told", "read", "worked-out", "seems"];
+  const KNOWING_LABEL = {
+    saw: "I saw it",
+    told: "I was told",
+    read: "I read it",
+    "worked-out": "I worked it out",
+    seems: "it seems so",
+  };
+  const WENT = ["", "held", "fell", "cannot"];
+  const WENT_LABEL = {
+    "": "not yet",
+    held: "it held",
+    fell: "it fell",
+    cannot: "cannot be checked",
+  };
+
+  const emptyHop = () => ({
+    id: uid(),
+    who: "",
+    channel: "post",
+    where: "",
+    day: null,
+    said: "",
+    link: "",
+    checked: null,
+    gains: "",
+    runsOn: "",
+    record: "",
+    reframed: null,
+    turns: [],
+    asked: [],
+  });
+  const emptyProvenance = (today) => ({
+    slug: "",
+    title: "",
+    claim: "",
+    origin: "",
+    originWho: "",
+    knowing: [],
+    hops: [],
+    checks: [],
+    note: "",
+    recorded: today,
+    touched: today,
+  });
+
+  // the wordings, read as facts
+  const FAMILIES = [
+    "certainty",
+    "absolutes",
+    "urgency",
+    "sides",
+    "authority",
+    "reframe",
+    "heat",
+  ];
+  const FAMILY_LABEL = {
+    certainty: "certainty",
+    absolutes: "absolutes",
+    urgency: "urgency",
+    sides: "sides",
+    authority: "unnamed authority",
+    reframe: "reframing",
+    heat: "heat",
+  };
+  const PATTERN = {
+    certainty:
+      /\b(obviously|clearly|undeniabl\w*|no doubt|the truth is|the fact is|proven|proof|definitely|without question|it is known|unquestionabl\w*|100 ?%|guaranteed|plain and simple|period)\b/gi,
+    absolutes:
+      /\b(always|never|everyone knows|everybody knows|everyone|everybody|nobody|no one|every single|all of them|none of them|the only)\b/gi,
+    urgency:
+      /\b(breaking|urgent\w*|right now|act now|before it'?s too late|wake up|hurry|last chance|immediately|must (?:see|read|watch|know)|you need to (?:see|know|hear)|this changes everything|time is running out)\b/gi,
+    sides:
+      /\b(they don'?t want you|the elites?|the establishment|the mainstream media|the media|msm|sheeple|normies|us (?:vs|versus) them|our people|those people|the other side|globalists|the regime|the system|big (?:tech|pharma|media))\b/gi,
+    authority:
+      /\b(studies show|research shows|science says|experts (?:say|agree|warn)|scientists (?:say|agree|warn)|sources say|people are saying|it has been reported|according to sources|insiders say|many are saying|data shows|the numbers don'?t lie|a (?:new )?study found)\b/gi,
+    reframe:
+      /\b(so-called|what this really means|in other words|basically|let that sink in|read between the lines|make no mistake|the real (?:story|reason|question|issue)|actually means|translation:|which is to say)\b/gi,
+    heat: /\b(outrag\w*|disgust\w*|shocking|terrifying|insane|unbelievable|disgrace\w*|scandal\w*|horrif\w*|destroy\w*|exposed|slammed|humiliat\w*|devastat\w*|catastroph\w*|nightmare)\b/gi,
+  };
+  const ATTRIBUTED =
+    /\b(according to|citing|cites?|sourced? (?:to|from)|as reported by|as .{2,40}? (?:said|wrote|put it|reports?|found)|per )\b/gi;
+  const NOT_NAMES = new Set(
+    "I I'm I've I'd I'll The A An And But Or If So It Its This That These Those There Here What Which Who When Where Why How Not No Yes You Your We Our They Their He She His Her My Me Us Them Is Are Was Were Be Been Do Does Did Have Has Had Will Would Can Could Should May Might Must Just Also Even Still Only Then Than As At By For From In Into Of On To With Because While After Before Every Some Any All Most Many Much More Very Too One Two Three Everyone Everybody Nobody Breaking Wake Act".split(
+      " ",
+    ),
+  );
+
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+
+  function census(text) {
+    const hits = {};
+    let n = 0;
+    for (const fam of FAMILIES) {
+      const seen = new Set();
+      for (const m of text.matchAll(PATTERN[fam])) seen.add(m[1].toLowerCase());
+      hits[fam] = [...seen];
+      n += hits[fam].length;
+    }
+    const attributed = [...text.matchAll(ATTRIBUTED)].length;
+    const named = new Set();
+    for (const s of sentencesOf(text)) {
+      const words = s.split(/\s+/);
+      for (let i = 1; i < words.length; i++) {
+        const w = words[i].replace(/^[("'“‘]+|[)"'”’.,;:!?]+$/g, "");
+        if (
+          /^[A-Z][A-Za-z'’.-]{1,}$/.test(w) &&
+          !NOT_NAMES.has(w) &&
+          !/^[A-Z]+$/.test(w)
+        )
+          named.add(w);
+        else if (/^@[A-Za-z0-9_]{2,}$/.test(w)) named.add(w);
+      }
+    }
+    return {
+      hits,
+      n,
+      attributed,
+      named: [...named].slice(0, 8),
+      sentences: sentencesOf(text).length,
+    };
+  }
+
+  const list = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+
+  function censusWords(c) {
+    return FAMILIES.filter((f) => c.hits[f].length)
+      .map(
+        (f) =>
+          `${FAMILY_LABEL[f]} ×${c.hits[f].length} (${c.hits[f].slice(0, 4).join(", ")})`,
+      )
+      .join(" · ");
+  }
+
+  // a smaller stop list than usual: the hedges a reframe removes are the substance of the change
+  const STOP = new Set(
+    "a an the and or but if then than that this these those there here it its i i'm i've i'd my me we our you your he she they them their his her is are was were be been being am do does did done have has had not no nor so as at by for from in into of on to with about over under after before again once also very too just when where why how what which who whom whose because while during through between out up down off".split(
+      " ",
+    ),
+  );
+  function wordsOf(text) {
+    const m = new Map();
+    for (const raw of text.toLowerCase().split(/[^a-z0-9'’%-]+/)) {
+      const w = raw.replace(/^['’-]+|['’-]+$/g, "");
+      if (!w || STOP.has(w)) continue;
+      if (!/\d/.test(w) && w.length < 3) continue;
+      m.set(w, (m.get(w) ?? 0) + 1);
+    }
+    return m;
+  }
+  function gainedLost(next, prev) {
+    const a = wordsOf(next);
+    const b = wordsOf(prev);
+    // a number that fell out of a claim is the classic turn, so numbers come first
+    const num = (w) => (/\d/.test(w) ? 1 : 0);
+    const pick = (x, y) =>
+      [...x.entries()]
+        .filter(([w]) => !y.has(w))
+        .sort(
+          (p, q) =>
+            q[1] - p[1] ||
+            num(q[0]) - num(p[0]) ||
+            q[0].length - p[0].length ||
+            p[0].localeCompare(q[0]),
+        )
+        .map(([w]) => w)
+        .slice(0, 12);
+    return { gained: pick(a, b), lost: pick(b, a) };
+  }
+  function wordings(p) {
+    const out = [];
+    if (p.origin.trim())
+      out.push({
+        at: "origin",
+        label: p.originWho.trim() || "the first saying",
+        text: p.origin.trim(),
+      });
+    for (const h of p.hops)
+      if (h.said.trim())
+        out.push({
+          at: h.id,
+          label: h.who.trim() || CHANNEL_LABEL[h.channel],
+          text: h.said.trim(),
+        });
+    if (p.claim.trim())
+      out.push({ at: "you", label: "as it reached you", text: p.claim.trim() });
+    return out;
+  }
+  function driftAlong(p) {
+    const ws = wordings(p);
+    const out = [];
+    for (let i = 0; i + 1 < ws.length; i++) {
+      const { gained, lost } = gainedLost(ws[i + 1].text, ws[i].text);
+      out.push({ from: ws[i].at, to: ws[i + 1].at, gained, lost });
+    }
+    return out;
+  }
+  function drift(p) {
+    if (!p.origin.trim() || !p.claim.trim()) return { gained: [], lost: [] };
+    return gainedLost(p.claim, p.origin);
+  }
+
+  /** Solid: the reader marked that they checked this hand themselves, or it is their own eyes. */
+  const checkedHop = (h) => h.checked !== null || h.channel === "own";
+
+  function tally(p) {
+    const t = {
+      hands: p.hops.length,
+      dated: 0,
+      first: null,
+      checked: 0,
+      reframed: 0,
+      turns: 0,
+      gains: 0,
+      runsOn: 0,
+      record: 0,
+      asked: 0,
+      answered: 0,
+      checks: 0,
+      held: 0,
+      fell: 0,
+      cannot: 0,
+      byChannel: {},
+    };
+    for (const h of p.hops) {
+      if (h.day && validDay(h.day)) {
+        t.dated++;
+        if (!t.first || h.day < t.first) t.first = h.day;
+      }
+      if (checkedHop(h)) t.checked++;
+      if (h.reframed === true) t.reframed++;
+      if (h.gains.trim()) t.gains++;
+      if (h.runsOn.trim()) t.runsOn++;
+      if (h.record.trim()) t.record++;
+      for (const q of h.asked) {
+        t.asked++;
+        if (q.answer.trim()) t.answered++;
+      }
+      t.turns += h.turns.length;
+      t.byChannel[h.channel] = (t.byChannel[h.channel] ?? 0) + 1;
+    }
+    for (const c of p.checks) {
+      t.checks++;
+      if (c.went === "held") t.held++;
+      else if (c.went === "fell") t.fell++;
+      else if (c.went === "cannot") t.cannot++;
+    }
+    return t;
+  }
+
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+  /** Facts about the provenance. None of them is a verdict on the claim. */
+  function readings(p) {
+    const out = [];
+    if (!p.claim.trim() && !p.hops.length && !p.origin.trim())
+      return [
+        "put the claim in your own words, as it reached you. then name the hands it came through — the last one first, if that is the one you remember.",
+      ];
+    const t = tally(p);
+    if (p.knowing.length)
+      out.push(
+        `you know it because: ${list(p.knowing.map((k) => KNOWING_LABEL[k].toLowerCase()))}.`,
+      );
+    else out.push("you have not said how you know it.");
+    if (t.hands) {
+      const hands = p.hops.map(
+        (h) =>
+          `${CHANNEL_LABEL[h.channel]}${h.who.trim() ? ` (${h.who.trim()}${h.where.trim() ? `, ${h.where.trim()}` : ""})` : h.where.trim() ? ` (${h.where.trim()})` : ""}`,
+      );
+      out.push(
+        `${plural(t.hands, "hand")} between the first saying and you: ${list(hands)}.`,
+      );
+      out.push(
+        `${t.dated} of ${t.hands} dated${t.first ? `, the first ${formatDay(t.first)}` : ""} · ${t.checked} checked by you or seen with your own eyes, ${t.hands - t.checked} not — what is not checked is drawn hollow.`,
+      );
+    } else
+      out.push(
+        "no hands named yet — the claim arrived from nowhere you have said.",
+      );
+    if (p.origin.trim())
+      out.push(
+        p.originWho.trim()
+          ? `the first saying is ${p.originWho.trim()}'s, in their words.`
+          : "the first saying is written down; who said it first is not.",
+      );
+    else
+      out.push(
+        "the first saying is not written down — the chain begins somewhere you cannot yet see.",
+      );
+    const d = drift(p);
+    if (d.gained.length || d.lost.length) {
+      const parts = [];
+      if (d.gained.length)
+        parts.push(`gained ${list(d.gained.slice(0, 6).map((w) => `'${w}'`))}`);
+      if (d.lost.length)
+        parts.push(`lost ${list(d.lost.slice(0, 6).map((w) => `'${w}'`))}`);
+      out.push(
+        `between the first saying and what reached you, the claim ${parts.join(" and ")}.`,
+      );
+    }
+    if (t.hands)
+      out.push(
+        `you marked ${plural(t.reframed, "hand")} as turning the wording${t.turns ? `; ${plural(t.turns, "turn")} noted` : ""}.`,
+      );
+    if (p.claim.trim()) {
+      const c = census(p.claim);
+      const words = censusWords(c);
+      out.push(
+        `as it reached you it ${words ? `leans on ${words}` : "leans on none of the usual words"}; it ${c.attributed ? `says where it got this ${plural(c.attributed, "time")}` : "does not say where it got this"}${c.named.length ? ` and names ${list(c.named.slice(0, 4))}` : " and names no one"}.`,
+      );
+    }
+    const loudest = p.hops
+      .filter((h) => h.said.trim())
+      .map((h) => ({ h, c: census(h.said) }))
+      .sort((a, b) => b.c.n - a.c.n)[0];
+    if (loudest && loudest.c.n)
+      out.push(
+        `of the hands, ${loudest.h.who.trim() || CHANNEL_LABEL[loudest.h.channel]} leans hardest: ${censusWords(loudest.c)}.`,
+      );
+    if (t.hands)
+      out.push(
+        `${t.gains} of ${t.hands} hands have what they gain named; ${t.runsOn} have what they run on; ${t.record} have a record noted · ${plural(t.asked, "question")} put${t.answered ? `, ${t.answered} answered` : ""}.`,
+      );
+    if (t.checks) {
+      const done = t.held + t.fell + t.cannot;
+      out.push(
+        `${plural(t.checks, "check")} named: ${done ? `${done} made — ${[t.held ? `${t.held} held` : "", t.fell ? `${t.fell} fell` : "", t.cannot ? `${t.cannot} cannot be` : ""].filter(Boolean).join(", ")}` : "none made yet"}${t.checks - done > 0 ? `; ${t.checks - done} still to make` : ""}.`,
+      );
+    } else
+      out.push(
+        "no check named — what would settle it, and who could be asked?",
+      );
+    return out;
+  }
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "claim"}`;
+  }
+  function titleOf(p) {
+    if (p.title.trim()) return p.title.trim();
+    const first = sentencesOf(p.claim)[0] ?? "";
+    return first.replace(/[.!?]$/, "").slice(0, 80) || "a claim";
+  }
+
+  // validation at the boundary: what comes back out of storage is read the way niwa read a file
+  const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const obj = (v) =>
+    v && typeof v === "object" && !Array.isArray(v) ? v : null;
+  const arrOf = (v, n, fn) =>
+    Array.isArray(v)
+      ? v
+          .slice(0, n)
+          .map(fn)
+          .filter((y) => y !== null)
+      : [];
+  function questionOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const text = str(x.text, 300);
+    if (!text) return null;
+    return { id: str(x.id, 24) || uid(), text, answer: str(x.answer, 2000) };
+  }
+  function turnOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const was = str(x.was, 300);
+    const became = str(x.became, 300);
+    if (!was || !became) return null;
+    return { id: str(x.id, 24) || uid(), was, became };
+  }
+  function checkedOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const on = str(x.on, 10);
+    return { on: validDay(on) ? on : "", found: str(x.found, 600) };
+  }
+  function hopOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const who = str(x.who, 120);
+    const said = str(x.said, 2000);
+    const where = str(x.where, 120);
+    if (!who && !said && !where && !str(x.link, 600)) return null;
+    const d = str(x.day, 10);
+    return {
+      id: str(x.id, 24) || uid(),
+      who,
+      channel: CHANNELS.includes(x.channel) ? x.channel : "other",
+      where,
+      day: validDay(d) ? d : null,
+      said,
+      link: str(x.link, 600),
+      checked: checkedOf(x.checked),
+      gains: str(x.gains, 600),
+      runsOn: str(x.runsOn, 600),
+      record: str(x.record, 1000),
+      reframed:
+        x.reframed === true ? true : x.reframed === false ? false : null,
+      turns: arrOf(x.turns, 12, turnOf),
+      asked: arrOf(x.asked, 12, questionOf),
+    };
+  }
+  function checkOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const text = str(x.text, 300);
+    if (!text) return null;
+    const on = str(x.on, 10);
+    return {
+      id: str(x.id, 24) || uid(),
+      text,
+      how: str(x.how, 300),
+      went: WENT.includes(x.went) ? x.went : "",
+      on: validDay(on) ? on : null,
+    };
+  }
+  function provOf(v) {
+    const x = obj(v);
+    if (!x) return null;
+    const slug = str(x.slug, 90);
+    if (!/^[a-z0-9][a-z0-9-]{0,88}$/.test(slug) || slug === SPEC) return null;
+    const recorded = str(x.recorded, 10);
+    const touched = str(x.touched, 10);
+    const p = {
+      slug,
+      title: str(x.title, 120),
+      claim: str(x.claim, 4000),
+      origin: str(x.origin, 4000),
+      originWho: str(x.originWho, 120),
+      knowing: Array.isArray(x.knowing)
+        ? [...new Set(x.knowing.filter((k) => KNOWINGS.includes(k)))]
+        : [],
+      hops: arrOf(x.hops, 24, hopOf),
+      checks: arrOf(x.checks, 24, checkOf),
+      note: str(x.note, 4000),
+      recorded: validDay(recorded) ? recorded : "",
+      touched: validDay(touched) ? touched : validDay(recorded) ? recorded : "",
+    };
+    return worthKeeping(p) ? p : null;
+  }
+  const worthKeeping = (p) =>
+    !!(p.claim.trim() || p.origin.trim() || p.hops.length);
+
+  // ── the specimen: niwa's Specimen A. Every hand, quote, gain and check is fiction ──
+  const SPECIMEN = {
+    slug: SPEC,
+    title: "Remote workers are always the first to go",
+    claim:
+      "Remote workers are always the first to go when a company cuts — everyone knows it, the data shows it.",
+    origin:
+      "In a survey of 412 managers at firms with more than 200 staff, 31% said an employee's location would be one factor among several in any future reduction.",
+    originWho: "a consultancy's annual workplace survey (2024)",
+    knowing: ["read", "told"],
+    hops: [
+      {
+        id: "ha1",
+        who: "a business desk",
+        channel: "press",
+        where: "a national paper",
+        day: "2024-11",
+        said: "Remote staff first in line for cuts, survey finds. A new survey has found that remote workers could be first in line when companies cut staff, with nearly a third of managers saying location would be a factor.",
+        link: "",
+        checked: null,
+        gains: "the headline gets the click; the desk is measured on clicks",
+        runsOn: "advertising and subscriptions",
+        record: "",
+        reframed: true,
+        turns: [
+          {
+            id: "ta1",
+            was: "one factor among several",
+            became: "first in line",
+          },
+        ],
+        asked: [],
+      },
+      {
+        id: "ha2",
+        who: "@officeguy",
+        channel: "post",
+        where: "x.com",
+        day: "2025-02",
+        said: "They're coming for remote work. Wake up. Nobody who WFH is safe — a new study found remote workers are ALWAYS first to be cut. Let that sink in.",
+        link: "https://x.com/officeguy/status/1",
+        checked: {
+          on: "2026-09-18",
+          found:
+            "the post as quoted, and under it: “My Presence Playbook is 40% off this week.”",
+        },
+        gains: "sells a 'presence playbook' course; the post links to it",
+        runsOn: "course sales · 140k followers",
+        record:
+          "said the same about 'quiet quitting' in 2023; the study he cited then was a poll of 80 people",
+        reframed: true,
+        turns: [
+          {
+            id: "ta2",
+            was: "could be first in line",
+            became: "ALWAYS first to be cut",
+          },
+        ],
+        asked: [
+          {
+            id: "qa1",
+            text: "who paid for the survey he calls a study?",
+            answer: "",
+          },
+          {
+            id: "qa2",
+            text: "did he link the survey, or the paper's headline about it?",
+            answer: "the paper",
+          },
+        ],
+      },
+      {
+        id: "ha3",
+        who: "the For You feed",
+        channel: "feed",
+        where: "x.com",
+        day: "2025-02",
+        said: "",
+        link: "",
+        checked: null,
+        gains: "keeps me scrolling",
+        runsOn: "attention, sold as ads",
+        record: "",
+        reframed: null,
+        turns: [],
+        asked: [],
+      },
+      {
+        id: "ha4",
+        who: "Dana, at lunch",
+        channel: "talk",
+        where: "the office",
+        day: "2026-03",
+        said: "Remote is over. Everyone knows the numbers — first to go.",
+        link: "",
+        checked: null,
+        gains: "",
+        runsOn: "",
+        record: "",
+        reframed: false,
+        turns: [],
+        asked: [],
+      },
+    ],
+    checks: [
+      {
+        id: "ca1",
+        text: "find the survey and read the question as it was asked",
+        how: "the consultancy publishes it as a PDF; look for 'one factor among several'",
+        went: "held",
+        on: "2026-09-20",
+      },
+      {
+        id: "ca2",
+        text: "find one firm that cut this year and what it said about location",
+        how: "a filing or the firm's own note, not a report of one",
+        went: "",
+        on: null,
+      },
+    ],
+    note: "The 31% survived the whole way. 'One factor among several' did not.",
+    recorded: "2026-09-19",
+    touched: "2026-09-20",
+  };
+
+  // ── state ─────────────────────────────────────────────────────────────
+  const S = {
+    provs: [], // the reader's claims, newest touched first
+    slug: null, // SPEC, a reader's slug, or null for a fresh one not yet kept
+    draft: null,
+    selected: null,
+    query: "",
+    sure: null, // "hand" | "file"
+    theme: "",
+    openKey: 0,
+    chainFor: -1,
+    drawn: new Set(),
+  };
+  const writable = () => !!S.draft && S.slug !== SPEC;
+
+  function loadStore() {
+    const empty = { provs: [], open: null, theme: "" };
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return empty;
+      const j = obj(JSON.parse(raw));
+      if (!j) return empty;
+      return {
+        provs: arrOf(j.provs, 200, provOf).sort((a, b) =>
+          a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
+        ),
+        open: typeof j.open === "string" ? j.open : null,
+        theme: j.theme === "light" || j.theme === "dark" ? j.theme : "",
+      };
+    } catch {
+      return empty;
+    }
+  }
+  function writeStore() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({ v: 1, provs: S.provs, open: S.slug, theme: S.theme }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ── saying and keeping ────────────────────────────────────────────────
+  let capT = null;
+  function say(msg) {
+    clearTimeout(capT);
+    const el = $("cap");
+    el.hidden = true;
+    void el.offsetWidth;
+    el.textContent = `— ${msg}`;
+    el.hidden = false;
+    capT = setTimeout(() => (el.hidden = true), 2600);
+  }
+  let keptT = null;
+  function flashKept(ok) {
+    clearTimeout(keptT);
+    $("status").textContent = ok ? "kept" : "not kept";
+    $("status").style.color = ok ? "" : "var(--accent)";
+    keptT = setTimeout(renderStatus, 1600);
+  }
+
+  let saveT = null;
+  function scheduleSave() {
+    clearTimeout(saveT);
+    saveT = setTimeout(save, 700);
+  }
+  function keepNow() {
+    clearTimeout(saveT);
+    save();
+  }
+  function save() {
+    clearTimeout(saveT);
+    saveT = null;
+    const d = S.draft;
+    if (!writable() || !worthKeeping(d)) return;
+    const today = todayStr();
+    if (!d.slug) {
+      const taken = new Set(S.provs.map((x) => x.slug));
+      const base = slugOf(
+        titleOf(d),
+        validDay(d.recorded) ? d.recorded : today,
+      );
+      let slug = base;
+      let n = 2;
+      while (taken.has(slug)) slug = `${base}-${n++}`;
+      d.slug = slug;
+    }
+    d.recorded = validDay(d.recorded) ? d.recorded : today;
+    d.touched = today;
+    const kept = provOf(clone(d));
+    if (!kept) return;
+    S.provs = [kept, ...S.provs.filter((x) => x.slug !== kept.slug)];
+    S.slug = d.slug;
+    flashKept(writeStore());
+    renderClaims();
+    renderFile();
+  }
+  addEventListener("pagehide", () => {
+    if (saveT) save();
+  });
+
+  // ── opening ───────────────────────────────────────────────────────────
+  function open(slug) {
+    if (saveT) save();
+    const p = slug === SPEC ? SPECIMEN : S.provs.find((x) => x.slug === slug);
+    if (!p) return;
+    S.slug = p.slug;
+    S.draft = clone(p);
+    S.selected = null;
+    S.sure = null;
+    S.openKey++;
+    writeStore();
+    renderAll();
+  }
+  function begin() {
+    if (saveT) save();
+    S.slug = null;
+    S.draft = emptyProvenance(todayStr());
+    S.selected = null;
+    S.sure = null;
+    S.openKey++;
+    renderAll();
+    $("claim").focus({ preventScroll: true });
+    $("sheet").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function letGo() {
+    const d = S.draft;
+    if (!writable() || !d.slug) return;
+    S.provs = S.provs.filter((x) => x.slug !== d.slug);
+    S.sure = null;
+    clearTimeout(saveT);
+    saveT = null;
+    S.slug = null;
+    writeStore();
+    open(S.provs[0] ? S.provs[0].slug : SPEC);
+    say("let go of the claim.");
+  }
+
+  // ── the hands ─────────────────────────────────────────────────────────
+  const hopById = (id) => S.draft.hops.find((h) => h.id === id);
+  function addHop(where) {
+    if (!writable()) return;
+    const h = emptyHop();
+    S.draft.hops =
+      where === "before" ? [h, ...S.draft.hops] : [...S.draft.hops, h];
+    S.selected = h.id;
+    S.sure = null;
+    renderDerived();
+    renderCard(true);
+    const who = $("cardIn").querySelector('[data-f="h-who"]');
+    if (who) who.focus({ preventScroll: true });
+    revealCard();
+  }
+  function select(id) {
+    S.selected = S.selected === id ? null : id;
+    S.sure = null;
+    renderChain();
+    renderDrift();
+    renderHands();
+    renderCard(true);
+    if (S.selected) revealCard();
+  }
+  function revealCard() {
+    const r = $("card").getBoundingClientRect();
+    if (r.top > innerHeight - 80 || r.bottom < 0)
+      $("card").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── drawing the chain ─────────────────────────────────────────────────
+  // Across the sheet from the first saying to the reader; down it on a narrow screen, where a
+  // line across has no room for the hands' names.
+  function renderChain() {
+    const el = $("chain");
+    const d = S.draft;
+    if (!d) return;
+    const W = Math.max(280, Math.round(el.clientWidth || 900));
+    const n = d.hops.length;
+    const vert = W < 560;
+    const fresh = S.chainFor !== S.openKey;
+    if (fresh) S.drawn = new Set();
+    const hasOrigin = !!d.origin.trim();
+    const originName = hasOrigin ? d.originWho.trim() || "as first said" : "not yet written";
+    const youName = `you · ${formatDay(todayStr())}`;
+    const bw = 22;
+    const bh = 16;
+    const CW = 6.6; // a character of the hand's name, near enough
+    const CM = 5.3; // a character of the mono channel line
+
+    // where everything sits
+    const LX = 30;
+    let H, A, B, xs, rows, LY, gap;
+    if (vert) {
+      const top = 30;
+      const step = 58;
+      A = [LX, top];
+      B = [LX, top + step * (n + 1)];
+      H = B[1] + 28;
+      xs = d.hops.map((_, i) => [LX, top + step * (i + 1)]);
+    } else {
+      const X0 = Math.max(54, Math.round(W * 0.09));
+      const X1 = W - X0;
+      gap = (X1 - X0) / (n + 1);
+      const stag = n > 3 && gap < 112;
+      LY = stag ? 100 : 74;
+      H = LY + 74;
+      A = [X0, LY];
+      B = [X1, LY];
+      xs = d.hops.map((_, i) => [X0 + gap * (i + 1), LY]);
+      // staggered, the hands nearest the ends go above, clear of the ends' names
+      rows = d.hops.map((_, i) => stag && (i % 2 === 0 || i === n - 1));
+    }
+
+    const r = rand(seedOf("prov-line"));
+    const ld = stroke(A, B, r, 1.6, 4);
+    const ink = ribbon(ld, 2.2, seedOf("prov-ink"));
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="The chain of hands from the first saying to you: ${n} ${n === 1 ? "hand" : "hands"}, ${tally(d).checked} checked">`;
+    s += `<defs><mask id="p-line-mask" maskUnits="userSpaceOnUse" x="${Math.min(A[0], B[0]) - 20}" y="${Math.min(A[1], B[1]) - 20}" width="${Math.abs(B[0] - A[0]) + 40}" height="${Math.abs(B[1] - A[1]) + 40}"><path class="mk${fresh ? " draw" : ""}" d="${ld}" pathLength="1" stroke-width="8" stroke-linecap="round"/></mask></defs>`;
+    s += `<path class="c-line" d="${ink}" mask="url(#p-line-mask)"/>`;
+
+    // the first saying, and you
+    if (hasOrigin) {
+      s += `<path class="c-origin" d="${roughEllipse(18, 18, seedOf("prov-origin"), { pad: 0, steps: 14, wobble: 1.4 })}" transform="translate(${A[0] - 9} ${A[1] - 9})"/>`;
+      s += `<path class="c-origin-ring" d="${roughEllipse(26, 26, seedOf("prov-origin-ring"), { pad: 0, steps: 14, wobble: 1.6 })}" transform="translate(${A[0] - 13} ${A[1] - 13})"/>`;
+    } else {
+      s += `<path class="c-hollow" d="${roughEllipse(18, 18, seedOf("prov-origin-hollow"), { pad: 0, steps: 14, wobble: 1.4 })}" transform="translate(${A[0] - 9} ${A[1] - 9})"/>`;
+    }
+    s += `<path class="c-you" d="${roughEllipse(14, 14, seedOf("prov-you"), { pad: 0, steps: 12 })}" transform="translate(${B[0] - 7} ${B[1] - 7})"/>`;
+    const oCls = `c-name ${hasOrigin ? "o" : "none"}`;
+    let endHalf = 0;
+    if (vert) {
+      const room = Math.floor((W - LX - 34) / CW);
+      s += `<text class="${oCls}" x="${LX + 28}" y="${A[1] + 1}">${esc(short(originName, room))}</text>`;
+      s += `<text class="c-end" x="${LX + 28}" y="${A[1] + 15}">the first saying</text>`;
+      s += `<text class="c-name" x="${LX + 28}" y="${B[1] + 1}">${esc(youName)}</text>`;
+      s += `<text class="c-end" x="${LX + 28}" y="${B[1] + 15}">reached you</text>`;
+    } else {
+      const endY = rows.some(Boolean) ? LY - 70 : LY - 34;
+      const oName = short(originName, 22);
+      endHalf = (Math.max(oName.length, youName.length) * CW) / 2;
+      s += `<text class="c-end" x="${A[0]}" y="${endY}" text-anchor="middle">the first saying</text>`;
+      s += `<text class="c-end" x="${B[0]}" y="${endY}" text-anchor="middle">reached you</text>`;
+      s += `<text class="${oCls}" x="${A[0]}" y="${LY + 34}" text-anchor="middle">${esc(oName)}</text>`;
+      s += `<text class="c-name" x="${B[0]}" y="${LY + 34}" text-anchor="middle">${esc(youName)}</text>`;
+    }
+
+    // the hands
+    d.hops.forEach((h, i) => {
+      const [x, y] = xs[i];
+      const on = h.id === S.selected;
+      const solid = checkedHop(h);
+      const settle = !S.drawn.has(h.id);
+      S.drawn.add(h.id);
+      const where = h.where.trim();
+      const day = h.day && validDay(h.day) ? formatDay(h.day) : "";
+      s += `<g class="p-mark${settle ? " settle" : ""}" style="--i:${fresh ? i : 0}" data-act="sel" data-h="${esc(h.id)}">`;
+      if (h.reframed === true) {
+        const [tx, ty] = vert ? [x - 4.5, y - bh / 2 - 15] : [x - bw / 2 - 16, y - 4.5];
+        s += `<path class="c-turn" d="${roughEllipse(9, 9, seedOf(`${h.id}-turn`), { pad: 0, steps: 12, wobble: 1 })}" transform="translate(${tx} ${ty})"/>`;
+      }
+      s += `<rect class="c-box${solid ? " solid" : ""}" x="${x - bw / 2}" y="${y - bh / 2}" width="${bw}" height="${bh}"/>`;
+      s += `<path class="c-edge${solid ? " solid" : ""}${on ? " on" : ""}" d="${roughRect(bw, bh, seedOf(h.id), { wobble: 0.9, overshoot: 2 })}" transform="translate(${x - bw / 2} ${y - bh / 2})"/>`;
+      if (on)
+        s += `<path class="c-ring" d="${roughEllipse(bw + 16, bh + 16, seedOf(`${h.id}-ring`), { pad: 0, steps: 14, wobble: 1.2 })}" transform="translate(${x - bw / 2 - 8} ${y - bh / 2 - 8})"/>`;
+      if (vert) {
+        const room = W - LX - 34;
+        const chan = [CHANNEL_LABEL[h.channel], where, day].filter(Boolean).join(" · ");
+        s += `<text class="c-name${on ? " on" : ""}" x="${LX + 28}" y="${y + 1}">${esc(short(h.who.trim() || "unnamed", Math.floor(room / CW)))}</text>`;
+        s += `<text class="c-chan" x="${LX + 28}" y="${y + 15}">${esc(short(chan, Math.floor(room / CM)))}</text>`;
+        s += `<rect class="c-hit" x="0" y="${y - 26}" width="${W}" height="52"/>`;
+      } else {
+        const above = rows[i];
+        // half the width this hand's label may take: up to its nearest neighbour on its own row
+        let half = Infinity;
+        xs.forEach(([x2], j) => {
+          if (j !== i && rows[j] === above) half = Math.min(half, Math.abs(x2 - x) / 2 - 4);
+        });
+        if (!above) half = Math.min(half, x - A[0] - endHalf - 6, B[0] - x - endHalf - 6);
+        half = Math.max(half, 18);
+        const whoMax = Math.max(5, Math.min(on ? 30 : 18, Math.floor((2 * half) / CW)));
+        const chanMax = Math.max(5, Math.floor((2 * half) / CM));
+        const full = CHANNEL_LABEL[h.channel] + (where ? ` · ${where}` : "");
+        const chan = full.length <= chanMax ? full : short(CHANNEL_LABEL[h.channel], chanMax);
+        const yWho = above ? LY - 22 : LY + 34;
+        const yChan = above ? LY - 36 : LY + 47;
+        const yDay = above ? LY - 49 : LY + 61;
+        s += `<text class="c-name${on ? " on" : ""}" x="${x}" y="${yWho}" text-anchor="middle">${esc(short(h.who.trim() || "unnamed", whoMax))}</text>`;
+        s += `<text class="c-chan" x="${x}" y="${yChan}" text-anchor="middle">${esc(chan)}</text>`;
+        if (day) s += `<text class="c-day" x="${x}" y="${yDay}" text-anchor="middle">${esc(day)}</text>`;
+        const hw = Math.min(Math.max(2 * half, 30), 90);
+        s += `<rect class="c-hit" x="${x - hw / 2}" y="${above ? LY - 62 : LY - 22}" width="${hw}" height="${above ? 72 : 90}"/>`;
+      }
+      s += `</g>`;
+    });
+    if (n === 0) {
+      const msg = writable()
+        ? W < 720
+          ? "name the hands it came through"
+          : "name the hands it came through — the last one first, if that is the one you remember"
+        : "no hands named";
+      s += vert
+        ? `<text class="c-empty" x="${LX + 28}" y="${(A[1] + B[1]) / 2 + 5}">${msg}</text>`
+        : `<text class="c-empty" x="${(A[0] + B[0]) / 2}" y="${LY - 14}" text-anchor="middle">${msg}</text>`;
+    }
+    s += `</svg>`;
+    el.innerHTML = s;
+    S.chainFor = S.openKey;
+  }
+  let chainW = 0;
+  new ResizeObserver(() => {
+    const w = $("chain").clientWidth;
+    if (w && w !== chainW) {
+      chainW = w;
+      renderChain();
+    }
+  }).observe($("chain"));
+
+  // ── the sheet ─────────────────────────────────────────────────────────
+  function renderStatus() {
+    const st = $("status");
+    st.style.color = "";
+    st.textContent =
+      S.slug === SPEC ? "specimen · read-only" : S.slug ? "" : "not yet kept";
+  }
+  function renderHead() {
+    const d = S.draft;
+    $("ttl").textContent = titleOf(d);
+    const t = tally(d);
+    $("counts").textContent =
+      `· ${t.hands} ${t.hands === 1 ? "hand" : "hands"} · ${t.checked} checked`;
+  }
+  function renderCensus() {
+    const d = S.draft;
+    const el = $("census");
+    if (!d.claim.trim()) {
+      el.hidden = true;
+      return;
+    }
+    const c = census(d.claim);
+    const w = censusWords(c);
+    el.hidden = false;
+    el.textContent =
+      (w ? `leans on ${w}` : "leans on none of the usual words") +
+      " · " +
+      (c.attributed
+        ? `says where it got this ${c.attributed}×`
+        : "does not say where it got this") +
+      (c.named.length
+        ? ` · names ${c.named.slice(0, 4).join(", ")}`
+        : " · names no one");
+  }
+  function renderDrift() {
+    const d = S.draft;
+    const ws = wordings(d);
+    const el = $("h2h");
+    if (ws.length < 2) {
+      el.innerHTML = "";
+      return;
+    }
+    const drifts = driftAlong(d);
+    let h = `<div class="meta">hand to hand · what each wording gained and lost</div><ol>`;
+    ws.forEach((w, i) => {
+      const dr = drifts[i - 1];
+      const hop = d.hops.find((x) => x.id === w.at);
+      const on = !!hop && w.at === S.selected;
+      if (dr && (dr.gained.length || dr.lost.length)) {
+        h += `<li class="drift"><span aria-hidden="true">↓</span>`;
+        if (dr.gained.length)
+          h += `<span>gained <span class="g">${esc(dr.gained.slice(0, 6).join(", "))}</span></span>`;
+        if (dr.lost.length)
+          h += `<span>lost <s>${esc(dr.lost.slice(0, 6).join(", "))}</s></span>`;
+        h += `</li>`;
+      }
+      const cls = w.at === "origin" ? "o" : w.at === "you" ? "y" : "";
+      const inner = `<span class="wl ${cls}">${esc(short(w.label, 22))}</span><span class="wt">${esc(w.text)}</span>`;
+      h += `<li>${
+        hop
+          ? `<button type="button" class="wrow${on ? " on" : ""}" data-act="sel" data-h="${esc(hop.id)}" aria-pressed="${on}">${inner}</button>`
+          : `<div class="wrow">${inner}</div>`
+      }`;
+      if (hop && hop.turns.length)
+        h += `<div class="turned">${esc(hop.turns.map((t) => `‘${t.was}’ → ‘${t.became}’`).join(" · "))}</div>`;
+      h += `</li>`;
+    });
+    el.innerHTML = h + `</ol>`;
+  }
+  function chip(label, on, act, data, { acc = false, dis = false } = {}) {
+    return `<button type="button" class="chip${on ? " on" : ""}${acc ? " acc" : ""}" data-act="${act}" ${data} aria-pressed="${on}"${dis ? " disabled" : ""}>${esc(label)}</button>`;
+  }
+  function renderKnowing() {
+    const d = S.draft;
+    $("knowing").innerHTML = KNOWINGS.map((k) =>
+      chip(
+        KNOWING_LABEL[k],
+        d.knowing.includes(k),
+        "knowing",
+        `data-k="${k}"`,
+        {
+          acc: true,
+          dis: !writable(),
+        },
+      ),
+    ).join("");
+  }
+  function renderChecks() {
+    const d = S.draft;
+    const w = writable();
+    const ro = w ? "" : " readonly";
+    $("addCheck").hidden = !w;
+    $("noChecks").hidden = d.checks.length > 0;
+    $("checks").innerHTML = d.checks
+      .map((c) => {
+        let h = `<li><div class="ck-top"><span class="dot ${c.went}" title="${esc(WENT_LABEL[c.went])}" aria-hidden="true"></span>`;
+        h += `<input class="f hand grow" data-f="ck-text" data-c="${esc(c.id)}" value="${esc(c.text)}" placeholder="what would settle it" aria-label="What would settle it"${ro}/>`;
+        if (w)
+          h += `<button type="button" class="x" data-act="rmCheck" data-c="${esc(c.id)}" aria-label="Remove the check">×</button>`;
+        h += `</div><div class="ck-bot"><input class="f hand" data-f="ck-how" data-c="${esc(c.id)}" value="${esc(c.how)}" placeholder="how — where to look, whom to ask" aria-label="How"${ro}/>`;
+        h += WENT.map((x) =>
+          chip(
+            WENT_LABEL[x],
+            c.went === x,
+            "went",
+            `data-c="${esc(c.id)}" data-w="${x}"`,
+            {
+              acc: x === "fell",
+              dis: !w,
+            },
+          ),
+        ).join("");
+        if (c.on) h += `<span class="meta low">${esc(formatDay(c.on))}</span>`;
+        return h + `</div></li>`;
+      })
+      .join("");
+  }
+  function renderFields() {
+    const d = S.draft;
+    const w = writable();
+    for (const id of ["originWho", "origin", "claim", "note"]) {
+      const el = $(id);
+      el.value = d[id];
+      el.readOnly = !w;
+    }
+    $("banner").hidden = S.slug !== SPEC;
+  }
+
+  // ── the desk ──────────────────────────────────────────────────────────
+  function renderClaims() {
+    const q = S.query.trim().toLowerCase();
+    const all = [...S.provs, SPECIMEN];
+    const rows =
+      q.length < 2
+        ? all.slice(0, 8)
+        : all
+            .filter(
+              (p) =>
+                titleOf(p).toLowerCase().includes(q) ||
+                p.claim.toLowerCase().includes(q) ||
+                p.hops.some((h) => h.who.toLowerCase().includes(q)),
+            )
+            .slice(0, 8);
+    $("nClaims").textContent = `the claims · ${S.provs.length}`;
+    $("claims").innerHTML = rows.length
+      ? rows
+          .map((p) => {
+            const on = p.slug === S.slug;
+            const tail =
+              p.slug === SPEC
+                ? "specimen"
+                : `${p.hops.length} ${p.hops.length === 1 ? "hand" : "hands"}`;
+            return `<li><button type="button" class="lrow${on ? " on" : ""}" data-act="open" data-slug="${esc(p.slug)}" aria-current="${on}"><span class="t">${esc(titleOf(p))}</span><span class="meta${p.slug === SPEC ? " acc" : ""}">${tail}</span></button></li>`;
+          })
+          .join("")
+      : `<li class="hint">nothing found.</li>`;
+  }
+  function renderReading() {
+    $("reading").innerHTML = readings(S.draft)
+      .map((w) => `<li>${esc(w)}</li>`)
+      .join("");
+  }
+  function renderHands() {
+    const d = S.draft;
+    const w = writable();
+    if (!d.hops.length && !w) {
+      $("hands").innerHTML = "";
+      return;
+    }
+    let h = `<div class="meta">the hands, first to last`;
+    if (w)
+      h += ` <button type="button" class="lk" data-act="addHop" data-where="before" style="margin-left:8px">+ one before</button> <button type="button" class="lk" data-act="addHop" data-where="after" style="margin-left:8px">+ one after · h</button>`;
+    h += `</div><ul class="list">`;
+    d.hops.forEach((x, i) => {
+      const on = x.id === S.selected;
+      h += `<li><button type="button" class="lrow${on ? " on" : ""}" data-act="sel" data-h="${esc(x.id)}" aria-pressed="${on}"><span class="mk-h${checkedHop(x) ? " s" : ""}${x.reframed ? " r" : ""}" aria-hidden="true"></span><span class="t">${i + 1}. ${esc(x.who.trim() || "unnamed")}<span style="color:var(--faint)"> · ${esc(CHANNEL_LABEL[x.channel])}${x.where.trim() ? ` · ${esc(x.where.trim())}` : ""}</span></span><span class="meta">${x.day && validDay(x.day) ? esc(formatDay(x.day)) : ""}</span></button></li>`;
+    });
+    $("hands").innerHTML = h + `</ul>`;
+  }
+  function renderFile() {
+    const d = S.draft;
+    if (!writable()) {
+      $("file").innerHTML = "";
+      return;
+    }
+    if (!d.slug) {
+      $("file").innerHTML =
+        `<p class="meta low" style="margin:0">kept in this browser once the claim is down, or a hand is named</p>`;
+      return;
+    }
+    const sure = S.sure === "file";
+    $("file").innerHTML =
+      `<p class="meta low" style="margin:0 0 6px">kept in this browser · written ${esc(d.recorded ? formatDay(d.recorded) : "—")}</p><button type="button" class="chip${sure ? " on acc" : ""}" data-act="letGo">${sure ? "yes, let go of the claim" : "let go of the claim"}</button>`;
+  }
+  const isLink = (s) => /^https?:\/\/[^\s]+$/i.test(s.trim());
+  let cardFor = null;
+  function renderCard(resketch) {
+    const card = $("card");
+    const d = S.draft;
+    const h = S.selected ? hopById(S.selected) : null;
+    if (!h) {
+      card.hidden = true;
+      cardFor = null;
+      return;
+    }
+    const w = writable();
+    const ro = w ? "" : " readonly";
+    const dis = { dis: !w };
+    const i = d.hops.indexOf(h);
+    const f = (name, cls, val, ph, label, extra = "") =>
+      `<input class="f ${cls}" data-f="${name}" data-h="${esc(h.id)}" value="${esc(val)}" placeholder="${esc(ph)}" aria-label="${esc(label)}" autocomplete="off"${ro}${extra}/>`;
+    const ta = (name, val, rows, max, ph, label) =>
+      `<textarea class="f hand" data-f="${name}" data-h="${esc(h.id)}" rows="${rows}" maxlength="${max}" placeholder="${esc(ph)}" aria-label="${esc(label)}"${ro}>${esc(val)}</textarea>`;
+    let s = `<div class="row-between"><span class="meta acc">hand ${i + 1} of ${d.hops.length}<span style="color:var(--faint)"> · ${checkedHop(h) ? "checked" : "not checked"}</span></span><button type="button" class="lk" data-act="desel">esc</button></div>`;
+    s += `<div class="r2">${f("h-who", "hand grow", h.who, "who — a name, a handle, a masthead", "Who")}<select class="f" data-f="h-channel" data-h="${esc(h.id)}" aria-label="Channel"${w ? "" : " disabled"}>${CHANNELS.map((c) => `<option value="${c}"${c === h.channel ? " selected" : ""}>${CHANNEL_LABEL[c]}</option>`).join("")}</select></div>`;
+    s += `<div class="r2">${f("h-where", "hand grow", h.where, "where — a host, a room", "Where")}${f("h-day", `mono-s day${h.day && !validDay(h.day) ? " bad" : ""}`, h.day ?? "", "2025-02", "Day, as YYYY, YYYY-MM or YYYY-MM-DD")}</div>`;
+    s += ta(
+      "h-said",
+      h.said,
+      3,
+      2000,
+      "what this hand said — the claim in its wording, verbatim if you can",
+      "What it said",
+    );
+    s += `<div class="r2">${f("h-link", "mono-s grow", h.link, "a link, if there is one", "Link")}${w ? `<a class="lk" id="openLink" href="${isLink(h.link) ? esc(h.link.trim()) : "#"}" target="_blank" rel="noopener noreferrer"${isLink(h.link) ? "" : " hidden"}>open it yourself</a>` : ""}</div>`;
+
+    s += `<div class="meta sub">did you go to it yourself?</div><div class="chips">`;
+    s += chip(
+      "I checked it myself",
+      h.checked !== null,
+      "checked",
+      `data-v="yes"`,
+      { acc: true, ...dis },
+    );
+    s += chip("not checked", h.checked === null, "checked", `data-v="no"`, dis);
+    s += `</div>`;
+    if (h.channel === "own")
+      s += `<p class="note-own">my own eyes — drawn solid; you were there.</p>`;
+    if (h.checked)
+      s += `<div class="r2"><span class="meta acc low">checked${h.checked.on ? ` ${esc(formatDay(h.checked.on))}` : ""}</span>${f("h-found", "hand grow", h.checked.found, "what you found there", "What you found there")}</div>`;
+
+    s += `<div class="meta sub">its interests</div>`;
+    s += `<div class="r2">${f("h-gains", "hand grow", h.gains, "what it gains if you believe this", "What it gains")}</div>`;
+    s += `<div class="r2">${f("h-runsOn", "hand grow", h.runsOn, "what it runs on — who pays it, what it sells", "What it runs on")}</div>`;
+    s += ta(
+      "h-record",
+      h.record,
+      2,
+      1000,
+      "its record — what it said before, and how that went",
+      "Its record",
+    );
+
+    s += `<div class="meta sub">the wording, in this hand</div><div class="chips">`;
+    for (const [v, label] of [
+      [true, "turned"],
+      [false, "kept as it was"],
+      [null, "not said"],
+    ])
+      s += chip(label, h.reframed === v, "reframed", `data-v="${v}"`, {
+        acc: v === true,
+        ...dis,
+      });
+    if (w)
+      s += `<button type="button" class="lk" data-act="addTurn" style="margin-left:6px">+ note a turn</button>`;
+    s += `</div>`;
+    if (h.turns.length) {
+      s += `<ul>`;
+      for (const t of h.turns) {
+        s += `<li class="turn-row"><input class="f hand" data-f="t-was" data-h="${esc(h.id)}" data-t="${esc(t.id)}" value="${esc(t.was)}" placeholder="was" aria-label="Was"${ro}/><span class="meta" aria-hidden="true">→</span><input class="f hand b" data-f="t-became" data-h="${esc(h.id)}" data-t="${esc(t.id)}" value="${esc(t.became)}" placeholder="became" aria-label="Became"${ro}/>`;
+        if (w)
+          s += `<button type="button" class="x" data-act="rmTurn" data-t="${esc(t.id)}" aria-label="Remove the turn">×</button>`;
+        s += `</li>`;
+      }
+      s += `</ul>`;
+    }
+
+    s += `<div class="meta sub">questions to put to it${w ? ` <button type="button" class="lk" data-act="addQ" style="margin-left:8px">+ one</button>` : ""}</div>`;
+    if (!h.asked.length)
+      s += `<p class="hint">who pays it? what does it gain? what did it say last time, and how did that go? whom does it cite?</p>`;
+    else {
+      s += `<ul>`;
+      for (const q of h.asked) {
+        s += `<li><div class="r2 q-row" style="margin:0"><input class="f hand" data-f="q-text" data-h="${esc(h.id)}" data-q="${esc(q.id)}" value="${esc(q.text)}" placeholder="the question" aria-label="The question"${ro}/>`;
+        if (w)
+          s += `<button type="button" class="x" data-act="rmQ" data-q="${esc(q.id)}" aria-label="Remove the question">×</button>`;
+        s += `</div><input class="f hand q-ans" data-f="q-answer" data-h="${esc(h.id)}" data-q="${esc(q.id)}" value="${esc(q.answer)}" placeholder="what you found" aria-label="What you found"${ro}/></li>`;
+      }
+      s += `</ul>`;
+    }
+    if (w) {
+      const sure = S.sure === "hand";
+      s += `<div class="chips" style="margin-top:16px"><button type="button" class="chip${sure ? " on acc" : ""}" data-act="rmHop">${sure ? "yes, take the hand back" : "take it back"}</button></div>`;
+    }
+    $("cardIn").innerHTML = s;
+    card.hidden = false;
+    if (resketch || cardFor !== h.id) sketch(card, `hand-${h.id}`, "acc", true);
+    cardFor = h.id;
+  }
+
+  function renderDerived() {
+    renderHead();
+    renderChain();
+    renderCensus();
+    renderDrift();
+    renderReading();
+    renderHands();
+  }
+  function renderAll() {
+    renderStatus();
+    renderFields();
+    renderKnowing();
+    renderChecks();
+    renderClaims();
+    renderFile();
+    renderCard(false);
+    renderDerived();
+  }
+
+  // ── typing ────────────────────────────────────────────────────────────
+  document.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.id === "search") {
+      S.query = t.value;
+      renderClaims();
+      return;
+    }
+    const fld = t.dataset && t.dataset.f;
+    if (!fld || !writable()) return;
+    const d = S.draft;
+    const v = t.value;
+    const h = t.dataset.h ? hopById(t.dataset.h) : null;
+    if (["claim", "origin", "originWho", "note"].includes(fld)) d[fld] = v;
+    else if (fld === "ck-text" || fld === "ck-how") {
+      const c = d.checks.find((x) => x.id === t.dataset.c);
+      if (c) c[fld === "ck-text" ? "text" : "how"] = v;
+    } else if (h && fld === "h-day") {
+      h.day = v.trim() || null;
+      t.classList.toggle("bad", !!h.day && !validDay(h.day));
+    } else if (h && fld === "h-found") {
+      if (h.checked) h.checked.found = v;
+    } else if (h && fld === "h-link") {
+      h.link = v;
+      const a = $("openLink");
+      if (a) {
+        a.hidden = !isLink(v);
+        a.href = isLink(v) ? v.trim() : "#";
+      }
+    } else if (h && fld.startsWith("h-") && fld !== "h-channel")
+      h[fld.slice(2)] = v;
+    else if (h && (fld === "t-was" || fld === "t-became")) {
+      const x = h.turns.find((y) => y.id === t.dataset.t);
+      if (x) x[fld.slice(2)] = v;
+    } else if (h && (fld === "q-text" || fld === "q-answer")) {
+      const x = h.asked.find((y) => y.id === t.dataset.q);
+      if (x) x[fld === "q-text" ? "text" : "answer"] = v;
+    } else return;
+    renderDerived();
+    scheduleSave();
+  });
+  document.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset && t.dataset.f === "h-channel" && writable()) {
+      const h = hopById(t.dataset.h);
+      if (!h) return;
+      h.channel = t.value;
+      renderDerived();
+      renderCard(false);
+      keepNow();
+    }
+  });
+
+  // ── pressing ──────────────────────────────────────────────────────────
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    const act = b.dataset.act;
+    const d = S.draft;
+    const h = S.selected ? hopById(S.selected) : null;
+    if (act === "begin") return begin();
+    if (act === "open") return open(b.dataset.slug);
+    if (act === "sel") return select(b.dataset.h);
+    if (act === "desel") return select(S.selected);
+    if (act === "theme") return;
+    if (!writable()) return;
+    if (act === "knowing") {
+      const k = b.dataset.k;
+      d.knowing = d.knowing.includes(k)
+        ? d.knowing.filter((x) => x !== k)
+        : [...d.knowing, k];
+      renderKnowing();
+      renderReading();
+      return keepNow();
+    }
+    if (act === "addCheck") {
+      d.checks.push({ id: uid(), text: "", how: "", went: "", on: null });
+      renderChecks();
+      renderReading();
+      const ins = $("checks").querySelectorAll('[data-f="ck-text"]');
+      if (ins.length) ins[ins.length - 1].focus();
+      return;
+    }
+    if (act === "rmCheck") {
+      d.checks = d.checks.filter((x) => x.id !== b.dataset.c);
+      renderChecks();
+      renderReading();
+      return keepNow();
+    }
+    if (act === "went") {
+      const c = d.checks.find((x) => x.id === b.dataset.c);
+      if (!c) return;
+      c.went = b.dataset.w;
+      c.on = c.went ? todayStr() : null;
+      renderChecks();
+      renderReading();
+      return keepNow();
+    }
+    if (act === "addHop") return addHop(b.dataset.where);
+    if (act === "letGo") {
+      if (S.sure === "file") return letGo();
+      S.sure = "file";
+      return renderFile();
+    }
+    if (!h) return;
+    if (act === "rmHop") {
+      if (S.sure !== "hand") {
+        S.sure = "hand";
+        return renderCard(false);
+      }
+      d.hops = d.hops.filter((x) => x.id !== h.id);
+      S.selected = null;
+      S.sure = null;
+      renderCard(false);
+      renderDerived();
+      return keepNow();
+    }
+    if (act === "checked") {
+      h.checked =
+        b.dataset.v === "yes"
+          ? h.checked || { on: todayStr(), found: "" }
+          : null;
+    } else if (act === "reframed") {
+      h.reframed =
+        b.dataset.v === "true" ? true : b.dataset.v === "false" ? false : null;
+    } else if (act === "addTurn") {
+      h.turns.push({ id: uid(), was: "", became: "" });
+    } else if (act === "rmTurn") {
+      h.turns = h.turns.filter((x) => x.id !== b.dataset.t);
+    } else if (act === "addQ") {
+      h.asked.push({ id: uid(), text: "", answer: "" });
+    } else if (act === "rmQ") {
+      h.asked = h.asked.filter((x) => x.id !== b.dataset.q);
+    } else return;
+    renderCard(false);
+    renderDerived();
+    if (act === "addTurn" || act === "addQ") {
+      const sel = act === "addTurn" ? '[data-f="t-was"]' : '[data-f="q-text"]';
+      const ins = $("cardIn").querySelectorAll(sel);
+      if (ins.length) ins[ins.length - 1].focus();
+    }
+    keepNow();
+  });
+
+  // ── keys ──────────────────────────────────────────────────────────────
+  addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const el = e.target;
+    const typing =
+      el &&
+      (el.tagName === "INPUT" ||
+        el.tagName === "TEXTAREA" ||
+        el.tagName === "SELECT" ||
+        el.isContentEditable);
+    if (typing) {
+      if (e.key === "Escape") el.blur();
+      return;
+    }
+    if (e.key === "/") {
+      e.preventDefault();
+      $("search").focus();
+    } else if (e.key === "Escape") {
+      if (S.selected) select(S.selected);
+      S.sure = null;
+      renderFile();
+    } else if (e.key === "n") begin();
+    else if (e.key === "h" && writable()) addHop("after");
+  });
+
+  // ── the theme: niwa's paper and sumi ──────────────────────────────────
+  const dark = matchMedia("(prefers-color-scheme: dark)");
+  function applyTheme() {
+    if (S.theme) document.documentElement.dataset.theme = S.theme;
+    else delete document.documentElement.dataset.theme;
+    const isDark = S.theme ? S.theme === "dark" : dark.matches;
+    $("theme").textContent = isDark ? "paper" : "sumi";
+  }
+  $("theme").addEventListener("click", () => {
+    const isDark = S.theme ? S.theme === "dark" : dark.matches;
+    S.theme = isDark ? "light" : "dark";
+    applyTheme();
+    writeStore();
+  });
+  dark.addEventListener("change", applyTheme);
+
+  // ── boot: opens on the specimen, or on the reader's last claim ────────
+  function boot() {
+    const st = loadStore();
+    S.provs = st.provs;
+    S.theme = st.theme;
+    applyTheme();
+    const slug =
+      st.open && S.provs.some((p) => p.slug === st.open) ? st.open : SPEC;
+    const p = slug === SPEC ? SPECIMEN : S.provs.find((x) => x.slug === slug);
+    S.slug = p.slug;
+    S.draft = clone(p);
+    S.selected = null;
+    S.sure = null;
+    S.openKey++;
+    renderAll();
+  }
+  boot();
+  for (const [id, seed, cls] of [
+    ["sheet", "prov-sheet", ""],
+    ["pOrigin", "origin", "acc"],
+    ["pClaim", "claim", ""],
+    ["pReading", "prov-reading", ""],
+  ])
+    sketch($(id), seed, cls, true);
+</script>

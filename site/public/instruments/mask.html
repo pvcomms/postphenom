@@ -1,0 +1,1882 @@
+<title>Mask</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Write the other side's case as they would put it, to be read by them. Then mark each sentence for what you could mean. Where the mask slips is where you stand."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Ink on bone, after niwa's paper and sumi. The accent is the only colour: it marks the
+     labels of the sheet, the tells that give a writer away, and a sentence refused. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #7f776b;
+    --rule: #e2ded5;
+    --rule-2: #cdc7b9;
+    --accent: #b5532a;
+    --accent-wash: rgba(181, 83, 42, 0.07);
+    --ink-wash: rgba(35, 33, 30, 0.035);
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #8c8577;
+      --rule: #302e25;
+      --rule-2: #4a4639;
+      --accent: #d9763f;
+      --accent-wash: rgba(217, 118, 63, 0.1);
+      --ink-wash: rgba(237, 233, 223, 0.04);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #8c8577;
+    --rule: #302e25;
+    --rule-2: #4a4639;
+    --accent: #d9763f;
+    --accent-wash: rgba(217, 118, 63, 0.1);
+    --ink-wash: rgba(237, 233, 223, 0.04);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    line-height: 1.5;
+  }
+  .meta.acc {
+    color: var(--accent);
+  }
+  .meta.lower {
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .hand {
+    font-style: italic;
+    color: var(--faint);
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .acc {
+    color: var(--accent);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .meta {
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(60px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin-top: 22px;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 32ch;
+  }
+  .claim {
+    font-size: clamp(19px, 2.1vw, 22px);
+    line-height: 1.42;
+    letter-spacing: -0.008em;
+    max-width: 36ch;
+  }
+  .claim + .claim {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  /* the work: a sheet and a desk beside it */
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 24px;
+    margin-top: 32px;
+    scroll-margin-top: 16px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: clamp(20px, 3vw, 30px);
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 18px;
+  }
+  .panel.masked {
+    border-left: 2px solid var(--accent);
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    padding: 5px 11px;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    color: var(--muted);
+    white-space: nowrap;
+    transition:
+      color 200ms var(--ease),
+      border-color 200ms var(--ease),
+      background-color 200ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip.acc:not(:disabled):hover {
+    background: var(--accent-wash);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 4px 9px;
+    border: 1px dashed var(--accent);
+    border-radius: 2px;
+  }
+
+  /* fields: hairline underneath, never a box */
+  .line,
+  .case {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule-2);
+    border-radius: 0;
+    padding: 4px 0;
+    color: var(--ink);
+    transition: border-color 220ms var(--ease);
+  }
+  .line:hover,
+  .case:hover {
+    border-bottom-color: var(--faint);
+  }
+  .line:focus-visible,
+  .case:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-bottom-color: var(--ink);
+  }
+  .line[readonly],
+  .case[readonly] {
+    border-bottom-color: var(--rule);
+    resize: none;
+  }
+  .line::placeholder,
+  .case::placeholder {
+    color: var(--faint);
+    font-style: italic;
+  }
+  .case {
+    display: block;
+    margin-top: 10px;
+    font-size: 17px;
+    line-height: 1.62;
+    resize: vertical;
+    min-height: 6.5em;
+    field-sizing: content;
+  }
+  .case.big {
+    font-size: clamp(23px, 2.8vw, 28px);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    min-height: 2.6em;
+  }
+  .case.short {
+    min-height: 4.5em;
+  }
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .two .line {
+    margin-top: 4px;
+    font-size: 16px;
+  }
+  .row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 18px;
+  }
+
+  /* the matter */
+  .matter {
+    margin-top: 12px;
+    max-width: 40rem;
+    font-size: clamp(26px, 3.2vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .sides {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 28px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+  .sides label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .sides .line {
+    width: auto;
+    max-width: 100%;
+    font-size: 15px;
+    padding: 1px 0;
+  }
+  .census {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--faint);
+  }
+  .census .hand {
+    font-family: var(--serif);
+    font-size: 14px;
+  }
+
+  /* the sentences of the mask, each marked: ink for mean it, muted for could, accent strike for refused */
+  .sentences {
+    margin-top: 6px;
+  }
+  .sent {
+    display: grid;
+    grid-template-columns: 10px minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    align-items: start;
+    padding: 9px 8px;
+    border-radius: 3px;
+    transition: background-color 160ms var(--ease);
+  }
+  .sent:hover {
+    background: var(--ink-wash);
+  }
+  .sent + .sent {
+    border-top: 1px solid var(--rule);
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    margin-top: 8px;
+    border-radius: 50%;
+    border: 1px dashed var(--ink);
+    transition:
+      background-color 200ms var(--ease),
+      border-color 200ms var(--ease);
+  }
+  .sent[data-mark] .dot {
+    border-style: solid;
+  }
+  .sent[data-mark="mean"] .dot {
+    background: var(--ink);
+  }
+  .sent[data-mark="refuse"] .dot {
+    border-color: var(--accent);
+  }
+  .sent .t {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .sent[data-mark="could"] .t {
+    color: var(--muted);
+  }
+  .sent[data-mark="refuse"] .t {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1px;
+  }
+
+  /* an adherent's reading */
+  .tells {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .tell {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .tell .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+  }
+  .q {
+    font-style: italic;
+    font-size: 17px;
+  }
+  .hollow {
+    color: var(--muted);
+    border-bottom: 1px dashed var(--rule-2);
+  }
+  .x {
+    margin-left: auto;
+    background: none;
+    border: 0;
+    padding: 0 4px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+  .instead {
+    margin-top: 2px;
+    padding-left: 16px;
+    font-size: 15px;
+    color: var(--muted);
+    border-bottom-color: transparent;
+  }
+  .missing {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .missing li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 15.5px;
+    line-height: 1.5;
+  }
+  .missing li span {
+    flex: 1;
+    min-width: 0;
+  }
+  .add {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .add .line {
+    flex: 1 1 14rem;
+    font-size: 15px;
+  }
+  select.chip {
+    padding-right: 8px;
+  }
+
+  /* the list of masks */
+  .list {
+    margin-top: 8px;
+  }
+  .list li + li {
+    border-top: 1px solid var(--rule);
+  }
+  .list button {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+    width: 100%;
+    padding: 10px 8px;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-radius: 3px;
+    transition: background-color 160ms var(--ease);
+  }
+  .list button:hover {
+    background: var(--ink-wash);
+  }
+  .list .ti {
+    font-size: 19px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .list button:hover .ti {
+    color: var(--accent);
+  }
+
+  /* the desk */
+  .desk ul.plain {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .desk .refused li {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--accent);
+  }
+  .how {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    counter-reset: how;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .how li {
+    counter-increment: how;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .how li::before {
+    content: counter(how);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    padding-top: 3px;
+  }
+  table.voices {
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .voices th {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    text-align: right;
+    padding: 4px 0;
+  }
+  .voices td {
+    padding: 2px 0;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .voices td:first-child,
+  .voices th:first-child {
+    text-align: left;
+    font-family: var(--serif);
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .voices tr.gap td {
+    padding-top: 9px;
+  }
+  .leans {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .leans div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+  }
+  .leans .n {
+    font-style: italic;
+    font-size: 15.5px;
+  }
+  .words {
+    margin-top: 8px;
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  /* your values */
+  .vals {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  .val {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20px;
+    gap: 0 6px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .val .line {
+    font-size: 15px;
+    border-bottom-color: transparent;
+  }
+  .val .line:hover {
+    border-bottom-color: var(--rule-2);
+  }
+  .val .nm {
+    font-style: italic;
+    font-size: 16.5px;
+  }
+  .val .tm {
+    grid-column: 1;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .val .x {
+    grid-row: 1;
+    grid-column: 2;
+    margin: 0;
+  }
+  .gap-top {
+    margin-top: 18px;
+  }
+  .gap-top-s {
+    margin-top: 6px;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule-2);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .tell {
+      animation: none;
+    }
+  }
+  @media (max-width: 980px) {
+    .work {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 44px;
+    }
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .sent {
+      grid-template-columns: 10px minmax(0, 1fr);
+    }
+    .sent .chips {
+      grid-column: 2;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Mask</h1>
+      <p class="deck">
+        Write the other side's case as they would put it, to be read by them.
+        Then mark each sentence for what you could mean. Where the mask slips is
+        where you stand.
+      </p>
+    </div>
+    <div>
+      <p class="claim">
+        An ideological Turing test turned inward: write the other side's case as
+        they would put it, then find out which of it you could mean.
+      </p>
+      <p class="claim">
+        It counts the tells in each voice, says which of your values each case
+        leans on and what the two share. Counts, never a grade. It never says
+        whether the mask passes, or which side is right.
+      </p>
+    </div>
+  </header>
+
+  <main class="work" id="work" aria-live="off"></main>
+
+  <footer>
+    <span class="meta">Center for Applied Post-Phenomenology · Mask</span>
+    <span class="meta" id="kept"></span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────
+     Specimen A's mask: a synthetic life writing the case for the office rule it argued
+     against, as the people who want it would put it, then marking what it could and could
+     not say. Fiction. Its values are the specimen's five, which the reader can replace. */
+  const SPECIMEN_MASK = {
+    slug: "2026-09-21-should-the-company-require-two-office-days",
+    title: "Should the company require two office days a week",
+    matter: "Should the company require two office days a week?",
+    side: "against the requirement",
+    other: "for the requirement",
+    ownCase:
+      "The work gets done. Nobody has shown me a number that says otherwise, and the people asking for office days are the people whose jobs are mostly meetings. What they want is to see us; what we want is to finish. A rule that costs everyone two commutes a week so that a few managers feel the room is not a rule about work.",
+    otherCase:
+      "We are not asking for this because we like the room. We are asking because the parts of the job that are hardest to see are the parts that have gone missing: the junior who learns by overhearing, the disagreement that gets settled in a corridor instead of festering in a thread, the sense that the person you are frustrated with is a person. Two days is not a lot. It is the least that keeps us a team rather than a set of contractors who share a payroll. We would rather have a clear rule than a quiet resentment about who shows up and who never does.",
+    stand:
+      "I still do not want the rule, and I still think the people asking for it have not counted the commute. But I could not write 'the junior who learns by overhearing' without meaning it, and I have not once asked a junior. Where I stand: against a blanket rule, for finding out what the juniors actually lose.",
+    stone: null,
+    opened: "2026-09-21",
+    touched: "2026-09-23",
+    marks: [
+      {
+        text: "We are not asking for this because we like the room.",
+        mark: "could",
+      },
+      {
+        text: "We are asking because the parts of the job that are hardest to see are the parts that have gone missing: the junior who learns by overhearing, the disagreement that gets settled in a corridor instead of festering in a thread, the sense that the person you are frustrated with is a person.",
+        mark: "mean",
+      },
+      { text: "Two days is not a lot.", mark: "refuse" },
+      {
+        text: "It is the least that keeps us a team rather than a set of contractors who share a payroll.",
+        mark: "could",
+      },
+      {
+        text: "We would rather have a clear rule than a quiet resentment about who shows up and who never does.",
+        mark: "mean",
+      },
+    ],
+    tells: [
+      {
+        id: "sm1",
+        quote: "because we like the room",
+        kind: "sneer",
+        instead:
+          "We would not raise that at all; nobody on our side thinks it is about the room.",
+        by: "proposed",
+        kept: true,
+      },
+      {
+        id: "sm2",
+        quote: "who never does",
+        kind: "absolute",
+        instead:
+          "who is rarely in — we are careful not to name anyone as never.",
+        by: "proposed",
+        kept: false,
+      },
+    ],
+    missing: [
+      {
+        id: "sn1",
+        text: "New people leave within a year at twice the rate they did when the office was full, and exit interviews say the same thing: they never felt they belonged to anything.",
+        by: "proposed",
+        kept: true,
+      },
+    ],
+    note: "",
+  };
+
+  /** The specimen's values, name and terms only: what the desk reads each case for. */
+  const SPECIMEN_VALUES = [
+    { name: "craft", terms: ["craft", "quality", "made", "design"] },
+    { name: "candour", terms: ["candour", "honest", "plain", "truth"] },
+    { name: "curiosity", terms: ["curiosity", "question", "wonder", "learn"] },
+    { name: "care", terms: ["care", "kind", "people", "family"] },
+    { name: "quiet", terms: ["quiet", "private", "local", "small"] },
+  ];
+
+  /* ── the mask, pure (ported from niwa lib/mask.ts, way.ts, provenance.ts) ── */
+
+  const MARKS = ["mean", "could", "refuse"];
+  const MARK_LABEL = {
+    "": "unmarked",
+    mean: "I could say this and mean it",
+    could: "I can say it, but do not",
+    refuse: "I could not write it straight",
+  };
+  const MARK_SHORT = {
+    "": "—",
+    mean: "mean it",
+    could: "could say it",
+    refuse: "refuse it",
+  };
+  const TELL_KINDS = ["distance", "scare", "hedge", "sneer", "absolute"];
+  const TELL_LABEL = {
+    distance: "distancing",
+    scare: "scare quotes",
+    hedge: "hedging",
+    sneer: "sneer",
+    absolute: "absolutes",
+  };
+
+  /** The phrases that give a writer away when they are wearing a mask — or, in their own voice, that they lean on. */
+  const TELL = {
+    distance:
+      /\b(they (?:claim|believe|think|say|argue|insist|maintain|would (?:say|argue|claim|have you believe))|supposedly|allegedly|purportedly|according to them|in their (?:view|eyes|world|minds?)|so they say|or so we are told|apparently)\b/gi,
+    hedge:
+      /\b(arguably|perhaps|maybe|some (?:might|would) say|it could be argued|to some extent|in a sense|sort of|kind of|if you like|one might think|for what it'?s worth|i suppose|i guess|to be fair|admittedly)\b/gi,
+    sneer:
+      /\b(naive\w*|nonsense|absurd\w*|ridiculous\w*|laughabl\w*|silly|childish|simplistic|dogma\w*|zealot\w*|cults?\b|cultish|cult-like|delusion\w*|fantasy|conveniently|of course they|predictably|the usual|so much for|as if)\b/gi,
+    absolute:
+      /\b(always|never|everyone|everybody|nobody|no one|all of them|none of them|the only|obviously|clearly|undeniabl\w*|any (?:sane|reasonable|honest) person)\b/gi,
+  };
+  /** A short quoted span is a phrase held at arm's length; a long one is a quotation. */
+  const QUOTED =
+    /(?:"([^"\n]{1,60})"|“([^”\n]{1,60})”|‘([^’\n]{1,60})’|\bso-called\s+(\w[\w-]*))/g;
+
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+
+  const STOP = new Set(
+    "a an the and or but if then than that this these those there here it its i i'm i've i'd my me we our you your he she they them their his her is are was were be been being am do does did done have has had not no nor so as at by for from in into of on to with about over under after before again once also very too just when where why how what which who whom whose because while during through between out up down off".split(
+      " ",
+    ),
+  );
+  function wordsOf(text) {
+    const m = new Map();
+    for (const raw of text.toLowerCase().split(/[^a-z0-9'’%-]+/)) {
+      const w = raw.replace(/^['’-]+|['’-]+$/g, "");
+      if (!w || STOP.has(w)) continue;
+      if (!/\d/.test(w) && w.length < 3) continue;
+      m.set(w, (m.get(w) ?? 0) + 1);
+    }
+    return m;
+  }
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  function tells(text) {
+    const out = [];
+    for (const kind of ["distance", "hedge", "sneer", "absolute"]) {
+      const re = new RegExp(TELL[kind].source, "gi");
+      for (const m of text.matchAll(re))
+        out.push({ kind, phrase: m[0].toLowerCase() });
+    }
+    for (const m of text.matchAll(QUOTED)) {
+      const inner = (m[1] ?? m[2] ?? m[3] ?? m[4] ?? "").trim();
+      if (!inner) continue;
+      if (inner.split(/\s+/).length <= 4)
+        out.push({ kind: "scare", phrase: inner });
+    }
+    return out;
+  }
+
+  /** Who the writer is standing with, by pronoun. A mask that says "they" of its own side has slipped. */
+  function stance(text) {
+    const we = (text.match(/\b(we|us|our|ours|ourselves)\b/gi) ?? []).length;
+    const they = (text.match(/\b(they|them|their|theirs|themselves)\b/gi) ?? [])
+      .length;
+    return { we, they };
+  }
+
+  function census(text) {
+    const found = tells(text);
+    const byKind = { distance: 0, scare: 0, hedge: 0, sneer: 0, absolute: 0 };
+    for (const f of found) byKind[f.kind]++;
+    return {
+      found,
+      byKind,
+      n: found.length,
+      stance: stance(text),
+      sentences: sentencesOf(text).length,
+      words: text.trim() ? text.trim().split(/\s+/).length : 0,
+    };
+  }
+
+  const examples = (c, k) =>
+    [
+      ...new Set(c.found.filter((f) => f.kind === k).map((f) => f.phrase)),
+    ].slice(0, 3);
+
+  function censusWords(c) {
+    const parts = TELL_KINDS.filter((k) => c.byKind[k]).map(
+      (k) => `${TELL_LABEL[k]} ×${c.byKind[k]} (${examples(c, k).join(", ")})`,
+    );
+    return parts.length ? parts.join(" · ") : "no tells found";
+  }
+
+  const norm = (s) =>
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+
+  function markOf(marks, sentence) {
+    const k = norm(sentence);
+    return marks.find((m) => norm(m.text) === k)?.mark ?? "";
+  }
+
+  function setMark(marks, sentence, mark) {
+    const k = norm(sentence);
+    const rest = marks.filter((m) => norm(m.text) !== k);
+    return mark ? [...rest, { text: sentence.trim(), mark }] : rest;
+  }
+
+  /** Which of the reader's values a text leans on, by the value's own terms. */
+  function leans(text, values) {
+    const hay = ` ${text.toLowerCase()} `;
+    return values
+      .map((v) => ({
+        name: v.name,
+        hits: v.terms
+          .map((t) => t.toLowerCase().trim())
+          .filter((t) => t && hay.includes(t)),
+      }))
+      .filter((l) => l.hits.length);
+  }
+
+  function common(own, other) {
+    const a = wordsOf(own);
+    const b = wordsOf(other);
+    const by = (m, not) =>
+      [...m.entries()]
+        .filter(([w]) => !not.has(w))
+        .sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))
+        .map(([w]) => w);
+    const shared = [...a.entries()]
+      .filter(([w]) => b.has(w))
+      .sort(
+        (x, y) =>
+          Math.min(y[1], b.get(y[0])) - Math.min(x[1], b.get(x[0])) ||
+          (x[0] < y[0] ? -1 : 1),
+      )
+      .map(([w]) => w);
+    return { shared, ownOnly: by(a, b), otherOnly: by(b, a) };
+  }
+
+  const emptyMask = (today) => ({
+    slug: "",
+    title: "",
+    matter: "",
+    side: "",
+    other: "",
+    ownCase: "",
+    otherCase: "",
+    stand: "",
+    stone: null,
+    opened: today,
+    touched: today,
+    marks: [],
+    tells: [],
+    missing: [],
+    note: "",
+  });
+
+  function tally(m) {
+    const sentences = sentencesOf(m.otherCase);
+    const marks = { "": 0, mean: 0, could: 0, refuse: 0 };
+    const crossed = [];
+    const refused = [];
+    for (const s of sentences) {
+      const k = markOf(m.marks, s);
+      marks[k]++;
+      if (k === "mean") crossed.push(s);
+      if (k === "refuse") refused.push(s);
+    }
+    return {
+      own: census(m.ownCase),
+      mask: census(m.otherCase),
+      sentences,
+      marks,
+      crossed,
+      refused,
+      tellsKept: m.tells.filter((t) => t.kept).length,
+      tellsHollow: m.tells.filter((t) => !t.kept).length,
+      missingKept: m.missing.filter((x) => x.kept).length,
+      missingHollow: m.missing.filter((x) => !x.kept).length,
+      common: common(m.ownCase, m.otherCase),
+      stood: Boolean(m.stand.trim()),
+    };
+  }
+
+  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const list = (xs) => xs.map((w) => `'${w}'`).join(", ");
+
+  /** Facts about the two cases and the marks; none a verdict on either side or on the mask. */
+  function readings(m, t, values) {
+    const out = [];
+    out.push(
+      m.ownCase.trim()
+        ? `your case: ${n(t.own.sentences, "sentence")}, ${t.own.words} words · ${censusWords(t.own)} · 'we' ×${t.own.stance.we}, 'they' ×${t.own.stance.they}`
+        : "your case is not written yet",
+    );
+    out.push(
+      m.otherCase.trim()
+        ? `the mask: ${n(t.mask.sentences, "sentence")}, ${t.mask.words} words · ${censusWords(t.mask)} · 'we' ×${t.mask.stance.we}, 'they' ×${t.mask.stance.they}`
+        : "the mask is not written yet",
+    );
+    if (t.sentences.length) {
+      const marked = t.marks.mean + t.marks.could + t.marks.refuse;
+      out.push(
+        marked
+          ? `${marked} of ${t.sentences.length} marked: ${t.marks.mean} you could say and mean, ${t.marks.could} you can say but do not, ${t.marks.refuse} you could not write straight` +
+              (t.marks[""] ? `; ${t.marks[""]} unmarked` : "")
+          : `${n(t.sentences.length, "sentence")} in the mask, none marked yet`,
+      );
+    }
+    if (t.tellsKept || t.tellsHollow || t.missingKept || t.missingHollow) {
+      const parts = [
+        t.tellsKept ? `${n(t.tellsKept, "tell")} kept` : "",
+        t.tellsHollow ? `${t.tellsHollow} proposed and hollow` : "",
+        t.missingKept ? `${n(t.missingKept, "missing reason")} kept` : "",
+        t.missingHollow ? `${t.missingHollow} missing proposed` : "",
+      ].filter(Boolean);
+      out.push(`an adherent's reading: ${parts.join(", ")}`);
+    }
+    const [ownV, maskV] = values;
+    if (ownV?.length || maskV?.length) {
+      const o = ownV.map((l) => l.name);
+      const k = maskV.map((l) => l.name);
+      const both = o.filter((x) => k.includes(x));
+      out.push(
+        `values leaned on — your case: ${o.length ? list(o) : "none by their terms"}; the mask: ${k.length ? list(k) : "none by their terms"}` +
+          (both.length ? `; both lean on ${list(both)}` : ""),
+      );
+    }
+    if (m.ownCase.trim() && m.otherCase.trim())
+      out.push(
+        t.common.shared.length
+          ? `${n(t.common.shared.length, "word")} the two cases share: ${list(t.common.shared.slice(0, 6))}`
+          : "the two cases share no content word",
+      );
+    out.push(
+      t.stood
+        ? "where you stand is written"
+        : "where you stand is not yet written",
+    );
+    return out;
+  }
+
+  function titleOf(m) {
+    if (m.title.trim()) return m.title.trim();
+    const first = (sentencesOf(m.matter)[0] ?? m.matter.trim())
+      .replace(/[.!…]+$/, "")
+      .trim();
+    if (first)
+      return first.length > 72 ? `${first.slice(0, 69).trim()}…` : first;
+    if (m.side.trim() || m.other.trim())
+      return `${m.side.trim() || "one side"} · ${m.other.trim() || "the other"}`;
+    return "a mask";
+  }
+
+  const y = (s) => JSON.stringify(s);
+
+  /** The mask as the markdown file niwa kept it in: sections a person can read, the marks in the frontmatter. */
+  function serialiseMask(m) {
+    const lines = [
+      `title: ${y(m.title)}`,
+      `side: ${y(m.side)}`,
+      `other: ${y(m.other)}`,
+    ];
+    if (m.stone) lines.push(`stone: ${y(m.stone)}`);
+    lines.push(`opened: ${y(m.opened)}`, `touched: ${y(m.touched)}`);
+    if (m.marks.length) {
+      lines.push("marks:");
+      for (const k of m.marks)
+        lines.push(`  - { text: ${y(k.text)}, mark: ${y(k.mark)} }`);
+    }
+    if (m.tells.length) {
+      lines.push("tells:");
+      for (const t of m.tells)
+        lines.push(
+          `  - { id: ${y(t.id)}, quote: ${y(t.quote)}, kind: ${y(t.kind)}, instead: ${y(t.instead)}, by: ${y(t.by)}, kept: ${t.kept} }`,
+        );
+    }
+    if (m.missing.length) {
+      lines.push("missing:");
+      for (const x of m.missing)
+        lines.push(
+          `  - { id: ${y(x.id)}, text: ${y(x.text)}, by: ${y(x.by)}, kept: ${x.kept} }`,
+        );
+    }
+    const body = [
+      `## the matter\n\n${m.matter.trim()}`,
+      `## your case, in your voice\n\n${m.ownCase.trim()}`,
+      `## their case, in the mask\n\n${m.otherCase.trim()}`,
+      `## where you stand\n\n${m.stand.trim()}`,
+    ];
+    if (m.note.trim()) body.push(`## note\n\n${m.note.trim()}`);
+    return `---\n${lines.join("\n")}\n---\n\n${body.join("\n\n")}\n`;
+  }
+
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+  /** Validation at the boundary: a mask arrives from the begin form, or from what this browser kept. */
+  function validateMask(input, today) {
+    const r = input ?? {};
+    const matterText =
+      typeof r.matter === "string" ? r.matter.trim().slice(0, 2000) : "";
+    const side = str(r.side, 120);
+    const other = str(r.other, 120);
+    if (!matterText && !side && !other)
+      throw new Error("a mask needs the matter, or the two sides named");
+    const day = (v) => (typeof v === "string" && DAY.test(v) ? v : today);
+    const text = (v, max) =>
+      typeof v === "string" ? v.trim().slice(0, max) : "";
+    const marks = (Array.isArray(r.marks) ? r.marks : [])
+      .slice(0, 400)
+      .map((x) => {
+        const o = x ?? {};
+        const mark = str(o.mark, 10);
+        return {
+          text: str(o.text, 600),
+          mark: MARKS.includes(mark) ? mark : "",
+        };
+      })
+      .filter((k) => k.text && k.mark);
+    const tellsIn = (Array.isArray(r.tells) ? r.tells : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        const kind = str(o.kind, 20);
+        return {
+          id: str(o.id, 24) || uid(),
+          quote: str(o.quote, 200),
+          kind: TELL_KINDS.includes(kind) ? kind : "distance",
+          instead: str(o.instead, 300),
+          by: o.by === "proposed" ? "proposed" : "you",
+          kept: o.kept !== false,
+        };
+      })
+      .filter((t) => t.quote);
+    const missing = (Array.isArray(r.missing) ? r.missing : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        return {
+          id: str(o.id, 24) || uid(),
+          text: str(o.text, 400),
+          by: o.by === "proposed" ? "proposed" : "you",
+          kept: o.kept !== false,
+        };
+      })
+      .filter((x) => x.text);
+    const m = {
+      slug: str(r.slug, 120),
+      title: str(r.title, 120),
+      matter: matterText,
+      side,
+      other,
+      ownCase: text(r.ownCase, 8000),
+      otherCase: text(r.otherCase, 8000),
+      stand: text(r.stand, 4000),
+      stone: str(r.stone, 200) || null,
+      opened: day(r.opened),
+      touched: day(r.touched),
+      marks,
+      tells: tellsIn,
+      missing,
+      note: text(r.note, 4000),
+    };
+    m.title = titleOf(m);
+    if (!m.slug) m.slug = slugOf(m.title, m.opened);
+    return m;
+  }
+
+  /* ── what this browser keeps ──────────────────────────────────────────── */
+
+  const KEY = "pp-mask";
+  const localToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const TODAY = localToday();
+
+  // masks: the reader's own; values: null until the reader edits them (then the specimen's are copied in);
+  // open: the slug on the sheet, or null for the list. A first visit opens on the specimen.
+  const store = { masks: [], values: null, open: SPECIMEN_MASK.slug };
+  let keeps = true;
+
+  function cleanValues(v) {
+    if (!Array.isArray(v)) return null;
+    return v.slice(0, 24).map((x) => ({
+      name: str(x?.name, 60),
+      terms: (Array.isArray(x?.terms) ? x.terms : [])
+        .map((t) => str(t, 60))
+        .filter(Boolean)
+        .slice(0, 24),
+    }));
+  }
+
+  function load() {
+    let raw = null;
+    try {
+      raw = localStorage.getItem(KEY);
+    } catch {
+      keeps = false;
+      return;
+    }
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw);
+      store.masks = [];
+      for (const x of Array.isArray(d.masks) ? d.masks : []) {
+        try {
+          store.masks.push(validateMask(x, TODAY));
+        } catch {
+          /* a mask with nothing in it is not kept */
+        }
+      }
+      store.values = cleanValues(d.values);
+      store.open = typeof d.open === "string" ? d.open : null;
+    } catch {
+      /* unreadable: start from the specimen */
+    }
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(store));
+      keeps = true;
+    } catch {
+      keeps = false;
+    }
+    $("kept").textContent = keeps
+      ? "Kept in this browser, and nowhere else"
+      : "This browser keeps nothing: gone on reload";
+  }
+
+  const values = () =>
+    (store.values ?? SPECIMEN_VALUES).filter((v) => v.name.trim());
+  const ownValues = () => {
+    if (!store.values)
+      store.values = SPECIMEN_VALUES.map((v) => ({
+        name: v.name,
+        terms: [...v.terms],
+      }));
+    return store.values;
+  };
+
+  const current = () => {
+    if (!store.open) return null;
+    if (store.open === SPECIMEN_MASK.slug) return SPECIMEN_MASK;
+    return store.masks.find((m) => m.slug === store.open) ?? null;
+  };
+  const isSpecimen = (m) => m === SPECIMEN_MASK;
+  const sorted = () =>
+    [...store.masks].sort((a, b) =>
+      a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
+    );
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const work = $("work");
+  const draft = {
+    matter: "",
+    side: "",
+    other: "",
+    tell: "",
+    kind: "distance",
+    miss: "",
+  };
+  let sure = false;
+
+  function render(scroll) {
+    sure = false;
+    const m = current();
+    if (store.open && !m) store.open = null;
+    work.innerHTML = m ? sheetHtml(m) : beginHtml();
+    if (m) {
+      refresh();
+      renderAdherent();
+    }
+    renderValues();
+    if (scroll) work.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* the list, and the form that begins a mask */
+  function beginHtml() {
+    const can = draft.matter.trim() || draft.side.trim() || draft.other.trim();
+    const row = (m, spec) => {
+      const t = tally(m);
+      const marked = t.marks.mean + t.marks.could + t.marks.refuse;
+      return `<li><button type="button" data-act="open" data-slug="${esc(m.slug)}"><span class="ti">${esc(m.title)}</span><span class="meta lower">${spec ? "specimen · " : ""}${esc(m.opened)} · ${esc(m.side || "?")} / ${esc(m.other || "?")} · ${marked} of ${t.sentences.length} marked${m.stand.trim() ? " · stood" : ""}</span></button></li>`;
+    };
+    const mine = sorted();
+    return `
+      <section class="col" aria-label="Begin a mask">
+        <div class="panel rise" style="--d:60ms">
+          <p class="meta acc">the matter</p>
+          <textarea class="case big" id="matterIn" rows="2" maxlength="2000" aria-label="The matter" placeholder="the question the two sides disagree about">${esc(draft.matter)}</textarea>
+          <div class="two">
+            <label><span class="meta">your side</span><input class="line" id="sideIn" maxlength="120" placeholder="in a few words" aria-label="Your side" value="${esc(draft.side)}" /></label>
+            <label><span class="meta">the other side</span><input class="line" id="otherIn" maxlength="120" placeholder="as they would name themselves" aria-label="The other side" value="${esc(draft.other)}" /></label>
+          </div>
+          <div class="row-actions">
+            <button type="button" class="chip" id="beginBtn" data-act="begin" ${can ? 'aria-pressed="true"' : "disabled"}>put the mask on</button>
+            <span class="hand">you will write your case first, then theirs</span>
+          </div>
+          <p class="meta gap-top">${mine.length ? "masks kept" : "the specimen's mask"}</p>
+          <ol class="list">${mine.map((x) => row(x, false)).join("")}${row(SPECIMEN_MASK, true)}</ol>
+          ${mine.length ? "" : `<p class="hand gap-top-s">no mask of your own yet — the first one begins above</p>`}
+        </div>
+      </section>
+      <aside class="col desk">
+        <section class="panel rise" style="--d:120ms" aria-label="How to wear it">
+          <p class="meta acc">how to wear it</p>
+          <ol class="how">
+            <li><span>Write your own case first, in your voice, so it is on the record.</span></li>
+            <li><span>Then write theirs as they would — to be read by them, not by you. No “they claim”, no scare quotes, no hedging. Say “we”.</span></li>
+            <li><span>Mark each sentence of the mask: could you say it and mean it, say it but not hold it, or not write it straight at all?</span></li>
+            <li><span>Read it as an adherent would and name what gives you away, and the reasons they give that you left out. Better, show it to one.</span></li>
+            <li><span>Write where you actually stand. The sentences that crossed are the ones you hold; the ones you refused are the line.</span></li>
+          </ol>
+          <p class="hand gap-top">after the ideological Turing test — turned inward: nothing here judges whether you pass</p>
+        </section>
+        <section class="panel rise" style="--d:180ms" id="valuesP" aria-label="Your values"></section>
+      </aside>`;
+  }
+
+  /* one mask on the sheet, the desk beside it */
+  function sheetHtml(m) {
+    const spec = isSpecimen(m);
+    const ro = spec ? "readonly" : "";
+    const w = (s) => Math.max(8, s.length + 2);
+    return `
+      <section class="col" aria-label="The mask">
+        <div class="panel rise" style="--d:40ms">
+          <div class="head">
+            <p class="meta acc">the matter · ${esc(m.opened)}</p>
+            <div class="chips">
+              ${spec ? `<span class="tag">specimen · fiction · read only</span>` : ""}
+              <button type="button" class="chip${spec ? " acc" : ""}" data-act="close">${spec ? "begin your own" : "all masks"}</button>
+            </div>
+          </div>
+          <p class="matter">${esc(m.matter || "(the matter is not written)")}</p>
+          <div class="sides">
+            <label><span class="meta">your side ·</span><input class="line" data-f="side" ${ro} maxlength="120" aria-label="Your side" value="${esc(m.side)}" style="width:${w(m.side)}ch" /></label>
+            <label><span class="meta">the other side ·</span><input class="line" data-f="other" ${ro} maxlength="120" aria-label="The other side" value="${esc(m.other)}" style="width:${w(m.other)}ch" /></label>
+          </div>
+        </div>
+
+        <div class="panel rise" style="--d:90ms">
+          <p class="meta acc" id="ownHead"></p>
+          <textarea class="case" data-f="ownCase" ${ro} maxlength="8000" rows="5" aria-label="Your case" placeholder="${spec ? "" : "as you would actually argue it — so it is on the record before you put the mask on"}">${esc(m.ownCase)}</textarea>
+          <p class="census" id="ownCensus"></p>
+        </div>
+
+        <div class="panel masked rise" style="--d:140ms">
+          <div class="head">
+            <p class="meta acc" id="maskHead"></p>
+            <span class="hand">to be read by them — say “we”</span>
+          </div>
+          <textarea class="case" data-f="otherCase" ${ro} maxlength="8000" rows="6" aria-label="Their case, in the mask" placeholder="${spec ? "" : "their case, as the most thoughtful person on their side would put it — the reasons they actually give, in their words"}">${esc(m.otherCase)}</textarea>
+          <p class="census" id="maskCensus"></p>
+          <div id="sentences"></div>
+          <p class="meta acc gap-top">an adherent's reading</p>
+          <div id="adherent"></div>
+          ${
+            spec
+              ? ""
+              : `<div class="add">
+              <input class="line" id="tellIn" maxlength="200" placeholder="a phrase in the mask that gives you away" aria-label="A tell" value="${esc(draft.tell)}" />
+              <select class="chip" id="kindIn" aria-label="Its kind">${TELL_KINDS.map((k) => `<option value="${k}"${draft.kind === k ? " selected" : ""}>${TELL_LABEL[k]}</option>`).join("")}</select>
+              <button type="button" class="chip" id="tellBtn" data-act="tell" ${draft.tell.trim() ? 'aria-pressed="true"' : "disabled"}>name it</button>
+            </div>
+            <div class="add">
+              <input class="line" id="missIn" maxlength="400" placeholder="a reason they give that the mask left out" aria-label="A missing reason" value="${esc(draft.miss)}" />
+              <button type="button" class="chip" id="missBtn" data-act="miss" ${draft.miss.trim() ? 'aria-pressed="true"' : "disabled"}>add it</button>
+            </div>`
+          }
+        </div>
+
+        <div class="panel rise" style="--d:190ms">
+          <p class="meta acc">where you stand</p>
+          <p class="hand gap-top-s">written last, after the marks — what you hold, what you refuse, and what the mask taught you about the line between</p>
+          <textarea class="case short" data-f="stand" ${ro} maxlength="4000" rows="3" aria-label="Where you stand" placeholder="${spec ? "" : "in your own voice again"}">${esc(m.stand)}</textarea>
+        </div>
+      </section>
+
+      <aside class="col desk" aria-label="The desk">
+        <section class="panel rise" style="--d:80ms" id="crossed" aria-label="What crossed"></section>
+        <section class="panel rise" style="--d:140ms" id="voices" aria-label="The two voices"></section>
+        <section class="panel rise" style="--d:200ms" aria-label="The reading">
+          <p class="meta acc">the reading</p>
+          <p class="words" id="words"></p>
+          <div class="chips gap-top">
+            <button type="button" class="chip" data-act="copy" id="copyBtn">copy as markdown</button>
+            ${spec ? "" : `<button type="button" class="chip" data-act="remove" id="removeBtn">take the mask off</button>`}
+          </div>
+          <p class="meta lower gap-top">${spec ? "fiction, like the rest of the specimen" : keeps ? `kept in this browser as ${esc(m.slug)}` : "this browser keeps nothing: gone on reload"}</p>
+        </section>
+        <section class="panel rise" style="--d:260ms" id="valuesP" aria-label="Your values"></section>
+      </aside>`;
+  }
+
+  function censusHtml(c) {
+    let h = c.words
+      ? `${c.sentences} sentences · ${c.words} words · 'we' ×${c.stance.we} · 'they' ×${c.stance.they}`
+      : "nothing written yet";
+    if (c.n > 0)
+      h += TELL_KINDS.filter((k) => c.byKind[k])
+        .map(
+          (k) =>
+            ` · <span class="acc">${TELL_LABEL[k]}</span> ×${c.byKind[k]} <span class="hand">(${esc(examples(c, k).join(", "))})</span>`,
+        )
+        .join("");
+    return h;
+  }
+
+  /* everything derived from the texts and marks: redrawn on every keystroke, never the fields themselves */
+  function refresh() {
+    const m = current();
+    if (!m) return;
+    const spec = isSpecimen(m);
+    const t = tally(m);
+    const vals = values();
+    const ownL = leans(m.ownCase, vals);
+    const maskL = leans(m.otherCase, vals);
+    $("ownHead").textContent =
+      `your case, in your voice${m.side ? ` · ${m.side}` : ""}`;
+    $("maskHead").textContent =
+      `their case, in the mask${m.other ? ` · ${m.other}` : ""}`;
+    $("ownCensus").innerHTML = censusHtml(t.own);
+    $("maskCensus").innerHTML = censusHtml(t.mask);
+
+    $("sentences").innerHTML = t.sentences.length
+      ? `<p class="meta acc gap-top">sentence by sentence — could you mean it?</p><ol class="sentences">${t.sentences
+          .map((s, i) => {
+            const k = markOf(m.marks, s);
+            return `<li class="sent"${k ? ` data-mark="${k}"` : ""}><span class="dot" title="${MARK_LABEL[k]}"></span><span class="t">${esc(s)}</span><span class="chips">${MARKS.map(
+              (x) =>
+                `<button type="button" class="chip${x === "refuse" && k === x ? " acc" : ""}" data-act="mark" data-i="${i}" data-k="${x}" aria-pressed="${k === x}" title="${MARK_LABEL[x]}"${spec ? " disabled" : ""}>${MARK_SHORT[x]}</button>`,
+            ).join("")}</span></li>`;
+          })
+          .join("")}</ol>`
+      : "";
+
+    $("crossed").innerHTML =
+      `<p class="meta acc">what crossed</p><p class="hand gap-top-s">sentences in their voice you could say and mean — these you hold, whichever side said them</p>` +
+      (t.crossed.length
+        ? `<ul class="plain">${t.crossed.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`
+        : `<p class="meta lower gap-top-s">none marked yet</p>`) +
+      `<p class="meta acc gap-top">what you refused</p>` +
+      (t.refused.length
+        ? `<ul class="plain refused">${t.refused.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`
+        : `<p class="meta lower gap-top-s">none marked yet</p>`);
+
+    const cell = (v) => (v ? v : "·");
+    let v = `<p class="meta acc">the two voices</p><table class="voices"><thead><tr><th></th><th>yours</th><th>the mask</th></tr></thead><tbody>`;
+    v += TELL_KINDS.map(
+      (k) =>
+        `<tr><td>${TELL_LABEL[k]}</td><td>${cell(t.own.byKind[k])}</td><td>${cell(t.mask.byKind[k])}</td></tr>`,
+    ).join("");
+    v += `<tr class="gap"><td>‘we’</td><td>${cell(t.own.stance.we)}</td><td>${cell(t.mask.stance.we)}</td></tr>`;
+    v += `<tr><td>‘they’</td><td>${cell(t.own.stance.they)}</td><td>${cell(t.mask.stance.they)}</td></tr></tbody></table>`;
+    if (vals.length) {
+      v += `<p class="meta gap-top">values leaned on, by their terms</p><div class="leans">`;
+      for (const val of vals) {
+        const o = ownL.find((l) => l.name === val.name);
+        const k = maskL.find((l) => l.name === val.name);
+        if (!o && !k) continue;
+        v += `<div><span class="n">${esc(val.name)}</span><span class="meta lower">${o ? `yours (${esc(o.hits.join(", "))})` : ""}${o && k ? " · " : ""}${k ? `the mask (${esc(k.hits.join(", "))})` : ""}</span></div>`;
+      }
+      if (!ownL.length && !maskL.length)
+        v += `<span class="meta lower">neither case uses a term of any value yet</span>`;
+      v += `</div>`;
+    }
+    if (m.ownCase.trim() && m.otherCase.trim())
+      v += `<p class="meta gap-top">common ground</p><p class="hand gap-top-s" style="color:var(--ink)">${esc(t.common.shared.length ? t.common.shared.slice(0, 10).join(" · ") : "no word both cases use")}</p>`;
+    $("voices").innerHTML = v;
+
+    $("words").textContent = readings(m, t, [ownL, maskL]).join(" · ");
+  }
+
+  /* the tells and missing reasons: redrawn when one is named or dropped, not while its "instead" is typed */
+  function renderAdherent() {
+    const m = current();
+    if (!m) return;
+    const spec = isSpecimen(m);
+    let h = "";
+    if (!m.tells.length && !m.missing.length)
+      h += `<p class="hand gap-top-s">nothing yet — name a phrase that gives you away</p>`;
+    if (m.tells.length)
+      h += `<ul class="tells">${m.tells
+        .map(
+          (x, i) =>
+            `<li class="tell" style="--i:${Math.min(i, 8)}"><div class="top"><span class="meta acc">${TELL_LABEL[x.kind]}</span><span class="q${x.kept ? "" : " hollow"}">“${esc(x.quote)}”</span>${spec ? "" : `<button type="button" class="x" data-act="dropTell" data-id="${esc(x.id)}" aria-label="Drop the tell">×</button>`}</div>${
+              x.instead || !spec
+                ? `<input class="line instead" data-tell="${esc(x.id)}" ${spec ? "readonly" : ""} maxlength="300" placeholder="how they would have put it" aria-label="How they would have put it" value="${esc(x.instead)}" />`
+                : ""
+            }</li>`,
+        )
+        .join("")}</ul>`;
+    if (m.missing.length)
+      h += `<p class="meta gap-top">reasons they give that the mask left out</p><ul class="missing">${m.missing
+        .map(
+          (x) =>
+            `<li><span${x.kept ? "" : ' class="hollow"'}>${esc(x.text)}</span>${spec ? "" : `<button type="button" class="x" data-act="dropMiss" data-id="${esc(x.id)}" aria-label="Drop">×</button>`}</li>`,
+        )
+        .join("")}</ul>`;
+    if (
+      spec &&
+      (m.tells.some((x) => !x.kept) || m.missing.some((x) => !x.kept))
+    )
+      h += `<p class="hand gap-top-s">dashed: proposed by a reading and not yet kept</p>`;
+    $("adherent").innerHTML = h;
+  }
+
+  /* the reader's values: names and terms, opening on the specimen's */
+  function renderValues() {
+    const box = $("valuesP");
+    if (!box) return;
+    const vs = store.values ?? SPECIMEN_VALUES;
+    box.innerHTML =
+      `<div class="head"><p class="meta acc">your values</p>${store.values ? `<button type="button" class="chip" data-act="resetValues">the specimen's</button>` : `<span class="meta lower">the specimen's, until you change them</span>`}</div>` +
+      `<p class="hand gap-top-s">the desk says which of these each case leans on, by their terms</p>` +
+      `<ol class="vals">${vs
+        .map(
+          (v, i) =>
+            `<li class="val"><input class="line nm" data-v="name" data-i="${i}" maxlength="60" placeholder="a value" aria-label="Value ${i + 1}" value="${esc(v.name)}" /><button type="button" class="x" data-act="dropValue" data-i="${i}" aria-label="Drop ${esc(v.name || "this value")}">×</button><input class="line tm" data-v="terms" data-i="${i}" maxlength="400" placeholder="its terms, by commas" aria-label="Terms of value ${i + 1}" value="${esc(v.terms.join(", "))}" /></li>`,
+        )
+        .join("")}</ol>` +
+      `<div class="chips gap-top-s"><button type="button" class="chip" data-act="addValue">add a value</button></div>`;
+  }
+
+  /* ── what the reader does ─────────────────────────────────────────────── */
+
+  const touch = (m) => {
+    m.touched = TODAY;
+    persist();
+  };
+
+  function begin() {
+    const fields = {
+      matter: draft.matter.trim(),
+      side: draft.side.trim(),
+      other: draft.other.trim(),
+    };
+    if (!fields.matter && !fields.side && !fields.other) return;
+    const m = validateMask({ ...emptyMask(TODAY), ...fields }, TODAY);
+    const taken = new Set([
+      SPECIMEN_MASK.slug,
+      ...store.masks.map((x) => x.slug),
+    ]);
+    const base = m.slug;
+    let k = 2;
+    while (taken.has(m.slug)) m.slug = `${base}-${k++}`;
+    store.masks.push(m);
+    store.open = m.slug;
+    draft.matter = draft.side = draft.other = "";
+    persist();
+    render(true);
+    work.querySelector('[data-f="ownCase"]')?.focus({ preventScroll: true });
+  }
+
+  function addTell() {
+    const m = current();
+    const quote = str(draft.tell, 200);
+    if (!m || isSpecimen(m) || !quote) return;
+    m.tells.push({
+      id: uid(),
+      quote,
+      kind: draft.kind,
+      instead: "",
+      by: "you",
+      kept: true,
+    });
+    draft.tell = "";
+    touch(m);
+    renderAdherent();
+    refresh();
+    $("tellIn").value = "";
+    $("tellBtn").disabled = true;
+    $("tellBtn").removeAttribute("aria-pressed");
+  }
+
+  function addMissing() {
+    const m = current();
+    const text = str(draft.miss, 400);
+    if (!m || isSpecimen(m) || !text) return;
+    if (!m.missing.some((x) => norm(x.text) === norm(text)))
+      m.missing.push({ id: uid(), text, by: "you", kept: true });
+    draft.miss = "";
+    touch(m);
+    renderAdherent();
+    refresh();
+    $("missIn").value = "";
+    $("missBtn").disabled = true;
+    $("missBtn").removeAttribute("aria-pressed");
+  }
+
+  async function copy(btn) {
+    const m = current();
+    if (!m) return;
+    const text = serialiseMask(m);
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = "copied";
+    } catch {
+      btn.textContent = "not copied: this browser refused";
+    }
+    setTimeout(() => (btn.textContent = "copy as markdown"), 2400);
+  }
+
+  work.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    const m = current();
+    const act = b.dataset.act;
+    if (act === "open") {
+      store.open = b.dataset.slug;
+      persist();
+      render(true);
+    } else if (act === "close") {
+      store.open = null;
+      persist();
+      render(true);
+    } else if (act === "begin") begin();
+    else if (act === "mark" && m && !isSpecimen(m)) {
+      const s = tally(m).sentences[+b.dataset.i];
+      if (!s) return;
+      const k = b.dataset.k;
+      m.marks = setMark(m.marks, s, markOf(m.marks, s) === k ? "" : k);
+      touch(m);
+      refresh();
+    } else if (act === "tell") addTell();
+    else if (act === "miss") addMissing();
+    else if (
+      (act === "dropTell" || act === "dropMiss") &&
+      m &&
+      !isSpecimen(m)
+    ) {
+      const key = act === "dropTell" ? "tells" : "missing";
+      m[key] = m[key].filter((x) => x.id !== b.dataset.id);
+      touch(m);
+      renderAdherent();
+      refresh();
+    } else if (act === "copy") copy(b);
+    else if (act === "remove" && m && !isSpecimen(m)) {
+      if (!sure) {
+        sure = true;
+        b.textContent = "take the mask off — sure?";
+        b.classList.add("acc");
+        return;
+      }
+      store.masks = store.masks.filter((x) => x !== m);
+      store.open = null;
+      persist();
+      render(true);
+    } else if (act === "addValue") {
+      ownValues().push({ name: "", terms: [] });
+      persist();
+      renderValues();
+      const ins = $("valuesP").querySelectorAll('[data-v="name"]');
+      ins[ins.length - 1]?.focus();
+    } else if (act === "dropValue") {
+      ownValues().splice(+b.dataset.i, 1);
+      persist();
+      renderValues();
+      if (current()) refresh();
+    } else if (act === "resetValues") {
+      store.values = null;
+      persist();
+      renderValues();
+      if (current()) refresh();
+    }
+  });
+
+  work.addEventListener("input", (e) => {
+    const el = e.target;
+    const m = current();
+    if (el.id === "matterIn" || el.id === "sideIn" || el.id === "otherIn") {
+      draft[{ matterIn: "matter", sideIn: "side", otherIn: "other" }[el.id]] =
+        el.value;
+      const can =
+        draft.matter.trim() || draft.side.trim() || draft.other.trim();
+      const btn = $("beginBtn");
+      btn.disabled = !can;
+      if (can) btn.setAttribute("aria-pressed", "true");
+      else btn.removeAttribute("aria-pressed");
+      return;
+    }
+    if (el.id === "tellIn" || el.id === "missIn") {
+      const k = el.id === "tellIn" ? "tell" : "miss";
+      draft[k] = el.value;
+      const btn = $(k === "tell" ? "tellBtn" : "missBtn");
+      btn.disabled = !el.value.trim();
+      if (el.value.trim()) btn.setAttribute("aria-pressed", "true");
+      else btn.removeAttribute("aria-pressed");
+      return;
+    }
+    if (el.dataset.v) {
+      const v = ownValues()[+el.dataset.i];
+      if (!v) return;
+      if (el.dataset.v === "name")
+        v.name = el.value.replace(/\s+/g, " ").slice(0, 60);
+      else
+        v.terms = el.value
+          .split(",")
+          .map((t) => t.trim().slice(0, 60))
+          .filter(Boolean);
+      persist();
+      if (m) refresh();
+      // the reset chip appears on the first edit, without redrawing the field being typed in
+      const head = $("valuesP").querySelector(".head span.meta");
+      if (head) {
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip";
+        c.dataset.act = "resetValues";
+        c.textContent = "the specimen's";
+        head.replaceWith(c);
+      }
+      return;
+    }
+    if (!m || isSpecimen(m)) return;
+    if (el.dataset.f) {
+      m[el.dataset.f] = el.value;
+      if (el.dataset.f === "side" || el.dataset.f === "other")
+        el.style.width = `${Math.max(8, el.value.length + 2)}ch`;
+      touch(m);
+      refresh();
+    } else if (el.dataset.tell) {
+      const t = m.tells.find((x) => x.id === el.dataset.tell);
+      if (t) {
+        t.instead = el.value;
+        touch(m);
+      }
+    }
+  });
+
+  work.addEventListener("change", (e) => {
+    if (e.target.id === "kindIn") draft.kind = e.target.value;
+  });
+
+  work.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.isComposing) return;
+    if (e.target.id === "tellIn") {
+      e.preventDefault();
+      addTell();
+    } else if (e.target.id === "missIn") {
+      e.preventDefault();
+      addMissing();
+    }
+  });
+
+  // a side or a value cleaned up when the reader leaves the field, as niwa did on blur
+  work.addEventListener("focusout", (e) => {
+    const m = current();
+    const el = e.target;
+    if (!m || isSpecimen(m)) return;
+    if (el.dataset.f === "side" || el.dataset.f === "other") {
+      m[el.dataset.f] = str(el.value, 120);
+      el.value = m[el.dataset.f];
+      persist();
+      refresh();
+    }
+  });
+
+  load();
+  render(false);
+  persist();
+</script>

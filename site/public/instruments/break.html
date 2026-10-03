@@ -1,0 +1,1870 @@
+<title>Break</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="When it hurts: notice it, remember you are not the only one, be kind. Three sentences in your words, a hand where it helps, and what you would say to a friend in your spot, set beside what you say to yourself."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a workbook page laid on the desk. Bone paper and ink; red ochre marks only the
+     practice's own headings, the button that takes the break, and the break open in the triad.
+     The three sentences each keep one hue — ochre for noticed, slate for shared, moss for kind —
+     and the hue is used nowhere else, so a ring and its sentence are read as one thing. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8a8276;
+    --rule: #e2ded5;
+    --rule-2: #cbc5b8;
+    --accent: #b5532a;
+    --hover: rgba(35, 33, 30, 0.03);
+    --notice: #b08a3e;
+    --shared: #4f5f8a;
+    --kind: #5e7a4e;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #857e70;
+      --rule: #302e25;
+      --rule-2: #4a473b;
+      --accent: #d9763f;
+      --hover: rgba(237, 233, 223, 0.03);
+      --notice: #d2aa5a;
+      --shared: #8393c4;
+      --kind: #8dae78;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #857e70;
+    --rule: #302e25;
+    --rule-2: #4a473b;
+    --accent: #d9763f;
+    --hover: rgba(237, 233, 223, 0.03);
+    --notice: #d2aa5a;
+    --shared: #8393c4;
+    --kind: #8dae78;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+  .label,
+  .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+  .meta.head {
+    color: var(--accent);
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-style: italic;
+  }
+  .small {
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.4;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .mast .aside {
+    margin: 0;
+    font-size: 16px;
+    color: var(--muted);
+    border-left: 1px solid var(--rule-2);
+    padding-left: 20px;
+  }
+
+  /* lede */
+  .lede {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 48px 40px;
+  }
+  .lede .body {
+    max-width: 64ch;
+  }
+  .claim {
+    font-size: clamp(21px, 2.6vw, 26px);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  /* the book: the sheet and the desk */
+  .book {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19.5rem;
+    gap: 28px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .sheet {
+    padding: 26px 30px 32px;
+    min-width: 0;
+  }
+  .sheet-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .specimen-note {
+    margin: 14px 0 0;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .specimen-note b {
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 5px 10px;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      color 200ms var(--ease),
+      border-color 200ms var(--ease),
+      transform 180ms var(--ease),
+      opacity 200ms var(--ease);
+  }
+  .chip.case {
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 11px;
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--rule-2);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip.accent:not(:disabled):hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--hover);
+  }
+  .chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  /* the open break */
+  .open {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: 20px 36px;
+  }
+  .case {
+    display: block;
+    width: 100%;
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    resize: none;
+    transition: border-color 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    font-style: italic;
+  }
+  .case[readonly] {
+    cursor: default;
+  }
+  .case[readonly]:focus {
+    border-bottom-color: var(--rule-2);
+    box-shadow: none;
+  }
+  .what {
+    font-size: clamp(24px, 3vw, 30px);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .step {
+    margin-top: 22px;
+  }
+  .step > .meta.head {
+    display: block;
+    margin-bottom: 6px;
+  }
+  .three {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sentence {
+    display: grid;
+    grid-template-columns: 10px 6.2ch minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+  }
+  .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0.85;
+  }
+  .sw-notice {
+    background: var(--notice);
+  }
+  .sw-shared {
+    background: var(--shared);
+  }
+  .sw-kind {
+    background: var(--kind);
+  }
+  .sentence .case {
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.25;
+  }
+  .sentence .case.stock {
+    color: var(--muted);
+  }
+  .hardest {
+    background: none;
+    border: 0;
+    padding: 2px 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    opacity: 0;
+    transition:
+      opacity 160ms var(--ease),
+      color 160ms var(--ease);
+  }
+  .sentence:hover .hardest,
+  .hardest:focus-visible {
+    opacity: 1;
+  }
+  .hardest:hover {
+    color: var(--accent);
+  }
+  .hardest.on {
+    opacity: 1;
+    color: var(--accent);
+  }
+  @media (hover: none) {
+    .hardest {
+      opacity: 0.7;
+    }
+  }
+  .hardest:disabled {
+    cursor: default;
+  }
+  .others {
+    margin: 8px 0 0 calc(10px + 6.2ch + 24px);
+    animation: rise 360ms var(--ease) both;
+  }
+  .hint {
+    margin: 10px 0 0;
+    font-size: 15px;
+    color: var(--faint);
+  }
+  .need {
+    font-style: italic;
+    font-size: 21px;
+    line-height: 1.25;
+  }
+  .take {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+  }
+  .take .hand {
+    font-size: 15.5px;
+    color: var(--faint);
+  }
+
+  /* the triad */
+  .triad svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .ring-notice {
+    fill: var(--notice);
+  }
+  .ring-shared {
+    fill: var(--shared);
+  }
+  .ring-kind {
+    fill: var(--kind);
+  }
+  .ring-label {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    fill: var(--ink);
+  }
+  .triad-cap {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 11.5px;
+    fill: var(--faint);
+  }
+  .mark {
+    fill: var(--surface);
+    stroke: var(--ink);
+    stroke-width: 1.1;
+    animation: fade 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .mark.on {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+
+  /* the friend, the letter, afterwards */
+  .friend {
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+  .friend .lead {
+    margin: 4px 0 0;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .voices {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 28px;
+  }
+  .field .case {
+    font-size: 16.5px;
+    line-height: 1.55;
+  }
+  .field .case.big {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+  .compared {
+    margin: 14px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .trouble {
+    margin: 14px 0 0;
+    color: var(--accent);
+  }
+  .off {
+    margin-top: 24px;
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 18px 18px 20px;
+  }
+  .desk p.read {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .record {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .record li {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .record button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 7px 6px;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-radius: 3px;
+    transition: background-color 160ms var(--ease);
+  }
+  .record button:hover {
+    background: var(--hover);
+  }
+  .record .when {
+    color: var(--faint);
+  }
+  .record [aria-current="true"] .when {
+    color: var(--accent);
+  }
+  .record .w {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .record .a {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--muted);
+  }
+  .practices {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .practices .n {
+    font-style: italic;
+    font-size: 17px;
+  }
+  .practices .here {
+    margin-left: 8px;
+    color: var(--faint);
+  }
+  .practices p {
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .source-line {
+    margin: 14px 0 0;
+    color: var(--faint);
+  }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .rise {
+    animation: rise 560ms var(--ease) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .others,
+    .mark,
+    .record li {
+      animation: none;
+    }
+    .chip,
+    .case,
+    .hardest,
+    .record button {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1040px) {
+    .book {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .desk {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  @media (max-width: 860px) {
+    .open {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .triad {
+      max-width: 20rem;
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 44px;
+    }
+    .lede {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      padding-block: 36px 28px;
+    }
+    .voices,
+    .desk {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 520px) {
+    .sheet {
+      padding: 20px 16px 24px;
+    }
+    .sentence {
+      grid-template-columns: 10px minmax(0, 1fr) auto;
+      gap: 4px 10px;
+    }
+    .sentence .lab {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .sentence .hardest {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .sentence .case {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .others {
+      margin-left: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Break</h1>
+      <p class="deck hand">
+        When it hurts: notice it, remember you are not the only one, be kind.
+        Three sentences in your words, a hand where it helps, and what you would
+        say to a friend in your spot.
+      </p>
+    </div>
+    <p class="aside">
+      Mindful self-compassion as an instrument, after Kristin Neff and Chris
+      Germer. The three sentences are enough. Everything under them is there if
+      you want it.
+    </p>
+  </header>
+
+  <section class="lede">
+    <div><span class="label">The claim</span></div>
+    <div class="body">
+      <p class="claim">
+        When something hurts and the critic has the floor, the voice you use on
+        yourself is not the one you would use on a friend in exactly your spot,
+        and from inside you cannot hear the difference.
+      </p>
+      <p>
+        So the page sets the two side by side and counts what each leans on,
+        word by word: absolutes, shoulds, labels, contempt, <em>you</em> turned
+        on yourself, and allowance. Every word it counted is shown so you can
+        check it. It says what the friend's version drops or adds, and never
+        which voice is right. The record counts breaks, hands, and which
+        sentence was hardest to say. It never says you are hard on yourself, and
+        it never scores.
+      </p>
+      <p class="small">
+        It opens on a specimen: one of two breaks a made-up person took, with
+        the friend's version and afterwards filled in. Start your own with
+        <em>a new break</em>. What you write stays in this browser and nowhere
+        else.
+      </p>
+    </div>
+  </section>
+
+  <div class="book">
+    <section class="panel sheet rise" aria-label="The break">
+      <div class="sheet-top">
+        <span class="meta head" id="when">now</span>
+        <div class="chips">
+          <button class="chip" type="button" id="srcSpecimen">
+            the specimen's
+          </button>
+          <button class="chip" type="button" id="srcMine">yours</button>
+          <button class="chip" type="button" id="fresh">a new break</button>
+        </div>
+      </div>
+      <p class="specimen-note hand" id="specimenNote">
+        <b>Specimen A's break.</b> Fiction, and read-only. Press
+        <em>a new break</em> to take your own.
+      </p>
+
+      <div class="open">
+        <div style="min-width: 0">
+          <textarea
+            class="case what"
+            id="what"
+            rows="2"
+            placeholder="what hurts, right now — in a line"
+            aria-label="What hurts"
+          ></textarea>
+
+          <div class="step">
+            <span class="meta head"
+              >the three · say them, out loud if you can</span
+            >
+            <div class="three" id="three"></div>
+            <p class="hint hand">
+              the workbook's words are grey until they are yours · click a
+              sentence for other ways to say it · say which was hardest
+            </p>
+          </div>
+
+          <div class="step">
+            <span class="meta head">a hand</span>
+            <div class="chips" id="touches"></div>
+          </div>
+
+          <div class="step">
+            <label class="meta head" for="need"
+              >what do I need to hear right now?</label
+            >
+            <input
+              class="case need"
+              id="need"
+              placeholder="in a line, from someone who has your back"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="take" id="takeRow">
+            <button class="chip accent" type="button" id="take">
+              take the break
+            </button>
+            <span class="hand"
+              >that is enough. the rest is there if you want it.</span
+            >
+          </div>
+        </div>
+
+        <div class="triad" id="triad"></div>
+      </div>
+
+      <div class="friend">
+        <span class="meta head">the friend</span>
+        <p class="lead hand">
+          what you are saying to yourself, and what you would say to a friend in
+          exactly this spot
+        </p>
+        <div class="voices">
+          <div class="step field">
+            <label class="meta head" for="toSelf">to myself</label>
+            <textarea
+              class="case"
+              id="toSelf"
+              rows="4"
+              placeholder="the voice as it actually sounds"
+            ></textarea>
+          </div>
+          <div class="step field">
+            <label class="meta head" for="toFriend">to a friend</label>
+            <textarea
+              class="case"
+              id="toFriend"
+              rows="4"
+              placeholder="what you would say to them, and how"
+            ></textarea>
+          </div>
+        </div>
+        <p class="compared" id="compared" hidden></p>
+      </div>
+
+      <div class="step field">
+        <label class="meta head" for="letter"
+          >the letter · from someone who loves you as you are</label
+        >
+        <textarea
+          class="case big"
+          id="letter"
+          rows="6"
+          placeholder="who knows your history and your struggles, and is not trying to fix you"
+        ></textarea>
+      </div>
+      <div class="step field">
+        <label class="meta head" for="after">afterwards</label>
+        <textarea
+          class="case"
+          id="after"
+          rows="2"
+          placeholder="how it went, later — a line"
+        ></textarea>
+      </div>
+
+      <div class="off" id="offRow" hidden>
+        <button class="chip" type="button" id="off">
+          take it off the record
+        </button>
+      </div>
+      <p class="meta trouble" id="trouble" role="alert" hidden></p>
+    </section>
+
+    <aside class="desk">
+      <section
+        class="panel rise"
+        style="animation-delay: 60ms"
+        aria-label="The reading"
+      >
+        <span class="meta head">the reading</span>
+        <p class="read" id="reading"></p>
+      </section>
+
+      <section
+        class="panel rise"
+        style="animation-delay: 100ms"
+        aria-label="The record"
+      >
+        <span class="meta head">the record</span>
+        <p class="read hand" id="noRecord" hidden>no breaks taken yet</p>
+        <ol class="record" id="record"></ol>
+      </section>
+
+      <section
+        class="panel rise"
+        style="animation-delay: 140ms"
+        aria-label="The practices, offered"
+      >
+        <span class="meta head">the practices, offered</span>
+        <ol class="practices" id="practices"></ol>
+        <p class="meta plain source-line">
+          after Kristin Neff and Chris Germer, The Mindful Self-Compassion
+          Workbook, and the eight-week course their Center for Mindful
+          Self-Compassion runs
+        </p>
+      </section>
+
+      <section
+        class="panel rise"
+        style="animation-delay: 180ms"
+        aria-label="What the break holds to"
+      >
+        <span class="meta head">what the break holds to</span>
+        <p class="read">
+          The three sentences are enough; everything under them is optional. The
+          hurt is not a problem to be solved here. The friend's version is set
+          beside yours and counted, word by word, so you can see the difference;
+          nothing says which voice is right. The record counts breaks and hands
+          and which sentence was hardest; it never says you are hard on
+          yourself, and it never scores.
+        </p>
+        <p class="meta plain source-line" id="keptWhere"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="label">Break · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ── the break (after niwa lib/break.ts; pure) ──────────────────────────────
+  // Three sentences in the reader's own words, a hand, what they need to hear; then, if they
+  // want, the friend, a letter, afterwards. The desk counts; it never says the reader is hard
+  // on themselves, and it never scores.
+
+  const THREE = ["notice", "shared", "kind"];
+  const THREE_LABEL = { notice: "noticed", shared: "shared", kind: "kind" };
+  const THREE_DEFAULT = {
+    notice: "This is a moment of suffering.",
+    shared: "Suffering is a part of life.",
+    kind: "May I be kind to myself.",
+  };
+  const THREE_OTHERS = {
+    notice: [
+      "This hurts.",
+      "Ouch.",
+      "This is hard right now.",
+      "This is stress.",
+    ],
+    shared: [
+      "Other people feel this way.",
+      "I'm not alone.",
+      "We all struggle in our lives.",
+      "Anyone in this spot would feel this.",
+    ],
+    kind: [
+      "May I give myself what I need.",
+      "May I accept myself as I am.",
+      "May I forgive myself.",
+      "May I be patient.",
+      "May I be strong.",
+    ],
+  };
+
+  const TOUCHES = ["heart", "both", "cheek", "hand", "arms", "none"];
+  const TOUCH_LABEL = {
+    "": "",
+    heart: "a hand on the heart",
+    both: "both hands on the chest",
+    cheek: "a hand on the cheek",
+    hand: "one hand holding the other",
+    arms: "arms around yourself",
+    none: "no hand",
+  };
+
+  const emptyMoment = (at) => ({
+    slug: "",
+    at,
+    what: "",
+    three: { ...THREE_DEFAULT },
+    touch: "",
+    need: "",
+    hardest: "",
+    toSelf: "",
+    toFriend: "",
+    letter: "",
+    after: "",
+    stone: null,
+  });
+
+  const dayOf = (at) => at.slice(0, 10);
+
+  // the two voices
+  const FAMILIES = [
+    "absolutes",
+    "shoulds",
+    "labels",
+    "contempt",
+    "you",
+    "allowance",
+  ];
+  const WORDS = {
+    absolutes:
+      /\b(always|never|every time|everyone|everybody|no one|nobody|nothing|everything|all the time|completely|totally|forever|again and again)\b/gi,
+    shoulds:
+      /\b(should(?:n't| not)?|must(?:n't| not)?|have to|has to|had to|ought(?: not)? to|supposed to)\b/gi,
+    labels:
+      /\b(idiot|stupid|lazy|failure|loser|pathetic|useless|worthless|weak|broken|hopeless|fraud|mess|disaster|coward|selfish|childish|embarrassing|disgusting|incompetent|a joke)\b/gi,
+    contempt:
+      /\b(hate|hated|disgust(?:ing|ed)?|ridiculous|pathetic|contempt|sick of|can't stand)\b/gi,
+    allowance:
+      /\b(it'?s ok(?:ay)?|that'?s ok(?:ay)?|of course|makes sense|understandable|anyone would|you'?re allowed|allowed to|not alone|it'?s hard|this is hard|enough|doing your best|did your best|human|take your time|it will pass|gentle|gently)\b/gi,
+  };
+
+  /** The words a piece of self-talk leans on, by family, with each hit kept so it can be checked. */
+  function census(text) {
+    const out = {};
+    for (const f of FAMILIES) out[f] = [];
+    const t = text.replace(/\s+/g, " ");
+    for (const f of Object.keys(WORDS)) {
+      const hits = t.match(WORDS[f]) ?? [];
+      out[f] = hits.map((h) => h.toLowerCase());
+    }
+    out.you = (t.match(/\byou(?:'re|'ve|'ll|r|rself)?\b/gi) ?? []).map((h) =>
+      h.toLowerCase(),
+    );
+    return out;
+  }
+
+  const list = (xs) => [...new Set(xs)].map((w) => `'${w}'`).join(", ");
+  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+
+  /** The two voices side by side, as counts with the words. Never which voice is right. */
+  function compare(toSelf, toFriend) {
+    if (!toSelf.trim() && !toFriend.trim()) return [];
+    const a = census(toSelf);
+    const b = census(toFriend);
+    const ONE = {
+      absolutes: "absolute",
+      shoulds: "should",
+      labels: "label",
+      contempt: "word of contempt",
+    };
+    const MANY = {
+      absolutes: "absolutes",
+      shoulds: "shoulds",
+      labels: "labels",
+      contempt: "words of contempt",
+    };
+    const say = (c, who) => {
+      const parts = [];
+      for (const f of ["absolutes", "shoulds", "labels", "contempt"])
+        if (c[f].length)
+          parts.push(`${n(c[f].length, ONE[f], MANY[f])} (${list(c[f])})`);
+      if (c.allowance.length)
+        parts.push(
+          `${n(c.allowance.length, "allowance")} (${list(c.allowance)})`,
+        );
+      return `${who}: ${parts.length ? parts.join(", ") : "none of the counted words"}`;
+    };
+    const out = [];
+    if (toSelf.trim()) {
+      out.push(say(a, "to yourself"));
+      if (a.you.length)
+        out.push(`'you' turned on yourself ${n(a.you.length, "time")}`);
+    }
+    if (toFriend.trim()) out.push(say(b, "to a friend"));
+    if (toSelf.trim() && toFriend.trim()) {
+      const onlySelf = ["absolutes", "shoulds", "labels", "contempt"].filter(
+        (f) => a[f].length && !b[f].length,
+      );
+      const onlyFriend = a.allowance.length === 0 && b.allowance.length > 0;
+      if (onlySelf.length && onlyFriend)
+        out.push(
+          `the friend's version drops the ${onlySelf.join(", ")} and adds allowance`,
+        );
+      else if (onlySelf.length)
+        out.push(`the friend's version drops the ${onlySelf.join(", ")}`);
+      else if (onlyFriend) out.push("the friend's version adds allowance");
+      const wa = toSelf.trim().split(/\s+/).length;
+      const wb = toFriend.trim().split(/\s+/).length;
+      if (wb > wa * 1.5) out.push("the friend gets more words");
+      else if (wa > wb * 1.5) out.push("you get more words than the friend");
+    }
+    return out;
+  }
+
+  // the tally and the readings
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+
+  function tally(moments, today) {
+    const days = moments.map((m) => dayOf(m.at));
+    const last = days.slice().sort().at(-1) ?? null;
+    const touches = new Map();
+    const hardest = { notice: 0, shared: 0, kind: 0 };
+    const critic = new Map();
+    let own = 0;
+    for (const m of moments) {
+      if (m.touch) touches.set(m.touch, (touches.get(m.touch) ?? 0) + 1);
+      if (m.hardest) hardest[m.hardest]++;
+      if (
+        THREE.some(
+          (k) => m.three[k].trim() && m.three[k].trim() !== THREE_DEFAULT[k],
+        )
+      )
+        own++;
+      const c = census(m.toSelf);
+      for (const w of new Set([...c.labels, ...c.contempt, ...c.absolutes]))
+        critic.set(w, (critic.get(w) ?? 0) + 1);
+    }
+    return {
+      n: moments.length,
+      week: days.filter((d) => daysBetween(d, today) < 7).length,
+      month: days.filter((d) => daysBetween(d, today) < 30).length,
+      last,
+      sinceLast: last ? daysBetween(last, today) : null,
+      own,
+      touches: [...touches]
+        .map(([touch, n]) => ({ touch, n }))
+        .sort((a, b) => b.n - a.n),
+      hardest,
+      friend: moments.filter((m) => m.toFriend.trim()).length,
+      letter: moments.filter((m) => m.letter.trim()).length,
+      after: moments.filter((m) => m.after.trim()).length,
+      need: moments.filter((m) => m.need.trim()).length,
+      critic: [...critic]
+        .map(([word, n]) => ({ word, n }))
+        .filter((c) => c.n > 1)
+        .sort((a, b) => b.n - a.n || (a.word < b.word ? -1 : 1))
+        .slice(0, 6),
+    };
+  }
+
+  const ago = (d) =>
+    d === 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
+
+  /** Facts about the record of breaks; none a verdict on the reader. */
+  function readings(t) {
+    const out = [];
+    if (!t.n) return ["no breaks taken yet"];
+    out.push(
+      `${n(t.n, "break")} · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
+    );
+    out.push(
+      t.own === t.n
+        ? "the three sentences were in your own words every time"
+        : t.own
+          ? `the three sentences were in your own words in ${t.own} of ${t.n}`
+          : "the three sentences have been the workbook's so far",
+    );
+    if (t.touches.length)
+      out.push(
+        `a hand: ${t.touches.map((x) => `${TOUCH_LABEL[x.touch]} ×${x.n}`).join(", ")}`,
+      );
+    const h = THREE.filter((k) => t.hardest[k]);
+    if (h.length)
+      out.push(
+        `hardest to say: ${h.map((k) => `the ${THREE_LABEL[k]} one ×${t.hardest[k]}`).join(", ")}`,
+      );
+    out.push(
+      `what you needed to hear written for ${t.need} · the friend's version for ${t.friend} · a letter for ${t.letter} · afterwards for ${t.after}`,
+    );
+    if (t.critic.length)
+      out.push(
+        `the words that come back when you talk to yourself: ${t.critic.map((c) => `'${c.word}' ×${c.n}`).join(", ")}`,
+      );
+    return out;
+  }
+
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const AT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?([+-]\d{2}:\d{2}|Z)?$/;
+
+  function validateMoment(input) {
+    const r = input ?? {};
+    const what = str(r.what, 600);
+    if (!what) throw new Error("a break needs what hurts");
+    const t = r.three ?? {};
+    const three = {
+      notice: str(t.notice, 300) || THREE_DEFAULT.notice,
+      shared: str(t.shared, 300) || THREE_DEFAULT.shared,
+      kind: str(t.kind, 300) || THREE_DEFAULT.kind,
+    };
+    const touch = TOUCHES.includes(String(r.touch)) ? r.touch : "";
+    const hardest = THREE.includes(String(r.hardest)) ? r.hardest : "";
+    const at =
+      typeof r.at === "string" && AT.test(r.at)
+        ? r.at
+        : new Date().toISOString().slice(0, 16);
+    const m = {
+      slug: str(r.slug, 120),
+      at,
+      what,
+      three,
+      touch,
+      need: long(r.need, 600),
+      hardest,
+      toSelf: long(r.toSelf, 4000),
+      toFriend: long(r.toFriend, 4000),
+      letter: long(r.letter, 8000),
+      after: long(r.after, 2000),
+      stone: str(r.stone, 200) || null,
+    };
+    if (!m.slug)
+      m.slug = `${at.slice(0, 10)}-${at.slice(11, 13)}${at.slice(14, 16)}`;
+    return m;
+  }
+
+  // ── the workbook's practices (niwa content/break.ts) ────────────────────────
+  const EXERCISES = [
+    {
+      name: "the self-compassion break",
+      how: "In a moment that hurts, say three things: that it hurts, that others feel this too, and something kind. In your own words, and out loud if you can.",
+      here: "break",
+    },
+    {
+      name: "soothing touch",
+      how: "A hand on the heart, both hands on the chest, a hand on the cheek, one hand holding the other, arms around yourself. The body reads it before the mind does.",
+      here: "hand",
+    },
+    {
+      name: "how would I treat a friend?",
+      how: "Write what you would say to a friend in exactly your spot. Then write what you are saying to yourself. Read the two side by side.",
+      here: "friend",
+    },
+    {
+      name: "the compassionate letter",
+      how: "Write to yourself from the point of view of someone who loves you as you are, who knows your history and your struggles, and who is not trying to fix you.",
+      here: "letter",
+    },
+    {
+      name: "affectionate breathing",
+      how: "Sit and let the breath find its own rhythm. Let each breath be a kindness you are receiving, then one you are giving.",
+      here: "wish",
+    },
+    {
+      name: "soften, soothe, allow",
+      how: "Find where the feeling sits in the body. Soften around it. Soothe yourself for having it. Allow it to be there, as it is, for now.",
+      here: null,
+    },
+    {
+      name: "the compassionate voice",
+      how: "Hear what the critic says, and what it is trying to protect. Then let another voice answer, one that wants the same thing for you and says it kindly.",
+      here: null,
+    },
+    {
+      name: "living deeply",
+      how: "Name what you most want your life to be about. Ask where you are already living it, and what stands in the way, and treat the obstacle with compassion.",
+      here: null,
+    },
+  ];
+
+  // Specimen A's breaks: the first with only the three, the second with the friend's version
+  // and afterwards. Fiction.
+  const SPECIMEN = [
+    {
+      slug: "2026-09-24-2210",
+      at: "2026-09-24T22:10+02:00",
+      what: "Sent the wrong file to the client and only saw it two hours later.",
+      three: {
+        notice: "This is a moment of suffering.",
+        shared: "Everyone has sent the wrong file.",
+        kind: "May I be kind to myself.",
+      },
+      touch: "heart",
+      need: "",
+      hardest: "kind",
+      toSelf: "",
+      toFriend: "",
+      letter: "",
+      after: "",
+      stone: null,
+    },
+    {
+      slug: "2026-09-26-0740",
+      at: "2026-09-26T07:40+02:00",
+      what: "Woke up already behind. The list from yesterday, untouched.",
+      three: {
+        notice: "This is stress.",
+        shared: "Anyone in this spot would feel this.",
+        kind: "May I give myself what I need.",
+      },
+      touch: "both",
+      need: "That the list is not a verdict.",
+      hardest: "shared",
+      toSelf:
+        "You're so lazy. You always do this. You should have started last night and now the whole day is a mess.",
+      toFriend:
+        "Of course you're tired, you were up late with the client thing. The list is just a list. Start with one thing and see how it goes; anyone would need a slow morning after yesterday.",
+      letter: "",
+      after: "Did one thing. The day was not a mess.",
+      stone: null,
+    },
+  ].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+
+  // ── the pen (after niwa lib/hand.ts): deterministic for its seed ────────────
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (v) => String(Math.round(v * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const k = Math.round(steps * overlap);
+    for (let i = 0; i <= k; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const v = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [v[0], v[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [v[0], v[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = v;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const len = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < len; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(len - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const l = Math.hypot(tx, ty) || 1;
+        tx /= l;
+        ty /= l;
+        const t = i / (len - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ── the three, drawn ────────────────────────────────────────────────────────
+  // Neff's three as rings that overlap: what is noticed, what is shared, what is kind. Every
+  // break taken is a mark in the ring that was hardest to say that day; the one open is filled.
+  const TW = 300;
+  const TH = 250;
+  const RINGS = [
+    { k: "notice", cx: 105, cy: 92 },
+    { k: "shared", cx: 195, cy: 92 },
+    { k: "kind", cx: 150, cy: 168 },
+  ].map((r) => {
+    const s = seedOf(`triad-${r.k}`);
+    return {
+      ...r,
+      d: ribbon(
+        roughEllipse(150, 130, s, { pad: 0, grow: 1, wobble: 1.2, steps: 20 }),
+        1.6,
+        s,
+      ),
+    };
+  });
+
+  function triad(moments, open) {
+    let h = `<svg viewBox="0 0 ${TW} ${TH}" role="img" aria-label="The three: noticed, shared, kind; a mark for every break in the one hardest to say">`;
+    for (const r of RINGS) {
+      h += `<path class="ring-${r.k}" d="${r.d}" opacity="0.9" transform="translate(${r.cx - 75} ${r.cy - 65})"/>`;
+      const x = r.cx + (r.k === "notice" ? -34 : r.k === "shared" ? 34 : 0);
+      const y = r.k === "kind" ? r.cy + 50 : r.cy - 48;
+      h += `<text class="ring-label" x="${x}" y="${y}" text-anchor="middle">${THREE_LABEL[r.k]}</text>`;
+    }
+    moments
+      .filter((m) => m.hardest)
+      .forEach((m, i) => {
+        const r = RINGS.find((x) => x.k === m.hardest);
+        const j = jitter(seedOf(`mark-${m.slug}`), 22, 0);
+        const on = open && open.slug === m.slug;
+        const cx =
+          r.cx +
+          j.dx * (r.k === "notice" ? -1 : 1) -
+          (r.k === "notice" ? 14 : r.k === "shared" ? -14 : 0);
+        const cy = r.cy + j.dy + (r.k === "kind" ? 8 : -6);
+        h += `<circle class="mark${on ? " on" : ""}" cx="${fx(cx)}" cy="${fx(cy)}" r="${on ? 4 : 2.6}" style="--i:${i}"/>`;
+      });
+    h += `<text class="triad-cap" x="${TW / 2}" y="${TH - 6}" text-anchor="middle">a mark for every break, in the one hardest to say</text></svg>`;
+    return h;
+  }
+
+  // ── keeping: one key in this browser ────────────────────────────────────────
+  const KEY = "pp-break";
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+  const newestFirst = (a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0);
+
+  function load() {
+    let raw = null;
+    try {
+      raw = JSON.parse(localStorage.getItem(KEY) || "null");
+    } catch {
+      raw = null;
+    }
+    const out = [];
+    if (raw && Array.isArray(raw.moments))
+      for (const m of raw.moments) {
+        try {
+          const v = validateMoment(m);
+          if (SLUG.test(v.slug)) out.push(v);
+        } catch {
+          /* a break that no longer reads is left out, not repaired */
+        }
+      }
+    return out.sort(newestFirst);
+  }
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ moments: S.mine }));
+    } catch {
+      say("this browser would not keep it; it lasts until the page is closed.");
+    }
+  }
+
+  // ── state ───────────────────────────────────────────────────────────────────
+  const nowIso = () => {
+    const d = new Date();
+    const p = (v) => String(v).padStart(2, "0");
+    const off = -d.getTimezoneOffset();
+    const sign = off >= 0 ? "+" : "-";
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}${sign}${p(Math.floor(Math.abs(off) / 60))}:${p(Math.abs(off) % 60)}`;
+  };
+  const today = nowIso().slice(0, 10);
+
+  const S = {
+    mine: load(),
+    source: "specimen",
+    open: null,
+    kept: false,
+    sure: false,
+    others: null,
+  };
+  const moments = () => (S.source === "mine" ? S.mine : SPECIMEN);
+  const writable = () => S.source === "mine";
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  function say(msg) {
+    $("trouble").textContent = msg || "";
+    $("trouble").hidden = !msg;
+  }
+
+  function fresh() {
+    S.kept = false;
+    S.open = emptyMoment(nowIso());
+    S.sure = false;
+    S.others = null;
+    say("");
+    render(true);
+  }
+  function loadMoment(m) {
+    S.kept = true;
+    S.open = structuredClone(m);
+    S.sure = false;
+    S.others = null;
+    say("");
+    render(true);
+  }
+
+  /** Keep the open break: a fresh one whose slug is taken gets a numbered one. */
+  function save(m) {
+    if (!writable()) return null;
+    let v;
+    try {
+      v = validateMoment(m);
+    } catch (e) {
+      say(e.message);
+      return null;
+    }
+    if (!S.kept) {
+      const taken = new Set(S.mine.map((x) => x.slug));
+      const base = v.slug;
+      let k = 2;
+      while (taken.has(v.slug)) v.slug = `${base}-${k++}`;
+    }
+    if (!SLUG.test(v.slug)) {
+      say("bad slug");
+      return null;
+    }
+    S.mine = S.mine.some((x) => x.slug === v.slug)
+      ? S.mine.map((x) => (x.slug === v.slug ? v : x))
+      : [v, ...S.mine].sort(newestFirst);
+    persist();
+    S.kept = true;
+    S.open = { ...S.open, slug: v.slug };
+    say("");
+    return v;
+  }
+  // A kept break is kept again whenever a field is let go.
+  const commit = () => {
+    if (S.open && S.kept && writable()) {
+      save(S.open);
+      renderDesk();
+    }
+  };
+  const set = (p) => {
+    S.open = { ...S.open, ...p };
+    if (S.kept && writable()) save(S.open);
+    render(false);
+  };
+
+  // ── the address carries the open break: ?slug= ──────────────────────────────
+  function writeAddress() {
+    try {
+      const url = new URL(location.href);
+      if (S.kept && S.open?.slug && S.source === "mine")
+        url.searchParams.set("slug", S.open.slug);
+      else url.searchParams.delete("slug");
+      history.replaceState(null, "", url);
+    } catch {
+      /* opened from disk, where the address cannot always be changed */
+    }
+  }
+
+  // ── drawing ─────────────────────────────────────────────────────────────────
+  // `fields` is true when the open break changed underneath the inputs and they must be refilled.
+  function render(fields) {
+    const m = S.open;
+    const w = writable();
+    const ms = moments();
+
+    $("srcSpecimen").setAttribute(
+      "aria-pressed",
+      String(S.source === "specimen"),
+    );
+    $("srcMine").setAttribute("aria-pressed", String(S.source === "mine"));
+    $("srcMine").textContent = `yours · ${S.mine.length}`;
+    $("specimenNote").hidden = w;
+
+    for (const id of [
+      "what",
+      "need",
+      "toSelf",
+      "toFriend",
+      "letter",
+      "after",
+    ]) {
+      const el = $(id);
+      el.readOnly = !w;
+      if (fields) el.value = m[id];
+    }
+
+    // the three
+    $("three").innerHTML = THREE.map((k) => {
+      const v = m.three[k];
+      const stock = v === THREE_DEFAULT[k];
+      const hard = m.hardest === k;
+      let h = `<div data-k="${k}"><div class="sentence"><span class="swatch sw-${k}" aria-hidden="true"></span><span class="meta lab" style="color: var(--faint)">${THREE_LABEL[k]}</span>`;
+      h += `<input class="case${stock ? " stock" : ""}" data-three="${k}" value="${esc(v)}" aria-label="The ${THREE_LABEL[k]} sentence"${w ? "" : " readonly"} autocomplete="off" />`;
+      h += hard
+        ? `<button class="hardest on" type="button" data-hardest="" title="this one was hardest to say"${w ? "" : " disabled"}>hardest</button>`
+        : `<button class="hardest" type="button" data-hardest="${k}" title="mark this one as the hardest to say" aria-label="Mark the ${THREE_LABEL[k]} one as hardest"${w ? "" : " disabled"}>hardest?</button>`;
+      h += `</div>`;
+      if (w)
+        h += `<div class="others chips"${S.others === k ? "" : " hidden"}>${[THREE_DEFAULT[k], ...THREE_OTHERS[k]]
+          .map(
+            (o) =>
+              `<button class="chip case" type="button" data-other="${esc(o)}" aria-pressed="${v === o}">${esc(o)}</button>`,
+          )
+          .join("")}</div>`;
+      return h + `</div>`;
+    }).join("");
+
+    // a hand
+    $("touches").innerHTML = TOUCHES.map(
+      (tc) =>
+        `<button class="chip" type="button" data-touch="${tc}" aria-pressed="${m.touch === tc}"${w ? "" : " disabled"}>${TOUCH_LABEL[tc]}</button>`,
+    ).join("");
+
+    // the two voices
+    const voices = compare(m.toSelf, m.toFriend);
+    $("compared").hidden = !voices.length;
+    $("compared").textContent = voices.join(" · ");
+    renderDesk();
+  }
+
+  // What changes when a break is kept, without touching the inputs and buttons under the hand.
+  function renderDesk() {
+    const m = S.open;
+    const w = writable();
+    const ms = moments();
+    $("srcMine").textContent = `yours · ${S.mine.length}`;
+    $("fresh").hidden = !S.kept;
+    $("when").textContent = S.kept
+      ? `a break · ${m.at.slice(0, 16).replace("T", " · ")}`
+      : "now";
+    $("takeRow").hidden = S.kept;
+    $("offRow").hidden = !(S.kept && w);
+    $("off").textContent = S.sure
+      ? "take it off the record — sure?"
+      : "take it off the record";
+    $("off").classList.toggle("accent", S.sure);
+
+    // the triad: the open break is a mark too, before it is kept
+    const marks = m && !S.kept ? [...ms, m] : ms;
+    $("triad").innerHTML = triad(marks, m);
+
+    // the desk
+    $("reading").textContent = readings(tally(ms, today)).join(" · ");
+    $("noRecord").hidden = ms.length > 0;
+    $("record").innerHTML = ms
+      .slice(0, 20)
+      .map((x, i) => {
+        const on = S.kept && m.slug === x.slug;
+        return `<li style="--i:${i}"><button type="button" data-slug="${esc(x.slug)}"${on ? ' aria-current="true"' : ""}><span class="meta plain when">${dayOf(x.at)}${x.touch ? ` · ${TOUCH_LABEL[x.touch]}` : ""}${x.toFriend.trim() ? " · the friend" : ""}${x.letter.trim() ? " · a letter" : ""}</span><span class="w">${esc(x.what)}</span>${x.after.trim() ? `<span class="a">afterwards: ${esc(x.after)}</span>` : ""}</button></li>`;
+      })
+      .join("");
+    $("keptWhere").textContent = w
+      ? "kept in this browser, under pp-break · nothing leaves it"
+      : "fiction, like the rest of the specimen";
+    writeAddress();
+  }
+
+  $("practices").innerHTML = EXERCISES.map(
+    (e) =>
+      `<li><span class="n">${esc(e.name)}</span>${e.here && e.here !== "wish" ? `<span class="meta plain here">on this sheet</span>` : ""}<p>${esc(e.how)}</p></li>`,
+  ).join("");
+
+  // ── the reader's hand on it ─────────────────────────────────────────────────
+  function setSource(src) {
+    if (src === S.source) return;
+    S.source = src;
+    if (src === "mine") {
+      if (S.mine.length) loadMoment(S.mine[0]);
+      else fresh();
+    } else loadMoment(SPECIMEN[0]);
+  }
+  $("srcSpecimen").addEventListener("click", () => setSource("specimen"));
+  $("srcMine").addEventListener("click", () => setSource("mine"));
+  $("fresh").addEventListener("click", () => {
+    S.source = "mine";
+    fresh();
+    $("what").focus();
+  });
+
+  for (const id of ["what", "need", "toSelf", "toFriend", "letter", "after"]) {
+    $(id).addEventListener("input", (e) => {
+      S.open = { ...S.open, [id]: e.target.value };
+      if (id === "toSelf" || id === "toFriend") {
+        const voices = compare(S.open.toSelf, S.open.toFriend);
+        $("compared").hidden = !voices.length;
+        $("compared").textContent = voices.join(" · ");
+      }
+    });
+    $(id).addEventListener("blur", commit);
+  }
+
+  const three = $("three");
+  three.addEventListener("input", (e) => {
+    const k = e.target.dataset.three;
+    if (!k) return;
+    S.open = { ...S.open, three: { ...S.open.three, [k]: e.target.value } };
+    e.target.classList.toggle("stock", e.target.value === THREE_DEFAULT[k]);
+  });
+  three.addEventListener("focusin", (e) => {
+    const k = e.target.dataset.three;
+    if (!k || S.others === k || !writable()) return;
+    S.others = k;
+    for (const o of three.querySelectorAll(".others"))
+      o.hidden = o.parentElement.dataset.k !== k;
+  });
+  three.addEventListener(
+    "blur",
+    (e) => {
+      if (e.target.dataset.three) commit();
+    },
+    true,
+  );
+  // A wording picked from the chips keeps the pointer from blurring the sentence first.
+  three.addEventListener("mousedown", (e) => {
+    if (e.target.closest("[data-other]")) e.preventDefault();
+  });
+  three.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || !writable()) return;
+    const k = b.closest("[data-k]").dataset.k;
+    if (b.dataset.other !== undefined) {
+      const o = b.dataset.other;
+      S.open = { ...S.open, three: { ...S.open.three, [k]: o } };
+      const el = three.querySelector(`[data-three="${k}"]`);
+      el.value = o;
+      el.classList.toggle("stock", o === THREE_DEFAULT[k]);
+      for (const c of b.parentElement.children)
+        c.setAttribute("aria-pressed", String(c.dataset.other === o));
+      if (S.kept) save(S.open);
+      renderDesk();
+      el.focus();
+    } else if (b.dataset.hardest !== undefined)
+      set({ hardest: b.dataset.hardest });
+  });
+
+  $("touches").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-touch]");
+    if (!b || !writable()) return;
+    const tc = b.dataset.touch;
+    set({ touch: S.open.touch === tc ? "" : tc });
+  });
+
+  $("take").addEventListener("click", () => {
+    if (!writable()) return;
+    if (!S.open.what.trim()) {
+      say("say what hurts, in a line");
+      return;
+    }
+    if (save({ ...S.open, at: S.open.at || nowIso() })) render(false);
+  });
+
+  $("off").addEventListener("click", () => {
+    if (!S.kept || !writable()) return;
+    if (!S.sure) {
+      S.sure = true;
+      return render(false);
+    }
+    S.mine = S.mine.filter((x) => x.slug !== S.open.slug);
+    persist();
+    fresh();
+  });
+
+  $("record").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-slug]");
+    if (!b) return;
+    const m = moments().find((x) => x.slug === b.dataset.slug);
+    if (m) loadMoment(m);
+  });
+
+  // ── open: the reader's own record if they have one, else the specimen ───────
+  (() => {
+    let wanted = null;
+    try {
+      wanted = new URLSearchParams(location.search).get("slug");
+    } catch {
+      wanted = null;
+    }
+    if (S.mine.length) {
+      S.source = "mine";
+      const m = wanted && S.mine.find((x) => x.slug === wanted);
+      if (m) loadMoment(m);
+      else fresh();
+    } else loadMoment(SPECIMEN[0]);
+  })();
+</script>

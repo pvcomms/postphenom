@@ -1,0 +1,3078 @@
+<title>Fence</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Chesterton's fence as an instrument. Before a rule, a habit or a custom is cleared away, find out what it was for, and say how you know."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a sheet laid on gravel. Ink on bone. The one accent is the latch, the call and what
+     came through; everything else is ink, pencil (muted) and the faint line of what is hollow. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #645e55;
+    --faint: #8c8478;
+    --rule: #e2ded5;
+    --accent: #a94b24;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain: multiply;
+    --grain-o: 0.06;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --swing: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d766a;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --grain: screen;
+      --grain-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain: screen;
+    --grain-o: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain-o);
+    mix-blend-mode: var(--grain);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .label {
+    margin: 0 0 22px;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(64px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .claim .label {
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+  .claim p:not(.label) {
+    font-size: clamp(18px, 1.9vw, 20px);
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+  .claim p:not(.label):last-child {
+    margin: 0;
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+
+  /* the sheet and the desk */
+  .room {
+    display: grid;
+    gap: 24px;
+    margin-top: 32px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+    animation: rise 600ms var(--ease) both;
+  }
+  .sheet {
+    padding: 22px 20px 26px;
+    scroll-margin-top: 16px;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .desk .panel:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .desk .panel:nth-child(3) {
+    animation-delay: 100ms;
+  }
+  .desk .panel:nth-child(4) {
+    animation-delay: 140ms;
+  }
+  .desk-text {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .desk-sub {
+    margin: 4px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .desk ol {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .desk li > button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .desk li > button:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .desk li > button[aria-current="true"] .meta {
+    color: var(--accent);
+  }
+  .rec-name {
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .rec-sub {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .rule-name {
+    font-size: 17px;
+    line-height: 1.22;
+  }
+  .rule-why {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .rule-why.none {
+    color: var(--faint);
+  }
+  .desk-group {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  blockquote {
+    margin: 12px 0 0;
+    font-size: 16.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+
+  /* the hand-drawn border and the pen's underline */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .mask-line {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .spec-note {
+    margin: 6px 0 0;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .spec-note b {
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .case {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .case[readonly] {
+    border-bottom-color: transparent;
+  }
+  textarea.case {
+    resize: none;
+    overflow: hidden;
+  }
+  .fence-line {
+    margin-top: 8px;
+    font-size: clamp(26px, 3.4vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .prose {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .hand-in {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.25;
+  }
+  .note {
+    margin: 4px 0 0;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .note.faint {
+    color: var(--faint);
+  }
+  .top {
+    display: grid;
+    gap: 20px 32px;
+    margin-top: 16px;
+  }
+  .gate-box {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 34rem;
+  }
+  #gate {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .drawn {
+    margin: 4px 0 0;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .field + .field {
+    margin-top: 20px;
+  }
+  .two {
+    display: grid;
+    gap: 8px 16px;
+    margin-top: 8px;
+  }
+  .part {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .pair {
+    display: grid;
+    gap: 24px 32px;
+  }
+  .row-add {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .row-add .case {
+    flex: 1;
+  }
+  .gutter {
+    width: 32px;
+    flex: none;
+  }
+  .uses,
+  .throughs,
+  .calls,
+  .after-list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .uses {
+    gap: 16px;
+  }
+  .throughs {
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .calls {
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .after-list {
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .use {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .use-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .glyph {
+    flex: none;
+    margin-top: 12px;
+  }
+  .marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 20px;
+    margin-top: 6px;
+  }
+  .thr {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .thr .case {
+    flex: 1;
+    font-size: 18px;
+  }
+  .x {
+    flex: none;
+    padding: 2px 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+  .linkish {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    text-align: left;
+    transition: color 160ms var(--ease);
+  }
+  .linkish.has {
+    color: var(--muted);
+  }
+  .linkish:not(:disabled):hover {
+    color: var(--accent);
+  }
+  .call-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    color: var(--muted);
+  }
+  .call-row.last {
+    color: var(--ink);
+  }
+  .call-row .hand {
+    font-size: 18px;
+    line-height: 1.25;
+  }
+  .call-row .why {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .due {
+    margin: 8px 0 0;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .pending {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .until {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .until input {
+    width: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .after-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .after-row .hand {
+    font-size: 18px;
+    line-height: 1.25;
+  }
+  .after-row .hand.not {
+    color: var(--faint);
+  }
+  .setdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-top: 20px;
+  }
+  .trouble {
+    margin: 12px 0 0;
+    color: var(--accent);
+  }
+
+  /* chips and the choice written out as words */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--muted);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.45;
+  }
+  .seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 4px;
+  }
+  .seg-i {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .seg-o {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    padding-block: 2px;
+    transition: color 160ms var(--ease);
+  }
+  .seg-o.on {
+    color: var(--ink);
+  }
+  .seg-o:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .seg-o:disabled {
+    opacity: 0.7;
+  }
+  .seg .dot {
+    padding-inline: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+  }
+  .ul {
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 6px;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .ul.draw {
+    animation: ul-draw 520ms var(--ease) both;
+  }
+  @keyframes ul-draw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* the drawing's inks: classes, so the theme repaints it without a line of script */
+  .f-ink {
+    fill: var(--ink);
+  }
+  .f-muted {
+    fill: var(--muted);
+  }
+  .f-faint {
+    fill: var(--faint);
+  }
+  .f-accent {
+    fill: var(--accent);
+  }
+  .s-ink {
+    stroke: var(--ink);
+  }
+  .s-muted {
+    stroke: var(--muted);
+  }
+  .s-faint {
+    stroke: var(--faint);
+  }
+  .rail-guess {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.1;
+    stroke-dasharray: 4 3;
+    stroke-linecap: round;
+  }
+  .rail-hollow {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 0.7;
+  }
+  .splinter {
+    fill: none;
+    stroke-width: 1;
+    stroke-linecap: round;
+  }
+  .side {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    fill: var(--faint);
+  }
+  .g-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .halo {
+    stroke: var(--surface);
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+  .ground {
+    fill: var(--muted);
+    opacity: 0.75;
+  }
+  .brace {
+    opacity: 0.8;
+  }
+  .moved-line {
+    stroke: var(--faint);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+
+  /* The drawing moves when the call is made: the fence lies down, the gate swings on its
+     hinge, the latch lifts once a use is found, and what came through crosses over. */
+  .fn-fence,
+  .fn-gate,
+  .fn-latch,
+  .fn-through,
+  .fn-words {
+    transform-box: view-box;
+    transition:
+      transform 900ms var(--swing),
+      opacity 600ms var(--ease);
+  }
+  .fn-latch {
+    transition-duration: 460ms;
+  }
+  .fn-through {
+    transition-delay: calc(var(--i, 0) * 90ms);
+  }
+  .fn-latch path {
+    transition: fill 460ms var(--ease);
+  }
+  /* A rail is drawn on from the left when it is set down, and again when it is inked. */
+  .fn-rail {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: fn-draw 640ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @keyframes fn-draw {
+    from {
+      opacity: 0.15;
+      transform: scaleX(0);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+  /* Rows arrive after the last; a row already on the sheet stays put when the sheet is redrawn. */
+  .fn-row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .fn-arrive {
+    animation: rise 360ms var(--ease) both;
+  }
+  .still {
+    animation: none;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+  footer .label {
+    color: var(--muted);
+  }
+
+  @media (min-width: 640px) {
+    .sheet {
+      padding: 28px;
+    }
+    .two {
+      grid-template-columns: minmax(0, 1fr) 11rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .pair {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .room {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  @media (min-width: 1240px) {
+    .top {
+      grid-template-columns: minmax(0, 1fr) 24rem;
+    }
+    .top .draw-col {
+      order: 2;
+    }
+  }
+  @media (max-width: 820px) {
+    .mast {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-block: 44px 28px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .fn-row,
+    .fn-arrive,
+    .fn-rail,
+    .ul.draw,
+    .sketch .mask-line {
+      animation: none;
+    }
+    .sketch .mask-line {
+      stroke-dashoffset: 0;
+    }
+    .fn-fence,
+    .fn-gate,
+    .fn-latch,
+    .fn-through,
+    .fn-words {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Fence</h1>
+      <p class="deck">
+        <em>Before a thing is cleared away, find out what it was for.</em> What
+        it costs you, what it might be for and how you know, what would come
+        through, whether it could go back up. Then the call is yours.
+      </p>
+    </div>
+    <div class="claim">
+      <p class="label">The claim</p>
+      <p>
+        From where you stand, a fence whose use you cannot see looks like a
+        fence with no use, and a reason you guessed reads like one you found
+        out. The sheet makes you say which. It draws the difference: found in
+        ink, guessed in pencil, a reason that no longer holds as a broken rail.
+      </p>
+      <p>
+        It opens on a specimen, two fences from a small studio that never
+        existed. Start a new fence to set down your own. What you set down stays
+        in this browser.
+      </p>
+    </div>
+  </header>
+
+  <div class="room">
+    <section class="panel sheet" id="sheet" aria-label="The fence">
+      <div id="sheetHead"></div>
+      <div class="top">
+        <div class="draw-col">
+          <div class="gate-box">
+            <svg id="gate" viewBox="0 0 360 292" role="img"></svg>
+            <p class="hand drawn" id="drawn"></p>
+          </div>
+        </div>
+        <div class="cost-col" id="costCol"></div>
+      </div>
+      <div id="sheetBody"></div>
+    </section>
+
+    <aside class="desk">
+      <section class="panel" aria-label="The reading">
+        <div class="label">the reading</div>
+        <p class="desk-text" id="reading"></p>
+      </section>
+      <section class="panel" aria-label="The record">
+        <div class="label">the record</div>
+        <p class="desk-text" id="recordText"></p>
+        <div id="recordList"></div>
+      </section>
+      <section class="panel" aria-label="Fences already standing">
+        <div class="label">fences already standing</div>
+        <p class="hand desk-sub">
+          the rules in the specimen's record, oldest first, each with the reason
+          given then. open one to look at it as a fence.
+        </p>
+        <ol id="standing"></ol>
+      </section>
+      <section class="panel" aria-label="What the fence holds to">
+        <div class="label">what the fence holds to</div>
+        <p class="desk-text">
+          Before a fence comes down, say what it was for. The sheet asks how you
+          know each reason — a guess, or found out by asking, reading or
+          watching — and draws the difference: found in ink, guessed in pencil,
+          a reason that no longer holds as a broken rail. It asks what would
+          come through and whether it could go back up. The call is yours, and
+          dated. Nothing here says whether a fence should come down, and nothing
+          keeps one for being old. The one lean is Chesterton's: taking a fence
+          down before a use is found asks once more, and the record says so.
+        </p>
+        <blockquote class="hand">
+          “If you don't see the use of it, I certainly won't let you clear it
+          away. Go away and think.”
+        </blockquote>
+        <p class="meta" style="margin: 4px 0 0">
+          G. K. Chesterton, The Thing (1929)
+        </p>
+        <p class="meta" id="kept" style="margin: 12px 0 0"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="label">Fence · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────────
+     Two fences from the studio in a synthetic life. The first was looked into and
+     moved: the check stays, the wait goes. The second was taken down for a while and
+     looked at again on the day named; one thing listed came through, and it went back
+     up twice a week. Then the rules already standing in the same studio's record, each
+     with the reason given when it went up. Fiction, all of it. */
+  const SPECIMEN_FENCES = [
+    {
+      slug: "2026-09-08-the-friday-file-check-before-anything-goes-to-a-client",
+      put: "2026-09-08",
+      touched: "2026-09-12",
+      fence: "The Friday file check before anything goes to a client.",
+      cost: "Half an hour every Friday for two of us, and a send that is ready on a Tuesday waits until the end of the week.",
+      maker: "ask",
+      by: "Marta, who ran the studio before me",
+      when: "2021",
+      uses: [
+        {
+          id: "u1",
+          text: "So nothing half-finished goes out.",
+          known: "guess",
+          holds: "",
+          instead: "",
+          by: "you",
+          kept: true,
+        },
+        {
+          id: "u2",
+          text: "After the week a client was sent another client's drafts.",
+          known: "asked",
+          holds: "holds",
+          instead: "",
+          by: "you",
+          kept: true,
+        },
+        {
+          id: "u3",
+          text: "So the juniors see everything that leaves the studio.",
+          known: "seen",
+          holds: "unsure",
+          instead: "the Thursday review, partly",
+          by: "you",
+          kept: true,
+        },
+      ],
+      through: [
+        { id: "t1", text: "A wrong file, to the wrong client.", came: "" },
+        { id: "t2", text: "The juniors never seeing finished work.", came: "" },
+      ],
+      back: "easily",
+      backHow: "A line back in the Friday calendar.",
+      calls: [
+        {
+          on: "2026-09-12",
+          call: "move",
+          until: "",
+          note: "To the day a send is ready — the check stays, the wait goes.",
+          unseen: false,
+        },
+      ],
+      after: "",
+      stone: null,
+    },
+    {
+      slug: "2026-09-15-the-9-30-stand-up-every-day",
+      put: "2026-09-15",
+      touched: "2026-09-26",
+      fence: "The 9:30 stand-up, every day.",
+      cost: "Fifteen minutes that break the best hour of the morning, for four people.",
+      maker: "me",
+      by: "the week we all went home",
+      when: "March 2020",
+      uses: [
+        {
+          id: "u1",
+          text: "So the ones working from home were not forgotten.",
+          known: "written",
+          holds: "gone",
+          instead: "",
+          by: "you",
+          kept: true,
+        },
+        {
+          id: "u2",
+          text: "So blocked work surfaces the same day, not on Friday.",
+          known: "guess",
+          holds: "",
+          instead: "",
+          by: "you",
+          kept: true,
+        },
+      ],
+      through: [
+        { id: "t1", text: "Blocked work sitting for days.", came: "came" },
+        { id: "t2", text: "The quiet junior going quieter.", came: "not" },
+      ],
+      back: "easily",
+      backHow: "One message on a Monday.",
+      calls: [
+        {
+          on: "2026-09-15",
+          call: "trial",
+          until: "2026-09-26",
+          note: "Two weeks without it, watching the board.",
+          unseen: false,
+        },
+        {
+          on: "2026-09-26",
+          call: "back",
+          until: "",
+          note: "Twice a week, Monday and Thursday.",
+          unseen: false,
+        },
+      ],
+      after:
+        "Two tasks sat blocked for three days before anyone said. Nobody missed the ritual itself.",
+      stone: null,
+    },
+  ];
+
+  /* What an empty sheet draws before a word is typed: the gate Chesterton had in mind,
+     across a lane, with two guesses at what it is for and nothing found yet. */
+  const EXAMPLE_FENCE = {
+    slug: "",
+    put: "",
+    touched: "",
+    fence: "The gate across the lane to the top field.",
+    cost: "Out of the car to open it, and out again to shut it, twice a day.",
+    maker: "unknown",
+    by: "",
+    when: "before we came",
+    uses: [
+      {
+        id: "u1",
+        text: "To keep the sheep off the lane.",
+        known: "guess",
+        holds: "",
+        instead: "",
+        by: "you",
+        kept: true,
+      },
+      {
+        id: "u2",
+        text: "To mark where the right of way ends.",
+        known: "guess",
+        holds: "",
+        instead: "",
+        by: "you",
+        kept: true,
+      },
+    ],
+    through: [
+      { id: "t1", text: "Sheep on the lane.", came: "" },
+      { id: "t2", text: "Walkers in the top field.", came: "" },
+    ],
+    back: "cost",
+    backHow: "A new gate and two posts, and a day to hang it.",
+    calls: [],
+    after: "",
+    stone: null,
+  };
+
+  /* The studio's rules, as the specimen's record keeps them: a rule, the reason given
+     when it went up, and the day it first appears in the record (null: not yet). */
+  const SPECIMEN_RULES = [
+    {
+      id: "rule-no-calls-after-six",
+      label: "No client calls after six.",
+      why: "The winter we all answered at nine at night, and the work was no better for it.",
+      since: "2023-01-09",
+    },
+    {
+      id: "rule-date-first",
+      label: "Every file is named with its date first.",
+      why: "The week the wrong version went out twice, because nobody could tell which was newest.",
+      since: "2022-05-16",
+    },
+    {
+      id: "rule-two-readers",
+      label: "Two people read anything before it goes to print.",
+      why: "The brochure that went to print with the wrong phone number, four thousand copies of it.",
+      since: "2021-11-02",
+    },
+    {
+      id: "rule-no-leave-quarter-end",
+      label: "Nobody books leave in the last week of a quarter.",
+      why: "",
+      since: "2024-03-25",
+    },
+    {
+      id: "rule-juniors-first-meeting",
+      label: "The juniors sit in on every first client meeting.",
+      why: "So they hear what the client asked for, and not my version of it.",
+      since: null,
+    },
+  ];
+
+  /* ── the fence (a hand port of niwa's lib/fence.ts; the maths and the words are the same) ── */
+
+  const MAKERS = ["me", "ask", "gone", "unknown"];
+  const MAKER_LABEL = {
+    me: "I did",
+    ask: "someone I can ask",
+    gone: "someone I can't ask",
+    unknown: "no one knows",
+  };
+  const KNOWN = ["guess", "asked", "written", "seen"];
+  const KNOWN_LABEL = {
+    guess: "a guess",
+    asked: "asked",
+    written: "found it written",
+    seen: "saw it at work",
+  };
+  const HOLDS = ["holds", "gone", "unsure"];
+  const HOLDS_LABEL = {
+    holds: "still holds",
+    gone: "no longer holds",
+    unsure: "not sure",
+  };
+  const BACKS = ["easily", "cost", "never"];
+  const BACK_LABEL = {
+    easily: "easily",
+    cost: "at a cost",
+    never: "not at all",
+  };
+  const CALL_KINDS = ["keep", "move", "down", "trial", "back"];
+  /* How a call made is written: on the record, in the readings. */
+  const CALL_LABEL = {
+    keep: "kept",
+    move: "moved",
+    down: "taken down",
+    trial: "down for a while",
+    back: "put back up",
+  };
+  /* How the call is asked for, before it is made. */
+  const CALL_ASK = {
+    keep: "keep it",
+    move: "move it",
+    down: "take it down",
+    trial: "down for a while",
+    back: "put it back up",
+  };
+
+  const last = (xs) => xs[xs.length - 1];
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  const emptyFence = (day) => ({
+    slug: "",
+    put: day,
+    touched: day,
+    fence: "",
+    cost: "",
+    maker: "",
+    by: "",
+    when: "",
+    uses: [],
+    through: [],
+    back: "",
+    backHow: "",
+    calls: [],
+    after: "",
+    stone: null,
+  });
+  const newUse = (text) => ({
+    id: uid(),
+    text,
+    known: "guess",
+    holds: "",
+    instead: "",
+    by: "you",
+    kept: true,
+  });
+  const newThrough = (text) => ({ id: uid(), text, came: "" });
+
+  /* where it stands */
+  const stateOf = (f) => (f.calls.length ? last(f.calls).call : "open");
+  /* A use is found when it is kept and known by more than a guess. */
+  const isFound = (u) => u.kept && u.known !== "guess";
+  const hasUse = (f) => f.uses.some(isFound);
+  /* Whether the fence has ever come down, so that afterwards can be asked. */
+  const cameDown = (f) =>
+    f.calls.some((c) => c.call === "down" || c.call === "trial");
+  /* The calls a fence can take from where it stands. */
+  function callsFrom(s) {
+    if (s === "down") return ["back", "move"];
+    if (s === "trial") return ["back", "move", "down"];
+    return ["keep", "move", "down", "trial"];
+  }
+
+  /* days */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  /* A when as written: a day with its year, anything else as the reader put it. */
+  const whenWords = (w) =>
+    DAY.test(w.trim())
+      ? `${dayWords(w.trim())} ${w.trim().slice(0, 4)}`
+      : w.trim();
+  /* A trial whose day to look again has come. */
+  const isDue = (f, today) => {
+    const c = last(f.calls);
+    return (
+      !!c &&
+      c.call === "trial" &&
+      DAY.test(c.until) &&
+      daysBetween(c.until, today) >= 0
+    );
+  };
+
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max).replace(/\s+\S*$/, "")}…`;
+
+  /* The rules in the record, oldest first; those with no day on record last. */
+  const standingOf = (rules) =>
+    rules
+      .map((r) => ({ id: r.id, label: r.label, why: r.why, since: r.since }))
+      .sort((a, b) => {
+        const x = a.since ?? "9";
+        const y = b.since ?? "9";
+        return x < y ? -1 : x > y ? 1 : a.label < b.label ? -1 : 1;
+      });
+
+  /* A fresh fence about a rule: its name as the fence, its recorded reason offered hollow. */
+  const fenceAbout = (a, day) => ({
+    ...emptyFence(day),
+    fence: a.label,
+    maker: a.mine ? "me" : "",
+    when: a.since ?? "",
+    uses: a.why
+      ? [
+          {
+            id: "u1",
+            text: a.why,
+            known: "written",
+            holds: "",
+            instead: "",
+            by: "garden",
+            kept: false,
+          },
+        ]
+      : [],
+    stone: a.id,
+  });
+
+  /* the readings */
+  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const FOUND_WORDS = {
+    asked: "found by asking",
+    written: "found written",
+    seen: "seen at work",
+  };
+
+  function made(f) {
+    const who =
+      f.maker === "me"
+        ? `you put it up${f.by.trim() ? ` — ${f.by.trim()}` : ""}`
+        : f.by.trim()
+          ? `put up by ${f.by.trim()}`
+          : f.maker === "unknown"
+            ? "no one knows who put it up"
+            : "";
+    const parts = [`set down ${dayWords(f.put)}`];
+    if (who) parts.push(who);
+    if (f.when.trim()) parts.push(whenWords(f.when));
+    if (f.maker === "ask") parts.push("someone you can ask");
+    if (f.maker === "gone") parts.push("someone you cannot ask");
+    return parts.join(" · ");
+  }
+
+  function callWords(c, today) {
+    if (c.call === "trial") {
+      const left = daysBetween(today, c.until);
+      const when = DAY.test(c.until)
+        ? left > 0
+          ? `, until ${dayWords(c.until)} — ${n(left, "day")} to go`
+          : left === 0
+            ? `, until ${dayWords(c.until)} — the day to look again is today`
+            : `, until ${dayWords(c.until)} — the day to look again was ${n(-left, "day")} ago`
+        : "";
+      return `down for a while since ${dayWords(c.on)}${when}`;
+    }
+    // A move and a putting back say where the fence went; the other calls' notes are
+    // reasons, and stay on the sheet.
+    const where =
+      (c.call === "move" || c.call === "back") && c.note.trim()
+        ? `: ${c.note.trim()}`
+        : "";
+    return `${CALL_LABEL[c.call]} ${dayWords(c.on)}${where}`;
+  }
+
+  /* Facts about one fence, in the order the sheet asks for them; never a verdict. */
+  function readings(f, today) {
+    const out = [made(f)];
+    const kept = f.uses.filter((u) => u.kept);
+    const hollow = f.uses.length - kept.length;
+    if (!f.uses.length) out.push("nothing set down yet that it might be for");
+    else {
+      const found = ["asked", "written", "seen"]
+        .map((k) => [k, kept.filter((u) => u.known === k).length])
+        .filter(([, c]) => c)
+        .map(([k, c]) => `${c} ${FOUND_WORDS[k]}`);
+      const guesses = kept.filter((u) => u.known === "guess").length;
+      if (guesses) found.push(n(guesses, "guess", "guesses"));
+      if (hollow) found.push(`${hollow} from the record, not yet kept`);
+      out.push(
+        `${n(f.uses.length, "thing")} it might be for: ${found.join(", ")}`,
+      );
+      const first = f.uses.find(isFound);
+      out.push(
+        first
+          ? `a use found: ${clip(first.text, 90)}`
+          : kept.length
+            ? "no use found yet: every one is a guess"
+            : "no use found yet",
+      );
+      const fu = f.uses.filter(isFound);
+      const marks = HOLDS.map((h) => [
+        h,
+        fu.filter((u) => u.holds === h).length,
+      ])
+        .filter(([, c]) => c)
+        .map(([h, c]) =>
+          h === "unsure"
+            ? `${c} not sure`
+            : `${c} ${h === "holds" ? "still" : "no longer"} ${c === 1 ? "holds" : "hold"}`,
+        );
+      if (marks.length) out.push(`of what was found: ${marks.join(", ")}`);
+      const instead = kept.filter((u) => u.instead.trim());
+      if (instead.length)
+        out.push(
+          `something else does this now for ${instead.length}: ${instead.map((u) => u.instead.trim()).join("; ")}`,
+        );
+    }
+    out.push(
+      f.through.length
+        ? `if it came down: ${n(f.through.length, "thing")} you said would come through`
+        : "not said yet what would come through",
+    );
+    out.push(
+      f.back
+        ? `if it has to go back up: ${BACK_LABEL[f.back]}${f.backHow.trim() ? ` — ${f.backHow.trim()}` : ""}`
+        : "not said yet whether it could go back up",
+    );
+    const c = last(f.calls);
+    if (!c) out.push("no call yet");
+    else {
+      const earlier = f.calls
+        .slice(0, -1)
+        .map((x) => `${CALL_LABEL[x.call]} ${dayWords(x.on)}`);
+      out.push(
+        `${callWords(c, today)}${c.unseen ? ", before a use was found" : ""}${earlier.length ? ` · before that: ${earlier.join(", ")}` : ""}`,
+      );
+    }
+    if (cameDown(f) && f.through.length) {
+      const came = f.through.filter((t) => t.came === "came").length;
+      const not = f.through.filter((t) => t.came === "not").length;
+      const open = f.through.length - came - not;
+      if (came || not)
+        out.push(
+          `afterwards: of the ${f.through.length} you listed, ${came} came through, ${not} did not${open ? `, ${open} not marked` : ""}`,
+        );
+    }
+    return out;
+  }
+
+  function tally(fences, today) {
+    const state = { open: 0, keep: 0, move: 0, down: 0, trial: 0, back: 0 };
+    const by = { asked: 0, written: 0, seen: 0 };
+    let uses = 0,
+      guesses = 0,
+      holds = 0,
+      gone = 0,
+      unsure = 0,
+      looked = 0,
+      listed = 0;
+    for (const f of fences) {
+      state[stateOf(f)]++;
+      for (const u of f.uses.filter((x) => x.kept)) {
+        uses++;
+        if (u.known === "guess") guesses++;
+        else {
+          by[u.known]++;
+          if (u.holds === "holds") holds++;
+          if (u.holds === "gone") gone++;
+          if (u.holds === "unsure") unsure++;
+        }
+      }
+      if (cameDown(f) && f.through.some((t) => t.came)) {
+        looked++;
+        if (f.through.some((t) => t.came === "came")) listed++;
+      }
+    }
+    return {
+      n: fences.length,
+      found: fences.filter(hasUse).length,
+      state,
+      unseen: fences.filter((f) => f.calls.some((c) => c.unseen)).length,
+      uses,
+      guesses,
+      by,
+      holds,
+      gone,
+      unsure,
+      looked,
+      listed,
+      due: fences
+        .filter((f) => isDue(f, today))
+        .map((f) => ({
+          slug: f.slug,
+          fence: f.fence,
+          until: last(f.calls).until,
+        })),
+    };
+  }
+
+  const STATE_WORDS = {
+    open: "no call yet",
+    keep: "kept",
+    move: "moved",
+    down: "down",
+    trial: "down for a while",
+    back: "put back up",
+  };
+
+  /* Facts about the record of fences; none a verdict on a fence or the reader. */
+  function recordReadings(t) {
+    if (!t.n) return ["no fences set down yet"];
+    const out = [`${n(t.n, "fence")} set down · a use found for ${t.found}`];
+    out.push(
+      `where they stand: ${Object.keys(STATE_WORDS)
+        .filter((s) => t.state[s])
+        .map((s) => `${STATE_WORDS[s]} ${t.state[s]}`)
+        .join(" · ")}`,
+    );
+    if (t.unseen) out.push(`taken down before a use was found: ${t.unseen}`);
+    if (t.uses) {
+      const found = t.uses - t.guesses;
+      const how = ["asked", "written", "seen"]
+        .filter((k) => t.by[k])
+        .map((k) => `${FOUND_WORDS[k]} ${t.by[k]}`);
+      const marks = [
+        t.holds ? `${t.holds} still ${t.holds === 1 ? "holds" : "hold"}` : "",
+        t.gone ? `${t.gone} no longer` : "",
+        t.unsure ? `${t.unsure} not sure` : "",
+      ].filter(Boolean);
+      out.push(
+        `what they might be for: ${t.uses} — ${n(t.guesses, "guess", "guesses")}, ${found} found${how.length ? ` (${how.join(", ")})` : ""}${marks.length ? ` · of the found, ${marks.join(", ")}` : ""}`,
+      );
+    }
+    if (t.looked)
+      out.push(
+        `looked at again after coming down: ${t.looked} — something you listed came through for ${t.listed} of ${t.looked}`,
+      );
+    if (t.due.length)
+      out.push(
+        `a day to look again has come: ${t.due.map((d) => `${d.fence.replace(/[.!?]+$/, "")} (${dayWords(d.until)})`).join(", ")}`,
+      );
+    return out;
+  }
+
+  /* validation: every choice clamped, a call of no kind the sheet knows dropped, a fence with no words refused */
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const dayOr = (v, or) => (typeof v === "string" && DAY.test(v) ? v : or);
+  const ID = /^[a-z0-9]{1,24}$/;
+  const oneOf = (v, xs, or) => (xs.includes(String(v)) ? v : or);
+
+  function validateFence(input) {
+    const r = input ?? {};
+    const fence = str(r.fence, 300);
+    if (!fence) throw new Error("a fence needs what it is, in a line");
+    const today = new Date().toISOString().slice(0, 10);
+    const put = dayOr(r.put, today);
+    const list = (v) => (Array.isArray(v) ? v : []).slice(0, 12);
+    const uses = list(r.uses)
+      .filter((u) => str(u.text, 400))
+      .map((u, i) => ({
+        id: typeof u.id === "string" && ID.test(u.id) ? u.id : `u${i + 1}`,
+        text: str(u.text, 400),
+        known: oneOf(u.known, KNOWN, "guess"),
+        holds: oneOf(u.holds, ["", ...HOLDS], ""),
+        instead: str(u.instead, 200),
+        by: u.by === "garden" ? "garden" : "you",
+        kept: u.kept !== false,
+      }));
+    const through = list(r.through)
+      .filter((t) => str(t.text, 200))
+      .map((t, i) => ({
+        id: typeof t.id === "string" && ID.test(t.id) ? t.id : `t${i + 1}`,
+        text: str(t.text, 200),
+        came: oneOf(t.came, ["", "came", "not"], ""),
+      }));
+    // Same-day calls keep the order they were made in: the sort is stable.
+    const calls = (Array.isArray(r.calls) ? r.calls : [])
+      .slice(0, 30)
+      .filter((c) => CALL_KINDS.includes(String(c?.call)))
+      .map((c) => ({
+        on: dayOr(c.on, put),
+        call: c.call,
+        until: c.call === "trial" ? dayOr(c.until, "") : "",
+        note: str(c.note, 400),
+        unseen: (c.call === "down" || c.call === "trial") && c.unseen === true,
+      }))
+      .sort((a, b) => (a.on < b.on ? -1 : a.on > b.on ? 1 : 0));
+    const f = {
+      slug: str(r.slug, 120),
+      put,
+      touched: dayOr(r.touched, put),
+      fence,
+      cost: long(r.cost, 2000),
+      maker: oneOf(r.maker, ["", ...MAKERS], ""),
+      by: str(r.by, 200),
+      when: str(r.when, 80),
+      uses,
+      through,
+      back: oneOf(r.back, ["", ...BACKS], ""),
+      backHow: long(r.backHow, 600),
+      calls,
+      after: long(r.after, 2000),
+      stone: str(r.stone, 200) || null,
+    };
+    if (!f.slug) f.slug = slugOf(f.fence, f.put);
+    return f;
+  }
+
+  /* ── the hand (a port of niwa's lib/hand.ts): every stroke is the same for its seed ── */
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (v) => String(Math.round(v * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /* One pen stroke from a to b, the pen starting and stopping just past the ends. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len,
+      uy = dy / len;
+    const nx = -uy,
+      ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+  /* A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset,
+      y0 = inset,
+      x1 = w - inset,
+      y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)],
+        p1 = pts[i],
+        p2 = pts[i + 1],
+        p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+  /* The circling: a loop round a w×h box that runs past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2,
+      cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const k = Math.round(steps * overlap);
+    for (let i = 0; i <= k; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx,
+        y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const v = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [v[0], v[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [v[0], v[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = v;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10,
+            u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  /* The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const k = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [],
+        right = [];
+      for (let i = 0; i < k; i++) {
+        const a = pts[Math.max(0, i - 1)],
+          b = pts[Math.min(k - 1, i + 1)];
+        let tx = b[0] - a[0],
+          ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (k - 1);
+        const kk = t * 4;
+        const ki = Math.min(3, Math.floor(kk));
+        const press = knots[ki] * (1 - (kk - ki)) + knots[ki + 1] * (kk - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2,
+          ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const KEY = "pp-fence";
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const TODAY = localToday();
+  const clipEnd = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
+
+  const NOTE_ASK = {
+    keep: "why, in a line — if you want",
+    move: "moved to what, or where",
+    down: "why, in a line — if you want",
+    trial: "what you will watch for while it is down",
+    back: "how it goes back up — as it was, or changed",
+  };
+  const STATE_SHORT = {
+    open: "no call yet",
+    keep: "kept",
+    move: "moved",
+    down: "down",
+    trial: "down for a while",
+    back: "put back up",
+  };
+
+  const S = {
+    own: [],
+    last: "",
+    stored: true,
+    open: null,
+    slug: "",
+    kept: false,
+    example: false,
+    spec: false,
+    trouble: null,
+    sure: null,
+    pending: null,
+    useText: "",
+    throughText: "",
+    insteadFor: null,
+    picked: null,
+    focusNext: null,
+    seen: new Set(),
+    deskSeen: new Set(),
+  };
+  const editable = () => !S.spec;
+
+  /* storage: one key, and the page still works when the browser will not keep anything */
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      const fences = [];
+      for (const f of Array.isArray(data?.fences) ? data.fences : []) {
+        try {
+          const v = validateFence(f);
+          if (SLUG.test(v.slug) && !fences.some((x) => x.slug === v.slug))
+            fences.push(v);
+        } catch {
+          /* a fence with no words is not read back */
+        }
+      }
+      S.own = fences;
+      S.last = typeof data?.last === "string" ? data.last : "";
+      sortOwn();
+    } catch {
+      S.stored = false;
+    }
+  }
+  function persist() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({ v: 1, fences: S.own, last: S.last }),
+      );
+      S.stored = true;
+      return true;
+    } catch {
+      S.stored = false;
+      return false;
+    }
+  }
+  function sortOwn() {
+    S.own.sort((a, b) =>
+      a.touched !== b.touched
+        ? a.touched < b.touched
+          ? 1
+          : -1
+        : a.put < b.put
+          ? 1
+          : a.put > b.put
+            ? -1
+            : 0,
+    );
+  }
+
+  /* entrances: a row animates the first time it is drawn for this fence, never again */
+  function enter(set, key) {
+    if (set.has(key)) return " still";
+    set.add(key);
+    return "";
+  }
+
+  /* ── the hand-drawn border on a panel ─────────────────────────────────── */
+
+  let maskN = 0;
+  function sketch(host, seed) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    host.prepend(svg);
+    let size = [0, 0];
+    const draw = () => {
+      const [w, h] = size;
+      if (!w || !h) return;
+      const s = seedOf(host.dataset.seed || seed);
+      const line = roughRect(w, h, s);
+      const id = `m${++maskN}`;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML =
+        `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+        `<path class="mask-line" d="${line}" pathLength="1" stroke-width="7.4"/></mask></defs>` +
+        `<path class="ink" d="${ribbon(line, 1.7, s)}" mask="url(#${id})"/>`;
+    };
+    new ResizeObserver(() => {
+      const next = [host.offsetWidth, host.offsetHeight];
+      if (next[0] === size[0] && next[1] === size[1]) return;
+      size = next;
+      draw();
+    }).observe(host);
+    host._redraw = draw;
+  }
+
+  /* ── the pieces of the sheet ──────────────────────────────────────────── */
+
+  const chip = (
+    text,
+    act,
+    { on = false, accent = false, disabled = false, k = act, attrs = "" } = {},
+  ) =>
+    `<button type="button" class="chip${on ? " on" : ""}${accent ? " accent" : ""}" data-act="${act}" data-k="${esc(k)}" ${attrs}${on ? ' aria-pressed="true"' : ""}${disabled ? " disabled" : ""}>${esc(text)}</button>`;
+
+  function underline(seed, draw) {
+    const s = seedOf(seed);
+    return `<svg class="ul${draw ? " draw" : ""}" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true"><path class="f-accent" d="${ribbon(roughUnderline(100, s, { y: 3 }), 1.5, s)}"/></svg>`;
+  }
+
+  /* A choice written out as words, the one chosen inked and underlined by hand. */
+  function seg(label, options, labels, value, act, id = "") {
+    const W = editable();
+    return (
+      `<span class="seg" role="group" aria-label="${esc(label)}">` +
+      options
+        .map((o, i) => {
+          const on = value === o;
+          const k = `${act}:${id}:${o}`;
+          return (
+            `<span class="seg-i"><button type="button" class="seg-o${on ? " on" : ""}" data-act="${act}" data-v="${o}"${id ? ` data-id="${esc(id)}"` : ""} data-k="${esc(k)}" aria-pressed="${on}"${W ? "" : " disabled"}>` +
+            `${esc(labels[o])}${on ? underline(`${label}-${o}`, S.picked === k) : ""}</button>` +
+            (i < options.length - 1
+              ? `<span class="dot" aria-hidden="true">·</span>`
+              : "") +
+            `</span>`
+          );
+        })
+        .join("") +
+      `</span>`
+    );
+  }
+
+  /* the drawing's styles: inked when found, pencilled when guessed, hollow from the record */
+  const styleOf = (u) =>
+    !u.kept ? "hollow" : u.known === "guess" ? "guess" : "found";
+  const INK = { found: "ink", guess: "muted", hollow: "faint" };
+  function rail(d, style, seed) {
+    if (style === "found")
+      return `<path class="f-ink" d="${ribbon(d, 2.6, seed)}"/>`;
+    if (style === "guess") return `<path class="rail-guess" d="${d}"/>`;
+    return `<path class="rail-hollow" d="${ribbon(d, 3.4, seed)}"/>`;
+  }
+  /* The same rail, small, beside its use on the sheet. */
+  function railGlyph(u) {
+    const style = styleOf(u);
+    const broken = u.holds === "gone";
+    const s = seedOf(`glyph-${u.id}`);
+    const r = rand(s);
+    const parts = broken
+      ? [
+          stroke([2, 6], [13, 6], r, 0.7, 1),
+          stroke([19, 6], [30, 6], r, 0.7, 1),
+        ]
+      : [stroke([2, 6], [30, 6], r, 0.7, 1)];
+    return `<svg class="glyph" viewBox="0 0 32 12" width="32" height="12" aria-hidden="true">${parts.map((d, i) => rail(d, style, s + i)).join("")}</svg>`;
+  }
+
+  /* ── the drawing ─────────────────────────────────────────────────────── */
+
+  const GW = 360,
+    GH = 292,
+    GROUND = 212,
+    TOP = 94;
+  const POSTS = [40, 110, 180, 250, 320];
+  const HINGE = 180,
+    LATCH = 250,
+    LATCH_Y = 150;
+  /* Where the things that would come through stand on the other side: a few get rows of
+     their own and room for their words; five share the ground and are cut short. */
+  const BEYOND = {
+    1: [[46, 52]],
+    2: [
+      [46, 40],
+      [150, 70],
+    ],
+    3: [
+      [46, 34],
+      [176, 56],
+      [70, 80],
+    ],
+    5: [
+      [46, 44],
+      [178, 34],
+      [258, 58],
+      [104, 70],
+      [214, 80],
+    ],
+  };
+  const spotsFor = (k) => BEYOND[k] ?? BEYOND[5];
+  const wordsFor = (k) => (k <= 3 ? 44 : 26);
+  const railYs = (k) =>
+    k <= 1
+      ? [158]
+      : Array.from({ length: k }, (_, i) => 120 + (i * 78) / (k - 1));
+
+  const G = { railKey: null, rails: [] };
+
+  function buildGate() {
+    const svg = $("#gate");
+    const posts = POSTS.map((x, i) => {
+      const s = seedOf(`fence-post-${i}`);
+      return ribbon(
+        stroke(
+          [x, GROUND + 7],
+          [x, TOP - (x === HINGE || x === LATCH ? 7 : 0)],
+          rand(s),
+          0.8,
+          2,
+        ),
+        3.6,
+        s,
+      );
+    });
+    const s = seedOf("fence-frame");
+    const r = rand(s);
+    const ground = ribbon(
+      stroke([8, GROUND + 6], [GW - 8, GROUND + 6], r, 1.4, 4),
+      1.3,
+      s,
+    );
+    const brace = ribbon(
+      stroke([HINGE + 5, GROUND - 12], [LATCH - 5, TOP + 14], r, 1, 2),
+      2,
+      s + 1,
+    );
+    const hinges = [TOP + 22, GROUND - 26].map((y, i) =>
+      ribbon(stroke([HINGE - 6, y], [HINGE + 9, y], r, 0.4, 1), 2.2, s + 2 + i),
+    );
+    const bar = ribbon(
+      stroke([LATCH - 20, LATCH_Y - 2], [LATCH + 8, LATCH_Y - 2], r, 0.5, 1),
+      2.2,
+      s + 5,
+    );
+    const hook = ribbon(
+      stroke([LATCH + 8, LATCH_Y - 2], [LATCH + 9, LATCH_Y + 5], r, 0.3, 0),
+      2,
+      s + 6,
+    );
+    svg.innerHTML =
+      `<text class="side" x="10" y="16">THE OTHER SIDE</text>` +
+      `<text class="side" x="10" y="${GH - 6}">THIS SIDE</text>` +
+      `<g id="gMoved"></g>` +
+      `<path class="ground" d="${ground}"/>` +
+      `<g class="fn-fence" id="gFence" style="transform-origin:${GW / 2}px ${GROUND + 6}px">` +
+      posts.map((d) => `<path class="f-ink" d="${d}"/>`).join("") +
+      `<circle class="f-ink" cx="${LATCH + 6}" cy="${LATCH_Y + 3}" r="2.3"/>` +
+      `<g id="gRails"></g>` +
+      `<g class="fn-gate" id="gGate" style="transform-origin:${HINGE}px ${GROUND}px">` +
+      `<path class="f-ink brace" d="${brace}"/>` +
+      hinges.map((d) => `<path class="f-ink" d="${d}"/>`).join("") +
+      `<g id="gGateRails"></g>` +
+      `<g class="fn-latch" id="gLatch" style="transform-origin:${LATCH - 20}px ${LATCH_Y - 2}px">` +
+      `<path id="latchBar" d="${bar}"/><path id="latchHook" d="${hook}"/></g>` +
+      `</g></g>` +
+      `<g class="fn-words" id="gWords"></g>` +
+      `<g id="gThrough"></g>`;
+  }
+
+  /* Keep the children that are still wanted, in order, without moving one that is already in place. */
+  function keyed(parent, items, keyOf, make, update) {
+    const have = new Map([...parent.children].map((c) => [c.dataset.key, c]));
+    let ref = parent.firstElementChild;
+    const keep = new Set();
+    items.forEach((it, i) => {
+      const k = keyOf(it, i);
+      keep.add(k);
+      let node = have.get(k);
+      if (!node) {
+        node = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        node.dataset.key = k;
+        make(node, it, i);
+      }
+      update(node, it, i);
+      if (node === ref) ref = ref.nextElementSibling;
+      else parent.insertBefore(node, ref);
+    });
+    for (const c of [...parent.children])
+      if (!keep.has(c.dataset.key)) c.remove();
+  }
+
+  /**
+   * The fence across the lane, drawn by hand. A rail for every use set down — inked when
+   * found out, pencilled when a guess, hollow while it is the record's and not yet kept,
+   * broken where the reason no longer holds. The latch lifts once a use is found. What
+   * would come through stands on the other side until it is marked as having come. Taken
+   * down, the fence lies flat; down for a while, the gate stands open on its hinge; moved,
+   * it stands a little along from where it was.
+   */
+  function updateGate(f) {
+    const svg = $("#gate");
+    const state = stateOf(f);
+    const found = hasUse(f);
+    const shown = f.uses.slice(0, 4);
+    const more = f.uses.length - shown.length;
+    const railKey = shown
+      .map((u) => `${u.id}:${styleOf(u)}:${u.holds === "gone" ? 1 : 0}`)
+      .join("|");
+    if (railKey !== G.railKey) {
+      G.railKey = railKey;
+      const ys = railYs(shown.length);
+      G.rails = shown.map((u, i) => {
+        const y = ys[i];
+        const s = seedOf(`fence-rail-${u.id}-${i}`);
+        const r = rand(s);
+        const seg2 = (a, b) =>
+          stroke([a, y + (r() - 0.5) * 2], [b, y + (r() - 0.5) * 2], r, 1.1, 3);
+        const broken = u.holds === "gone";
+        return {
+          id: u.id,
+          y,
+          s,
+          style: styleOf(u),
+          broken,
+          left: broken
+            ? [seg2(POSTS[0] - 3, 100), seg2(120, HINGE + 2)]
+            : [seg2(POSTS[0] - 3, HINGE + 2)],
+          gate: seg2(HINGE + 1, LATCH - 1),
+          right: seg2(LATCH - 2, POSTS[4] + 3),
+          splinters: broken
+            ? [
+                stroke([100, y], [104, y - 4], r, 0.3, 0),
+                stroke([120, y], [116, y + 4], r, 0.3, 0),
+              ]
+            : [],
+        };
+      });
+      keyed(
+        $("#gRails"),
+        G.rails,
+        (r) => `${r.id}:${r.style}:${r.broken}`,
+        (node) => node.setAttribute("class", "fn-rail"),
+        (node, r, i) => {
+          node.style.setProperty("--i", i);
+          node.innerHTML =
+            r.left.map((d, j) => rail(d, r.style, r.s + j)).join("") +
+            rail(r.right, r.style, r.s + 7) +
+            r.splinters
+              .map((d) => `<path class="splinter s-${INK[r.style]}" d="${d}"/>`)
+              .join("");
+        },
+      );
+      keyed(
+        $("#gGateRails"),
+        G.rails,
+        (r) => `${r.id}:${r.style}`,
+        (node) => node.setAttribute("class", "fn-rail"),
+        (node, r, i) => {
+          node.style.setProperty("--i", i);
+          node.innerHTML = rail(r.gate, r.style, r.s + 5);
+        },
+      );
+    }
+
+    $("#gFence").style.transform =
+      state === "down"
+        ? "scaleY(0.06)"
+        : state === "move"
+          ? "translateX(24px)"
+          : "none";
+    $("#gFence").style.opacity = state === "down" ? 0.85 : 1;
+    $("#gGate").style.transform = state === "trial" ? "scaleX(0.28)" : "none";
+    $("#gLatch").style.transform = found ? "rotate(-32deg)" : "none";
+    $("#latchBar").setAttribute("class", found ? "f-accent" : "f-ink");
+    $("#latchHook").setAttribute("class", found ? "f-accent" : "f-ink");
+    $("#gMoved").innerHTML =
+      state === "move"
+        ? POSTS.map(
+            (x) =>
+              `<line class="moved-line" x1="${x}" x2="${x}" y1="${GROUND + 4}" y2="${TOP}"/>`,
+          ).join("")
+        : "";
+
+    const words = $("#gWords");
+    words.style.transform = state === "move" ? "translateX(24px)" : "none";
+    words.style.opacity = state === "down" ? 0 : 1;
+    words.innerHTML =
+      shown
+        .map((u, i) => {
+          const y = G.rails[i]?.y ?? 158;
+          const style = styleOf(u);
+          return (
+            `<text class="g-hand halo f-${INK[style]}" x="${POSTS[0] + 5}" y="${y - 5}" font-size="12.5" stroke-width="3">${esc(clip(u.text, 44))}</text>` +
+            (u.kept && u.holds === "unsure"
+              ? `<text class="g-hand f-faint" x="${POSTS[4] + 9}" y="${y + 4}" font-size="13">?</text>`
+              : "")
+          );
+        })
+        .join("") +
+      (more > 0
+        ? `<text class="g-hand f-faint" x="${POSTS[4]}" y="${GROUND - 4}" font-size="11.5" text-anchor="end">and ${more} more</text>`
+        : "") +
+      (!f.uses.length
+        ? `<text class="g-hand halo f-muted" x="${GW / 2}" y="160" font-size="13.5" text-anchor="middle" stroke-width="4">no rails yet — what is it for?</text>`
+        : "");
+
+    const through = f.through.slice(0, 5);
+    const spots = spotsFor(through.length);
+    const wcap = wordsFor(through.length);
+    keyed(
+      $("#gThrough"),
+      through,
+      (t) => t.id,
+      (node) => node.setAttribute("class", "fn-through"),
+      (node, t, i) => {
+        const came = t.came === "came";
+        const text = clip(t.text, wcap);
+        const w = Math.min(290, text.length * 6.2 + 14);
+        // Newsreader's italic runs wider than niwa's hand: a line that would run off the
+        // other side is moved back along until it fits.
+        const x = Math.max(8, Math.min(spots[i][0], GW - w));
+        const y = spots[i][1];
+        const s = seedOf(`through-${t.id}`);
+        node.style.setProperty("--i", i);
+        node.style.transform = `translate(${x}px, ${came ? GROUND + 30 + (i % 3) * 17 : y}px)`;
+        node.innerHTML =
+          (came
+            ? `<path class="f-accent" transform="translate(-7 -15)" d="${ribbon(roughEllipse(w, 21, s, { pad: 0, grow: 1, wobble: 0.8, steps: 16 }), 1.2, s)}"/>`
+            : "") +
+          `<text class="g-hand f-${came ? "ink" : t.came === "not" ? "faint" : "muted"}" font-size="13">${esc(text)}</text>` +
+          (t.came === "not"
+            ? `<line class="s-faint" x1="-2" x2="${w - 12}" y1="-4" y2="-4" stroke-width="0.9"/>`
+            : "");
+      },
+    );
+    svg.setAttribute(
+      "aria-label",
+      `The fence: ${f.uses.length} rails, the latch ${found ? "up" : "down"}, ${STATE_SHORT[state]}`,
+    );
+  }
+
+  /* What the drawing shows, in words, under it. */
+  function drawn(f) {
+    const s = stateOf(f);
+    const c = last(f.calls);
+    const kept = f.uses.filter((u) => u.kept);
+    const inked = kept.filter((u) => u.known !== "guess").length;
+    const pencil = kept.length - inked;
+    const hollow = f.uses.length - kept.length;
+    const broken = kept.filter((u) => u.holds === "gone").length;
+    const rails = !f.uses.length
+      ? "posts, and no rails yet"
+      : `${f.uses.length} ${f.uses.length === 1 ? "rail" : "rails"}: ` +
+        [
+          inked ? `${inked} inked` : "",
+          pencil ? `${pencil} pencilled` : "",
+          hollow ? `${hollow} hollow` : "",
+          broken ? `${broken} broken` : "",
+        ]
+          .filter(Boolean)
+          .join(", ");
+    const latch = hasUse(f)
+      ? "the latch is up"
+      : "the latch is down until a use is found";
+    const where = !c
+      ? ""
+      : s === "trial"
+        ? `open for a while, until ${dayWords(c.until)}`
+        : s === "down"
+          ? `down since ${dayWords(c.on)}`
+          : `${STATE_SHORT[s]} ${dayWords(c.on)}`;
+    return [rails, latch, where].filter(Boolean).join(" · ");
+  }
+
+  /* ── rendering ───────────────────────────────────────────────────────── */
+
+  function metaLine() {
+    const f = S.open;
+    const head = S.spec
+      ? `the specimen · set down ${dayWords(f.put)}`
+      : S.kept
+        ? `a fence · set down ${dayWords(f.put)}`
+        : S.example
+          ? "an example — Chesterton's gate"
+          : "now";
+    return esc(head) + (f.stone ? " · about a rule already standing" : "");
+  }
+
+  function renderHead() {
+    const f = S.open;
+    const W = editable();
+    const showNew = S.kept || S.example || S.spec;
+    $("#sheetHead").innerHTML =
+      `<div class="sheet-head"><div class="label" id="meta">${metaLine()}</div>` +
+      (showNew ? chip("a new fence", "new") : "") +
+      `</div>` +
+      (S.spec
+        ? `<p class="hand spec-note"><b>A specimen.</b> One of two fences from a studio that never existed, there to read before you write. It can't be changed; start a new fence to set down your own.</p>`
+        : "") +
+      `<textarea class="case fence-line" data-f="fence" data-k="fence" rows="1"${W ? "" : " readonly"} placeholder="what would you clear away? a rule, a habit, a step, a custom, a line of code — in a line" aria-label="The fence">${esc(f.fence)}</textarea>` +
+      `<p class="hand note faint" id="exnote"${S.example ? "" : " hidden"}>an example, drawn so the sheet is on the table — write over it, start a new fence, or pick one already standing in the specimen's record</p>`;
+  }
+
+  function renderCost() {
+    const f = S.open;
+    const W = editable();
+    const ro = W ? "" : " readonly";
+    $("#costCol").innerHTML =
+      `<div class="field"><div class="label">what it costs to keep</div>` +
+      `<textarea class="case prose" data-f="cost" data-k="cost" rows="1"${ro} placeholder="what it costs you as it stands — in your words" aria-label="What it costs to keep">${esc(f.cost)}</textarea></div>` +
+      `<div class="field"><div class="label">who put it up</div><div style="margin-top:8px">${seg("who put it up", MAKERS, MAKER_LABEL, f.maker, "maker")}</div>` +
+      `<div class="two"><input class="case hand-in" data-f="by" data-k="by" value="${esc(f.by)}"${ro} placeholder="${f.maker === "me" ? "when you did, and what was happening" : "who, or which — a name, a team, a law"}" aria-label="Who put it up" />` +
+      `<input class="case hand-in" data-f="when" data-k="when" value="${esc(f.when)}"${ro} placeholder="when — a year, a day" aria-label="When it was put up" /></div>` +
+      (f.stone && DAY.test(f.when)
+        ? `<p class="meta" style="margin:6px 0 0">${esc(whenWords(f.when))} is the day the rule first appears in the record</p>`
+        : "") +
+      `</div>` +
+      (!S.kept && W
+        ? `<div class="setdown">${chip("set it down", "setdown", { accent: true })}<span class="hand note faint" style="margin:0">nothing is kept until you set it down or make the call</span></div>`
+        : "");
+  }
+
+  function renderBody() {
+    const f = S.open;
+    const W = editable();
+    const ro = W ? "" : " readonly";
+    const state = stateOf(f);
+    const found = hasUse(f);
+    const due = isDue(f, TODAY);
+    let h = "";
+
+    /* what it might be for */
+    h +=
+      `<div class="part"><div class="label">what might it be for?</div>` +
+      `<p class="hand note">go away and think. a guess is a start — then find out: ask whoever put it up, read what was written when it went up, or watch what it does. then say whether each reason still holds.</p>` +
+      `<ol class="uses">`;
+    f.uses.forEach((u, i) => {
+      h += `<li class="fn-row${enter(S.seen, `use-${u.id}`)}" style="--i:${i}"><div class="use">${railGlyph(u)}<div class="use-body">`;
+      if (u.by === "garden")
+        h += `<div class="meta">the record says${u.kept ? "" : " · hollow until you keep it"}</div>`;
+      h += `<textarea class="case hand-in" rows="1" data-f="use-text" data-id="${esc(u.id)}" data-k="use-text-${esc(u.id)}"${ro} aria-label="What it might be for" style="color:var(--${u.kept ? "ink" : "muted"})">${esc(u.text)}</textarea>`;
+      if (u.kept) {
+        h +=
+          `<div class="marks">${seg(`how you know ${u.id}`, KNOWN, KNOWN_LABEL, u.known, "known", u.id)}` +
+          seg(
+            `whether it holds ${u.id}`,
+            HOLDS,
+            HOLDS_LABEL,
+            u.holds,
+            "holds",
+            u.id,
+          );
+        if (W || u.instead)
+          h += `<button type="button" class="linkish${u.instead ? " has" : ""}" data-act="instead" data-id="${esc(u.id)}" data-k="instead-${esc(u.id)}"${W ? "" : " disabled"}>${esc(u.instead ? `something else does this now: ${u.instead}` : "something else does this now?")}</button>`;
+        h += `</div>`;
+      } else if (W) {
+        h += `<div class="chips" style="margin-top:6px">${chip("keep", "keepuse", { on: true, k: `keepuse-${u.id}`, attrs: `data-id="${esc(u.id)}"` })}${chip("drop", "deluse", { k: `dropuse-${u.id}`, attrs: `data-id="${esc(u.id)}"` })}</div>`;
+      }
+      if (S.insteadFor === u.id && W)
+        h += `<input class="case hand-in fn-arrive${enter(S.seen, `instead-${u.id}`)}" style="margin-top:6px;font-size:16px" data-f="use-instead" data-id="${esc(u.id)}" data-k="use-instead-${esc(u.id)}" value="${esc(u.instead)}" placeholder="what does this job now, if anything" aria-label="What else does this now" />`;
+      h += `</div>`;
+      if (W && u.kept)
+        h += `<button type="button" class="x" data-act="deluse" data-id="${esc(u.id)}" data-k="x-use-${esc(u.id)}" aria-label="Take this one off" title="take this one off">×</button>`;
+      h += `</div></li>`;
+    });
+    h += `</ol>`;
+    if (W)
+      h +=
+        `<div class="row-add"><span class="gutter" aria-hidden="true"></span>` +
+        `<input class="case hand-in" data-f="new-use" data-k="new-use" value="${esc(S.useText)}" placeholder="${f.uses.length ? "another thing it might be for" : "what might it be for? a guess is a start"}" aria-label="Another thing it might be for" />` +
+        chip("add", "adduse", { disabled: !S.useText.trim() }) +
+        `</div>`;
+    h += `</div>`;
+
+    /* what would come through · putting it back */
+    h += `<div class="part pair"><div style="min-width:0"><div class="label">if it came down tomorrow, what would come through?</div><ul class="throughs">`;
+    f.through.forEach((t, i) => {
+      h +=
+        `<li class="thr fn-row${enter(S.seen, `thr-${t.id}`)}" style="--i:${i}">` +
+        `<input class="case hand-in" data-f="through-text" data-id="${esc(t.id)}" data-k="through-${esc(t.id)}" value="${esc(t.text)}"${ro} aria-label="What would come through" />` +
+        (W
+          ? `<button type="button" class="x" data-act="delthrough" data-id="${esc(t.id)}" data-k="x-thr-${esc(t.id)}" aria-label="Take this one off" title="take this one off">×</button>`
+          : "") +
+        `</li>`;
+    });
+    h += `</ul>`;
+    if (W)
+      h +=
+        `<div class="row-add" style="margin-top:8px"><input class="case hand-in" style="font-size:18px" data-f="new-through" data-k="new-through" value="${esc(S.throughText)}" placeholder="something that would come through" aria-label="Something that would come through" />` +
+        chip("add", "addthrough", { disabled: !S.throughText.trim() }) +
+        `</div>`;
+    h +=
+      `</div><div style="min-width:0"><div class="label">if it has to go back up</div>` +
+      `<div style="margin-top:8px">${seg("whether it could go back up", BACKS, BACK_LABEL, f.back, "back")}</div>` +
+      `<input class="case hand-in" style="margin-top:8px;font-size:18px" data-f="backHow" data-k="backHow" value="${esc(f.backHow)}"${ro} placeholder="what putting it back would take" aria-label="What putting it back would take" />` +
+      `</div></div>`;
+
+    /* the call */
+    h += `<div class="part"><div class="label">the call · yours</div>`;
+    if (f.calls.length) {
+      h += `<ol class="calls">`;
+      f.calls.forEach((c, i) => {
+        h +=
+          `<li class="call-row fn-row${i === f.calls.length - 1 ? " last" : ""}${enter(S.seen, `call-${i}-${c.on}-${c.call}`)}" style="--i:${i}">` +
+          `<span class="meta">${esc(dayWords(c.on))}</span>` +
+          `<span class="hand">${esc(CALL_LABEL[c.call])}${c.call === "trial" && c.until ? `, until ${esc(dayWords(c.until))}` : ""}${c.unseen ? " · before a use was found" : ""}</span>` +
+          (c.note ? `<span class="why">— ${esc(c.note)}</span>` : "") +
+          `</li>`;
+      });
+      h += `</ol>`;
+    }
+    if (due)
+      h += `<p class="label due">the day to look again, ${esc(dayWords(last(f.calls).until))}, has come</p>`;
+    if (W) {
+      h +=
+        `<div class="chips">` +
+        callsFrom(state)
+          .map((k) =>
+            chip(
+              k === "down" && state === "trial" ? "leave it down" : CALL_ASK[k],
+              "pick",
+              {
+                on: S.pending?.call === k,
+                k: `pick-${k}`,
+                attrs: `data-v="${k}"`,
+              },
+            ),
+          )
+          .join("") +
+        `</div>`;
+      const p = S.pending;
+      if (p) {
+        const downing = p.call === "down" || p.call === "trial";
+        h +=
+          `<div class="pending fn-arrive${enter(S.seen, `pending-${p.call}`)}">` +
+          `<input class="case hand-in" style="font-size:18px" data-f="note" data-k="note" value="${esc(p.note)}" placeholder="${esc(NOTE_ASK[p.call])}" aria-label="The call, in a line" />` +
+          (p.call === "trial"
+            ? `<label class="until">look again on <input class="case" type="date" data-f="until" data-k="until" value="${esc(p.until)}" min="${TODAY}" /></label>`
+            : "") +
+          (downing && !found
+            ? `<p class="hand note" style="margin:0">no use found yet — every one set down is a guess. it can still come down; the record will say so.</p>`
+            : "") +
+          `<div>${chip(
+            S.sure === "call"
+              ? "down without knowing what it was for — sure?"
+              : `make the call · ${p.call === "down" && state === "trial" ? "leave it down" : CALL_ASK[p.call]}`,
+            "call",
+            { accent: true },
+          )}</div></div>`;
+      }
+    }
+    h += `</div>`;
+
+    /* afterwards */
+    if (cameDown(f)) {
+      h += `<div class="part fn-arrive${enter(S.seen, "after")}"><div class="label">afterwards · what came through</div>`;
+      if (f.through.length) {
+        h += `<ul class="after-list">`;
+        for (const t of f.through)
+          h +=
+            `<li class="after-row"><span class="hand${t.came === "not" ? " not" : ""}">${esc(t.text)}</span>` +
+            seg(
+              `came through ${t.id}`,
+              ["came", "not"],
+              { came: "came through", not: "did not come" },
+              t.came,
+              "came",
+              t.id,
+            ) +
+            `</li>`;
+        h += `</ul>`;
+      } else
+        h += `<p class="hand note">nothing was listed as coming through</p>`;
+      h += `<textarea class="case prose" style="margin-top:12px" data-f="after" data-k="after" rows="2"${ro} placeholder="afterwards, in your words — and anything that came through that you did not list" aria-label="Afterwards">${esc(f.after)}</textarea></div>`;
+    }
+
+    if (S.kept && W)
+      h += `<div class="chips" style="margin-top:24px">${chip(
+        S.sure === "fence"
+          ? "take it off the record — sure?"
+          : "take it off the record",
+        "remove",
+        { accent: S.sure === "fence" },
+      )}</div>`;
+    h += `<p class="label trouble" role="alert" id="trouble"${S.trouble ? "" : " hidden"}>${esc(S.trouble || "")}</p>`;
+    $("#sheetBody").innerHTML = h;
+  }
+
+  /* A textarea as tall as what is in it. */
+  const grow = (el) => {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  /* Redraw the sheet's words, keeping the place the reader was typing in. */
+  function renderSheet() {
+    const a = document.activeElement;
+    const k = a && a.dataset ? a.dataset.k : null;
+    const sel =
+      a && "selectionStart" in a && a.type !== "date"
+        ? [a.selectionStart, a.selectionEnd]
+        : null;
+    renderHead();
+    renderCost();
+    renderBody();
+    S.picked = null;
+    document.querySelectorAll("#sheet textarea").forEach(grow);
+    const want = S.focusNext || k;
+    S.focusNext = null;
+    if (want) {
+      const el = document.querySelector(
+        `#sheet [data-k="${CSS.escape(want)}"]`,
+      );
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (sel && want === k && el.setSelectionRange && el.type !== "date") {
+          try {
+            el.setSelectionRange(sel[0], sel[1]);
+          } catch {
+            /* not a text field */
+          }
+        }
+      }
+    }
+  }
+
+  /* What follows every keystroke: the drawing, the words under it, and the desk. */
+  function renderLive() {
+    const f = S.open;
+    updateGate(f);
+    $("#drawn").textContent = drawn(f);
+    const meta = $("#meta");
+    if (meta) meta.innerHTML = metaLine();
+    const ex = $("#exnote");
+    if (ex) ex.hidden = !S.example;
+
+    // A draft is not on the record yet, so the reading does not say when it was set down.
+    const words = readings(f, TODAY);
+    if (!S.kept)
+      words[0] = words[0].replace(
+        /^set down [^·]*?(?= · |$)/,
+        "not set down yet",
+      );
+    $("#reading").textContent = words.join(" · ");
+
+    const mine = S.own.length > 0;
+    const rec = recordReadings(tally(mine ? S.own : SPECIMEN_FENCES, TODAY));
+    $("#recordText").textContent =
+      (mine ? "" : "the specimen's record: ") + rec.join(" · ");
+    const row = (f2, i, spec) => {
+      const on = S.kept && S.spec === spec && S.open.slug === f2.slug;
+      return (
+        `<li class="fn-row${enter(S.deskSeen, `${spec ? "s" : "o"}-${f2.slug}`)}" style="--i:${i}">` +
+        `<button type="button" data-act="${spec ? "loadspec" : "load"}" data-v="${esc(f2.slug)}"${on ? ' aria-current="true"' : ""}>` +
+        `<span class="meta">${esc(dayWords(f2.put))} · ${esc(STATE_SHORT[stateOf(f2)])}${spec ? " · specimen" : ""}${isDue(f2, TODAY) ? " · a day to look again has come" : ""}</span>` +
+        `<span class="rec-name">${esc(f2.fence)}</span>` +
+        `<span class="hand rec-sub">${hasUse(f2) ? "a use found" : f2.uses.length ? "no use found yet" : "nothing set down yet that it might be for"}</span>` +
+        `</button></li>`
+      );
+    };
+    $("#recordList").innerHTML =
+      (mine
+        ? `<ol>${S.own
+            .slice(0, 24)
+            .map((x, i) => row(x, i, false))
+            .join("")}</ol>`
+        : "") +
+      `<div class="${mine ? "desk-group" : ""}">${mine ? `<div class="meta">the specimen · fiction</div>` : ""}<ol>${SPECIMEN_FENCES.map((x, i) => row(x, i, true)).join("")}</ol></div>`;
+
+    $("#standing").innerHTML = standingOf(SPECIMEN_RULES)
+      .map((s, i) => {
+        const looked = S.own.some((x) => x.stone === s.id);
+        return (
+          `<li class="fn-row${enter(S.deskSeen, `r-${s.id}`)}" style="--i:${i}"><button type="button" data-act="rule" data-v="${esc(s.id)}">` +
+          `<span class="meta">${s.since ? `since ${esc(whenWords(s.since))}` : "not yet in the record's history"}${looked ? " · looked at" : ""}</span>` +
+          `<span class="hand rule-name">${esc(s.label)}</span>` +
+          `<span class="rule-why${s.why ? "" : " none"}">${esc(s.why || "no reason written down")}</span>` +
+          `</button></li>`
+        );
+      })
+      .join("");
+
+    $("#kept").textContent = S.stored
+      ? `yours are kept in this browser, under ${KEY}, and sent nowhere · the specimen is fiction`
+      : "this browser will not keep anything: what you set down lasts until the page is closed · the specimen is fiction";
+  }
+
+  function renderTrouble() {
+    const t = $("#trouble");
+    if (!t) return;
+    t.hidden = !S.trouble;
+    t.textContent = S.trouble || "";
+  }
+
+  function full(redraw = false) {
+    if (redraw) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `fence-${S.spec ? "specimen-" : ""}${S.open.slug || "fresh"}`;
+      sheet._redraw?.();
+    }
+    renderSheet();
+    renderLive();
+  }
+
+  /* ── keeping ─────────────────────────────────────────────────────────── */
+
+  const reset = () => {
+    S.pending = null;
+    S.sure = null;
+    S.trouble = null;
+    S.insteadFor = null;
+    S.seen = new Set();
+  };
+
+  function fresh(asExample = false, about = null) {
+    const day = localToday();
+    S.slug = "";
+    S.kept = false;
+    S.spec = false;
+    S.example = asExample && !about;
+    S.open = about
+      ? fenceAbout(about, day)
+      : asExample
+        ? { ...clone(EXAMPLE_FENCE), put: day, touched: day }
+        : emptyFence(day);
+    S.useText = "";
+    S.throughText = "";
+    reset();
+    if (S.last) {
+      S.last = "";
+      persist();
+    }
+    full(true);
+  }
+
+  function load(f, spec = false) {
+    S.slug = f.slug;
+    S.kept = true;
+    S.spec = spec;
+    S.example = false;
+    S.open = clone(f);
+    S.useText = "";
+    S.throughText = "";
+    reset();
+    if (!spec && S.last !== f.slug) {
+      S.last = f.slug;
+      persist();
+    }
+    full(true);
+  }
+
+  /* Keep a fence. A fresh one whose slug is taken gets a numbered one; a kept one is written in place. */
+  function save(f) {
+    if (!editable()) return null;
+    let out;
+    try {
+      out = validateFence({ ...f, slug: S.slug, touched: localToday() });
+    } catch (e) {
+      S.trouble = e.message;
+      renderTrouble();
+      return null;
+    }
+    let slug = out.slug;
+    if (!S.slug) {
+      const taken = new Set(S.own.map((x) => x.slug));
+      const base = slug;
+      let k = 2;
+      while (taken.has(slug)) slug = `${base}-${k++}`;
+    }
+    if (!SLUG.test(slug)) {
+      S.trouble = "not kept — bad slug";
+      renderTrouble();
+      return null;
+    }
+    out = { ...out, slug };
+    S.own = [out, ...S.own.filter((x) => x.slug !== slug)];
+    sortOwn();
+    S.slug = slug;
+    S.last = slug;
+    const wasKept = S.kept;
+    S.kept = true;
+    S.example = false;
+    S.open = { ...S.open, slug, put: out.put, touched: out.touched };
+    S.trouble = persist()
+      ? null
+      : "kept on this page only — this browser will not store it";
+    if (!wasKept) {
+      const sheet = $("#sheet");
+      sheet.dataset.seed = `fence-${slug}`;
+      sheet._redraw?.();
+    }
+    return out;
+  }
+
+  /* text: the draft moves with every keystroke; it is kept when the field is left */
+  function patch(p) {
+    S.example = false;
+    S.open = { ...S.open, ...p };
+  }
+  function commit() {
+    if (S.kept && editable()) {
+      save(S.open);
+      renderLive();
+      renderTrouble();
+    }
+  }
+  /* a choice: kept at once */
+  function set(p) {
+    S.example = false;
+    S.open = { ...S.open, ...p };
+    if (S.kept && editable()) save(S.open);
+    renderSheet();
+    renderLive();
+  }
+  const setUse = (id, p) =>
+    set({ uses: S.open.uses.map((u) => (u.id === id ? { ...u, ...p } : u)) });
+  const setThrough = (id, p) =>
+    set({
+      through: S.open.through.map((t) => (t.id === id ? { ...t, ...p } : t)),
+    });
+
+  function addUse() {
+    const t = S.useText.trim();
+    if (!t) return;
+    S.useText = "";
+    S.focusNext = "new-use";
+    set({ uses: [...S.open.uses, newUse(t)] });
+  }
+  function addThrough() {
+    const t = S.throughText.trim();
+    if (!t) return;
+    S.throughText = "";
+    S.focusNext = "new-through";
+    set({ through: [...S.open.through, newThrough(t)] });
+  }
+
+  function setDown() {
+    if (!editable()) return;
+    if (!S.open.fence.trim()) {
+      S.trouble = "say what the fence is, in a line";
+      renderTrouble();
+      return;
+    }
+    if (save(S.open)) full();
+  }
+
+  function makeCall() {
+    const f = S.open;
+    const p = S.pending;
+    if (!p || !editable()) return;
+    if (!f.fence.trim()) {
+      S.trouble = "say what the fence is, in a line";
+      renderTrouble();
+      return;
+    }
+    if (p.call === "trial" && !DAY.test(p.until)) {
+      S.trouble = "name a day to look again";
+      renderTrouble();
+      return;
+    }
+    const downing = p.call === "down" || p.call === "trial";
+    const unseen = downing && !hasUse(f);
+    if (unseen && S.sure !== "call") {
+      S.sure = "call";
+      S.focusNext = "call";
+      renderSheet();
+      return;
+    }
+    const call = {
+      on: localToday(),
+      call: p.call,
+      until: p.call === "trial" ? p.until : "",
+      note: p.note.trim(),
+      unseen,
+    };
+    S.open = { ...f, calls: [...f.calls, call] };
+    S.pending = null;
+    S.sure = null;
+    save(S.open);
+    full();
+  }
+
+  function remove() {
+    if (!S.kept || !editable()) return;
+    const slug = S.open.slug;
+    S.own = S.own.filter((x) => x.slug !== slug);
+    S.last = "";
+    persist();
+    fresh();
+  }
+
+  function openRule(id) {
+    const s = SPECIMEN_RULES.find((r) => r.id === id);
+    if (!s) return;
+    const existing = S.own.find((f) => f.stone === s.id);
+    if (existing) load(existing);
+    else fresh(false, { ...s, mine: true });
+    toSheet();
+  }
+  function toSheet() {
+    const sheet = $("#sheet");
+    if (sheet.getBoundingClientRect().top < 0)
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /* ── events ──────────────────────────────────────────────────────────── */
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b || b.disabled) return;
+    const act = b.dataset.act;
+    const v = b.dataset.v;
+    const id = b.dataset.id;
+    const f = S.open;
+    if (act === "new") return fresh(S.example ? false : S.own.length === 0);
+    if (act === "load") {
+      const x = S.own.find((y) => y.slug === v);
+      if (x) load(x);
+      return toSheet();
+    }
+    if (act === "loadspec") {
+      const x = SPECIMEN_FENCES.find((y) => y.slug === v);
+      if (x) load(x, true);
+      return toSheet();
+    }
+    if (act === "rule") return openRule(v);
+    if (!editable()) return;
+    S.picked = b.dataset.k || null;
+    if (act === "maker") return set({ maker: f.maker === v ? "" : v });
+    if (act === "known") return setUse(id, { known: v });
+    if (act === "holds") {
+      const u = f.uses.find((x) => x.id === id);
+      return setUse(id, { holds: u && u.holds === v ? "" : v });
+    }
+    if (act === "back") return set({ back: f.back === v ? "" : v });
+    if (act === "came") {
+      const t = f.through.find((x) => x.id === id);
+      return setThrough(id, { came: t && t.came === v ? "" : v });
+    }
+    if (act === "instead") {
+      S.insteadFor = S.insteadFor === id ? null : id;
+      if (S.insteadFor) S.focusNext = `use-instead-${id}`;
+      return renderSheet();
+    }
+    if (act === "keepuse") return setUse(id, { kept: true });
+    if (act === "deluse")
+      return set({ uses: f.uses.filter((x) => x.id !== id) });
+    if (act === "delthrough")
+      return set({ through: f.through.filter((x) => x.id !== id) });
+    if (act === "adduse") return addUse();
+    if (act === "addthrough") return addThrough();
+    if (act === "setdown") return setDown();
+    if (act === "pick") {
+      S.sure = null;
+      S.pending =
+        S.pending?.call === v
+          ? null
+          : {
+              call: v,
+              note: "",
+              until: v === "trial" ? addDays(TODAY, 21) : "",
+            };
+      if (S.pending) S.focusNext = "note";
+      return renderSheet();
+    }
+    if (act === "call") return makeCall();
+    if (act === "remove") {
+      if (S.sure === "fence") return remove();
+      S.sure = "fence";
+      return renderSheet();
+    }
+  });
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    const k = el.dataset && el.dataset.f;
+    if (!k || !el.closest("#sheet")) return;
+    if (el.tagName === "TEXTAREA") grow(el);
+    const id = el.dataset.id;
+    const v = el.value;
+    if (k === "new-use" || k === "new-through") {
+      if (k === "new-use") S.useText = v;
+      else S.throughText = v;
+      const add = el.parentElement.querySelector(".chip");
+      if (add) add.disabled = !v.trim();
+      return;
+    }
+    if (k === "note" || k === "until") {
+      if (S.pending) S.pending = { ...S.pending, [k]: v };
+      return;
+    }
+    if (!editable()) return;
+    if (k === "use-text")
+      patch({
+        uses: S.open.uses.map((u) => (u.id === id ? { ...u, text: v } : u)),
+      });
+    else if (k === "use-instead")
+      patch({
+        uses: S.open.uses.map((u) => (u.id === id ? { ...u, instead: v } : u)),
+      });
+    else if (k === "through-text")
+      patch({
+        through: S.open.through.map((t) =>
+          t.id === id ? { ...t, text: v } : t,
+        ),
+      });
+    else patch({ [k]: v });
+    renderLive();
+  });
+
+  document.addEventListener("focusout", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k || ["new-use", "new-through", "note", "until"].includes(k)) return;
+    if (!e.target.closest("#sheet")) return;
+    commit();
+    // what else does the job: once left, the line shows on the sheet as words
+    if (
+      k === "use-instead" &&
+      !(
+        e.relatedTarget &&
+        e.relatedTarget.dataset?.k === `instead-${e.target.dataset.id}`
+      )
+    ) {
+      S.insteadFor = null;
+      renderSheet();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k) return;
+    if (e.key === "Enter" && !e.isComposing) {
+      if (k === "new-use") {
+        e.preventDefault();
+        addUse();
+      } else if (k === "new-through") {
+        e.preventDefault();
+        addThrough();
+      } else if (k === "note" || k === "until") {
+        e.preventDefault();
+        makeCall();
+      } else if (k === "use-text") {
+        e.preventDefault();
+        e.target.blur();
+      } else if (k === "use-instead") {
+        e.preventDefault();
+        e.target.blur();
+      }
+    } else if (e.key === "Escape" && k === "use-instead") {
+      e.target.blur();
+    }
+  });
+
+  window.addEventListener("resize", () => document.querySelectorAll("#sheet textarea").forEach(grow));
+
+  /* ── open ────────────────────────────────────────────────────────────── */
+
+  buildGate();
+  sketch($("#sheet"), "fence-fresh");
+  document
+    .querySelectorAll(".desk .panel")
+    .forEach((p, i) =>
+      sketch(
+        p,
+        ["fence-reading", "fence-record", "fence-standing", "fence-laws"][i],
+      ),
+    );
+  readStore();
+  if (!S.own.length) load(SPECIMEN_FENCES[0], true);
+  else {
+    const wanted = S.own.find((x) => x.slug === S.last);
+    const going = S.own.find((x) => ["open", "trial"].includes(stateOf(x)));
+    if (wanted) load(wanted);
+    else if (going) load(going);
+    else fresh(false);
+  }
+</script>

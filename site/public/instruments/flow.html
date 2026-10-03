@@ -1,0 +1,3064 @@
+<title>Flow</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Nothing arrives alone. Put any note at the centre and see what flowed into it, what it flowed into, which of its roots have gone fallow or were never written down, and what would move if it changed."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* niwa's two palettes as tokens. Paper: ink on bone. Sumi: the same garden after dark.
+     The accent is only ever the centre and what runs both ways; every other colour is a
+     stone's kind or a thread's kind, and the ink. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #625c53;
+    --faint: #857d71;
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain-blend: multiply;
+    --grain: 0.06;
+
+    --kind-project: #2f3437;
+    --kind-concept: #b5532a;
+    --kind-user: #7b4b3a;
+    --kind-feedback: #5b6b52;
+    --kind-reference: #4a5a6b;
+    --kind-routine: #8a7549;
+    --kind-meta: #1a1815;
+    --kind-note: #6e6257;
+    --kind-notion: #3f6b66;
+    --kind-garden: #8e5b55;
+    --kind-reading: #8a6f84;
+    --kind-agent: #8c6a3f;
+    --kind-repo: #a8a49b;
+    --kind-ghost: #c6c0b4;
+
+    --link-link: #9b9384;
+    --link-concept: #c08a66;
+    --link-build: #8e9c81;
+    --link-seed: #bdb6a8;
+    --link-mention: #b3aa98;
+    --link-twin: #8fa8a3;
+
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #847d70;
+      --rule: #302e25;
+      --rule-2: #4a473b;
+      --accent: #d9763f;
+      --grain-blend: screen;
+      --grain: 0.045;
+
+      --kind-project: #a9a394;
+      --kind-concept: #d9763f;
+      --kind-user: #bc8064;
+      --kind-feedback: #8aa076;
+      --kind-reference: #7891ac;
+      --kind-routine: #b89751;
+      --kind-meta: #ede9df;
+      --kind-note: #948b7c;
+      --kind-notion: #7fa8a1;
+      --kind-garden: #c08a82;
+      --kind-reading: #b39aae;
+      --kind-agent: #d0a468;
+      --kind-repo: #6a665c;
+      --kind-ghost: #57534a;
+
+      --link-link: #7d7663;
+      --link-concept: #b06b3f;
+      --link-build: #748561;
+      --link-seed: #5d5847;
+      --link-mention: #666051;
+      --link-twin: #5f7d78;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #847d70;
+    --rule: #302e25;
+    --rule-2: #4a473b;
+    --accent: #d9763f;
+    --grain-blend: screen;
+    --grain: 0.045;
+
+    --kind-project: #a9a394;
+    --kind-concept: #d9763f;
+    --kind-user: #bc8064;
+    --kind-feedback: #8aa076;
+    --kind-reference: #7891ac;
+    --kind-routine: #b89751;
+    --kind-meta: #ede9df;
+    --kind-note: #948b7c;
+    --kind-notion: #7fa8a1;
+    --kind-garden: #c08a82;
+    --kind-reading: #b39aae;
+    --kind-agent: #d0a468;
+    --kind-repo: #6a665c;
+    --kind-ghost: #57534a;
+
+    --link-link: #7d7663;
+    --link-concept: #b06b3f;
+    --link-build: #748561;
+    --link-seed: #5d5847;
+    --link-mention: #666051;
+    --link-twin: #5f7d78;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 3.4vw, 40px);
+    padding-block: 0 80px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .label,
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .label {
+    color: var(--muted);
+  }
+  .hand {
+    font-style: italic;
+    letter-spacing: 0.003em;
+  }
+  .small {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 22px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 20px 0 0;
+    font-size: clamp(19px, 2.2vw, 23px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+    font-style: italic;
+  }
+  .deck b {
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .garden {
+    margin: 0;
+    padding: 18px 20px 16px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .garden .label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+  }
+  .garden .tag {
+    color: var(--accent);
+  }
+  .garden .count {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .garden .small {
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    margin-top: 14px;
+  }
+  .go {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    padding: 10px 15px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  .go:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+  }
+  .quiet {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    padding: 4px 0;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .quiet:hover {
+    color: var(--ink);
+  }
+  .status {
+    margin-top: 10px !important;
+    font-style: italic;
+  }
+  .status:empty {
+    display: none;
+  }
+
+  /* the work: the sheet, and the desk beside it */
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 28px;
+    margin-top: 28px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+  .sheet {
+    padding: 10px 12px 14px;
+  }
+
+  /* A pen line laid over the element it sits in. */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .draw {
+    stroke: white;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .sheet-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 4px 0;
+  }
+  .walk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 7px;
+    min-width: 0;
+  }
+  .walk .step {
+    font-style: italic;
+    font-size: 16px;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .walk .step:not(:disabled):hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  .walk .step:disabled {
+    color: var(--ink);
+    cursor: default;
+  }
+  .walk kbd {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-left: 4px;
+  }
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    transition:
+      color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    border-color: var(--rule-2);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="false"] {
+    color: var(--faint);
+  }
+
+  .sheet-scroll {
+    position: relative;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .flow-sheet {
+    display: block;
+    width: 100%;
+    aspect-ratio: 900 / 520;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .flow-sheet text {
+    pointer-events: none;
+  }
+  .flow-sheet .b-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  /* A halo of paper under each stone's name, so a thread passes behind the words. */
+  .flow-sheet .f-stone text {
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
+  }
+  .flow-sheet .b-mono {
+    font-family: var(--mono);
+  }
+  /* Threads draw on wave by wave: two hops in, one hop in, out, two out. */
+  .flow-sheet .draw {
+    animation-duration: 620ms;
+    animation-delay: calc(var(--i, 0) * 140ms + 80ms);
+  }
+  .flow-sheet .f-edge {
+    transition: opacity 200ms var(--ease);
+  }
+  /* A stone that stays through a recentre slides to its new place. */
+  .flow-sheet .f-stone {
+    transition:
+      transform 520ms var(--ease),
+      opacity 200ms var(--ease);
+  }
+  .flow-sheet .f-stone:focus {
+    outline: none;
+  }
+  .flow-sheet .f-stone:focus-visible .hit {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+  .sideways {
+    display: none;
+    margin: 6px 4px 0;
+  }
+  .empty {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 900 / 520;
+    padding: 24px;
+    text-align: center;
+  }
+  .empty p {
+    max-width: 36ch;
+    margin: 0;
+    color: var(--faint);
+    font-style: italic;
+  }
+
+  /* the card over a stone or an arrow */
+  .card {
+    position: absolute;
+    z-index: 5;
+    max-width: 18rem;
+    padding: 8px 12px;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 2px 10px color-mix(in srgb, var(--ink) 7%, transparent);
+    animation: fade 220ms var(--ease) both;
+  }
+  .card .t {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.22;
+    margin-top: 2px;
+  }
+  .card .s {
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.3;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .caption {
+    position: relative;
+    margin: 8px 4px 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--rule);
+  }
+  .caption p {
+    font-size: 15.5px;
+    line-height: 1.35;
+    color: var(--muted);
+    margin: 4px 0 8px;
+    max-width: 78ch;
+  }
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+  }
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend i {
+    display: block;
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+  }
+  .find {
+    position: relative;
+  }
+  .find label {
+    display: block;
+  }
+  .search {
+    width: 100%;
+    margin-top: 8px;
+    padding: 9px 12px;
+    font-family: var(--serif);
+    font-size: 16px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    outline: none;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  /* The outline is replaced, not removed: a ring in the accent. */
+  .search:focus,
+  .search:focus-visible {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .search::placeholder {
+    color: var(--faint);
+  }
+  .results {
+    margin-top: 8px;
+    padding: 6px 8px;
+  }
+  .rows {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .rows li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .stone {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: baseline;
+    gap: 8px;
+    padding: 2px 0;
+    background: none;
+    border: 0;
+    text-align: left;
+  }
+  .stone .dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    transform: translateY(-2px);
+  }
+  .stone .nm {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .stone:hover .nm {
+    color: var(--ink);
+  }
+  .rows .aside {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .reading {
+    padding: 16px 16px 14px;
+  }
+  .reading h2 {
+    font-style: italic;
+    font-size: 25px;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin-top: 4px;
+  }
+  .words {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+  }
+  .words li {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .part {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .part .meta.acc,
+  .meta.acc {
+    color: var(--accent);
+  }
+  .leaf {
+    font-style: italic;
+    font-size: 15px;
+    color: var(--faint);
+    margin: 4px 0 0;
+  }
+  .how {
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--faint);
+    margin: 0;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* entry: translateY + opacity only */
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .card,
+    .draw {
+      animation: none;
+    }
+    .draw {
+      stroke-dashoffset: 0;
+    }
+    .flow-sheet .f-stone {
+      transition: opacity 200ms var(--ease);
+    }
+  }
+
+  @media (max-width: 1040px) {
+    .work {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 40px;
+    }
+    /* The sheet keeps its drawing; on a phone it scrolls sideways inside its own frame. */
+    .flow-sheet,
+    .empty {
+      min-width: 660px;
+    }
+    .sideways {
+      display: block;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="rise">
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Flow</h1>
+      <p class="deck">
+        <b>Nothing arrives alone.</b> Pick a stone and see what flowed into it
+        and what it flowed into — the roots a thought rests on, which of them
+        have moved, and what would move if it changed.
+      </p>
+    </div>
+    <section
+      class="garden rise"
+      style="animation-delay: 60ms"
+      aria-labelledby="g-name"
+    >
+      <p class="label">
+        <span id="g-name">Specimen garden</span
+        ><span class="tag" id="g-tag">synthetic</span>
+      </p>
+      <p class="count" id="g-count"></p>
+      <p class="small" id="g-note"></p>
+      <div class="actions">
+        <button class="go" id="open" type="button">
+          Open a folder of notes
+        </button>
+        <button class="quiet" id="restore" type="button" hidden>
+          Put the specimen back
+        </button>
+      </div>
+      <p
+        class="small status"
+        id="g-status"
+        role="status"
+        aria-live="polite"
+      ></p>
+      <input type="file" id="folder" webkitdirectory multiple hidden />
+    </section>
+  </header>
+
+  <div class="work">
+    <section
+      class="sheet panel rise"
+      id="sheet"
+      style="animation-delay: 100ms"
+      aria-label="The flow"
+    >
+      <div class="sheet-top">
+        <div class="walk" id="walk"></div>
+        <button
+          class="chip"
+          id="vocab"
+          type="button"
+          aria-pressed="true"
+          title="Whether shared vocabulary counts as a thread"
+        >
+          vocabulary threads
+        </button>
+      </div>
+      <div class="sheet-scroll" id="scroll">
+        <div class="empty" id="empty" hidden><p id="empty-text"></p></div>
+        <svg
+          id="svg"
+          class="flow-sheet"
+          viewBox="0 0 900 520"
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label="The flow"
+        >
+          <defs id="defs"></defs>
+          <g id="heads"></g>
+          <g id="more"></g>
+          <g id="edges"></g>
+          <g id="stones"></g>
+        </svg>
+      </div>
+      <p class="meta sideways">the sheet scrolls sideways · tap a stone to walk</p>
+      <div class="card" id="card" hidden></div>
+      <div class="caption">
+        <div class="meta">what flows, and which way</div>
+        <p class="hand">
+          a note that links to, names or seeds a thing was fed by it; a term
+          practised in a note fed the note; a note that points at code fed the
+          code. hollow stones have gone fallow, dashed ones were never written.
+          hover to light a path, click to walk.
+        </p>
+        <ul class="legend" id="legend"></ul>
+      </div>
+    </section>
+
+    <aside class="desk rise" style="animation-delay: 160ms">
+      <div class="find">
+        <label class="meta" for="q">put a stone at the centre</label>
+        <input
+          id="q"
+          class="search"
+          placeholder="search the garden  /"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="results panel" id="results" hidden>
+          <ul class="rows" id="results-list"></ul>
+        </div>
+      </div>
+      <section
+        class="reading panel"
+        id="reading"
+        aria-label="The reading"
+        hidden
+      ></section>
+      <section id="influences" aria-label="The influences"></section>
+      <p class="hand how">
+        how it is read: the garden's threads, given a direction, walked up to
+        six hops. a linchpin is a direct root through which other roots reach
+        the centre and no other way. what would move is everything downstream.
+        nothing here is a grade.
+      </p>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="label">Flow · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script id="logic">
+  "use strict";
+
+  // ---- the pen (niwa lib/hand.ts) ----
+  // Every path is deterministic for its seed, so a re-render never redraws a line differently.
+
+  /** mulberry32 */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /** FNV-1a: a stable seed from a string. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b: a cubic a little off the straight line. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics. */
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+
+  /** The circling: once round a w×h box and a little past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** A path of M, C and L, sampled into points per subpath. */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ---- the garden (niwa lib/garden.ts, for files read in the page) ----
+  // The same rules, applied to one folder instead of four directories on one machine:
+  //   a file under a Glossary/ folder is a concept; a file with `source:` frontmatter is an
+  //   imported page (notion, readwise-reader → reading, anything else → garden); a file named
+  //   with a memory prefix (project_, feedback_, user_, reference_, routine_) or typed as one is
+  //   a memory stone; everything else is a note. A `~/Code/x` path is a repo only where the
+  //   caller names the repos — a page cannot see your code tree.
+
+  const MEMORY_PREFIXES = [
+    "project_",
+    "feedback_",
+    "user_",
+    "reference_",
+    "routine_",
+  ];
+  const MEMORY_KINDS = ["project", "feedback", "user", "reference", "routine"];
+
+  const unq = (s) => s.replace(/^["']|["']$/g, "");
+
+  /** The lenient line reader garden.ts falls back to when YAML throws, plus `- item` lists. */
+  function frontmatter(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    let parent = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s*-\s+(.*)$/);
+      if (item && parent) {
+        if (!Array.isArray(data[parent])) data[parent] = [];
+        data[parent].push(unq(item[1].trim()));
+        continue;
+      }
+      const field = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, indent, key, rawValue] = field;
+      const value = unq(rawValue.trim());
+      if (indent.length > 0 && parent) {
+        if (
+          typeof data[parent] !== "object" ||
+          data[parent] === null ||
+          Array.isArray(data[parent])
+        )
+          data[parent] = {};
+        data[parent][key] = value;
+        continue;
+      }
+      if (!value) {
+        parent = key;
+        data[key] = {};
+        continue;
+      }
+      parent = null;
+      data[key] = value.startsWith("[")
+        ? value
+            .slice(1, -1)
+            .split(",")
+            .map((s) => unq(s.trim()))
+            .filter(Boolean)
+        : value;
+    }
+    return { data, content: m[2] };
+  }
+
+  /** Wikilinks are written four ways: project_suji, project-suji, suji, suji.md. */
+  const norm = (s) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\.md$/, "")
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+
+  const stripPrefix = (key) => {
+    for (const p of MEMORY_PREFIXES)
+      if (key.startsWith(p)) return key.slice(p.length);
+    return key;
+  };
+
+  /** The body with its code blanked, character for character: a [[ref]] in code names nothing. */
+  const proseOf = (body) => {
+    const blank = (code) => code.replace(/[^\n]/g, " ");
+    return body.replace(/```[\s\S]*?```/g, blank).replace(/`[^`\n]*`/g, blank);
+  };
+
+  function stageOf(iso, now) {
+    if (!iso) return "unknown";
+    const days = (now - new Date(iso).getTime()) / 86400000;
+    if (days <= 7) return "fresh";
+    if (days <= 30) return "tended";
+    if (days <= 90) return "settled";
+    return "fallow";
+  }
+
+  function frontmatterType(data) {
+    const t = data?.type ?? data?.metadata?.type;
+    return typeof t === "string" ? t.toLowerCase() : null;
+  }
+
+  function frontmatterModified(data, fallback) {
+    const raw = data?.metadata?.modified ?? data?.modified ?? data?.updated;
+    if (raw && typeof raw === "string") {
+      const d = new Date(raw);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+    return fallback;
+  }
+
+  function kindFromMemoryFile(base, fmType) {
+    if (fmType && MEMORY_KINDS.includes(fmType)) return fmType;
+    for (const p of MEMORY_PREFIXES)
+      if (base.startsWith(p)) return p.slice(0, -1);
+    return "meta";
+  }
+
+  /** Single-word terms only match capitalised, or `keep`/`still`/`edge` poison everything. */
+  function conceptMatchers(title, aliases) {
+    const terms = [title, ...aliases].filter((t) => t && t.length >= 4);
+    return terms.map((t) => {
+      const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const multiword = /\s/.test(t);
+      return new RegExp(
+        `(?<![\\w-])${escaped}(?![\\w-])`,
+        multiword ? "i" : "",
+      );
+    });
+  }
+
+  const slugLike = (s) => /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(s);
+
+  /**
+   * files: [{ path: "Ideas/a note.md", text, mtime (ms) }]; repos: [{ name, mtime }].
+   * Returns { nodes: [{id, label, kind, modified, stage, degree}], links: [{source, target, kind}] }.
+   */
+  function buildGarden(files, { repos = [], now = Date.now() } = {}) {
+    const nodes = new Map();
+    const links = [];
+    const byKey = new Map();
+    const byBare = new Map();
+    const bodies = new Map();
+    const iso = (d) => d.toISOString();
+
+    const register = (node, extraKeys = []) => {
+      nodes.set(node.id, node);
+      const keys = [norm(node.id), ...extraKeys.map(norm)];
+      for (const k of keys) {
+        if (k && !byKey.has(k)) byKey.set(k, node.id);
+        const bare = stripPrefix(k);
+        if (bare && !byBare.has(bare)) byBare.set(bare, node.id);
+      }
+    };
+    const stone = (id, label, kind, modified) => ({
+      id,
+      label,
+      kind,
+      modified: modified ? iso(modified) : null,
+      stage: modified ? stageOf(iso(modified), now) : "unknown",
+      degree: 0,
+    });
+
+    const read = files.map((f) => {
+      const parts = f.path.split("/");
+      const base = parts[parts.length - 1].replace(/\.md$/, "");
+      const { data, content } = frontmatter(f.text);
+      const src = String(data.source ?? "").trim();
+      const fmType = frontmatterType(data);
+      const role = parts.slice(0, -1).includes("Glossary")
+        ? "concept"
+        : src && typeof data.source === "string"
+          ? "garden"
+          : base === "MEMORY" ||
+              MEMORY_PREFIXES.some((p) => base.startsWith(p)) ||
+              (fmType && MEMORY_KINDS.includes(fmType))
+            ? "memory"
+            : "note";
+      return {
+        parts,
+        base,
+        rel: f.path.replace(/\.md$/, ""),
+        mtime: new Date(f.mtime),
+        data,
+        content,
+        src,
+        fmType,
+        role,
+      };
+    });
+    const unique = (id, rel, prefix) =>
+      nodes.has(id) ? `${prefix}${rel}` : id;
+
+    // 1. memory: the index a person reads carries the real titles of slug-named files
+    const titles = new Map();
+    for (const r of read)
+      if (r.base === "MEMORY")
+        for (const m of r.content.matchAll(
+          /^\s*-\s*\[([^\]\n]+)\]\(([^)\s]+)\.md\)/gm,
+        )) {
+          const title = m[1].replace(/\*\*/g, "").trim();
+          if (title) titles.set(m[2].split("/").pop(), title);
+        }
+    for (const r of read.filter((x) => x.role === "memory")) {
+      const id = unique(r.base, r.rel, "memory:");
+      const kind = r.parts.includes("agents")
+        ? "agent"
+        : kindFromMemoryFile(r.base, r.fmType);
+      const name = typeof r.data.name === "string" ? r.data.name.trim() : "";
+      const label =
+        name && !slugLike(name)
+          ? name
+          : (titles.get(r.base) ??
+            r.base
+              .replace(/^(project|feedback|user|reference|routine)_/, "")
+              .replace(/[_-]/g, " "));
+      register(stone(id, label, kind, frontmatterModified(r.data, r.mtime)), [
+        r.base,
+        stripPrefix(norm(r.base)),
+        name,
+      ]);
+      bodies.set(id, r.content);
+    }
+
+    // 2. the glossary: the controlled vocabulary
+    const concepts = [];
+    for (const r of read.filter((x) => x.role === "concept")) {
+      const id = unique(`concept:${r.base}`, r.rel, "concept:");
+      const aliases = Array.isArray(r.data.aliases)
+        ? r.data.aliases.filter((a) => typeof a === "string")
+        : [];
+      register(
+        stone(id, r.base, "concept", frontmatterModified(r.data, r.mtime)),
+        [r.base, ...aliases],
+      );
+      nodes.get(id).signed =
+        String(r.data.status ?? "").toLowerCase() === "mine";
+      bodies.set(id, r.content);
+      concepts.push({ id, matchers: conceptMatchers(r.base, aliases) });
+    }
+
+    // 3. notes
+    for (const r of read.filter((x) => x.role === "note")) {
+      const id = `note:${r.rel}`;
+      register(
+        stone(id, r.base, "note", frontmatterModified(r.data, r.mtime)),
+        [r.base],
+      );
+      bodies.set(id, r.content);
+    }
+
+    // 3b. imported pages: kinded by `source:`, dated by `tended:`, linked by slug
+    const gardenBySlug = new Map();
+    const related = new Map();
+    for (const r of read.filter((x) => x.role === "garden")) {
+      const slug = r.base;
+      const tended =
+        typeof r.data.tended === "string" ? new Date(r.data.tended) : null;
+      const modified =
+        tended && !Number.isNaN(tended.getTime()) ? tended : r.mtime;
+      const kind =
+        r.src === "notion"
+          ? "notion"
+          : r.src === "readwise-reader"
+            ? "reading"
+            : "garden";
+      const label =
+        typeof r.data.title === "string" && r.data.title.trim()
+          ? r.data.title.trim()
+          : slug;
+      const id = `garden:${r.rel}`;
+      register(stone(id, label, kind, modified), [slug, label]);
+      bodies.set(id, r.content);
+      gardenBySlug.set(slug, id);
+      if (Array.isArray(r.data.related))
+        related.set(
+          id,
+          r.data.related.filter((x) => typeof x === "string"),
+        );
+    }
+
+    // 4. repos: only the ones the caller names
+    const repoIds = new Map();
+    for (const repo of repos) {
+      const id = `repo:${repo.name}`;
+      repoIds.set(repo.name.toLowerCase(), id);
+      nodes.set(id, stone(id, repo.name, "repo", new Date(repo.mtime)));
+    }
+
+    // 5. edges
+    const seen = new Set();
+    const addLink = (source, target, kind) => {
+      if (source === target) return;
+      const key = `${source}→${target}:${kind}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      links.push({ source, target, kind });
+    };
+    const resolve = (ref) => {
+      const k = norm(ref);
+      if (!k) return null;
+      if (byKey.has(k)) return byKey.get(k);
+      const bare = stripPrefix(k);
+      if (byBare.has(bare)) return byBare.get(bare);
+      for (const p of MEMORY_PREFIXES)
+        if (byKey.has(p + k)) return byKey.get(p + k);
+      return null;
+    };
+    const resolveFrom = (from, ref) =>
+      (from.startsWith("garden:") && gardenBySlug.get(ref.trim())) ||
+      resolve(ref);
+    const repoRe = /~\/Code\/([A-Za-z0-9][A-Za-z0-9._-]*)/g;
+
+    for (const [id, refs] of related)
+      for (const ref of refs) {
+        const target = resolveFrom(id, ref);
+        if (target) addLink(id, target, "link");
+      }
+
+    for (const [id, body] of bodies) {
+      // explicit wikilinks; unresolved ones become ghosts, unless written inside code
+      const prose = proseOf(body);
+      for (const m of body.matchAll(
+        /\[\[([^\]\[\n`|#]{2,80})(?:[|#][^\]\n]*)?\]\]/g,
+      )) {
+        const ref = m[1].replace(/\\$/, "").trim();
+        if (!ref || /^[^A-Za-z0-9]/.test(ref)) continue;
+        const target = resolveFrom(id, ref);
+        if (target) addLink(id, target, "link");
+        else if (prose[m.index] === "[") {
+          const ghostId = `ghost:${norm(ref)}`;
+          if (!nodes.has(ghostId))
+            nodes.set(ghostId, stone(ghostId, ref, "ghost", null));
+          addLink(id, ghostId, "seed");
+        }
+      }
+      // repo mentions
+      if (repoIds.size)
+        for (const m of body.matchAll(repoRe)) {
+          const name = m[1].replace(/[.,;:!?]+$/, "");
+          const repo = repoIds.get(name.toLowerCase());
+          if (repo) addLink(id, repo, "build");
+        }
+      // glossary vocabulary: where each concept is practised
+      for (const { id: conceptId, matchers } of concepts) {
+        if (conceptId === id) continue;
+        if (matchers.some((re) => re.test(body)))
+          addLink(conceptId, id, "concept");
+      }
+    }
+
+    // 6. relations nobody wrote down
+    const pair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const joined = new Set(links.map((l) => pair(l.source, l.target)));
+
+    // twin: the same title in two sources, or one a 24+ character prefix of the other
+    const PAGES = ["note", "notion", "garden", "reading"];
+    const titleKey = (s) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const pages = [...nodes.values()]
+      .filter((n) => PAGES.includes(n.kind))
+      .map((n) => ({ id: n.id, kind: n.kind, key: titleKey(n.label) }))
+      .filter((p) => p.key.length >= 10);
+    for (let i = 0; i < pages.length; i++)
+      for (let j = i + 1; j < pages.length; j++) {
+        const [a, b] = [pages[i], pages[j]];
+        const [short, long] =
+          a.key.length <= b.key.length ? [a.key, b.key] : [b.key, a.key];
+        const same =
+          a.kind !== b.kind &&
+          (short === long || (short.length >= 24 && long.startsWith(short)));
+        if (same && !joined.has(pair(a.id, b.id))) {
+          addLink(a.id, b.id, "twin");
+          joined.add(pair(a.id, b.id));
+        }
+      }
+
+    // mention: prose names another note by a title of two words and ten characters or more
+    const nameable = [...nodes.values()].filter(
+      (n) =>
+        !["concept", "repo", "ghost"].includes(n.kind) &&
+        /\s/.test(n.label.trim()) &&
+        n.label.trim().length >= 10 &&
+        /^[A-Za-z]/.test(n.label) &&
+        !/_/.test(n.label),
+    );
+    const named = nameable.map((n) => ({
+      id: n.id,
+      label: n.label.trim(),
+      lower: n.label.trim().toLowerCase(),
+      exact: n.label.trim().split(/\s+/).length <= 2,
+      re: null,
+    }));
+    for (const [id, body] of bodies) {
+      const prose = body
+        .replace(/\[\[[^\]\n]*\]\]/g, " ")
+        .replace(/\]\([^)\n]*\)/g, "]");
+      const lower = prose.toLowerCase();
+      for (const t of named) {
+        if (t.id === id || !lower.includes(t.lower)) continue;
+        if (joined.has(pair(id, t.id))) continue;
+        t.re ??= new RegExp(
+          `(?<![\\w-])${t.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`,
+          t.exact ? "" : "i",
+        );
+        if (t.re.test(prose)) {
+          addLink(id, t.id, "mention");
+          joined.add(pair(id, t.id));
+        }
+      }
+    }
+
+    for (const l of links) {
+      const s = nodes.get(l.source);
+      const t = nodes.get(l.target);
+      if (s) s.degree++;
+      if (t) t.degree++;
+    }
+    return { nodes: [...nodes.values()], links };
+  }
+
+  // ---- the flow (niwa lib/flow.ts) ----
+
+  /**
+   * Which way a thread carries influence. A note that links to, names or seeds something
+   * was fed by it; a concept practised in a note fed the note; a note that points at code
+   * fed the code; twins feed each other.
+   */
+  function orient(l) {
+    switch (l.kind) {
+      case "link":
+      case "mention":
+      case "seed":
+        return [{ from: l.target, to: l.source, kind: l.kind }];
+      case "concept":
+      case "build":
+        return [{ from: l.source, to: l.target, kind: l.kind }];
+      case "twin":
+        return [
+          { from: l.source, to: l.target, kind: l.kind },
+          { from: l.target, to: l.source, kind: l.kind },
+        ];
+    }
+    return [];
+  }
+
+  const SEP = "\u0000";
+  function push(m, k, v) {
+    const arr = m.get(k);
+    if (arr) arr.push(v);
+    else m.set(k, [v]);
+  }
+
+  function buildFlow(links) {
+    const into = new Map();
+    const outOf = new Map();
+    const pairs = new Set();
+    for (const l of links)
+      for (const a of orient(l)) {
+        push(into, a.to, a);
+        push(outOf, a.from, a);
+        pairs.add(`${a.from}${SEP}${a.to}`);
+      }
+    const mutual = new Map();
+    for (const p of pairs) {
+      const [f, t] = p.split(SEP);
+      if (!pairs.has(`${t}${SEP}${f}`)) continue;
+      if (!mutual.has(f)) mutual.set(f, new Set());
+      mutual.get(f).add(t);
+    }
+    return { into, outOf, mutual };
+  }
+
+  /** Two hops is where a premise still bears on a thought; six is used only to find loops. */
+  const NEAR = 2;
+  const HOPS = 6;
+
+  function walkFrom(next, pick, start, hops, block) {
+    const seen = new Map([[start, 0]]);
+    if (block) seen.set(block, -1);
+    let frontier = [start];
+    for (let h = 1; h <= hops && frontier.length; h++) {
+      const out = [];
+      for (const id of frontier)
+        for (const a of next.get(id) ?? []) {
+          const n = pick(a);
+          if (!seen.has(n)) {
+            seen.set(n, h);
+            out.push(n);
+          }
+        }
+      frontier = out;
+    }
+    seen.delete(start);
+    if (block) seen.delete(block);
+    return seen;
+  }
+
+  const upstream = (flow, id, hops = NEAR, block) =>
+    walkFrom(flow.into, (a) => a.from, id, hops, block);
+  const downstream = (flow, id, hops = NEAR) =>
+    walkFrom(flow.outOf, (a) => a.to, id, hops);
+  const reach = (flow, id, hops = NEAR) => downstream(flow, id, hops).size;
+  const uniq = (xs) => [...new Set(xs)];
+
+  function foundations(flow, nodes, id, hops = NEAR) {
+    const roots = upstream(flow, id, hops);
+    const down = downstream(flow, id, hops);
+    const far = downstream(flow, id, HOPS);
+    const direct = uniq((flow.into.get(id) ?? []).map((a) => a.from));
+    const byHop = (a, b) => roots.get(a) - roots.get(b);
+    const kind = (x) => nodes.get(x)?.kind;
+    const rootIds = [...roots.keys()];
+    let own = 0;
+    let read = 0;
+    let code = 0;
+    for (const r of rootIds) {
+      const k = kind(r);
+      if (k === "reading") read++;
+      else if (k === "repo") code++;
+      else if (k && k !== "ghost") own++;
+    }
+    // A linchpin: a direct root whose own roots reach this stone through no other direct root.
+    const sets = direct.map((u) => {
+      const s = new Set(upstream(flow, u, Math.max(1, hops - 1), id).keys());
+      s.add(u);
+      return s;
+    });
+    const linchpins = direct
+      .map((u, i) => {
+        let exclusive = 0;
+        for (const s of sets[i]) {
+          if (s === id) continue;
+          if (!sets.some((o, j) => j !== i && o.has(s))) exclusive++;
+        }
+        return { id: u, exclusive };
+      })
+      .filter((l) => l.exclusive >= 2)
+      .sort((a, b) => b.exclusive - a.exclusive);
+    return {
+      direct,
+      roots,
+      fallow: rootIds
+        .filter((r) => nodes.get(r)?.stage === "fallow")
+        .sort(byHop),
+      unwritten: rootIds.filter((r) => kind(r) === "ghost").sort(byHop),
+      own,
+      read,
+      code,
+      linchpins,
+      loops: rootIds.filter((r) => far.has(r)).sort(byHop),
+      mutual: [...(flow.mutual.get(id) ?? [])],
+      directOut: uniq((flow.outOf.get(id) ?? []).map((a) => a.to)),
+      reach: down.size,
+    };
+  }
+
+  const labelOf = (nodes, id) => nodes.get(id)?.label ?? id;
+  const listOf = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+
+  /** The reading, sentence by sentence. Facts about the structure; the judgment is left out. */
+  function readings(f, nodes, ctx) {
+    const out = [];
+    const n = f.roots.size;
+    const than = (x) =>
+      x >= 0.995
+        ? "any other stone here"
+        : `${Math.round(x * 100)}% of the garden`;
+    if (n === 0) out.push("rests on nothing written here — a root.");
+    else
+      out.push(
+        `rests on ${n} ${n === 1 ? "stone" : "stones"} within two hops, ${f.direct.length} of them directly${
+          ctx ? ` — more rooted than ${than(ctx.rootsBelow)}` : ""
+        }.`,
+      );
+    if (n > 0) {
+      const total = f.own + f.read + f.code;
+      if (total > 0) {
+        const ownShare = f.own / total;
+        if (f.read === 0) out.push("its roots are entirely your own writing.");
+        else if (ownShare >= 0.75)
+          out.push(
+            `its roots are mostly your own writing — ${f.read} of ${total} are things you read.`,
+          );
+        else if (ownShare <= 0.25)
+          out.push(
+            `its roots are mostly things you read — ${f.own} of ${total} are your own.`,
+          );
+        else
+          out.push(
+            `its roots are ${f.own} of your own and ${f.read} things you read.`,
+          );
+      }
+    }
+    if (f.fallow.length)
+      out.push(
+        `${f.fallow.length} of its roots ${f.fallow.length === 1 ? "has" : "have"} gone fallow — ${f.fallow.length === 1 ? "a premise" : "premises"} that may have moved since.`,
+      );
+    if (f.unwritten.length)
+      out.push(
+        `${f.unwritten.length} of its roots ${f.unwritten.length === 1 ? "was" : "were"} never written down.`,
+      );
+    if (f.linchpins.length) {
+      const l = f.linchpins[0];
+      out.push(
+        `${labelOf(nodes, l.id)} is a linchpin: ${l.exclusive} roots reach this only through it.`,
+      );
+    }
+    if (f.loops.length)
+      out.push(
+        `${f.loops.length} of its roots ${f.loops.length === 1 ? "is" : "are"} fed by it in turn — a loop.`,
+      );
+    if (f.mutual.length)
+      out.push(
+        `runs both ways with ${listOf(f.mutual.slice(0, 3).map((m) => labelOf(nodes, m)))}${
+          f.mutual.length > 3 ? ` and ${f.mutual.length - 3} more` : ""
+        }.`,
+      );
+    if (f.reach === 0) out.push("flows into nothing yet — a leaf.");
+    else
+      out.push(
+        `flows into ${f.directOut.length} ${f.directOut.length === 1 ? "stone" : "stones"} directly, ${f.reach} within two hops${
+          ctx ? ` — more than ${than(ctx.reachBelow)}` : ""
+        }; change it and they move.`,
+      );
+    return out;
+  }
+
+  /** Where one stone sits among all of them: the share with fewer roots, and with less reach. */
+  function context(flow, nodes, id, hops = NEAR) {
+    const ids = [...nodes.values()]
+      .filter((x) => x.kind !== "ghost" && x.kind !== "repo")
+      .map((x) => x.id);
+    const mine = {
+      roots: upstream(flow, id, hops).size,
+      reach: downstream(flow, id, hops).size,
+    };
+    let rootsBelow = 0;
+    let reachBelow = 0;
+    for (const o of ids) {
+      if (o === id) continue;
+      if (upstream(flow, o, hops).size < mine.roots) rootsBelow++;
+      if (downstream(flow, o, hops).size < mine.reach) reachBelow++;
+    }
+    const n = Math.max(1, ids.length - 1);
+    return { rootsBelow: rootsBelow / n, reachBelow: reachBelow / n, n };
+  }
+
+  /** What shaped the most, and what runs both ways. */
+  function influences(flow, nodes, n = 8) {
+    const ids = [...nodes.values()]
+      .filter(
+        (x) => x.kind !== "meta" && x.kind !== "ghost" && x.kind !== "repo",
+      )
+      .map((x) => x.id);
+    const shaped = ids
+      .map((id) => ({ id, reach: reach(flow, id) }))
+      .filter((x) => x.reach > 0)
+      .sort((a, b) => b.reach - a.reach)
+      .slice(0, n);
+    const argued = ids
+      .map((id) => ({ id, mutual: flow.mutual.get(id)?.size ?? 0 }))
+      .filter((x) => x.mutual > 0)
+      .sort((a, b) => b.mutual - a.mutual)
+      .slice(0, n);
+    return { shaped, argued };
+  }
+
+  const KIND_LABEL = {
+    project: "Builds",
+    concept: "Concepts",
+    user: "Self",
+    feedback: "Rules",
+    reference: "Reference",
+    routine: "Routines",
+    note: "Notes",
+    notion: "Notion",
+    garden: "Garden notes",
+    reading: "Reading",
+    meta: "Root",
+    agent: "Agents",
+    repo: "Repos",
+    ghost: "Unwritten",
+  };
+  const LINK_LABEL = {
+    link: "Written link",
+    concept: "Shared vocabulary",
+    build: "Points at code",
+    seed: "Unplanted",
+    mention: "Named in prose",
+    twin: "Same document",
+  };
+  const STAGE_LABEL = {
+    fresh: "Fresh",
+    tended: "Tended",
+    settled: "Settled",
+    fallow: "Fallow",
+    unknown: "Undated",
+  };
+
+  // ---- the specimen: a made-up reader's notes, as markdown files with their age in days ----
+  // Run through buildGarden like any folder. Ages, not dates, so the specimen never goes fallow.
+  const SPECIMEN = [
+    [
+      "Glossary/Slow Looking.md",
+      35,
+      "---\nstatus: mine\naliases: [slow look]\n---\nLooking at one thing for longer than is comfortable, until it shows you something you did not bring to it.",
+    ],
+    [
+      "Glossary/Attention Residue.md",
+      80,
+      "---\nstatus: borrowed\n---\nWhat is still thinking about the last thing when you have already started the next. From [[The Cost of Switching]].",
+    ],
+    [
+      "Glossary/Desire Path.md",
+      50,
+      "---\naliases:\n  - desire paths\n---\nThe line walked into the grass where the paving should have gone. A route nobody planned and every pair of feet agreed on.",
+    ],
+    [
+      "Glossary/Keel.md",
+      9,
+      "---\nstatus: mine\n---\nWhat stays put when the room turns. Not stubbornness: a position you would say out loud anywhere.",
+    ],
+    [
+      "Reader/notes-on-noticing.md",
+      240,
+      "---\ntitle: Notes on Noticing\nsource: readwise-reader\n---\nHighlights. The case for slow looking: a painting, a hedge, a stranger's coat, held for ten minutes instead of ten seconds.",
+    ],
+    [
+      "Reader/the-cost-of-switching.md",
+      400,
+      "---\ntitle: The Cost of Switching\nsource: readwise-reader\n---\nHighlights. Every switch leaves attention residue behind. An hour of small switches is an hour of half-attention.",
+    ],
+    [
+      "Reader/against-the-feed-again.md",
+      150,
+      "---\ntitle: Against the Feed, Again\nsource: readwise-reader\n---\nHighlights. The feed is less a place you visit than a climate you live in. Nobody decides to be rained on.",
+    ],
+    [
+      "Reader/paths-not-paved.md",
+      60,
+      "---\ntitle: Paths Not Paved\nsource: readwise-reader\n---\nHighlights. The campus that waited a year to see where people walked, then paved the desire paths.",
+    ],
+    [
+      "Reader/a-field-guide-to-boredom.md",
+      20,
+      "---\ntitle: A Field Guide to Boredom\nsource: readwise-reader\n---\nHighlights. Boredom as the feeling of attention coming back to you with nothing to hold on to.",
+    ],
+    [
+      "Notion/against-the-feed-again.md",
+      150,
+      "---\ntitle: Against the Feed, Again\nsource: notion\n---\nImported highlights page. Two passages marked to come back to.",
+    ],
+    [
+      "Notion/reading-list.md",
+      300,
+      "---\ntitle: Reading List\nsource: notion\n---\n[[notes-on-noticing]] · [[the-cost-of-switching]] · [[paths-not-paved]] · [[the quiet hour]]",
+    ],
+    [
+      "Ideas/The Feed as Weather.md",
+      12,
+      "Most of what I believe about the news I did not decide. It settled on me, the way weather does. [[Notes on Noticing]] made me want to look at it instead of through it, and Against the Feed, Again says it better than I can.\n\nIt is attention residue all day long, and no Keel to speak of. See [[Morning Walk]] and [[Phone in another room]], and the note I keep not writing, [[a weather report for attention]]. Counting it in ~/Code/feed-log.",
+    ],
+    [
+      "Journal/Morning Walk.md",
+      4,
+      "Left the phone at home and took the desire path behind the school instead of the road. Thinking about [[The Feed as Weather]] again: the weather lifts when I walk. The campus in [[Paths Not Paved]] would have paved this one by now. Same route as the [[First walk without the phone]].",
+    ],
+    [
+      "Journal/First walk without the phone.md",
+      130,
+      "My hand went to the empty pocket eleven times in the first hour. I counted. [[the quiet hour]] started here.",
+    ],
+    [
+      "feedback_phone-in-another-room.md",
+      70,
+      "---\nname: Phone in another room\ntype: feedback\n---\nThe phone sleeps in the kitchen. Why: [[The Cost of Switching]]; every glance leaves attention residue. How to apply: mornings, and any hour I mean to write.",
+    ],
+    [
+      "project_walking-map.md",
+      14,
+      "---\nname: Walking map\ntype: project\n---\nA map of every walk this year, each line shaded by how long I went without the phone. Code at ~/Code/walk-map. Background: [[Morning Walk]], [[The Feed as Weather]].",
+    ],
+    [
+      "user_what-i-keep.md",
+      40,
+      "---\nname: What I keep coming back to\ntype: user\n---\nLooking slowly, walking without a destination, and saying the same thing in every room. [[Slow Looking]], [[Keel]], [[Walking map]].",
+    ],
+    [
+      "Ideas/Attention is composed.md",
+      2,
+      "Attention is not only taken. It can be composed, the way a walk or a page is. [[The Feed as Weather]] is the problem stated; [[Slow Looking]] and the [[Morning Walk]] are the practice. Keep at it long enough and you get something like a Keel.",
+    ],
+    [
+      "Ideas/Saying it in every room.md",
+      28,
+      "A belief is one I would say at the family table and in the group chat alike. That is the Keel again. Against [[The Feed as Weather]]: the weather is the same in every room, and I am not.",
+    ],
+    [
+      "Ideas/Boredom is attention returning.md",
+      18,
+      "[[A Field Guide to Boredom]]. Ten minutes on the bus with nothing in my hands, and [[the quiet hour]] again.",
+    ],
+    [
+      "Ideas/Looking at one tree for a year.md",
+      45,
+      "The same oak from the kitchen window, once a day, for a year. Slow looking, the long version. Started after [[Notes on Noticing]].",
+    ],
+    [
+      "Ideas/Where attention goes.md",
+      8,
+      "Not a ledger. A map. The [[Walking map]] is the walking half; [[a weather report for attention]] would be the other.",
+    ],
+    [
+      "Drafts/Letter to R about phones.md",
+      6,
+      "R, you asked why I am slower to answer now. Read The Feed as Weather in my notes if you like. The short version is that the phone lives in the kitchen.",
+    ],
+    [
+      "Drafts/What the walk taught.md",
+      3,
+      "Essay draft. It starts from [[Attention is composed]] and ends on the [[Desire Path]], and in between it is mostly the [[Morning Walk]].",
+    ],
+    [
+      "Journal/Two weeks without the feed.md",
+      95,
+      "Day fourteen. The weather lifted around day five. [[Morning Walk]] most days. Less attention residue, more boredom, which [[A Field Guide to Boredom]] says is the point.",
+    ],
+    [
+      "Journal/Bus without headphones.md",
+      16,
+      "Twenty minutes. I heard a whole argument about a dog. Filed under [[Boredom is attention returning]].",
+    ],
+    [
+      "People/Conversation with my sister.md",
+      33,
+      "She thinks the feed is fine if you choose it. I think nobody chooses the weather. Saying it in every room is easier with her than anywhere else.",
+    ],
+  ];
+  const SPECIMEN_REPOS = [
+    ["walk-map", 14],
+    ["feed-log", 12],
+  ];
+  const SPECIMEN_START = "note:Ideas/The Feed as Weather";
+
+  function specimenGarden(now = Date.now()) {
+    const ago = (d) => now - d * 86400000;
+    return buildGarden(
+      SPECIMEN.map(([path, age, text]) => ({ path, text, mtime: ago(age) })),
+      {
+        repos: SPECIMEN_REPOS.map(([name, age]) => ({ name, mtime: ago(age) })),
+        now,
+      },
+    );
+  }
+</script>
+
+<script>
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const KEY = "pp-flow";
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const day = (iso) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "undated";
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+  function el(tag, attrs = {}) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs))
+      if (v != null) e.setAttribute(k, v);
+    return e;
+  }
+
+  // ---- what is kept: one key, this browser only ----
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || "null") || {};
+    } catch {
+      return {};
+    }
+  }
+  function save() {
+    const kept = load();
+    const out = {
+      vocab: S.vocab,
+      walks: { ...(kept.walks || {}), [S.source]: S.walk },
+      own: S.source === "own" ? S.packed : kept.own,
+    };
+    try {
+      localStorage.setItem(KEY, JSON.stringify(out));
+      return true;
+    } catch {
+      try {
+        // Too big to keep: keep the walk and the switch, and say so.
+        localStorage.setItem(KEY, JSON.stringify({ ...out, own: undefined }));
+      } catch {
+        /* storage refused: the page still works, it just forgets on reload */
+      }
+      return false;
+    }
+  }
+  /** A garden packed small: [id, label, kind, modified] and [source, target, kind] by index. */
+  const KINDS = Object.keys(LINK_LABEL);
+  function pack(g, name) {
+    const idx = new Map(g.nodes.map((n, i) => [n.id, i]));
+    return {
+      name,
+      at: new Date().toISOString(),
+      n: g.nodes.map((n) => [n.id, n.label, n.kind, n.modified]),
+      l: g.links.map((l) => [
+        idx.get(l.source),
+        idx.get(l.target),
+        KINDS.indexOf(l.kind),
+      ]),
+    };
+  }
+  function unpack(p) {
+    const now = Date.now();
+    const nodes = p.n.map(([id, label, kind, modified]) => ({
+      id,
+      label,
+      kind,
+      modified,
+      stage: stageOf(modified, now),
+      degree: 0,
+    }));
+    const links = p.l.map(([s, t, k]) => {
+      nodes[s].degree++;
+      nodes[t].degree++;
+      return { source: nodes[s].id, target: nodes[t].id, kind: KINDS[k] };
+    });
+    return { nodes, links };
+  }
+
+  // ---- state ----
+  const S = {
+    source: "specimen",
+    name: "",
+    at: null,
+    garden: null,
+    packed: null,
+    nodes: new Map(),
+    flow: null,
+    top: null,
+    centre: null,
+    walk: [],
+    vocab: true,
+    hover: null,
+    scene: null,
+    found: null,
+  };
+
+  function setGarden(
+    g,
+    { source, name = "", at = null, packed = null, walk = [] },
+  ) {
+    S.garden = g;
+    S.source = source;
+    S.name = name;
+    S.at = at;
+    S.packed = packed;
+    S.nodes = new Map(g.nodes.map((n) => [n.id, n]));
+    S.hover = null;
+    const kept = walk.filter((id) => S.nodes.has(id));
+    S.walk = kept;
+    S.centre = kept[kept.length - 1] ?? null;
+    reflow();
+  }
+
+  function reflow() {
+    S.flow = buildFlow(
+      S.vocab
+        ? S.garden.links
+        : S.garden.links.filter((l) => l.kind !== "concept"),
+    );
+    S.top = influences(S.flow, S.nodes, 8);
+    if (!S.centre) {
+      const first =
+        S.source === "specimen" && S.nodes.has(SPECIMEN_START)
+          ? SPECIMEN_START
+          : S.top.shaped[0]?.id;
+      if (first) {
+        S.centre = first;
+        S.walk = [first];
+      }
+    }
+    renderGarden();
+    renderCentre();
+  }
+
+  function go(id) {
+    S.centre = id;
+    if (S.walk[S.walk.length - 1] !== id) S.walk = [...S.walk, id];
+    S.hover = null;
+    save();
+    renderCentre(true);
+  }
+  function back() {
+    if (S.walk.length < 2) return;
+    S.walk = S.walk.slice(0, -1);
+    S.centre = S.walk[S.walk.length - 1];
+    S.hover = null;
+    save();
+    renderCentre(true);
+  }
+
+  // ---- a pen line over an element ----
+  let maskN = 0;
+  function sketch(
+    host,
+    { kind = "box", seed, color = "var(--pen)", width, draw = false },
+  ) {
+    const pen = width ?? { box: 1.7, ring: 1.6, strike: 1.5 }[kind];
+    const svg = el("svg", { class: "sketch", "aria-hidden": "true" });
+    const ink = el("path", { fill: color });
+    let mask = null;
+    let mpath = null;
+    if (draw && !REDUCE) {
+      const id = `sk${++maskN}`;
+      const defs = el("defs");
+      mask = el("mask", { id, maskUnits: "userSpaceOnUse" });
+      mpath = el("path", {
+        class: "draw",
+        pathLength: 1,
+        fill: "none",
+        "stroke-width": pen * 2 + 4,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+      });
+      mask.append(mpath);
+      defs.append(mask);
+      svg.append(defs);
+      ink.setAttribute("mask", `url(#${id})`);
+    }
+    svg.append(ink);
+    host.append(svg);
+    let cur = seed;
+    const paint = () => {
+      const w = host.offsetWidth;
+      const h = host.offsetHeight;
+      if (!w || !h) return;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const s = seedOf(cur);
+      const line =
+        kind === "box"
+          ? roughRect(w, h, s)
+          : kind === "ring"
+            ? roughEllipse(w, h, s, { pad: 3, grow: 1.18 })
+            : roughStrike(w, h, s);
+      ink.setAttribute("d", ribbon(line, pen, s));
+      if (mpath) {
+        mpath.setAttribute("d", line);
+        mask.setAttribute("x", -40);
+        mask.setAttribute("y", -40);
+        mask.setAttribute("width", w + 80);
+        mask.setAttribute("height", h + 80);
+      }
+    };
+    const ro = new ResizeObserver(paint);
+    ro.observe(host);
+    paint();
+    return {
+      reseed(s) {
+        if (s === cur) return;
+        cur = s;
+        paint();
+      },
+      remove() {
+        ro.disconnect();
+        svg.remove();
+      },
+    };
+  }
+
+  // ---- the sheet: columns by hop, edges among what is shown ----
+  const W = 900;
+  const H = 520;
+  const COLS = { up2: 150, up1: 315, centre: 450, down1: 585, down2: 750 };
+  const TOP = 56;
+  const BOTTOM = 470;
+  const PER_COLUMN = 8;
+
+  function column(ids, x, hop) {
+    const shown = ids.slice(0, PER_COLUMN);
+    const n = shown.length;
+    return {
+      placed: shown.map((id, i) => ({
+        id,
+        x,
+        y:
+          n === 1 ? (TOP + BOTTOM) / 2 : TOP + ((BOTTOM - TOP) * (i + 0.5)) / n,
+        hop,
+      })),
+      more: ids.length - n,
+    };
+  }
+
+  function buildScene() {
+    const { flow, centre } = S;
+    if (!flow || !centre) return null;
+    const up = upstream(flow, centre, 2);
+    const down = downstream(flow, centre, 2);
+    const byReach = (a, b) =>
+      (flow.outOf.get(b)?.length ?? 0) - (flow.outOf.get(a)?.length ?? 0) ||
+      a.localeCompare(b);
+    // A stone that both feeds the centre and is fed by it is a loop: drawn once, among the roots.
+    const pick = (m, hop) =>
+      [...m.entries()]
+        .filter(([, h]) => h === hop)
+        .map(([id]) => id)
+        .sort(byReach);
+    const u1 = column(pick(up, 1), COLS.up1, -1);
+    const u2 = column(pick(up, 2), COLS.up2, -2);
+    const d1 = column(
+      pick(down, 1).filter((id) => !up.has(id)),
+      COLS.down1,
+      1,
+    );
+    const d2 = column(
+      pick(down, 2).filter((id) => !up.has(id)),
+      COLS.down2,
+      2,
+    );
+    const placed = [
+      ...u2.placed,
+      ...u1.placed,
+      { id: centre, x: COLS.centre, y: (TOP + BOTTOM) / 2, hop: 0 },
+      ...d1.placed,
+      ...d2.placed,
+    ];
+    const at = new Map(placed.map((p) => [p.id, p]));
+    const isMutual = (a, b) => flow.mutual.get(a)?.has(b) ?? false;
+    const edges = [];
+    const seen = new Set();
+    const add = (from, to, kind, wave) => {
+      const key = `${from}>${to}`;
+      const rev = `${to}>${from}`;
+      if (seen.has(key) || seen.has(rev)) return;
+      seen.add(key);
+      edges.push({ from, to, kind, mutual: isMutual(from, to), wave });
+    };
+    for (const p of u2.placed)
+      for (const a of flow.outOf.get(p.id) ?? [])
+        if (at.get(a.to)?.hop === -1) add(p.id, a.to, a.kind, 0);
+    for (const p of u1.placed)
+      for (const a of flow.outOf.get(p.id) ?? [])
+        if (a.to === centre) add(p.id, centre, a.kind, 1);
+    for (const p of d1.placed)
+      for (const a of flow.into.get(p.id) ?? [])
+        if (a.from === centre) add(centre, p.id, a.kind, 2);
+    for (const p of d2.placed)
+      for (const a of flow.into.get(p.id) ?? [])
+        if (at.get(a.from)?.hop === 1) add(a.from, p.id, a.kind, 3);
+    return {
+      placed,
+      at,
+      edges,
+      more: { u1: u1.more, u2: u2.more, d1: d1.more, d2: d2.more },
+      upCount: up.size,
+      downCount: down.size,
+    };
+  }
+
+  /** The pen for one arrow: the line, shortened off both discs, and a head at the far end. */
+  function inkEdge(e, at) {
+    const a = at.get(e.from);
+    const b = at.get(e.to);
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const gapA = a.hop === 0 ? 14 : 11;
+    const gapB = b.hop === 0 ? 14 : 11;
+    const p = [a.x + ux * gapA, a.y + uy * gapA];
+    const q = [b.x - ux * gapB, b.y - uy * gapB];
+    const seed = seedOf(`${e.from}>${e.to}`);
+    const r = rand(seed);
+    const line = stroke(p, q, r, 2.2, 0);
+    const head = (end, dir, ang) => {
+      const hx = ux * dir;
+      const hy = uy * dir;
+      const s = [
+        end[0] - (hx * Math.cos(ang) - hy * Math.sin(ang)) * 9,
+        end[1] - (hx * Math.sin(ang) + hy * Math.cos(ang)) * 9,
+      ];
+      return ribbon(stroke(s, end, r, 0.5, 0), 1.3, seed + 5);
+    };
+    let d =
+      ribbon(line, e.mutual ? 1.5 : 1.25, seed) +
+      head(q, 1, 0.5) +
+      head(q, 1, -0.5);
+    if (e.mutual) d += head(p, -1, 0.5) + head(p, -1, -0.5);
+    return { d, line };
+  }
+
+  const edgeEls = new Map();
+  const stoneEls = new Map();
+
+  function drawHeads() {
+    const g = $("heads");
+    for (const [x, t] of [
+      [COLS.up2, "two hops in"],
+      [COLS.up1, "flowed into it"],
+      [COLS.down1, "it flowed into"],
+      [COLS.down2, "two hops out"],
+    ]) {
+      const tx = el("text", {
+        class: "b-mono",
+        x,
+        y: 26,
+        "text-anchor": "middle",
+        "font-size": 9.5,
+        "letter-spacing": 1.6,
+        fill: "var(--faint)",
+      });
+      tx.textContent = t.toUpperCase();
+      g.append(tx);
+    }
+  }
+
+  function renderSheet(recentred) {
+    const sc = S.scene;
+    const svg = $("svg");
+    if (!sc) {
+      svg.hidden = true;
+      $("empty").hidden = false;
+      $("empty-text").textContent = S.garden?.nodes.length
+        ? "nothing in this garden links to, names or seeds anything else yet — there is nothing to follow. search for a stone to put it at the centre anyway."
+        : "no stones here yet.";
+      return;
+    }
+    svg.hidden = false;
+    $("empty").hidden = true;
+    const centreNode = S.nodes.get(S.centre);
+    svg.setAttribute(
+      "aria-label",
+      `${centreNode?.label ?? ""}: ${sc.upCount} stones flow into it, it flows into ${sc.downCount}`,
+    );
+
+    // and n more
+    const more = $("more");
+    more.textContent = "";
+    for (const [x, n] of [
+      [COLS.up2, sc.more.u2],
+      [COLS.up1, sc.more.u1],
+      [COLS.down1, sc.more.d1],
+      [COLS.down2, sc.more.d2],
+    ])
+      if (n > 0) {
+        const t = el("text", {
+          class: "b-hand",
+          x,
+          y: H - 14,
+          "text-anchor": "middle",
+          "font-size": 13,
+          fill: "var(--faint)",
+        });
+        t.textContent = `and ${n} more`;
+        more.append(t);
+      }
+
+    // the threads, as pen arrows in their kind's colour; keyed, so one that stays is not redrawn
+    const keep = new Set();
+    for (const e of sc.edges) {
+      const k = `${e.from}>${e.to}`;
+      keep.add(k);
+      const { d, line } = inkEdge(e, sc.at);
+      let x = edgeEls.get(k);
+      if (!x) {
+        const g = el("g", { class: "f-edge" });
+        const ink = el("path");
+        const hit = el("path", {
+          fill: "none",
+          stroke: "transparent",
+          "stroke-width": 12,
+        });
+        g.append(ink, hit);
+        x = { g, ink, hit, mask: null, mpath: null, edge: e };
+        if (!REDUCE) {
+          const id = `fm-${seedOf(k)}`;
+          x.mask = el("mask", {
+            id,
+            maskUnits: "userSpaceOnUse",
+            x: 0,
+            y: 0,
+            width: W,
+            height: H,
+          });
+          x.mpath = el("path", {
+            class: "draw",
+            pathLength: 1,
+            fill: "none",
+            "stroke-width": 22,
+            "stroke-linecap": "round",
+            style: `--i:${e.wave}`,
+          });
+          x.mask.append(x.mpath);
+          $("defs").append(x.mask);
+          g.setAttribute("mask", `url(#${id})`);
+        }
+        const ref = x;
+        g.addEventListener("pointerenter", (ev) => showCard(ev, k, ref.edge));
+        g.addEventListener("pointermove", (ev) => showCard(ev, k, ref.edge));
+        g.addEventListener("pointerleave", hideCard);
+        $("edges").append(g);
+        edgeEls.set(k, x);
+      }
+      x.edge = e;
+      x.ink.setAttribute("d", d);
+      x.ink.setAttribute(
+        "fill",
+        e.mutual ? "var(--accent)" : `var(--link-${e.kind})`,
+      );
+      x.hit.setAttribute("d", line);
+      if (x.mpath) x.mpath.setAttribute("d", line);
+    }
+    for (const [k, x] of edgeEls)
+      if (!keep.has(k)) {
+        x.g.remove();
+        x.mask?.remove();
+        edgeEls.delete(k);
+      }
+
+    // the stones: keyed by id, so one that stays slides to its new place
+    const keepS = new Set();
+    for (const p of sc.placed) {
+      keepS.add(p.id);
+      const n = S.nodes.get(p.id);
+      const kind = n?.kind ?? "note";
+      const hollow = n?.stage === "fallow" || kind === "ghost";
+      const isCentre = p.hop === 0;
+      const left = p.hop < 0;
+      let x = stoneEls.get(p.id);
+      const fresh = !x;
+      if (fresh) {
+        const g = el("g", { class: "f-stone" });
+        const disc = el("circle");
+        const label = el("text", { class: "b-hand" });
+        const hit = el("circle", { class: "hit", r: 16, fill: "transparent" });
+        g.append(disc, label, hit);
+        x = { g, disc, label, hit, ring: null, p };
+        const ref = x;
+        g.addEventListener("pointerenter", (ev) => showCard(ev, ref.p.id));
+        g.addEventListener("pointermove", (ev) => showCard(ev, ref.p.id));
+        g.addEventListener("pointerleave", hideCard);
+        g.addEventListener("click", () => ref.p.hop !== 0 && go(ref.p.id));
+        g.addEventListener("keydown", (ev) => {
+          if ((ev.key === "Enter" || ev.key === " ") && ref.p.hop !== 0) {
+            ev.preventDefault();
+            go(ref.p.id);
+          }
+        });
+        g.addEventListener("focus", () => focusCard(ref));
+        g.addEventListener("blur", hideCard);
+        stoneEls.set(p.id, x);
+      }
+      x.p = p;
+      x.g.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      x.g.style.cursor = isCentre ? "default" : "pointer";
+      if (isCentre) {
+        x.g.removeAttribute("tabindex");
+        x.g.removeAttribute("role");
+        x.g.removeAttribute("aria-label");
+      } else {
+        x.g.setAttribute("tabindex", "0");
+        x.g.setAttribute("role", "button");
+        x.g.setAttribute(
+          "aria-label",
+          `${n?.label ?? p.id}: put at the centre`,
+        );
+      }
+      if (isCentre && !x.ring) {
+        x.ring = el("path", {
+          transform: "translate(-15 -15)",
+          fill: "var(--accent)",
+        });
+        x.g.insertBefore(x.ring, x.g.firstChild);
+      } else if (!isCentre && x.ring) {
+        x.ring.remove();
+        x.ring = null;
+      }
+      if (x.ring) {
+        const s = seedOf(p.id);
+        x.ring.setAttribute(
+          "d",
+          ribbon(
+            roughEllipse(30, 30, s, { wobble: 1.2, pad: 0, steps: 14 }),
+            1.6,
+            s,
+          ),
+        );
+      }
+      const r = isCentre ? 9 : 6.5;
+      x.disc.setAttribute("r", r);
+      x.disc.setAttribute("fill", hollow ? "var(--surface)" : `var(--kind-${kind})`);
+      x.disc.setAttribute("stroke", `var(--kind-${kind})`);
+      x.disc.setAttribute("stroke-width", hollow ? 1.6 : 0);
+      if (kind === "ghost") x.disc.setAttribute("stroke-dasharray", "2.5 2.5");
+      else x.disc.removeAttribute("stroke-dasharray");
+      x.label.setAttribute("x", isCentre ? 0 : left ? -13 : 13);
+      x.label.setAttribute("y", isCentre ? 30 : 4.5);
+      x.label.setAttribute(
+        "text-anchor",
+        isCentre ? "middle" : left ? "end" : "start",
+      );
+      x.label.setAttribute("font-size", isCentre ? 16 : 12.5);
+      x.label.setAttribute("fill", isCentre ? "var(--ink)" : "var(--muted)");
+      x.label.textContent = short(n?.label ?? p.id, isCentre ? 40 : 22);
+      if (fresh) $("stones").append(x.g);
+    }
+    for (const [id, x] of stoneEls)
+      if (!keepS.has(id)) {
+        x.g.remove();
+        stoneEls.delete(id);
+      }
+
+    light();
+    // On a phone the sheet scrolls inside its frame; keep the centre in view after a walk.
+    const sc2 = $("scroll");
+    if (
+      sc2.scrollWidth > sc2.clientWidth &&
+      (recentred || !sc2.dataset.placed)
+    ) {
+      sc2.dataset.placed = "1";
+      sc2.scrollLeft = (sc2.scrollWidth - sc2.clientWidth) / 2;
+    }
+  }
+
+  /** Under the pointer, the whole path lights: the stone, its arrows, and their way on to the centre. */
+  function litSets() {
+    const { hover, scene, centre } = S;
+    if (!hover || !scene || !centre) return null;
+    const key = (e) => `${e.from}>${e.to}`;
+    const edges = new Set();
+    const stones = new Set();
+    if (hover.edge) {
+      edges.add(key(hover.edge));
+      stones.add(hover.edge.from);
+      stones.add(hover.edge.to);
+      return { edges, stones };
+    }
+    const adj = (id) => scene.edges.filter((e) => e.from === id || e.to === id);
+    stones.add(hover.id);
+    for (const e of adj(hover.id)) {
+      edges.add(key(e));
+      const other = e.from === hover.id ? e.to : e.from;
+      stones.add(other);
+      if (other !== centre)
+        for (const f of adj(other))
+          if (f.from === centre || f.to === centre) {
+            edges.add(key(f));
+            stones.add(centre);
+          }
+    }
+    return { edges, stones };
+  }
+  function light() {
+    const lit = litSets();
+    for (const [k, x] of edgeEls) {
+      const on = lit ? lit.edges.has(k) : null;
+      x.g.setAttribute(
+        "opacity",
+        on === null ? (x.edge.mutual ? 0.95 : 0.8) : on ? 1 : 0.14,
+      );
+    }
+    for (const [id, x] of stoneEls) {
+      const on = lit ? lit.stones.has(id) : null;
+      x.g.setAttribute("opacity", on === null || on ? 1 : 0.3);
+    }
+  }
+
+  // ---- the card over a stone or an arrow ----
+  function showCard(ev, id, edge) {
+    const box = $("sheet").getBoundingClientRect();
+    S.hover = { id, x: ev.clientX - box.left, y: ev.clientY - box.top, edge };
+    renderCard();
+    light();
+  }
+  function focusCard(x) {
+    const box = $("sheet").getBoundingClientRect();
+    const b = x.disc.getBoundingClientRect();
+    S.hover = {
+      id: x.p.id,
+      x: b.right - box.left,
+      y: b.top - box.top + b.height / 2,
+    };
+    renderCard();
+    light();
+  }
+  function hideCard() {
+    S.hover = null;
+    $("card").hidden = true;
+    light();
+  }
+  function renderCard() {
+    const { hover, flow, centre, scene } = S;
+    const card = $("card");
+    if (!hover) return (card.hidden = true);
+    let html = "";
+    if (hover.edge) {
+      const e = hover.edge;
+      html =
+        `<div class="meta" style="color:${e.mutual ? "var(--accent)" : `var(--link-${e.kind})`}">${esc(LINK_LABEL[e.kind] ?? e.kind)}` +
+        (e.mutual
+          ? `<span style="color:var(--faint)"> · both ways</span>`
+          : "") +
+        `</div><div class="t">${esc(labelOf(S.nodes, e.from))}<span style="color:var(--faint)">${e.mutual ? " ↔ " : " → "}</span>${esc(labelOf(S.nodes, e.to))}</div>`;
+    } else {
+      const n = S.nodes.get(hover.id);
+      if (!n) return (card.hidden = true);
+      const hop = scene?.at.get(hover.id)?.hop;
+      const arrow =
+        (flow.into.get(centre) ?? []).find((a) => a.from === hover.id) ??
+        (flow.outOf.get(centre) ?? []).find((a) => a.to === hover.id) ??
+        null;
+      const where = arrow
+        ? `${LINK_LABEL[arrow.kind] ?? arrow.kind}${flow.mutual.get(centre)?.has(hover.id) ? " · runs both ways" : ""}`
+        : hop === 0
+          ? "the centre"
+          : hop === -2
+            ? "two hops in"
+            : hop === 2
+              ? "two hops out"
+              : "";
+      html =
+        `<div class="meta" style="color:var(--kind-${n.kind})">${esc(KIND_LABEL[n.kind] ?? n.kind)}<span style="color:var(--faint)"> · ${esc(STAGE_LABEL[n.stage] ?? n.stage)} · ${esc(day(n.modified))}</span></div>` +
+        `<div class="t">${esc(n.label)}</div>` +
+        `<div class="s">${esc(where)} · flows into ${downstream(flow, hover.id).size} · rests on ${upstream(flow, hover.id).size}</div>`;
+    }
+    card.innerHTML = html;
+    card.hidden = false;
+    // Kept inside the sheet: flipped to the left of the pointer near the right edge.
+    const sheetW = $("sheet").clientWidth;
+    let left = hover.x + 14;
+    if (left + card.offsetWidth > sheetW - 4)
+      left = Math.max(4, hover.x - card.offsetWidth - 14);
+    card.style.left = `${left}px`;
+    card.style.top = `${Math.max(4, hover.y - 10)}px`;
+  }
+
+  // ---- the walk ----
+  function renderWalk() {
+    const w = S.walk;
+    $("walk").innerHTML =
+      `<span class="meta">walked</span>` +
+      w
+        .map(
+          (id, i) =>
+            (i > 0 ? `<span class="meta">›</span>` : "") +
+            `<button class="step" type="button" data-step="${i}"${i === w.length - 1 ? " disabled" : ""}>${esc(short(labelOf(S.nodes, id), 28))}</button>`,
+        )
+        .join("") +
+      (w.length > 1 ? `<kbd>[ back</kbd>` : "");
+  }
+
+  // ---- the desk ----
+  const row = (id, aside = "") => {
+    const n = S.nodes.get(id);
+    return (
+      `<li><button class="stone" type="button" data-go="${esc(id)}"><span class="dot" style="background:var(--kind-${n?.kind ?? "note"})"></span><span class="nm">${esc(n?.label ?? id)}</span></button>` +
+      (aside ? `<span class="aside">${aside}</span>` : "") +
+      `</li>`
+    );
+  };
+
+  let readingSketch = null;
+  function renderReading() {
+    const box = $("reading");
+    const n = S.nodes.get(S.centre);
+    const f = S.found;
+    if (!n || !f) {
+      box.hidden = true;
+      return;
+    }
+    const ctx = context(S.flow, S.nodes, S.centre);
+    const words = readings(f, S.nodes, ctx);
+    let h =
+      `<div class="meta" style="color:var(--kind-${n.kind})">${esc(KIND_LABEL[n.kind] ?? n.kind)}<span style="color:var(--faint)"> · ${esc(STAGE_LABEL[n.stage] ?? n.stage)} · ${esc(day(n.modified))}</span></div>` +
+      `<h2>${esc(n.label)}</h2>` +
+      `<ul class="words">${words.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>`;
+    if (f.fallow.length)
+      h +=
+        `<div class="part"><div class="meta">roots that may have moved · ${f.fallow.length}</div><ul class="rows">` +
+        f.fallow
+          .slice(0, 6)
+          .map((id) => {
+            const hop = f.roots.get(id);
+            return row(
+              id,
+              `${hop} hop${hop === 1 ? "" : "s"} · ${esc(day(S.nodes.get(id)?.modified ?? null))}`,
+            );
+          })
+          .join("") +
+        `</ul></div>`;
+    if (f.unwritten.length)
+      h +=
+        `<div class="part"><div class="meta">never written down · ${f.unwritten.length}</div><ul class="rows">` +
+        f.unwritten
+          .slice(0, 6)
+          .map((id) => row(id))
+          .join("") +
+        `</ul></div>`;
+    if (f.linchpins.length)
+      h +=
+        `<div class="part"><div class="meta">linchpins</div><ul class="rows">` +
+        f.linchpins
+          .slice(0, 4)
+          .map((l) => row(l.id, `${l.exclusive} roots only through it`))
+          .join("") +
+        `</ul></div>`;
+    if (f.loops.length || f.mutual.length) {
+      h += `<div class="part">`;
+      if (f.mutual.length)
+        h +=
+          `<div class="meta acc">runs both ways with · ${f.mutual.length}</div><ul class="rows" style="margin-bottom:8px">` +
+          f.mutual
+            .slice(0, 6)
+            .map((id) => row(id))
+            .join("") +
+          `</ul>`;
+      if (f.loops.length)
+        h +=
+          `<div class="meta">loops · fed by this, and feeding it · ${f.loops.length}</div><ul class="rows">` +
+          f.loops
+            .slice(0, 6)
+            .map((id) => row(id))
+            .join("") +
+          `</ul>`;
+      h += `</div>`;
+    }
+    h +=
+      `<div class="part"><div class="meta">what would move · ${f.reach}</div>` +
+      (f.directOut.length
+        ? `<ul class="rows">${f.directOut
+            .slice(0, 8)
+            .map((id) => row(id))
+            .join("")}</ul>`
+        : `<p class="leaf">nothing yet — a leaf.</p>`) +
+      `</div>`;
+    // keep the pen line: it is a child of the box
+    const pen = readingSketch && box.querySelector(".sketch");
+    box.innerHTML = h;
+    box.hidden = false;
+    if (pen) box.append(pen);
+    if (!readingSketch)
+      readingSketch = sketch(box, {
+        seed: `flow-${n.id}`,
+        color: "var(--accent)",
+        draw: true,
+      });
+    else readingSketch.reseed(`flow-${n.id}`);
+  }
+
+  function renderInfluences() {
+    const { top } = S;
+    if (!top) return;
+    $("influences").innerHTML =
+      `<div class="meta">what shaped the most</div>` +
+      (top.shaped.length
+        ? `<ul class="rows">${top.shaped.map((s) => row(s.id, String(s.reach))).join("")}</ul>`
+        : `<p class="leaf">nothing flows anywhere yet.</p>`) +
+      `<div class="meta acc" style="margin-top:16px">what runs both ways</div>` +
+      (top.argued.length
+        ? `<ul class="rows">${top.argued.map((a) => row(a.id, String(a.mutual))).join("")}</ul>`
+        : `<p class="leaf">nothing runs both ways yet.</p>`);
+  }
+
+  // ---- search ----
+  let resultsSketch = null;
+  function renderResults() {
+    const q = $("q").value.trim().toLowerCase();
+    const hits = q
+      ? S.garden.nodes
+          .filter((n) => n.kind !== "repo" && n.label.toLowerCase().includes(q))
+          .sort((a, b) => b.degree - a.degree)
+          .slice(0, 8)
+      : [];
+    const box = $("results");
+    $("results-list").innerHTML = hits.map((n) => row(n.id)).join("");
+    if (hits.length && box.hidden) {
+      box.hidden = false;
+      resultsSketch?.remove();
+      resultsSketch = sketch(box, { seed: "flow-found", draw: true });
+    } else if (!hits.length) {
+      box.hidden = true;
+      resultsSketch?.remove();
+      resultsSketch = null;
+    }
+  }
+
+  // ---- the garden panel ----
+  function renderGarden() {
+    const g = S.garden;
+    const ghosts = g.nodes.filter((n) => n.kind === "ghost").length;
+    $("g-count").textContent =
+      `${g.nodes.length} stones · ${g.links.length} threads · ${ghosts} never written`;
+    if (S.source === "specimen") {
+      $("g-name").textContent = "Specimen garden";
+      $("g-tag").textContent = "synthetic";
+      $("g-note").textContent =
+        "A made-up reader's notes on attention, walking and the feed: readings, journal entries, a few terms of their own, two small pieces of code. Open a folder of your own markdown notes and the same rules read it here. Nothing is uploaded.";
+      $("restore").hidden = true;
+    } else {
+      $("g-name").textContent = S.name
+        ? `Your notes · ${S.name}`
+        : "Your notes";
+      $("g-tag").textContent = "yours";
+      $("g-note").textContent =
+        `Read in this page${S.at ? ` on ${day(S.at)}` : ""} and never uploaded. The titles and threads are kept in this browser so a reload finds them; the notes themselves are not.`;
+      $("restore").hidden = false;
+    }
+  }
+
+  function renderCentre(recentred = false) {
+    S.found =
+      S.flow && S.centre ? foundations(S.flow, S.nodes, S.centre) : null;
+    S.scene = buildScene();
+    renderSheet(recentred);
+    renderWalk();
+    renderReading();
+    renderInfluences();
+    renderCard();
+  }
+
+  // ---- the legend ----
+  $("legend").innerHTML =
+    Object.entries(LINK_LABEL)
+      .map(
+        ([k, label]) =>
+          `<li><i style="background:var(--link-${k})"></i><span class="meta">${esc(label)}</span></li>`,
+      )
+      .join("") +
+    `<li><i style="background:var(--accent)"></i><span class="meta acc">both ways</span></li>`;
+
+  // ---- events ----
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-go]");
+    if (t) {
+      go(t.dataset.go);
+      if (t.closest("#results")) {
+        $("q").value = "";
+        renderResults();
+      }
+      return;
+    }
+    const s = e.target.closest("[data-step]");
+    if (s && !s.disabled) {
+      const i = Number(s.dataset.step);
+      S.walk = S.walk.slice(0, i + 1);
+      S.centre = S.walk[i];
+      S.hover = null;
+      save();
+      renderCentre(true);
+    }
+  });
+  $("q").addEventListener("input", renderResults);
+  $("q").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const first = $("results-list").querySelector("[data-go]");
+      if (first) first.click();
+    }
+  });
+
+  let strike = null;
+  $("vocab").addEventListener("click", () => {
+    S.vocab = !S.vocab;
+    $("vocab").setAttribute("aria-pressed", String(S.vocab));
+    if (!S.vocab)
+      strike = sketch($("vocab"), {
+        kind: "strike",
+        seed: "vocab",
+        draw: true,
+      });
+    else {
+      strike?.remove();
+      strike = null;
+    }
+    save();
+    reflow();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    const typing =
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement;
+    if (e.key === "Escape") {
+      $("q").value = "";
+      renderResults();
+      hideCard();
+      e.target?.blur?.();
+    } else if (e.key === "/" && !typing) {
+      e.preventDefault();
+      $("q").focus();
+    } else if (e.key === "[" && !typing) back();
+  });
+
+  // ---- your own folder: read here, never sent ----
+  $("open").addEventListener("click", () => $("folder").click());
+  $("folder").addEventListener("change", async (e) => {
+    const input = e.target;
+    const all = [...input.files];
+    input.value = "";
+    if (!all.length) return;
+    const status = $("g-status");
+    const first = (all[0].webkitRelativePath || "").split("/")[0];
+    const picked = all
+      .map((f) => {
+        const segs = (f.webkitRelativePath || f.name).split("/");
+        return { f, path: (segs.length > 1 ? segs.slice(1) : segs).join("/") };
+      })
+      .filter(({ path }) => {
+        const segs = path.split("/");
+        return (
+          path.endsWith(".md") &&
+          !segs.some(
+            (s) => s.startsWith(".") || s.startsWith("_attachments"),
+          ) &&
+          !segs[segs.length - 1].startsWith("_")
+        );
+      });
+    if (!picked.length) {
+      status.textContent =
+        "No markdown notes in that folder. Nothing was read.";
+      return;
+    }
+    $("open").disabled = true;
+    status.textContent = `Reading ${picked.length} notes…`;
+    try {
+      const files = await Promise.all(
+        picked.map(async ({ f, path }) => ({
+          path,
+          text: await f.text(),
+          mtime: f.lastModified,
+        })),
+      );
+      await new Promise((r) => setTimeout(r, 30));
+      const g = buildGarden(files);
+      const packed = pack(g, first);
+      // A fresh folder is a fresh walk; the stored garden is re-read so stages are counted from today.
+      setGarden(unpack(packed), {
+        source: "own",
+        name: first,
+        at: packed.at,
+        packed,
+        walk: [],
+      });
+      const kept = save();
+      status.textContent =
+        `Read ${picked.length} notes: ${g.nodes.length} stones, ${g.links.length} threads.` +
+        (kept
+          ? ""
+          : " Too many to keep in this browser; open the folder again after a reload.");
+    } catch (err) {
+      status.textContent =
+        "That folder could not be read here. Nothing was kept.";
+    } finally {
+      $("open").disabled = false;
+    }
+  });
+  $("restore").addEventListener("click", () => {
+    S.packed = null;
+    try {
+      const kept = load();
+      delete kept.own;
+      if (kept.walks) delete kept.walks.own;
+      localStorage.setItem(KEY, JSON.stringify(kept));
+    } catch {
+      /* nothing kept to forget */
+    }
+    setGarden(specimenGarden(), {
+      source: "specimen",
+      walk: load().walks?.specimen ?? [],
+    });
+    $("g-status").textContent =
+      "Your notes are forgotten here. This is the specimen again.";
+  });
+
+  // ---- open ----
+  drawHeads();
+  sketch($("sheet"), { seed: "flow-sheet", draw: true });
+  {
+    const kept = load();
+    if (kept.vocab === false) {
+      S.vocab = false;
+      $("vocab").setAttribute("aria-pressed", "false");
+      strike = sketch($("vocab"), { kind: "strike", seed: "vocab" });
+    }
+    let opened = false;
+    if (kept.own?.n) {
+      try {
+        setGarden(unpack(kept.own), {
+          source: "own",
+          name: kept.own.name,
+          at: kept.own.at,
+          packed: kept.own,
+          walk: kept.walks?.own ?? [],
+        });
+        opened = true;
+      } catch {
+        opened = false;
+      }
+    }
+    if (!opened)
+      setGarden(specimenGarden(), {
+        source: "specimen",
+        walk: kept.walks?.specimen ?? [],
+      });
+  }
+</script>

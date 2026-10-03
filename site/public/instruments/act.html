@@ -1,0 +1,2668 @@
+<title>Act</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="From intention to action: what you mean to do, the steps as if-then plans on real days, and what it was like once they were done. What was meant, drawn beside what was lived."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Ink on bone. One accent, burnt orange, for today and for what is due; everything else is ink
+     let down by degrees. The pen is ink a little let down into the paper, so a drawn line sits
+     beside a hairline rule without shouting over it. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #9a9287;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --tooth: multiply;
+    --tooth-o: 0.06;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #6f685c;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --tooth: screen;
+      --tooth-o: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #6f685c;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --tooth: screen;
+    --tooth-o: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 72px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture and never as dirt. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--tooth-o);
+    mix-blend-mode: var(--tooth);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.03em;
+  }
+  /* niwa wrote these in a hand; here the hand is the serif's italic. */
+  .hand {
+    font-style: italic;
+  }
+  .mut {
+    color: var(--muted);
+  }
+  .fnt {
+    color: var(--faint);
+  }
+  .acc {
+    color: var(--accent);
+  }
+
+  /* masthead */
+  .mast {
+    padding-block: 52px 28px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px 28px;
+    align-items: end;
+  }
+  .mast .meta {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: clamp(56px, 8vw, 88px);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    font-size: clamp(17px, 1.9vw, 20px);
+    line-height: 1.35;
+    color: var(--muted);
+    max-width: 34rem;
+    padding-bottom: 6px;
+  }
+
+  /* the board: the sheet, and the desk beside it */
+  .board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 24px;
+    align-items: start;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border-radius: 3px;
+    min-width: 0;
+  }
+  .sheet {
+    padding: clamp(20px, 3.4vw, 32px);
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .desk .panel p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .desk .panel p.meta {
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+  .label {
+    color: var(--accent);
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* A pen line laid over the element it sits in: a filled ribbon, thin where the pen lands and
+     lifts. Drawing on reveals it through a mask that is the same line, stroked wide. */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch.u .ink {
+    fill: var(--accent);
+  }
+  .sketch .mk {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--muted);
+    transition:
+      color 160ms var(--ease),
+      border-color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    color: var(--ink);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.hot {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* the sheet */
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .note {
+    margin-top: 4px;
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+  .ac-case {
+    display: block;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0;
+    color: var(--ink);
+    transition: border-color 220ms var(--ease);
+  }
+  .ac-case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+  }
+  .ac-case:focus-visible {
+    outline: none;
+  }
+  .ac-case::placeholder,
+  .ac-in::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .intention {
+    margin-top: 12px;
+    font-size: clamp(26px, 3.3vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    padding-block: 4px;
+  }
+  .fields {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .fields label,
+  .after label {
+    display: block;
+    min-width: 0;
+  }
+  .fields .ac-case {
+    margin-top: 2px;
+    font-size: 16.5px;
+    line-height: 1.35;
+    font-style: italic;
+  }
+  .plot {
+    margin-top: 24px;
+    min-height: 176px;
+  }
+  .steps-head {
+    margin-top: 16px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .steps-head .meta.plain {
+    text-align: right;
+  }
+  .steps-head .label {
+    white-space: nowrap;
+  }
+  #steps {
+    margin-top: 8px;
+  }
+
+  /* a step: the cue and the action written into a sentence on dotted lines */
+  .ac-row {
+    position: relative;
+    padding-block: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .ac-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .ac-n {
+    flex-shrink: 0;
+    width: 1.1rem;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--faint);
+  }
+  .ac-clauses {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    min-width: 0;
+    flex: 1;
+    font-size: 17px;
+  }
+  .ac-clause {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+  .ac-clause.c1 {
+    flex: 1 1 0;
+    min-width: 12.5rem;
+  }
+  .ac-clause.c2 {
+    flex: 1.4 1 0;
+    min-width: 14.5rem;
+  }
+  .ac-clause > span {
+    flex-shrink: 0;
+  }
+  .ac-in {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted color-mix(in srgb, var(--faint) 60%, transparent);
+    border-radius: 0;
+    padding: 1px 0;
+    color: var(--ink);
+    font-style: italic;
+    min-width: 0;
+    transition: border-color 160ms var(--ease);
+  }
+  textarea.ac-in {
+    flex: 1;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.3;
+  }
+  .ac-in:focus {
+    outline: none;
+    border-bottom-style: solid;
+    border-bottom-color: var(--accent);
+  }
+  .ac-in:focus-visible {
+    outline: none;
+  }
+  .ac-sub {
+    margin-top: 6px;
+    padding-left: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+  .ac-sub .grow {
+    flex: 1;
+  }
+  .ac-sub .pair {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 15px;
+  }
+  .ac-where {
+    width: 8.5rem;
+  }
+  .ac-min {
+    width: 2.6rem;
+    text-align: right;
+  }
+  .ac-date {
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+  .ac-date:disabled {
+    color: var(--faint);
+  }
+  .ac-marks {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .ac-x {
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1;
+    color: var(--faint);
+    transition:
+      color 140ms var(--ease),
+      background-color 140ms var(--ease);
+  }
+  .ac-x:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+  }
+  .ac-row[data-state="done"] .ac-n {
+    color: var(--ink);
+  }
+  .ac-row[data-state="due"] .ac-n,
+  .ac-row[data-state="today"] .ac-n {
+    color: var(--accent);
+  }
+  .ac-row[data-state="not"] .ac-in {
+    color: var(--muted);
+  }
+  .ac-row[data-picked] {
+    animation: ac-flash 1400ms var(--ease) both;
+  }
+  @keyframes ac-flash {
+    from {
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+    to {
+      background: transparent;
+    }
+  }
+  .ac-lived-row {
+    margin-top: 8px;
+    padding-left: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+  }
+  .ac-lived-row.fresh {
+    animation: rise 420ms var(--ease) both;
+  }
+  .ac-lived {
+    flex: 1;
+    min-width: 12rem;
+    font-size: 15.5px;
+  }
+  .ac-felts {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+  }
+  .ac-felt {
+    position: relative;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--faint);
+    transition: color 140ms var(--ease);
+  }
+  .ac-felt[aria-pressed="true"] {
+    color: var(--ink);
+  }
+  .ac-felt:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .ac-felt:disabled {
+    cursor: default;
+  }
+  .ac-met {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--faint);
+  }
+  .ac-met.on {
+    color: var(--ink);
+  }
+  .ac-met input {
+    accent-color: var(--accent);
+    margin: 0;
+  }
+  .ac-add {
+    margin-top: 8px;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .ac-add:hover {
+    color: var(--ink);
+  }
+  .setdown {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .afterwards {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .after {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .after .ac-case {
+    margin-top: 4px;
+    font-size: 15.5px;
+    line-height: 1.55;
+  }
+  .offrow {
+    margin-top: 24px;
+  }
+  .trouble {
+    margin-top: 12px;
+    color: var(--accent);
+  }
+
+  /* Meant and lived: the two lines, the days, today, and a pen line from each step to the day it
+     was done. */
+  .ac-plot {
+    display: block;
+    overflow: visible;
+  }
+  .ac-plot text {
+    pointer-events: none;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .ac-plot .t-mut {
+    fill: var(--muted);
+  }
+  .ac-plot .t-fnt {
+    fill: var(--faint);
+  }
+  .ac-plot .t-acc {
+    fill: var(--accent);
+  }
+  .ac-rail {
+    fill: none;
+    stroke: color-mix(in srgb, var(--faint) 55%, transparent);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+  }
+  .ac-axis {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1;
+  }
+  .ac-tick {
+    stroke: var(--faint);
+    stroke-width: 1;
+  }
+  .ac-put {
+    stroke: var(--muted);
+    stroke-width: 1.3;
+  }
+  .ac-today {
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 4;
+  }
+  .ac-hit {
+    fill: transparent;
+  }
+  .ac-ring-fill {
+    fill: var(--surface);
+  }
+  .ac-ring {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+  .ac-num {
+    fill: var(--ink);
+  }
+  .ac-label {
+    fill: var(--muted);
+  }
+  .ac-step[data-state="done"] .ac-ring-fill {
+    fill: color-mix(in srgb, var(--ink) 9%, var(--surface));
+  }
+  .ac-step[data-state="today"] .ac-ring,
+  .ac-step[data-state="due"] .ac-ring {
+    stroke: var(--accent);
+    stroke-width: 1.9;
+  }
+  .ac-step[data-state="today"] .ac-num,
+  .ac-step[data-state="due"] .ac-num {
+    fill: var(--accent);
+  }
+  .ac-step[data-state="due"] .ac-ring {
+    stroke-dasharray: 3 3;
+  }
+  .ac-step[data-state="not"] .ac-ring {
+    stroke: var(--faint);
+  }
+  .ac-step[data-state="not"] .ac-num {
+    fill: var(--faint);
+  }
+  .ac-step[data-picked] .ac-ring {
+    stroke-width: 2.6;
+  }
+  .ac-ghost {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+  }
+  .ac-moved {
+    fill: none;
+    stroke: color-mix(in srgb, var(--faint) 70%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .ac-drop {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .ac-drop.fresh {
+    animation: ac-drop 700ms var(--ease) both;
+  }
+  @keyframes ac-drop {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .ac-lived-dot {
+    fill: var(--ink);
+  }
+  .ac-letgo {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+  .ac-handle {
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  .ac-pick {
+    cursor: pointer;
+  }
+  .ac-dragging,
+  .ac-dragging * {
+    cursor: ew-resize !important;
+    user-select: none;
+  }
+
+  /* the desk */
+  .rec-whose {
+    margin-top: 6px;
+  }
+  .ac-recs {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .ac-recs + .meta {
+    margin-top: 12px;
+  }
+  .ac-rec.first {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .ac-rec > button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .ac-rec > button:hover {
+    background: color-mix(in srgb, var(--ink) 3%, transparent);
+  }
+  .ac-rec .meta {
+    color: var(--faint);
+  }
+  .ac-rec [aria-current="true"] .meta {
+    color: var(--accent);
+  }
+  .rec-int {
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .rec-next {
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .cites {
+    margin-top: 12px;
+    color: var(--faint);
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    color: var(--faint);
+  }
+
+  @media (max-width: 1023px) {
+    .board {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 767px) {
+    .fields,
+    .after {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 36px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .sketch .draw,
+    .ac-drop.fresh,
+    .ac-rec.first,
+    .ac-lived-row.fresh,
+    .ac-row[data-picked] {
+      animation: none;
+    }
+    .sketch .draw {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+    <h1>Act</h1>
+    <p class="deck hand">
+      From intention to action: what you mean to do, the steps as if-then plans
+      on real days, and — once they are done in the world — what it was like.
+    </p>
+  </header>
+
+  <div class="board">
+    <section
+      class="panel sheet rise"
+      id="sheet"
+      aria-label="The intention"
+      style="animation-delay: 60ms"
+    >
+      <div id="head"></div>
+      <div id="fields"></div>
+      <div class="plot" id="plot"></div>
+      <div class="steps-head">
+        <span class="meta label">the steps</span>
+        <span class="meta plain fnt" id="hint"></span>
+      </div>
+      <ol id="steps"></ol>
+      <div id="tail"></div>
+      <p class="meta trouble" id="trouble" role="alert" hidden></p>
+    </section>
+
+    <aside class="desk">
+      <section
+        class="panel rise"
+        id="readingPanel"
+        aria-label="The reading"
+        style="animation-delay: 100ms"
+      >
+        <p class="meta label">the reading</p>
+        <p id="reading" style="margin-top: 8px"></p>
+      </section>
+
+      <section
+        class="panel rise"
+        id="recordPanel"
+        aria-label="The record"
+        style="animation-delay: 140ms"
+      >
+        <p class="meta label">the record</p>
+        <p id="record" style="margin-top: 8px"></p>
+        <p class="meta plain fnt rec-whose" id="whose" hidden></p>
+        <div id="recs"></div>
+      </section>
+
+      <section
+        class="panel rise"
+        id="lawsPanel"
+        aria-label="What the act holds to"
+        style="animation-delay: 180ms"
+      >
+        <p class="meta label">what the act holds to</p>
+        <p style="margin-top: 8px">
+          About half of the people who mean to do a thing do not do it; the gap
+          between intending and doing is where most decisions stop. What closes
+          it best in the research is plain: the best that would come of it set
+          against what in you would stand in the way, and a plan for when it
+          does; then each step as an if-then — when this happens, I will do that
+          — on a real day.
+        </p>
+        <p style="margin-top: 8px">
+          The sheet holds what you meant beside what you lived and counts the
+          difference. It sends nothing, reminds you of nothing, keeps no streak
+          and never says what to do, whether a step was enough, or whether you
+          kept to it well.
+        </p>
+        <p class="meta plain cites">
+          Paschal Sheeran, Intention–behavior relations (2002) · Peter
+          Gollwitzer, Implementation intentions (1999) · Gabriele Oettingen,
+          Rethinking Positive Thinking (2014) · the after-action review
+        </p>
+        <p class="meta plain cites" id="where"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Act · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ── logic ── (ported by hand from niwa lib/act.ts, lib/fence.ts days, lib/way.ts slug and uid)
+
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function addDays(d, k) {
+    if (!DAY.test(d)) return d;
+    return new Date(utc(d) + k * 86400000).toISOString().slice(0, 10);
+  }
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  const FELTS = ["easier", "same", "harder"];
+  const FELT_LABEL = {
+    easier: "easier than I thought",
+    same: "as I thought",
+    harder: "harder than I thought",
+  };
+
+  const emptyAct = (day) => ({
+    slug: "",
+    put: day,
+    touched: day,
+    intention: "",
+    outcome: "",
+    obstacle: "",
+    then: "",
+    steps: [],
+    after: { meant: "", happened: "", difference: "", keep: "" },
+  });
+
+  const newStep = (day) => ({
+    id: uid(),
+    when: "",
+    will: "",
+    where: "",
+    minutes: null,
+    day,
+    moved: [],
+    did: "",
+    on: "",
+    lived: "",
+    felt: "",
+    met: false,
+  });
+
+  /** Done or let go; else meant for a day to come, today, or a day that has gone by unmarked. */
+  function stateOf(s, today) {
+    if (s.did === "done") return "done";
+    if (s.did === "not") return "not";
+    const d = daysBetween(today, s.day);
+    return d > 0 ? "meant" : d === 0 ? "today" : "due";
+  }
+
+  /** A step meant for another day: the day it was meant for is kept as a move. */
+  function moveStep(s, day) {
+    if (!day || day === s.day) return s;
+    return { ...s, moved: [...s.moved, s.day].slice(-12), day };
+  }
+
+  /** A step marked: done, let go, or taken back. The day it was marked is kept. */
+  function markStep(s, did, today) {
+    if (!did) return { ...s, did: "", on: "", felt: "", met: false };
+    return { ...s, did, on: s.did === did && s.on ? s.on : today };
+  }
+
+  /** The steps in the order they are meant for, the day's own order kept. */
+  const inOrder = (steps) =>
+    steps
+      .map((s, i) => ({ s, i }))
+      .sort((a, b) =>
+        a.s.day < b.s.day ? -1 : a.s.day > b.s.day ? 1 : a.i - b.i,
+      )
+      .map((x) => x.s);
+
+  /** The span the drawing covers: from the day it was set down to past today and the last step, a week at least. */
+  function spanOf(a, today) {
+    const days = [
+      a.put,
+      today,
+      ...a.steps.flatMap((s) => [s.day, ...s.moved, s.on]),
+    ].filter((d) => DAY.test(d));
+    const from = days.reduce((m, d) => (d < m ? d : m), a.put);
+    let to = days.reduce((m, d) => (d > m ? d : m), a.put);
+    if (daysBetween(from, to) < 6) to = addDays(from, 6);
+    to = addDays(to, 1);
+    return { from, to, days: daysBetween(from, to) };
+  }
+
+  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
+
+  function tally(a, today) {
+    const t = {
+      steps: a.steps.length,
+      done: 0,
+      onDay: 0,
+      late: 0,
+      early: 0,
+      not: 0,
+      due: 0,
+      today: 0,
+      moved: 0,
+      minutes: 0,
+      easier: 0,
+      same: 0,
+      harder: 0,
+      met: 0,
+      first: null,
+    };
+    for (const s of a.steps) {
+      const st = stateOf(s, today);
+      if (s.moved.length) t.moved++;
+      if (s.minutes) t.minutes += s.minutes;
+      if (s.met) t.met++;
+      if (st === "not") t.not++;
+      else if (st === "due") t.due++;
+      else if (st === "today") t.today++;
+      if (st !== "done") continue;
+      t.done++;
+      const late = daysBetween(s.day, s.on);
+      if (late === 0) t.onDay++;
+      else if (late > 0) t.late++;
+      else t.early++;
+      if (s.felt) t[s.felt]++;
+      const since = daysBetween(a.put, s.on);
+      if (t.first === null || since < t.first) t.first = since;
+    }
+    return t;
+  }
+
+  /** When the steps done were done against the days they were meant for. */
+  function whenDone(t) {
+    if (t.done === t.onDay)
+      return t.done === 1 ? ", on the day meant" : ", each on the day meant";
+    const parts = [
+      t.onDay && `${t.onDay} on the day meant`,
+      t.late && `${t.late} later`,
+      t.early && `${t.early} earlier`,
+    ].filter(Boolean);
+    return ` (${parts.join(", ")})`;
+  }
+
+  const dayCount = (k) => (k === 0 ? "the same day" : `${n(k, "day")} after`);
+
+  /**
+   * What the act comes to, in sentences: the steps meant and where each stands, how long from the
+   * intention to the first thing done, what the steps were like, and what is next. Never whether
+   * it is enough, never a streak.
+   */
+  function readings(a, today) {
+    const t = tally(a, today);
+    const out = [];
+    if (!a.intention.trim()) out.push("no intention set down yet");
+    if (!t.steps) {
+      out.push("no step set down yet");
+      return out;
+    }
+    out.push(
+      `${n(t.steps, "step")} meant${t.minutes ? `, ${n(t.minutes, "minute")} between them` : ""}`,
+    );
+    const parts = [
+      t.done && `${t.done} done${whenDone(t)}`,
+      t.today && `${t.today} meant for today`,
+      t.due &&
+        `${t.due} past ${t.due === 1 ? "its" : "their"} day and not marked`,
+      t.not && `${t.not} let go`,
+    ].filter(Boolean);
+    if (parts.length) out.push(parts.join(" · "));
+    if (t.moved) out.push(`${n(t.moved, "step")} moved to another day`);
+    out.push(
+      t.first !== null
+        ? `the first step was done ${dayCount(t.first)} the intention was set down`
+        : `nothing done yet, ${n(Math.max(0, daysBetween(a.put, today)), "day")} after the intention was set down`,
+    );
+    const felt = [
+      t.easier && `${t.easier} easier than you thought`,
+      t.same && `${t.same} as you thought`,
+      t.harder && `${t.harder} harder`,
+    ].filter(Boolean);
+    if (felt.length) out.push(`of what was done: ${felt.join(", ")}`);
+    if (t.met && a.obstacle.trim())
+      out.push(`what stands in the way showed up on ${n(t.met, "step")}`);
+    const next = inOrder(a.steps).find((s) => {
+      const st = stateOf(s, today);
+      return st === "meant" || st === "today";
+    });
+    if (next)
+      out.push(
+        `next: ${clip(next.will.trim() || "a step with no words", 60)}, ${daysBetween(today, next.day) === 0 ? "today" : dayWords(next.day)}${next.when.trim() ? ` — when ${clip(next.when.trim(), 40)}` : ""}`,
+      );
+    return out;
+  }
+
+  function recordOf(acts, today) {
+    const r = {
+      acts: acts.length,
+      actedOn: 0,
+      whole: 0,
+      steps: 0,
+      done: 0,
+      onDay: 0,
+      easier: 0,
+      same: 0,
+      harder: 0,
+      middle: null,
+    };
+    const firsts = [];
+    for (const a of acts) {
+      const t = tally(a, today);
+      r.steps += t.steps;
+      r.done += t.done;
+      r.onDay += t.onDay;
+      r.easier += t.easier;
+      r.same += t.same;
+      r.harder += t.harder;
+      if (t.done) r.actedOn++;
+      if (t.steps && t.done === t.steps) r.whole++;
+      if (t.first !== null) firsts.push(t.first);
+    }
+    if (firsts.length) {
+      firsts.sort((x, y) => x - y);
+      r.middle = firsts[Math.floor((firsts.length - 1) / 2)];
+    }
+    return r;
+  }
+
+  function recordReadings(r) {
+    if (!r.acts) return ["nothing set down yet"];
+    const out = [
+      `${n(r.acts, "intention")} set down, ${r.actedOn} acted on${r.whole ? `, ${r.whole} with every step done` : ""}`,
+    ];
+    if (r.steps)
+      out.push(
+        `${r.done} of ${n(r.steps, "step")} done, ${r.onDay} on the day meant`,
+      );
+    if (r.middle !== null) {
+      const when =
+        r.middle === 0
+          ? "the same day as the intention"
+          : `within ${n(r.middle, "day")} of the intention`;
+      out.push(
+        r.actedOn === 1
+          ? `the first step came ${r.middle === 0 ? when : `${n(r.middle, "day")} after the intention`}`
+          : `in at least half of those acted on, the first step came ${when}`,
+      );
+    }
+    const felt = [
+      r.easier && `${r.easier} easier than thought`,
+      r.same && `${r.same} as thought`,
+      r.harder && `${r.harder} harder`,
+    ].filter(Boolean);
+    if (felt.length) out.push(`what was done: ${felt.join(", ")}`);
+    return out;
+  }
+
+  // What is read back from storage is checked the way niwa's server checked what it was sent.
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const day = (v, or) => (typeof v === "string" && DAY.test(v) ? v : or);
+  const field = (v, max) =>
+    str(v, max).replace(/\s·\s/g, " - ").replace(/\s—\s/g, " - ");
+  const ID = /^[a-z0-9]{1,24}$/i;
+
+  function validateAct(input) {
+    const r = input ?? {};
+    const intention = str(r.intention, 300);
+    if (!intention) throw new Error("say what you mean to do, in a line");
+    const today = new Date().toISOString().slice(0, 10);
+    const put = day(r.put, today);
+    const seen = new Set();
+    const steps = (Array.isArray(r.steps) ? r.steps : [])
+      .slice(0, 40)
+      .filter((s) => s && typeof s === "object")
+      .map((s, i) => {
+        let id =
+          typeof s.id === "string" && ID.test(s.id) && !seen.has(s.id)
+            ? s.id
+            : `s${i + 1}`;
+        while (seen.has(id)) id = `${id}x`;
+        seen.add(id);
+        const did = s.did === "done" || s.did === "not" ? s.did : "";
+        const minutes = Number(s.minutes);
+        return {
+          id,
+          when: field(s.when, 160),
+          will: field(s.will, 200),
+          where: field(s.where, 120),
+          minutes:
+            Number.isFinite(minutes) && minutes > 0
+              ? Math.min(1440, Math.round(minutes))
+              : null,
+          day: day(s.day, put),
+          moved: (Array.isArray(s.moved) ? s.moved : [])
+            .filter((d) => typeof d === "string" && DAY.test(d))
+            .slice(-12),
+          did,
+          on: did ? day(s.on, put) : "",
+          lived: str(s.lived, 600).replace(/\s—\s/g, " - "),
+          felt: did === "done" && FELTS.includes(s.felt) ? s.felt : "",
+          met: did !== "" && s.met === true,
+        };
+      });
+    const af = r.after ?? {};
+    const a = {
+      slug: str(r.slug, 120),
+      put,
+      touched: day(r.touched, put),
+      intention,
+      outcome: long(r.outcome, 1000),
+      obstacle: long(r.obstacle, 1000),
+      then: long(r.then, 1000),
+      steps,
+      after: {
+        meant: long(af.meant, 2000),
+        happened: long(af.happened, 2000),
+        difference: long(af.difference, 2000),
+        keep: long(af.keep, 2000),
+      },
+    };
+    if (!a.slug) a.slug = slugOf(a.intention, a.put);
+    return a;
+  }
+
+  // The specimen: two intentions from the studio in a synthetic life. The first moves the Friday
+  // file check to Thursday and keeps it: three steps done, one still to come. The second hands the
+  // quiet junior the Aldgate account. Fiction. Written as of 29 September 2026, and redated on
+  // opening so that it always stands where it stood that day.
+  const step = (s) => ({
+    when: "",
+    where: "",
+    minutes: null,
+    moved: [],
+    did: "",
+    on: "",
+    lived: "",
+    felt: "",
+    met: false,
+    ...s,
+  });
+  const SPECIMEN_DAY = "2026-09-29";
+  const SPECIMEN_ACTS = [
+    {
+      slug: "2026-09-12-move-the-friday-file-check-to-thursday-afternoons-and-keep-it",
+      put: "2026-09-12",
+      touched: "2026-09-25",
+      intention:
+        "Move the Friday file check to Thursday afternoons, and keep it.",
+      outcome:
+        "Fridays free for the week's last sends, and nothing half-finished going out.",
+      obstacle:
+        "I like to see everything myself before it leaves, and Thursday feels too early to let go of it.",
+      then: "If I catch myself holding a file back for Friday, I will send it with a note of what is still open.",
+      steps: [
+        step({
+          id: "s1",
+          day: "2026-09-14",
+          when: "I get in on Monday",
+          will: "tell Marta the check moves to Thursday",
+          where: "the studio",
+          minutes: 10,
+          did: "done",
+          on: "2026-09-14",
+          felt: "easier",
+          lived: "She had been meaning to suggest it herself.",
+        }),
+        step({
+          id: "s2",
+          day: "2026-09-17",
+          when: "the Thursday review ends",
+          will: "run the file check with Tom",
+          where: "the back table",
+          minutes: 30,
+          did: "done",
+          on: "2026-09-17",
+          felt: "harder",
+          met: true,
+          lived:
+            "Fifty minutes, not thirty. Two files were still open and I wanted to leave them for Friday.",
+        }),
+        step({
+          id: "s3",
+          day: "2026-09-24",
+          when: "the Thursday review ends",
+          will: "run it again, and time it",
+          minutes: 30,
+          did: "done",
+          on: "2026-09-25",
+          felt: "same",
+          lived:
+            "A day late. Thirty-five minutes, and Friday was clear for the first time in a month.",
+        }),
+        step({
+          id: "s4",
+          day: "2026-10-01",
+          when: "the month turns",
+          will: "ask Tom whether anything slipped through",
+          minutes: 10,
+        }),
+      ],
+      after: {
+        meant: "The check on Thursday, and Friday for sending.",
+        happened:
+          "It moved. The first Thursday ran long; the second was a day late and nearly on time.",
+        difference:
+          "Telling Marta first. Once she had said yes it was her plan too.",
+        keep: "Timing the check.",
+      },
+    },
+    {
+      slug: "2026-09-26-give-the-quiet-junior-the-aldgate-account-from-october",
+      put: "2026-09-26",
+      touched: "2026-09-28",
+      intention:
+        "Give the quiet junior the Aldgate account from October, with a week of overlap.",
+      outcome:
+        "She runs a client of her own, and I stop being the bottleneck on the small accounts.",
+      obstacle:
+        "I will want to take the call over the first time the client pushes back, the way I did with the fee.",
+      then: "If I start to speak on the call, I will write the thought down and tell her afterwards.",
+      steps: [
+        step({
+          id: "s1",
+          day: "2026-09-28",
+          when: "she is back from the shoot",
+          will: "ask what she would need to run Aldgate",
+          where: "over lunch",
+          minutes: 30,
+          did: "done",
+          on: "2026-09-28",
+          felt: "easier",
+          lived:
+            "She had a list already. Half of it was things I would have forgotten.",
+        }),
+        step({
+          id: "s2",
+          day: "2026-10-01",
+          moved: ["2026-09-30"],
+          when: "the October plan is drafted",
+          will: "put her name on Aldgate",
+          minutes: 10,
+        }),
+        step({
+          id: "s3",
+          day: "2026-10-06",
+          when: "the first Aldgate call is booked",
+          will: "sit in and say nothing",
+          where: "the call",
+          minutes: 45,
+        }),
+      ],
+      after: { meant: "", happened: "", difference: "", keep: "" },
+    },
+  ];
+
+  /** The specimen moved whole by k days: every relation inside it, and to today, kept. */
+  function redated(a, k) {
+    const m = (d) => (DAY.test(d) ? addDays(d, k) : d);
+    return {
+      ...a,
+      put: m(a.put),
+      touched: m(a.touched),
+      steps: a.steps.map((s) => ({
+        ...s,
+        day: m(s.day),
+        on: m(s.on),
+        moved: s.moved.map(m),
+      })),
+    };
+  }
+  const specimenFor = (today) =>
+    SPECIMEN_ACTS.map((a) => redated(a, daysBetween(SPECIMEN_DAY, today)));
+
+  /**
+   * What an empty sheet draws before a word is typed, set from today: running again, the way
+   * mental contrasting is usually taught, the first step small enough to do tonight. Nothing is
+   * kept until the reader writes over it and sets it down.
+   */
+  function exampleAct(today) {
+    return {
+      slug: "",
+      put: today,
+      touched: today,
+      intention: "Start running again, twice a week.",
+      outcome: "To feel my legs again, and sleep through the night.",
+      obstacle: "I will tell myself I am too tired after work.",
+      then: "If I feel too tired, I will put my shoes on and walk to the end of the road.",
+      steps: [
+        step({
+          id: "s1",
+          day: today,
+          when: "I get home tonight",
+          will: "put my running shoes by the door",
+          where: "the hall",
+          minutes: 2,
+        }),
+        step({
+          id: "s2",
+          day: addDays(today, 1),
+          when: "the alarm goes tomorrow",
+          will: "run to the end of the road and back",
+          where: "the front step",
+          minutes: 10,
+        }),
+        step({
+          id: "s3",
+          day: addDays(today, 4),
+          when: "I have had my coffee on Saturday",
+          will: "run for twenty minutes, slowly",
+          where: "the park",
+          minutes: 20,
+        }),
+      ],
+      after: { meant: "", happened: "", difference: "", keep: "" },
+    };
+  }
+
+  // ── end of the logic ──
+
+  // ── the hand (niwa lib/hand.ts): every stroke deterministic for its seed ──
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (v) => String(Math.round(v * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const k = Math.round(steps * overlap);
+    for (let i = 0; i <= k; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const v = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [v[0], v[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [v[0], v[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = v;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const k = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < k; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(k - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (k - 1);
+        const kk = t * 4;
+        const ki = Math.min(3, Math.floor(kk));
+        const press = knots[ki] * (1 - (kk - ki)) + knots[ki + 1] * (kk - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // A pen line laid over an element: a box round a panel, or a line under a word. Drawn on the
+  // first time it appears; redrawn in place when the element changes size.
+  const NS = "http://www.w3.org/2000/svg";
+  const drawn = new Set();
+  let maskN = 0;
+  const sketchRO = new ResizeObserver((es) =>
+    es.forEach((e) => drawSketch(e.target)),
+  );
+  function sketchOn(el, seed, kind = "box") {
+    let svg = el.querySelector(":scope > svg.sketch");
+    if (!svg) {
+      svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("class", `sketch${kind === "underline" ? " u" : ""}`);
+      svg.setAttribute("aria-hidden", "true");
+      el.prepend(svg);
+      sketchRO.observe(el);
+    }
+    const o = el._sk || {};
+    el._sk = { ...o, seed, kind, svg };
+    drawSketch(el);
+  }
+  function drawSketch(el) {
+    const o = el._sk;
+    if (!o) return;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h || (o.w === w && o.h === h && o.at === o.seed)) return;
+    o.w = w;
+    o.h = h;
+    o.at = o.seed;
+    const s = seedOf(o.seed);
+    const pen = o.kind === "box" ? 1.7 : 1.5;
+    const line =
+      o.kind === "box"
+        ? roughRect(w, h, s)
+        : roughUnderline(w, s, { y: h - 0.5 });
+    const ink = ribbon(line, pen, s);
+    const key = `${o.kind} ${o.seed}`;
+    o.svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    if (o.kind === "box" ? o.once : drawn.has(key)) {
+      o.svg.innerHTML = `<path class="ink" d="${ink}"/>`;
+      return;
+    }
+    drawn.add(key);
+    o.once = true;
+    const id = `pm${++maskN}`;
+    o.svg.innerHTML =
+      `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+      `<path class="mk draw" d="${line}" pathLength="1" stroke-width="${pen * 2 + 4}"/></mask></defs>` +
+      `<path class="ink" d="${ink}" mask="url(#${id})"/>`;
+  }
+
+  // ── the page ──
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const localToday = () => {
+    const d = new Date();
+    const p = (k) => String(k).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const grow = (el) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+  const reducedMotion = () =>
+    matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const STATE_WORDS = {
+    meant: "meant for",
+    today: "meant for today",
+    due: "past its day",
+    done: "done",
+    not: "let go",
+  };
+
+  // Everything kept lives in this browser under one key, and only there.
+  const KEY = "pp-act";
+  const byTouched = (a, b) =>
+    a.touched !== b.touched
+      ? a.touched < b.touched
+        ? 1
+        : -1
+      : a.put < b.put
+        ? 1
+        : a.put > b.put
+          ? -1
+          : 0;
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return [];
+      const d = JSON.parse(raw);
+      const seen = new Set();
+      return (Array.isArray(d?.acts) ? d.acts : [])
+        .map((a) => {
+          try {
+            return validateAct(a);
+          } catch {
+            return null;
+          }
+        })
+        .filter((a) => a && !seen.has(a.slug) && seen.add(a.slug))
+        .sort(byTouched);
+    } catch {
+      return [];
+    }
+  }
+  function writeStore() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ v: 1, acts: S.acts }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const today = localToday();
+  const SPEC = specimenFor(today);
+  const S = {
+    acts: readStore(),
+    open: null,
+    kept: false,
+    spec: false,
+    example: false,
+    trouble: null,
+    sure: false,
+    picked: null,
+    dragging: null,
+  };
+  let slugNow = "";
+  let dirty = false;
+  let held = null; // the span the drawing holds still while a step is dragged
+  let geom = null;
+  let livedFresh = new Set();
+  let firstRecs = true;
+  const writable = () => !S.spec;
+
+  /** Rebuild part of the page and put the reader back where they were typing. */
+  function keepFocus(fn) {
+    const a = document.activeElement;
+    const k = a?.dataset?.k;
+    let s0 = null;
+    let s1 = null;
+    try {
+      s0 = a.selectionStart;
+      s1 = a.selectionEnd;
+    } catch {}
+    fn();
+    if (!k) return;
+    const b = document.querySelector(`[data-k="${CSS.escape(k)}"]`);
+    if (b && b !== a) {
+      b.focus({ preventScroll: true });
+      try {
+        if (s0 !== null && b.value !== undefined) b.setSelectionRange(s0, s1);
+      } catch {}
+    }
+  }
+
+  /* ── keeping ── */
+
+  function save() {
+    const a = S.open;
+    const wasKept = S.kept;
+    let out;
+    try {
+      out = validateAct({ ...a, slug: slugNow, touched: today });
+    } catch (e) {
+      setTrouble(e.message);
+      return;
+    }
+    if (!slugNow) {
+      const taken = new Set(S.acts.map((x) => x.slug));
+      const base = out.slug;
+      let k = 2;
+      while (taken.has(out.slug)) out.slug = `${base}-${k++}`;
+    }
+    slugNow = out.slug;
+    S.acts = [out, ...S.acts.filter((x) => x.slug !== out.slug)];
+    const ok = writeStore();
+    dirty = false;
+    S.open = { ...S.open, slug: out.slug, put: out.put, touched: out.touched };
+    S.kept = true;
+    S.example = false;
+    S.trouble = ok
+      ? null
+      : "kept on this page only — this browser would not store it";
+    if (!wasKept) renderSheet();
+    else refreshLive();
+    renderRecord();
+    syncUrl();
+  }
+
+  /** A change on the sheet; kept when it is finished, if the intention is kept. */
+  function edit(f, done) {
+    const cur = S.open;
+    if (!cur) return;
+    const next = f(cur);
+    if (next !== cur) {
+      S.open = next;
+      dirty = true;
+      S.example = false;
+      S.sure = false;
+    }
+    if (done && dirty && S.kept && writable()) save();
+  }
+  const setStep = (id, p, done) =>
+    edit(
+      (a) => ({
+        ...a,
+        steps: a.steps.map((s) => (s.id === id ? { ...s, ...p } : s)),
+      }),
+      done,
+    );
+
+  function setTrouble(t) {
+    S.trouble = t;
+    const el = $("trouble");
+    el.hidden = !t;
+    el.textContent = t || "";
+  }
+
+  function fresh(asExample = false) {
+    slugNow = "";
+    dirty = false;
+    S.kept = false;
+    S.spec = false;
+    S.example = asExample;
+    S.open = asExample ? exampleAct(today) : emptyAct(today);
+    S.sure = false;
+    S.trouble = null;
+    S.picked = null;
+    renderSheet();
+    renderRecord();
+    syncUrl();
+    if (!asExample) setTimeout(() => $("intention")?.focus(), 60);
+  }
+  function load(a, spec = false) {
+    slugNow = a.slug;
+    dirty = false;
+    S.kept = true;
+    S.spec = spec;
+    S.example = false;
+    S.open = JSON.parse(JSON.stringify(a));
+    S.sure = false;
+    S.trouble = null;
+    S.picked = null;
+    renderSheet();
+    renderRecord();
+    syncUrl();
+  }
+  function remove() {
+    const a = S.open;
+    if (!a || !writable() || !S.kept) return;
+    S.acts = S.acts.filter((x) => x.slug !== a.slug);
+    writeStore();
+    fresh();
+  }
+  function syncUrl() {
+    try {
+      const url = new URL(location.href);
+      if (S.kept && !S.spec && S.open?.slug)
+        url.searchParams.set("slug", S.open.slug);
+      else url.searchParams.delete("slug");
+      history.replaceState(null, "", url);
+    } catch {}
+  }
+
+  /* ── the sheet ── */
+
+  function renderHead() {
+    const a = S.open;
+    const meta = S.kept
+      ? `${S.spec ? "the specimen · " : ""}an intention · set down ${dayWords(a.put)}`
+      : S.example
+        ? "an example — running again"
+        : "a new intention";
+    const chip = S.spec
+      ? `<button type="button" class="chip" data-do="own" data-k="own">write your own</button>`
+      : S.kept || S.example
+        ? `<button type="button" class="chip" data-do="new" data-k="new">a new intention</button>`
+        : "";
+    const note = S.spec
+      ? `<p class="note hand mut">Fiction: two intentions from a synthetic life, redated so that they stand today where they stood when they were written. Read it, then write your own. Nothing of yours is kept until you set it down, and then only in this browser.</p>`
+      : S.example
+        ? `<p class="note hand fnt">An example, set from today. Write over it, or start a new one; nothing is kept until you set it down.</p>`
+        : "";
+    $("head").innerHTML =
+      `<div class="head"><span class="meta label">${esc(meta)}</span>${chip}</div>${note}`;
+  }
+
+  function renderFields() {
+    const a = S.open;
+    const w = writable();
+    const ro = w ? "" : " readonly";
+    const field = (key, label, ph) =>
+      `<label><span class="meta fnt">${label}</span><textarea class="ac-case" rows="1" data-k="${key}" data-top="${key}"${ro} placeholder="${w ? ph : ""}">${esc(a[key])}</textarea></label>`;
+    $("fields").innerHTML =
+      `<textarea id="intention" class="ac-case intention" rows="1" data-k="intention" data-top="intention"${ro} aria-label="What you mean to do" placeholder="${w ? "what do you mean to do? in a line" : ""}">${esc(a.intention)}</textarea>` +
+      `<div class="fields">` +
+      field("outcome", "the best that would come of it", "in a line") +
+      field(
+        "obstacle",
+        "what in you would stand in the way",
+        "not the weather — you",
+      ) +
+      field("then", "if it does, I will", "the one thing you will do then") +
+      `</div>`;
+  }
+
+  function stepRow(s, i, first, w, obstacle) {
+    const st = stateOf(s, today);
+    const ro = w ? "" : " readonly";
+    const k = (f) => `${s.id}:${f}`;
+    const ta = (f, ph, label) =>
+      `<textarea class="ac-in" rows="1" data-f="${f}" data-k="${k(f)}"${ro} spellcheck="false" autocomplete="off" aria-label="Step ${i}: ${label}" placeholder="${w ? ph : ""}">${esc(s[f])}</textarea>`;
+    const stateText =
+      (st === "meant"
+        ? `${STATE_WORDS.meant} ${dayWords(s.day)}`
+        : st === "done"
+          ? `done ${dayWords(s.on)}${s.on !== s.day ? ` · meant ${dayWords(s.day)}` : ""}`
+          : st === "not"
+            ? `let go ${dayWords(s.on)}`
+            : STATE_WORDS[st]) +
+      (s.moved.length
+        ? ` · moved ${s.moved.length === 1 ? "once" : `${s.moved.length} times`}`
+        : "");
+    const marks = !w
+      ? ""
+      : `<span class="ac-marks">` +
+        (s.did
+          ? `<button type="button" class="chip" data-do="back" data-k="${k("back")}">take back</button>`
+          : `<button type="button" class="chip on" data-do="done" data-k="${k("done")}">done</button><button type="button" class="chip" data-do="not" data-k="${k("not")}">let go</button>`) +
+        `<button type="button" class="ac-x" data-do="remove" data-k="${k("x")}" aria-label="Take step ${i} off" title="take the step off">×</button></span>`;
+    let lived = "";
+    if (s.did) {
+      const felts =
+        s.did === "done"
+          ? `<span class="ac-felts" role="group" aria-label="How it was">` +
+            FELTS.map(
+              (f) =>
+                `<button type="button" class="ac-felt" data-do="felt" data-felt="${f}" data-k="${k(f)}" aria-pressed="${s.felt === f}"${w ? "" : " disabled"}>${FELT_LABEL[f].replace(" than I thought", "").replace("as I thought", "as thought")}</button>`,
+            ).join("") +
+            `</span>`
+          : "";
+      const met = obstacle
+        ? `<label class="ac-met${s.met ? " on" : ""}"><input type="checkbox" data-f="met" data-k="${k("met")}"${s.met ? " checked" : ""}${w ? "" : " disabled"} />what stands in the way showed up</label>`
+        : "";
+      lived =
+        `<div class="ac-lived-row${livedFresh.has(s.id) ? " fresh" : ""}">` +
+        `<input class="ac-in ac-lived" data-f="lived" data-k="${k("lived")}" value="${esc(s.lived)}"${ro} spellcheck="false" aria-label="Step ${i}: what it was like" placeholder="${w ? (s.did === "done" ? "what it was like, in your words" : "what stood in the way") : ""}" />` +
+        felts +
+        met +
+        `</div>`;
+    }
+    return (
+      `<li id="ac-step-${esc(s.id)}" class="ac-row" data-id="${esc(s.id)}" data-state="${st}"${S.picked === s.id ? " data-picked" : ""}>` +
+      `<div class="ac-line"><span class="ac-n" aria-hidden="true">${i}</span><div class="ac-clauses">` +
+      `<span class="ac-clause c1"><span class="hand mut">when</span>${ta("when", "a time, a place, or after something", "when")}</span>` +
+      `<span class="ac-clause c2"><span class="hand mut">then I will</span>${ta("will", first ? "the smallest thing you could do first" : "what you will do", "what you will do")}</span>` +
+      `</div></div>` +
+      `<div class="ac-sub">` +
+      `<input type="date" class="ac-date" data-f="day" data-k="${k("day")}" value="${s.day}"${!w || s.did ? " disabled" : ""} aria-label="Step ${i}: the day you mean to do it" />` +
+      `<span class="pair"><span class="hand mut">at</span><input class="ac-in ac-where" data-f="where" data-k="${k("where")}" value="${esc(s.where)}"${ro} spellcheck="false" autocomplete="off" aria-label="Step ${i}: where" placeholder="${w ? "where" : ""}" /></span>` +
+      `<span class="pair"><input class="ac-in ac-min" data-f="minutes" data-k="${k("minutes")}" value="${s.minutes ?? ""}"${ro} inputmode="numeric" aria-label="Step ${i}: minutes" placeholder="${w ? "–" : ""}" /><span class="hand mut">min</span></span>` +
+      `<span class="grow"></span>` +
+      `<span class="meta plain ${st === "due" || st === "today" ? "acc" : "fnt"}">${stateText}</span>` +
+      marks +
+      `</div>` +
+      lived +
+      `</li>`
+    );
+  }
+
+  function renderSteps() {
+    const a = S.open;
+    const w = writable();
+    const obstacle = !!a.obstacle.trim();
+    $("steps").innerHTML = inOrder(a.steps)
+      .map((s, i) => stepRow(s, i + 1, i === 0, w, obstacle))
+      .join("");
+    livedFresh = new Set();
+    $("steps")
+      .querySelectorAll(".ac-felt[aria-pressed='true']")
+      .forEach((b) =>
+        sketchOn(
+          b,
+          `${b.closest("li").dataset.id}-${b.dataset.felt}`,
+          "underline",
+        ),
+      );
+  }
+
+  function renderTail() {
+    const a = S.open;
+    const w = writable();
+    let h = "";
+    if (w)
+      h += `<button type="button" class="ac-add" data-do="add" data-k="add">+ a step</button>`;
+    if (!S.kept && w)
+      h += `<div class="setdown"><button type="button" class="chip${a.intention.trim() ? " on" : ""}" id="setdown" data-do="setdown" data-k="setdown">set it down</button><span class="meta plain fnt">kept in this browser; marked as you go</span></div>`;
+    if (S.kept) {
+      const review = (key, label) =>
+        `<label><span class="meta fnt">${label}</span><textarea class="ac-case" rows="2" data-k="after-${key}" data-after="${key}"${w ? "" : " readonly"} placeholder="${w ? "in your words" : ""}">${esc(a.after[key])}</textarea></label>`;
+      h +=
+        `<div class="afterwards"><p class="meta label">afterwards</p>` +
+        `<p class="note hand fnt">the after-action review: four questions, in your words, whenever you are ready</p>` +
+        `<div class="after">` +
+        review("meant", "what was meant to happen") +
+        review("happened", "what happened") +
+        review("difference", "what made the difference") +
+        review("keep", "what I would keep") +
+        `</div></div>`;
+    }
+    if (S.kept && w)
+      h += `<div class="offrow"><button type="button" class="chip${S.sure ? " hot" : ""}" data-do="off" data-k="off">${S.sure ? "take it off the record — sure?" : "take it off the record"}</button></div>`;
+    $("tail").innerHTML = h;
+  }
+
+  function renderSheet() {
+    keepFocus(() => {
+      renderHead();
+      renderFields();
+      renderSteps();
+      renderTail();
+    });
+    document.querySelectorAll("#sheet textarea").forEach(grow);
+    sketchOn($("sheet"), `act-${S.open.slug || "fresh"}`);
+    refreshLive();
+  }
+
+  /** What follows every keystroke: the drawing, the reading, the words around the sheet. */
+  function refreshLive() {
+    keepFocus(renderHead);
+    renderPlot();
+    $("hint").textContent = !writable()
+      ? "the specimen reads only; write your own to move a step"
+      : tally(S.open, today).steps
+        ? "drag a step along the line to another day"
+        : "when this happens, I will do that — on a day";
+    const sd = $("setdown");
+    if (sd) sd.classList.toggle("on", !!S.open.intention.trim());
+    setTrouble(S.trouble);
+    $("reading").textContent = readings(S.open, today).join(" · ");
+    $("where").textContent = S.spec
+      ? "the specimen is fiction, like everything in it"
+      : "kept in this browser only, under pp-act; nothing is sent anywhere";
+  }
+
+  /* ── meant and lived ── */
+
+  // Each step's day as planned on the upper line, the day it was done on the lower, a pen line
+  // between. A step still to come is dragged along to another day; the day it was meant for stays
+  // behind as a ghost.
+  const dropsDrawn = new Set();
+  function renderPlot() {
+    const box = $("plot");
+    const W = box.clientWidth;
+    const act = S.open;
+    if (!W || !act) return;
+    const live = spanOf(act, today);
+    if (!S.dragging || !held) held = live;
+    const span = held;
+    const narrow = W < 520;
+    const H = narrow ? 176 : 196;
+    const L = narrow ? 46 : 64;
+    const R = 16;
+    const meantY = narrow ? 50 : 58;
+    const livedY = narrow ? 118 : 134;
+    const axisY = H - 26;
+    const inner = Math.max(1, W - L - R);
+    const cell = inner / span.days;
+    const x = (d) => L + (daysBetween(span.from, d) + 0.5) * cell;
+    const steps = inOrder(act.steps);
+    const seed = seedOf(`act ${act.slug || act.put}`);
+    // The serif's italic runs wider than niwa's hand, so a day label wants a wider cell.
+    const every = cell >= 46 ? 1 : cell >= 23 ? 2 : 7;
+    geom = { L, cell, span };
+    const w = writable();
+    const o = [];
+    o.push(
+      `<svg width="${W}" height="${H}" class="ac-plot${S.dragging ? " ac-dragging" : ""}" role="img" aria-label="${steps.length} steps, what was meant above and what was lived below">`,
+    );
+    o.push(
+      `<text x="0" y="${meantY + 5}" font-size="14.5" class="t-mut">meant</text>`,
+    );
+    o.push(
+      `<text x="0" y="${livedY + 5}" font-size="14.5" class="t-mut">lived</text>`,
+    );
+    let lastLabel = -Infinity;
+    const r = rand(seed);
+    o.push(
+      `<path d="${stroke([L - 6, meantY], [W - R + 4, meantY], r, 0.7, 0)}" class="ac-rail"/>`,
+    );
+    o.push(
+      `<path d="${stroke([L - 6, livedY], [W - R + 4, livedY], r, 0.7, 0)}" class="ac-rail"/>`,
+    );
+    o.push(
+      `<path d="${stroke([L - 6, axisY], [W - R + 4, axisY], r, 0.5, 0)}" class="ac-axis"/>`,
+    );
+    for (let i = 0; i < span.days; i++) {
+      const d = addDays(span.from, i);
+      const cx = L + (i + 0.5) * cell;
+      const label = i % every === 0 || d === today;
+      o.push(
+        `<g transform="translate(${f1(cx)} ${axisY})"><line y1="-3" y2="3" class="ac-tick"/>`,
+      );
+      if (d === act.put)
+        o.push(
+          `<text y="17" text-anchor="middle" font-size="12" class="t-mut">set down</text>`,
+        );
+      else if (label && d !== today)
+        o.push(
+          `<text y="17" text-anchor="middle" font-size="12" class="t-fnt">${dayWords(d)}</text>`,
+        );
+      o.push(`</g>`);
+    }
+    o.push(
+      `<g transform="translate(${f1(x(act.put))} ${axisY})"><path d="M0 -8 L0 0" class="ac-put"/></g>`,
+    );
+    if (daysBetween(span.from, today) >= 0 && daysBetween(today, span.to) > 0)
+      o.push(
+        `<g transform="translate(${f1(x(today))} 0)"><line y1="16" y2="${axisY}" class="ac-today"/><text y="11" text-anchor="middle" font-size="13" class="t-acc">today</text></g>`,
+      );
+    steps.forEach((s, i) => {
+      const st = stateOf(s, today);
+      const cx = x(s.day);
+      const ghosts = s.moved.map((d) => x(d));
+      const rr = rand(seedOf(`${s.id} ${seed}`));
+      const ring = roughEllipse(20, 20, seedOf(`ring ${s.id}`), {
+        wobble: 0.8,
+        pad: 0,
+        steps: 12,
+      });
+      const showLabel = cx - lastLabel > 86 && st !== "not";
+      if (showLabel) lastLabel = cx;
+      const on = s.did === "done" ? x(s.on) : null;
+      o.push(
+        `<g class="ac-step" data-state="${st}"${S.picked === s.id ? " data-picked" : ""}>`,
+      );
+      ghosts.forEach((gx, k) => {
+        const to = (k + 1 < ghosts.length ? ghosts[k + 1] : cx) - 12;
+        o.push(
+          `<circle cx="${f1(gx)}" cy="${meantY}" r="9" class="ac-ghost"/><path d="M${f1(gx + 10)} ${meantY}L${f1(to)} ${meantY}" class="ac-moved"/>`,
+        );
+      });
+      if (on !== null) {
+        const key = `${act.slug || "fresh"} ${s.id} ${s.on}`;
+        const anim = !dropsDrawn.has(key);
+        dropsDrawn.add(key);
+        o.push(
+          `<path d="${stroke([cx, meantY + 11], [on, livedY - 7], rr, 0.9, 0)}" pathLength="1" class="ac-drop${anim ? " fresh" : ""}" style="animation-delay:${reducedMotion() ? 0 : 120 + i * 90}ms"/>` +
+            `<circle cx="${f1(on)}" cy="${livedY}" r="7" class="ac-lived-dot"/>`,
+        );
+      }
+      if (st === "not") {
+        const my = (meantY + livedY) / 2;
+        o.push(
+          `<path d="${stroke([cx, meantY + 11], [cx, my], rr, 0.6, 0)}" class="ac-letgo"/>` +
+            `<path d="M${f1(cx - 4)} ${my - 4}l8 8M${f1(cx + 4)} ${my - 4}l-8 8" class="ac-letgo"/>`,
+        );
+      }
+      const title = `${s.will || "a step"}${s.when ? ` — when ${s.when}` : ""} · ${STATE_WORDS[st]}${st === "meant" ? ` ${dayWords(s.day)}` : st === "done" ? ` ${dayWords(s.on)}` : ""}${s.lived ? ` · ${s.lived}` : ""}`;
+      o.push(
+        `<g transform="translate(${f1(cx - 10)} ${meantY - 10})" data-step="${esc(s.id)}" class="${w && st !== "done" && st !== "not" ? "ac-handle" : "ac-pick"}">` +
+          `<title>${esc(title)}</title>` +
+          `<rect x="-6" y="-6" width="32" height="32" class="ac-hit"/>` +
+          `<circle cx="10" cy="10" r="10" class="ac-ring-fill"/>` +
+          `<path d="${ring}" class="ac-ring"/>` +
+          `<text x="10" y="14.5" text-anchor="middle" font-size="13" class="ac-num">${i + 1}</text>` +
+          `</g>`,
+      );
+      if (showLabel)
+        o.push(
+          `<text x="${f1(cx)}" y="${meantY - 17}" text-anchor="middle" font-size="12.5" class="ac-label">${esc(clip(s.will.trim() || "a step", narrow ? 12 : 20))}</text>`,
+        );
+      o.push(`</g>`);
+    });
+    o.push(`</svg>`);
+    box.innerHTML = o.join("");
+  }
+
+  function pick(id) {
+    S.picked = id;
+    const li = document.getElementById(`ac-step-${id}`);
+    if (li) {
+      li.removeAttribute("data-picked");
+      void li.offsetWidth;
+      li.setAttribute("data-picked", "");
+      li.scrollIntoView({
+        behavior: reducedMotion() ? "auto" : "smooth",
+        block: "center",
+      });
+    }
+    renderPlot();
+    setTimeout(() => {
+      if (S.picked !== id) return;
+      S.picked = null;
+      document.getElementById(`ac-step-${id}`)?.removeAttribute("data-picked");
+      renderPlot();
+    }, 1400);
+  }
+
+  let dragFrom = null;
+  function onMove(id, d, done) {
+    const cur = S.open.steps.find((s) => s.id === id);
+    if (!cur) return;
+    if (!dragFrom || dragFrom.id !== id) dragFrom = { id, day: cur.day };
+    if (!done) {
+      edit(
+        (a) => ({
+          ...a,
+          steps: a.steps.map((s) => (s.id === id ? { ...s, day: d } : s)),
+        }),
+        false,
+      );
+      refreshLive();
+      return;
+    }
+    const from = dragFrom.day;
+    dragFrom = null;
+    edit(
+      (a) => ({
+        ...a,
+        steps: a.steps.map((s) =>
+          s.id === id ? moveStep({ ...s, day: from }, d) : s,
+        ),
+      }),
+      true,
+    );
+    renderSheet();
+  }
+
+  $("plot").addEventListener("pointerdown", (e) => {
+    const g = e.target.closest("[data-step]");
+    if (!g) return;
+    const s = S.open.steps.find((x) => x.id === g.dataset.step);
+    if (!s) return;
+    const st = stateOf(s, today);
+    if (!writable() || e.button !== 0 || st === "done" || st === "not") {
+      pick(s.id);
+      return;
+    }
+    e.preventDefault();
+    const svg = $("plot").querySelector("svg");
+    const bx = svg.getBoundingClientRect();
+    const x0 = e.clientX;
+    let moved = false;
+    let last = s.day;
+    const at = (cx) => {
+      const k = Math.floor((cx - bx.left - geom.L) / geom.cell);
+      return addDays(
+        geom.span.from,
+        Math.max(0, Math.min(geom.span.days - 1, k)),
+      );
+    };
+    const move = (ev) => {
+      if (!moved && Math.abs(ev.clientX - x0) < 4) return;
+      if (!moved) {
+        moved = true;
+        S.dragging = s.id;
+      }
+      const d = at(ev.clientX);
+      if (d !== last) {
+        last = d;
+        onMove(s.id, d, false);
+      }
+    };
+    const up = () => {
+      removeEventListener("pointermove", move);
+      removeEventListener("pointerup", up);
+      removeEventListener("pointercancel", up);
+      S.dragging = null;
+      if (moved) onMove(s.id, last, true);
+      else pick(s.id);
+    };
+    addEventListener("pointermove", move);
+    addEventListener("pointerup", up);
+    addEventListener("pointercancel", up);
+  });
+
+  /* ── what the reader does on the sheet ── */
+
+  function addStep() {
+    const a = S.open;
+    if (!a || !writable()) return;
+    const last = inOrder(a.steps).at(-1);
+    const d = last && last.day >= today ? addDays(last.day, 1) : today;
+    const s = newStep(d);
+    edit((x) => ({ ...x, steps: [...x.steps, s] }), true);
+    renderSheet();
+    setTimeout(
+      () => document.querySelector(`#ac-step-${s.id} textarea`)?.focus(),
+      40,
+    );
+  }
+
+  function setDown() {
+    const a = S.open;
+    if (!a || !writable()) return;
+    if (!a.intention.trim()) {
+      setTrouble("say what you mean to do, in a line");
+      $("intention")?.focus();
+      return;
+    }
+    save();
+  }
+
+  const sheet = $("sheet");
+  sheet.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-do]");
+    if (!b || b.disabled) return;
+    const id = b.closest("li")?.dataset.id;
+    switch (b.dataset.do) {
+      case "own":
+        fresh(S.acts.length === 0);
+        break;
+      case "new":
+        fresh();
+        break;
+      case "add":
+        addStep();
+        break;
+      case "setdown":
+        setDown();
+        break;
+      case "off":
+        if (S.sure) remove();
+        else {
+          S.sure = true;
+          keepFocus(renderTail);
+        }
+        break;
+      case "done":
+      case "not":
+      case "back":
+        if (id) {
+          const did = b.dataset.do === "back" ? "" : b.dataset.do;
+          if (did) livedFresh.add(id);
+          edit(
+            (a) => ({
+              ...a,
+              steps: a.steps.map((s) =>
+                s.id === id ? markStep(s, did, localToday()) : s,
+              ),
+            }),
+            true,
+          );
+          renderSheet();
+          if (did)
+            document
+              .querySelector(`[data-k="${CSS.escape(`${id}:back`)}"]`)
+              ?.focus();
+        }
+        break;
+      case "remove":
+        if (id) {
+          edit(
+            (a) => ({ ...a, steps: a.steps.filter((s) => s.id !== id) }),
+            true,
+          );
+          renderSheet();
+        }
+        break;
+      case "felt":
+        if (id && writable()) {
+          const f = b.dataset.felt;
+          const s = S.open.steps.find((x) => x.id === id);
+          setStep(id, { felt: s.felt === f ? "" : f }, true);
+          renderSheet();
+        }
+        break;
+    }
+  });
+
+  sheet.addEventListener("input", (e) => {
+    const el = e.target;
+    if (!writable()) return;
+    if (el.dataset.top) {
+      const key = el.dataset.top;
+      const had = !!S.open.obstacle.trim();
+      edit((a) => ({ ...a, [key]: el.value }), false);
+      grow(el);
+      if (key === "obstacle" && had !== !!S.open.obstacle.trim())
+        keepFocus(renderSteps);
+      refreshLive();
+      return;
+    }
+    if (el.dataset.after) {
+      const key = el.dataset.after;
+      edit((a) => ({ ...a, after: { ...a.after, [key]: el.value } }), false);
+      grow(el);
+      return;
+    }
+    const id = el.closest("li")?.dataset.id;
+    const f = el.dataset.f;
+    if (!id || !f) return;
+    if (f === "when" || f === "will") {
+      const v = el.value.replace(/\n/g, " ");
+      if (v !== el.value) el.value = v;
+      setStep(id, { [f]: v }, false);
+      grow(el);
+    } else if (f === "where" || f === "lived")
+      setStep(id, { [f]: el.value }, false);
+    else if (f === "minutes") {
+      const v = el.value.replace(/\D/g, "").slice(0, 4);
+      if (v !== el.value) el.value = v;
+      setStep(id, { minutes: v ? Number(v) : null }, false);
+    } else return;
+    refreshLive();
+  });
+
+  sheet.addEventListener("change", (e) => {
+    const el = e.target;
+    const id = el.closest("li")?.dataset.id;
+    if (!id || !writable()) return;
+    if (el.dataset.f === "day" && el.value) {
+      edit(
+        (a) => ({
+          ...a,
+          steps: a.steps.map((s) => (s.id === id ? moveStep(s, el.value) : s)),
+        }),
+        true,
+      );
+      renderSheet();
+    } else if (el.dataset.f === "met") {
+      setStep(id, { met: el.checked }, true);
+      renderSheet();
+    }
+  });
+
+  // A field left is a change finished: kept, if the intention is kept.
+  sheet.addEventListener("focusout", (e) => {
+    const el = e.target;
+    if (!writable()) return;
+    if (
+      el.dataset.top ||
+      el.dataset.after ||
+      ["when", "will", "where", "minutes", "lived"].includes(el.dataset.f)
+    )
+      edit((a) => a, true);
+  });
+
+  sheet.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const el = e.target;
+    const f = el.dataset.f;
+    if (f !== "when" && f !== "will") return;
+    e.preventDefault();
+    if (f === "will") addStep();
+    else el.closest("li")?.querySelector("[data-f='will']")?.focus();
+  });
+
+  /* ── the record ── */
+
+  function recItem(a, i, spec) {
+    const on = S.kept && S.spec === spec && S.open?.slug === a.slug;
+    const t = tally(a, today);
+    const next = inOrder(a.steps).find((s) => {
+      const st = stateOf(s, today);
+      return st === "meant" || st === "today";
+    });
+    return (
+      `<li class="ac-rec${firstRecs ? " first" : ""}" style="--i:${i}"><button type="button" data-open="${spec ? "spec" : "own"}" data-slug="${esc(a.slug)}" data-k="rec-${spec ? "s" : "o"}-${esc(a.slug)}"${on ? ` aria-current="true"` : ""}>` +
+      `<span class="meta plain">${spec ? "specimen · " : ""}${dayWords(a.put)} · ${t.done} of ${t.steps} done${t.due ? ` · ${t.due} past ${t.due === 1 ? "its" : "their"} day` : ""}</span>` +
+      `<span class="rec-int">${esc(a.intention)}</span>` +
+      (next
+        ? `<span class="rec-next">next: ${esc(clip(next.will || "a step", 40))}, ${daysBetween(today, next.day) === 0 ? "today" : dayWords(next.day)}</span>`
+        : "") +
+      `</button></li>`
+    );
+  }
+
+  function renderRecord() {
+    const own = S.acts;
+    $("record").textContent = recordReadings(
+      recordOf(own.length ? own : SPEC, today),
+    ).join(" · ");
+    $("whose").hidden = own.length > 0;
+    $("whose").textContent =
+      "the specimen's, until you set an intention of your own down";
+    let h = "";
+    if (own.length)
+      h += `<ol class="ac-recs">${own
+        .slice(0, 30)
+        .map((a, i) => recItem(a, i, false))
+        .join("")}</ol>`;
+    if (own.length) h += `<p class="meta fnt">the specimen</p>`;
+    h += `<ol class="ac-recs">${SPEC.map((a, i) => recItem(a, own.length + i, true)).join("")}</ol>`;
+    keepFocus(() => ($("recs").innerHTML = h));
+    firstRecs = false;
+  }
+
+  $("recs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-open]");
+    if (!b) return;
+    const spec = b.dataset.open === "spec";
+    const a = (spec ? SPEC : S.acts).find((x) => x.slug === b.dataset.slug);
+    if (!a) return;
+    load(a, spec);
+    const top = sheet.getBoundingClientRect().top;
+    if (top < 0)
+      sheet.scrollIntoView({
+        behavior: reducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
+  });
+
+  /* ── opening ── */
+
+  // Opens on the reader's own, if they have any: the one asked for, else one still going, else the
+  // latest. A stranger gets the specimen.
+  function going(list) {
+    return list.find((a) =>
+      a.steps.some((s) => {
+        const st = stateOf(s, today);
+        return st === "meant" || st === "today" || st === "due";
+      }),
+    );
+  }
+  let wanted = null;
+  try {
+    wanted = new URLSearchParams(location.search).get("slug");
+  } catch {}
+  const asked = wanted ? S.acts.find((a) => a.slug === wanted) : null;
+  if (asked) load(asked);
+  else if (S.acts.length) load(going(S.acts) || S.acts[0]);
+  else load(going(SPEC) || SPEC[0], true);
+
+  ["readingPanel", "recordPanel", "lawsPanel"].forEach((id) =>
+    sketchOn($(id), `act-${id.replace("Panel", "")}`),
+  );
+  let lastW = $("plot").clientWidth;
+  new ResizeObserver(() => {
+    const w = $("plot").clientWidth;
+    if (w === lastW) return;
+    lastW = w;
+    renderPlot();
+    document.querySelectorAll("#sheet textarea").forEach(grow);
+  }).observe($("plot"));
+</script>

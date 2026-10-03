@@ -38,6 +38,7 @@ postphenom/
       images/              screenshots of the instruments and Cohort Study, cropped, JPEG
       figures.html         the six figures — standalone HTML, moved from paramv.com as-is
       figures/legend.html  Reading the Figures
+      instruments/<slug>.html  the instruments, copied in by scripts/sync-instruments.py — never edit here
       position.html        What You Study
       fonts/               Newsreader + Plex Mono .woff2 for those three pages only
   next.config.ts           security headers + CSP; rewrites /figures, /figures/legend, /position to those files

@@ -226,3 +226,20 @@ and links, drops any link that does not stay on the Substack, and returns nothin
 fails. The reader's browser is sent a link and nothing else, so the CSP is unchanged
 (`connect-src 'self'`) and "no third-party scripts" still holds. The feed had no posts when this was
 built, so the section currently shows its heading and the link.
+
+---
+
+**2026-10-03 — The instruments are served from the site.**
+Param asked for every tool inside niwa to become its own instrument and go up on postphenom.com.
+Twenty-seven were ported, one single-file instrument each in `~/work/capp/instruments/<slug>/`, and
+they are served here with the four that already stood alone (half-second, familiar-voice,
+stop-flowing, chronology) at `/instruments/<slug>`. `scripts/sync-instruments.py` copies each
+`index.html` to `public/instruments/<slug>.html` for every built item in `site.ts` whose href is
+`/instruments/<slug>`; run it before `pnpm build`. Their fonts are the same files as
+`public/fonts/`, reached by a rewrite rather than copied again.
+
+They get the figures' policy: the instruments are standalone documents with inline `<style>`
+and style attributes, so `/instruments/:path+` is taken out of the main CSP and given
+`style-src 'self' 'unsafe-inline'`. Nothing else is loosened; the policy still names no origin but
+`'self'`, and none of the instruments fetches anything. What a reader adds stays in their own
+browser's `localStorage`.

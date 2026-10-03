@@ -1,0 +1,1577 @@
+<title>Toll</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="What a dollar buys when it buys silence, and what a signal has to cost once no one takes your word for it. The dictator game with a quiet door, and a room where a claim has to be shown."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Ink on bone, after niwa's paper and sumi. Two marks only: the coin, which is the
+     reader's dollar kept or paid, and the mark, which is what reaches the other side
+     (in the room, a person the claim is so for). The accent labels the sheet. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #7f776b;
+    --rule: #e2ded5;
+    --rule-2: #cdc7b9;
+    --accent: #b5532a;
+    --accent-wash: rgba(181, 83, 42, 0.07);
+    --coin: #b08a3e;
+    --mark: #4f5f8a;
+    --seat: #d3cec4;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #8c8577;
+      --rule: #302e25;
+      --rule-2: #4a4639;
+      --accent: #d9763f;
+      --accent-wash: rgba(217, 118, 63, 0.1);
+      --coin: #d2aa5a;
+      --mark: #8393c4;
+      --seat: #3e3b31;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #8c8577;
+    --rule: #302e25;
+    --rule-2: #4a4639;
+    --accent: #d9763f;
+    --accent-wash: rgba(217, 118, 63, 0.1);
+    --coin: #d2aa5a;
+    --mark: #8393c4;
+    --seat: #3e3b31;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0;
+  }
+  h1 {
+    font-weight: 400;
+    margin: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 200ms var(--ease);
+  }
+  a:hover {
+    text-decoration-color: var(--accent);
+  }
+  ol,
+  ul,
+  dl,
+  dd {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    line-height: 1.5;
+  }
+  .meta.acc {
+    color: var(--accent);
+  }
+  .hand {
+    font-style: italic;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .meta {
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(60px, 10vw, 112px);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+  .deck {
+    margin-top: 22px;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 32ch;
+  }
+  .claim {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 40ch;
+  }
+  .claim + .claim {
+    margin-top: 12px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24rem;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: clamp(20px, 3vw, 32px);
+    min-width: 0;
+  }
+  aside .panel,
+  aside.panel {
+    padding: 20px;
+    align-self: start;
+  }
+  .first {
+    margin-top: 32px;
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 12px;
+  }
+  .lead1 {
+    margin-top: 16px;
+    max-width: 44rem;
+    font-size: clamp(25px, 3vw, 31px);
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+  }
+  .lead2 {
+    margin-top: 16px;
+    max-width: 44rem;
+    font-size: 16.5px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .play-first {
+    margin-top: 24px;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--accent);
+  }
+  .body-text {
+    margin-top: 16px;
+    max-width: 40rem;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  .note {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--faint);
+  }
+
+  /* chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    padding: 5px 11px;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    color: var(--muted);
+    transition:
+      color 200ms var(--ease),
+      border-color 200ms var(--ease),
+      background-color 200ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip.acc:not(:disabled):hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-wash);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .chip .i {
+    margin-right: 8px;
+    color: var(--faint);
+  }
+
+  /* ten coins: the reader's sit left in the coin's colour; a coin sent across takes the
+     other side's mark and shifts right, so the split reads as a gap. The door's tenth
+     dollar is an outline: paid, and to no one. */
+  .purse {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    padding-right: 16px;
+    margin-top: 24px;
+  }
+  .coin {
+    --x: 0px;
+    --y: 0px;
+    display: block;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--rule-2);
+    background: var(--coin);
+    transform: translate(var(--x), var(--y));
+    transition:
+      background-color 350ms var(--ease),
+      border-color 350ms var(--ease),
+      transform 450ms var(--ease);
+  }
+  button.coin:hover {
+    --y: -3px;
+  }
+  .coin[data-side="theirs"] {
+    --x: 16px;
+    background: var(--mark);
+  }
+  .coin[data-side="toll"] {
+    --x: 16px;
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--faint);
+  }
+  .purse.small {
+    gap: 3px;
+    padding-right: 10px;
+    margin-top: 16px;
+  }
+  .purse.small .coin {
+    width: 15px;
+    height: 15px;
+  }
+  .purse.small .coin[data-side="theirs"],
+  .purse.small .coin[data-side="toll"] {
+    --x: 10px;
+  }
+  .split {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .split b {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .split .k {
+    color: var(--coin);
+  }
+  .split .s {
+    color: var(--mark);
+  }
+  .options {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    border-radius: 3px;
+    transition:
+      border-color 250ms var(--ease),
+      transform 250ms var(--ease);
+  }
+  .option:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+  .option .on {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .act {
+    animation: rise 500ms var(--ease) both;
+  }
+
+  /* the dials */
+  .dial {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 22px;
+    margin-top: 4px;
+    background: transparent;
+    cursor: ew-resize;
+  }
+  .dial.short {
+    max-width: 20rem;
+    margin-top: 16px;
+  }
+  .dial::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--rule-2);
+  }
+  .dial::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    transition: transform 160ms var(--ease);
+  }
+  .dial:hover::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  .dial::-moz-range-track {
+    height: 2px;
+    background: var(--rule-2);
+  }
+  .dial::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+  .dial:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .dial-row label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .dial-row .v {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .dial-row .note {
+    margin-top: 2px;
+  }
+
+  /* the study, the same shape elsewhere */
+  .rows > div {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 4px 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .rows dt.big {
+    font-size: 23px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    font-variant-numeric: tabular-nums;
+  }
+  .rows dt.meta {
+    padding-top: 4px;
+  }
+  .rows dd {
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+  .rows.muted dd {
+    color: var(--muted);
+  }
+  .came {
+    margin-top: 16px;
+    max-width: 40rem;
+    font-size: clamp(23px, 2.8vw, 28px);
+    line-height: 1.26;
+    letter-spacing: -0.015em;
+  }
+
+  /* the receipt */
+  .receipt li {
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .receipt li:first-child {
+    margin-top: 12px;
+  }
+  .receipt .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .receipt .now {
+    color: var(--accent);
+  }
+  .receipt .later {
+    color: var(--faint);
+  }
+  .receipt .r {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .receipt .cellrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    animation: rise 500ms var(--ease) both;
+  }
+  .cells {
+    display: inline-grid;
+    flex: none;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 2px;
+    width: 11rem;
+  }
+  .cells > span,
+  .key i[data-side] {
+    display: inline-block;
+    height: 10px;
+    border-radius: 1.5px;
+    background: var(--coin);
+  }
+  .key i[data-side] {
+    width: 10px;
+  }
+  .cells > span[data-side="theirs"],
+  .key i[data-side="theirs"] {
+    background: var(--mark);
+  }
+  .cells > span[data-side="toll"],
+  .key i[data-side="toll"] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--faint);
+  }
+  .key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .key span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* the signal */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: 22rem minmax(0, 1fr);
+    gap: 32px;
+    margin-top: 24px;
+  }
+  .step-text {
+    font-size: 16px;
+    line-height: 1.65;
+    animation: rise 500ms var(--ease) both;
+  }
+  .dials {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .figures {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+  .tells {
+    margin-top: 4px;
+    font-size: clamp(60px, 7vw, 78px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .tells small {
+    font-size: 18px;
+    letter-spacing: 0;
+    color: var(--faint);
+  }
+  .meter {
+    display: flex;
+    height: 12px;
+    margin-top: 16px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .meter span {
+    display: block;
+    transition: width 400ms var(--ease);
+  }
+  .meter .so {
+    background: var(--mark);
+  }
+  .meter .not {
+    background: var(--seat);
+  }
+  .meter-key {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .meter-key .so {
+    color: var(--mark);
+  }
+  .spent {
+    margin-top: 4px;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--coin);
+    font-variant-numeric: tabular-nums;
+  }
+  .story {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .room {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 24px;
+  }
+  .room circle {
+    fill: var(--seat);
+    stroke: transparent;
+    stroke-width: 1.6;
+    transition:
+      fill 400ms var(--ease),
+      stroke 400ms var(--ease);
+  }
+  .room circle.so {
+    fill: var(--mark);
+  }
+  .room circle.does {
+    stroke: var(--coin);
+  }
+  .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--seat);
+  }
+  .dot.so {
+    background: var(--mark);
+  }
+  .dot.does {
+    width: 7px;
+    height: 7px;
+    margin: 0 1.5px;
+    background: transparent;
+    box-shadow: 0 0 0 2px var(--coin);
+  }
+  .leaves {
+    margin-top: 12px;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.38;
+  }
+  .sources {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule-2);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .act,
+    .step-text,
+    .receipt .cellrow {
+      animation: none;
+    }
+    .coin,
+    .option,
+    .room circle,
+    .meter span {
+      transition: none;
+    }
+  }
+  @media (max-width: 1020px) {
+    .grid,
+    .signal-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 44px;
+    }
+    .options,
+    .figures {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rows > div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 420px) {
+    .purse {
+      gap: 3px;
+      padding-right: 12px;
+    }
+    .coin {
+      width: 22px;
+      height: 22px;
+    }
+    .coin[data-side="theirs"],
+    .coin[data-side="toll"] {
+      --x: 12px;
+    }
+    .cells {
+      width: 9rem;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Toll</h1>
+      <p class="deck">
+        What a dollar buys when it buys silence, and what a signal has to cost
+        once no one takes your word for it.
+      </p>
+    </div>
+    <div>
+      <p class="claim">
+        The dictator game four times: seen, offered a quiet door after the
+        split, posted under your name, and with no one to know. Then a room of a
+        hundred where a claim has to be shown, and its rules walked from a word
+        being enough to a signal that keeps getting dearer.
+      </p>
+      <p class="claim">
+        Dollars and counts, never a grade. It never says which round is the real
+        you, or which rules a room should keep. Nothing is kept.
+      </p>
+    </div>
+  </header>
+
+  <section class="panel rise first" style="--d: 60ms" aria-label="The game">
+    <p class="meta acc">the game</p>
+    <p class="lead1" id="lead1"></p>
+    <p class="lead2" id="lead2"></p>
+    <p class="play-first">Play it before you read what they did.</p>
+  </section>
+
+  <div class="grid">
+    <section class="panel" id="round" aria-live="polite"></section>
+    <aside class="panel rise" style="--d: 120ms" aria-label="Your receipt">
+      <p class="meta acc">your receipt</p>
+      <ol class="receipt" id="receipt"></ol>
+      <div class="key">
+        <span><i data-side="mine"></i>kept</span>
+        <span><i data-side="theirs"></i>sent</span>
+        <span><i data-side="toll"></i>the door's dollar</span>
+      </div>
+    </aside>
+  </div>
+
+  <section
+    class="panel rise"
+    style="--d: 180ms; margin-top: 24px"
+    aria-label="The signal"
+  >
+    <div class="head">
+      <p class="meta acc">the signal</p>
+      <span class="meta">→ and ← change the rules</span>
+    </div>
+    <p class="lead1" id="signal1"></p>
+    <p class="lead2" id="signal2"></p>
+    <div class="chips" id="chain" style="margin-top: 24px"></div>
+    <div class="signal-grid">
+      <div class="dials">
+        <p class="step-text" id="stepText"></p>
+        <div class="dial-row">
+          <label for="d-worth"
+            ><span>what being believed is worth</span
+            ><span class="v" id="v-worth"></span
+          ></label>
+          <input
+            id="d-worth"
+            class="dial"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            data-k="worth"
+          />
+          <p class="note">The more who are watching, the more it is worth.</p>
+        </div>
+        <div class="dial-row">
+          <label for="d-ifSo"
+            ><span>what the act costs if it is so</span
+            ><span class="v" id="v-ifSo"></span
+          ></label>
+          <input
+            id="d-ifSo"
+            class="dial"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            data-k="ifSo"
+          />
+          <p class="note">To someone who does speak Spanish.</p>
+        </div>
+        <div class="dial-row">
+          <label for="d-ifNot"
+            ><span>what the act costs if it is not</span
+            ><span class="v" id="v-ifNot"></span
+          ></label>
+          <input
+            id="d-ifNot"
+            class="dial"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            data-k="ifNot"
+          />
+          <p class="note">
+            To someone who would have to fake it, being found out included.
+            Trust lives here.
+          </p>
+        </div>
+        <div class="chips">
+          <button type="button" class="chip" id="back">back</button>
+          <button type="button" class="chip" id="next"></button>
+        </div>
+      </div>
+      <div>
+        <div class="figures">
+          <div>
+            <p class="meta">of those who do it, how many it is so for</p>
+            <p class="tells" id="tells"></p>
+            <div class="meter" aria-hidden="true">
+              <span class="so" id="m-so"></span
+              ><span class="not" id="m-not"></span>
+            </div>
+            <div class="meter-key">
+              <span class="so" id="k-so"></span><span id="k-not"></span>
+            </div>
+            <p class="meta" style="margin-top: 24px">
+              what the room spends on it
+            </p>
+            <p class="spent" id="spent"></p>
+          </div>
+          <div>
+            <p class="meta">in people and dollars</p>
+            <p class="story" id="story"></p>
+          </div>
+        </div>
+        <svg
+          class="room"
+          id="room"
+          role="img"
+          aria-label="A hundred people and who does it"
+        ></svg>
+        <div class="key">
+          <span><i class="dot"></i>it is not so</span>
+          <span><i class="dot so"></i>it is so</span>
+          <span><i class="dot does"></i>does the act</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section
+      class="panel rise"
+      style="--d: 240ms"
+      aria-label="The same shape elsewhere"
+    >
+      <p class="meta acc">the same shape elsewhere</p>
+      <dl class="rows" id="elsewhere" style="margin-top: 16px"></dl>
+    </section>
+    <aside class="col">
+      <section
+        class="panel rise"
+        style="--d: 300ms"
+        aria-label="What it leaves to you"
+      >
+        <p class="meta acc">what it leaves to you</p>
+        <p class="leaves" id="leaves"></p>
+        <p class="note" id="numbers" style="margin-top: 20px"></p>
+      </section>
+      <section class="panel rise" style="--d: 360ms" aria-label="Sources">
+        <p class="meta acc">sources</p>
+        <ul class="sources" id="sources"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Center for Applied Post-Phenomenology · Toll</span>
+    <span class="meta">Nothing on this page is kept</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── every word of the toll (niwa content/toll.ts) ──────────────────────
+     The four rounds follow Dana, Cain & Dawes (2006), whose door was offered after the
+     split was chosen; the feed is the page's own round and no study ran it. The room's
+     dollars are illustrative and the sheet says so. */
+
+  const LEAD = [
+    "Give a person ten dollars and a stranger to share it with, and most send something. It looks like wanting to help.",
+    "Then offer them nine dollars to leave before the stranger is told there was a game at all. A third of people in the study took it: a dollar paid so that someone they will never meet, who does not know their name, would not know what they did.",
+  ];
+
+  const ROUNDS = [
+    {
+      round: "envelope",
+      name: "the envelope",
+      text: "You have ten dollars. In another room sits a stranger you will never meet. They know a game is being played and that someone is deciding. Send them whatever you like, from nothing to all ten. They will see what you sent.",
+    },
+    {
+      round: "door",
+      name: "the door",
+      text: "Before your split is carried out, the person running the game makes an offer no one mentioned. Take nine dollars and leave now, and the stranger is never told there was a game, a ten, or a you.",
+      door: "take $9 and leave",
+    },
+    {
+      round: "feed",
+      name: "the feed",
+      text: "Ten dollars again, and a new stranger. This time what you send is posted under your name to everyone who follows you, and to everyone they pass it to. The door is there, and it keeps a receipt: take it and the post says you took nine and left.",
+      door: "take $9 and leave, posted",
+    },
+    {
+      round: "none",
+      name: "no one",
+      text: "Ten dollars again, and a new stranger. Whatever you send reaches them as a bonus on their pay for something else. They are never told there was a game, a ten, or a you, and no one else will see it. The door is there too.",
+      door: "take $9 and leave",
+    },
+  ];
+
+  /** What the study found, set beside the reader's rounds. Never over them. */
+  const STUDY = [
+    {
+      count: "11 of 40",
+      text: "took the door when it was offered after they had chosen their split (study 1). 9 of the 11 had chosen to send something.",
+    },
+    {
+      count: "43 in 100",
+      text: "took it in the second study, with the stranger told of the game as before.",
+    },
+    {
+      count: "almost none",
+      text: "took it when the stranger would get the money as a bonus from nowhere and never learn there was a game: the round called no one here.",
+    },
+  ];
+
+  const STUDY_NOTE =
+    "Dana, Cain & Dawes (2006). The authors read it as giving that is often about not letting down what another person expects, more than about their welfare. The feed is this page's own round; no one in the study was posted.";
+
+  const SIGNAL = [
+    "A signal is an act that is cheaper, or more likely, when what it says is so.",
+    "“I speak Spanish” costs nothing to say. It is believed where a false claim is found out and held against the one who made it, because then it costs more to say falsely than truly. Take the finding-out away and the words stop carrying anything, and something dearer has to stand in for them.",
+  ];
+
+  /** The room walked through, one set of rules at a time. Illustrative dollars. */
+  const CHAIN = [
+    {
+      name: "high trust",
+      rules: { worth: 20, ifSo: 0, ifNot: 60 },
+      text: "The act is saying it. Saying it costs nothing if it is so. If it is not, someone will ask you something in Spanish, and your name follows you: sixty dollars of standing. Being believed is worth twenty. The forty say it, the rest keep quiet, and a word is enough. The room spends nothing.",
+    },
+    {
+      name: "low trust",
+      rules: { worth: 20, ifSo: 0, ifNot: 5 },
+      text: "Now the room is strangers who will not meet again. A false claim is rarely found out and nothing follows anyone home: saying it falsely costs five dollars of unease. Being believed is still worth twenty, so all hundred say it. Of those who say it, forty in a hundred are so — the same as the room. The word has stopped carrying anything.",
+    },
+    {
+      name: "high receipt",
+      rules: { worth: 20, ifSo: 10, ifNot: 40 },
+      text: "So the listener asks for a receipt: a certificate, a test, a conversation on the spot. It costs ten dollars of time to someone who speaks it and forty to someone who would have to fake it. At twenty, only the forty do it. The act carries the claim again, and the room pays four hundred dollars for what a word used to do.",
+    },
+    {
+      name: "high signalling",
+      rules: { worth: 60, ifSo: 10, ifNot: 40 },
+      text: "Then everyone is watching. Posted and passed on, being believed is worth sixty. At sixty the forty-dollar receipt is worth faking, so all hundred show one, and of those who do, forty in a hundred are so. The room spends two thousand eight hundred dollars and a stranger learns nothing from the receipt.",
+    },
+    {
+      name: "the rules change",
+      rules: { worth: 60, ifSo: 30, ifNot: 90 },
+      text: "The receipt that carries the claim now is one that costs more to fake than being believed is worth: thirty to the forty, ninety to the rest. Only the forty show it. It says what a word said in the first room, and the room spends twelve hundred dollars to say it.",
+    },
+  ];
+
+  const ELSEWHERE = [
+    {
+      where: "Rapa Nui",
+      how: "Jared Diamond told Easter Island as chiefs out-building each other in stone until the island was spent. Hunt and Lipo read the same island otherwise, and the story is contested. As a shape it is the last room: a signal that holds only while it keeps getting dearer.",
+    },
+    {
+      where: "visible goods",
+      how: "Black and Hispanic households in the US spend about thirty percent more on what others can see — clothes, jewellery, cars — than White households of like income, and the gap tracks how poor the group around them is. Charles, Hurst and Roussanov find it comes with less spent on education and health.",
+    },
+    {
+      where: "less and fewer",
+      how: "Correcting a sentence that was already clear. Paul Fussell's Class (1983) reads that kind of care as a class marker: it costs attention that is cheaper to those who were taught it young.",
+    },
+    {
+      where: "a Super Bowl ad",
+      how: "Thirty seconds that say little about the product, except that the firm can afford them and expects to be around long enough to earn them back.",
+    },
+    {
+      where: "the feed",
+      how: "Every act leaves a receipt and the audience has no edge. What being believed is worth goes up, and with it what an act must cost before it tells anyone anything. The quiet door of the second round is the thing a feed does not have.",
+    },
+  ];
+
+  const LEAVES =
+    "Whether what you sent under watch was for the stranger or for the watching is yours to say. So is which room you would rather live in: one where a word is enough, or one where everything has to be shown.";
+
+  const NUMBERS_NOTE =
+    "The four rounds follow the study; the room's dollars are illustrative, set so each rule change shows. Nothing on this page is kept.";
+
+  const SOURCES = [
+    {
+      cite: "Dana, J., Cain, D. M. & Dawes, R. M. (2006). What you don't know won't hurt me: costly (but quiet) exit in dictator games. Organizational Behavior and Human Decision Processes, 100(2), 193–201.",
+      href: "https://doi.org/10.1016/j.obhdp.2005.10.001",
+    },
+    {
+      cite: "Spence, M. (1973). Job market signaling. Quarterly Journal of Economics, 87(3), 355–374.",
+      href: "https://doi.org/10.2307/1882010",
+    },
+    {
+      cite: "Charles, K. K., Hurst, E. & Roussanov, N. (2009). Conspicuous consumption and race. Quarterly Journal of Economics, 124(2), 425–467.",
+      href: "https://doi.org/10.1162/qjec.2009.124.2.425",
+    },
+    {
+      cite: "Fussell, P. (1983). Class: A Guide Through the American Status System. Summit Books.",
+    },
+    {
+      cite: "Diamond, J. (2005). Collapse: How Societies Choose to Fail or Succeed. Viking. Hunt, T. & Lipo, C. (2011). The Statues That Walked. Free Press.",
+    },
+    {
+      cite: "Yvain (2012). What is signaling, really? LessWrong.",
+      href: "https://www.lesswrong.com/posts/KheBaeW8Pi7LwewoF/what-is-signaling-really",
+    },
+  ];
+
+  /* ── the toll, pure (ported from niwa lib/toll.ts) ──────────────────────
+     The door is dominated in money by the game itself ($10 kept, or $9 kept and $1
+     sent), so what it sells is only that no one knows. The room: everyone for whom
+     being believed is worth more than the act costs does it. */
+
+  const POT = 10;
+  const DOOR = 9;
+
+  function payoff(m) {
+    if (m.door) return { kept: DOOR, sent: 0 };
+    const give = Math.max(0, Math.min(POT, Math.round(m.give)));
+    return { kept: POT - give, sent: give };
+  }
+
+  const usd = (n) => `$${n.toLocaleString("en-US")}`;
+
+  function doorReading(chose, tookDoor) {
+    const give = Math.max(0, Math.min(POT, Math.round(chose)));
+    if (!tookDoor)
+      return `You carried out your split: ${usd(POT - give)} for you, ${usd(give)} for them. The door would have left you ${usd(DOOR)} and them nothing, and they would never have known there was a game.`;
+    const was =
+      give === 0
+        ? `You had chosen to keep all ${usd(POT)}; the door left you ${usd(DOOR)}.`
+        : `You had chosen to send ${usd(give)}; the door left you ${usd(DOOR)} and them nothing.`;
+    return `${was} Inside the game you could have kept all ${usd(POT)}, or kept the same ${usd(DOOR)} and sent ${usd(1)}. The dollar the door cost bought only that they would not know.`;
+  }
+
+  const WHO = {
+    envelope: "the stranger sees",
+    door: "unless you leave",
+    feed: "your followers see",
+    none: "no one knows",
+  };
+  const WHEN = {
+    envelope: "the stranger would see it",
+    door: "you could leave unseen",
+    feed: "everyone who follows you would see it",
+    none: "no one would know",
+  };
+
+  function roundReading(r, m) {
+    const p = payoff(m);
+    if (r === "door")
+      return m.door
+        ? `You took the door: ${usd(DOOR)} for you, nothing for them, and they never learn there was a game.`
+        : `You stayed: ${usd(p.kept)} for you, ${usd(p.sent)} for them, and they learn there was a game.`;
+    if (r === "envelope")
+      return `With the stranger to see it, you sent ${usd(p.sent)} and kept ${usd(p.kept)}.`;
+    if (r === "feed")
+      return m.door
+        ? `Posted under your name, you took the door, and the post said you took ${usd(DOOR)} and left.`
+        : `Posted under your name to everyone who follows you, you sent ${usd(p.sent)}.`;
+    return m.door
+      ? `With no one to know either way, you took the door: ${usd(DOOR)} for you, and the stranger never had a game to learn of.`
+      : `With the money arriving from nowhere and no one to see it, you sent ${usd(p.sent)}.`;
+  }
+
+  const and = (xs) =>
+    xs.length < 2
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+
+  const WITH = {
+    envelope: "seen by the stranger",
+    door: "with a door to leave by",
+    feed: "posted to everyone who follows you",
+    none: "with no one to know",
+  };
+  const COUNT = ["", "one", "two", "three", "four"];
+
+  function spread(played) {
+    if (played.length < 2) return null;
+    const sent = played.map((p) => ({
+      round: p.round,
+      sent: payoff(p.move).sent,
+    }));
+    const hi = Math.max(...sent.map((p) => p.sent));
+    const lo = Math.min(...sent.map((p) => p.sent));
+    if (hi === lo)
+      return `The stranger got ${usd(hi)} in every round, whoever would know.`;
+    const under = (k) => {
+      const at = sent.filter((p) => p.sent === k).map((p) => p.round);
+      return at.length === 1
+        ? `when ${WHEN[at[0]]}`
+        : `in ${COUNT[at.length]} rounds: ${and(at.map((r) => WITH[r]))}`;
+    };
+    return `The most that reached a stranger was ${usd(hi)}, ${under(hi)}. The least was ${usd(lo)}, ${under(lo)}. Between the rounds only who would know was changed.`;
+  }
+
+  const ROOM = 100;
+  const SO = 40;
+
+  function outcome(r) {
+    const so = r.worth > r.ifSo ? SO : 0;
+    const not = r.worth > r.ifNot ? ROOM - SO : 0;
+    const doers = so + not;
+    const kind =
+      doers === 0 ? "none" : so && not ? "pools" : so ? "separates" : "inverts";
+    return {
+      so,
+      not,
+      doers,
+      tells: doers ? so / doers : null,
+      spent: so * r.ifSo + not * r.ifNot,
+      kind,
+    };
+  }
+
+  const fmt = (k) => k.toLocaleString("en-US");
+
+  function roomStory(r) {
+    const o = outcome(r);
+    const head = `Of ${ROOM} people, it is so for ${SO}. Being believed is worth ${usd(r.worth)}; the act costs ${usd(r.ifSo)} if it is so and ${usd(r.ifNot)} if it is not.`;
+    if (o.kind === "none")
+      return `${head} No one does it: it costs more than being believed is worth, even to those it is so for.`;
+    if (o.kind === "separates")
+      return `${head} The ${SO} it is so for do it and the ${ROOM - SO} do not, so of those who do it, ${SO} in ${SO} are so. The room spends ${usd(o.spent)} to be told.`;
+    if (o.kind === "inverts")
+      return `${head} Only the ${ROOM - SO} it is not so for do it, so doing it says the opposite of what it claims.`;
+    return `${head} All ${ROOM} do it, so of those who do it, ${SO} in ${ROOM} are so — as many as in the room. The room spends ${usd(o.spent)} and a stranger learns nothing they did not know.`;
+  }
+
+  /** Every sentence the page reads back. */
+  function readings(played, chose, rules) {
+    const out = played.map((p) => roundReading(p.round, p.move));
+    const door = played.find((p) => p.round === "door");
+    if (door) out.push(doorReading(chose, door.move.door));
+    const s = spread(played);
+    if (s) out.push(s);
+    for (const r of rules) out.push(roomStory(r));
+    return out;
+  }
+
+  /** Who in the room is who: a seeded shuffle of the seats (niwa lib/crowd.ts), so the forty are scattered and hold still. */
+  const mulberry32 = (a) => () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  function order(seed, k) {
+    const r = mulberry32(seed);
+    const a = Array.from({ length: k }, (_, i) => i);
+    for (let j = k - 1; j > 0; j--) {
+      const x = Math.floor(r() * (j + 1));
+      [a[j], a[x]] = [a[x], a[j]];
+    }
+    return a;
+  }
+  const SEATS = order(11, ROOM);
+  const COLS = 20;
+
+  /* ── the page. Nothing is kept: reload and it is gone. ─────────────────── */
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+
+  const S = {
+    stage: 0,
+    give: 0,
+    chose: 0,
+    played: [],
+    step: 0,
+    rules: { ...CHAIN[0].rules },
+  };
+
+  const sideOf = (i, give, door) =>
+    door ? (i < DOOR ? "mine" : "toll") : i < POT - give ? "mine" : "theirs";
+
+  function purseHtml(give, { door = false, small = false, live = false } = {}) {
+    const label = door
+      ? `The door: ${DOOR} dollars kept, one paid, nothing sent`
+      : `${POT - give} dollars kept, ${give} sent`;
+    let h = `<div class="purse${small ? " small" : ""}" role="${live ? "group" : "img"}" aria-label="${label}"${live ? ' id="purse"' : ""}>`;
+    for (let i = 0; i < POT; i++) {
+      const side = sideOf(i, give, door);
+      h += live
+        ? `<button type="button" class="coin" data-i="${i}" data-side="${side}"></button>`
+        : `<span class="coin" data-side="${side}"></span>`;
+    }
+    return h + `</div>`;
+  }
+
+  const splitHtml = (kept, sent, ids) =>
+    `<div class="split"><span>you <b class="k"${ids ? ' id="kept"' : ""}>$${kept}</b></span><span>them <b class="s"${ids ? ' id="sent"' : ""}>$${sent}</b></span></div>`;
+
+  /* the round on the table, or what the four came to */
+  function renderRound() {
+    const el = $("round");
+    el.classList.remove("act");
+    void el.offsetWidth;
+    el.classList.add("act");
+    if (S.stage >= ROUNDS.length) {
+      const door = S.played[1]?.move.door ?? false;
+      el.setAttribute("aria-label", "What it came to");
+      el.innerHTML =
+        `<p class="meta acc">what it came to</p>` +
+        `<p class="came">${esc(spread(S.played))}</p>` +
+        `<p class="body-text" style="color:var(--muted)">${esc(doorReading(S.chose, door))}</p>` +
+        `<p class="meta" style="margin-top:28px">in the study</p>` +
+        `<dl class="rows muted" style="margin-top:8px">${STUDY.map((s) => `<div><dt class="big">${esc(s.count)}</dt><dd>${esc(s.text)}</dd></div>`).join("")}</dl>` +
+        `<p class="note" style="margin-top:12px;max-width:40rem">${esc(STUDY_NOTE)}</p>` +
+        `<div class="chips" style="margin-top:20px"><button type="button" class="chip" data-act="again">again</button></div>`;
+      return;
+    }
+    const r = ROUNDS[S.stage];
+    el.setAttribute("aria-label", `Round ${S.stage + 1}: ${r.name}`);
+    let h =
+      `<div class="head"><p class="meta acc">${S.stage + 1} · ${esc(r.name)}</p><span class="meta">round ${S.stage + 1} of ${ROUNDS.length}</span></div>` +
+      `<p class="body-text">${esc(r.text)}</p>`;
+    if (r.round === "door") {
+      const opts = [
+        {
+          door: false,
+          name: "carry out my split",
+          note: "They learn there was a game, and what you sent.",
+        },
+        {
+          door: true,
+          name: r.door,
+          note: "They are never told. The tenth dollar goes back to the game.",
+        },
+      ];
+      h += `<div class="options">${opts
+        .map((o) => {
+          const p = payoff(
+            o.door ? { door: true } : { door: false, give: S.chose },
+          );
+          return `<button type="button" class="option" data-act="${o.door ? "door" : "stay"}"><span class="meta${o.door ? " acc" : ""}"${o.door ? "" : ' style="color:var(--ink)"'}>${esc(o.name)}</span>${purseHtml(S.chose, { door: o.door, small: true })}${splitHtml(p.kept, p.sent)}<span class="on">${esc(o.note)}</span></button>`;
+        })
+        .join("")}</div>`;
+    } else {
+      const p = payoff({ door: false, give: S.give });
+      h +=
+        purseHtml(S.give, { live: true }) +
+        `<input type="range" class="dial short" id="giveDial" min="0" max="${POT}" step="1" value="${S.give}" aria-label="Dollars sent to the stranger" />` +
+        splitHtml(p.kept, p.sent, true) +
+        `<p class="note" style="margin-top:8px">${r.round === "envelope" ? "Click a coin to send it across, and every coin beyond it." : "It starts where you left the envelope."}</p>` +
+        `<div class="chips" style="margin-top:20px"><button type="button" class="chip acc" data-act="send" id="sendBtn">send $${S.give}</button>${r.door ? `<button type="button" class="chip" data-act="door">${esc(r.door)}</button>` : ""}</div>`;
+    }
+    el.innerHTML = h;
+  }
+
+  /* the split moves in place, so the coins slide across rather than being redrawn */
+  function setGive(g) {
+    S.give = Math.max(0, Math.min(POT, g));
+    const purse = $("purse");
+    if (!purse) return;
+    purse.querySelectorAll(".coin").forEach((c, i) => {
+      const side = sideOf(i, S.give, false);
+      c.dataset.side = side;
+      const next = side === "mine" ? POT - i : POT - i - 1;
+      c.setAttribute("aria-label", `Send ${next} of the ten`);
+    });
+    purse.setAttribute(
+      "aria-label",
+      `${POT - S.give} dollars kept, ${S.give} sent`,
+    );
+    $("giveDial").value = S.give;
+    $("kept").textContent = `$${POT - S.give}`;
+    $("sent").textContent = `$${S.give}`;
+    $("sendBtn").textContent = `send $${S.give}`;
+  }
+
+  function renderReceipt() {
+    $("receipt").innerHTML = ROUNDS.map((r, i) => {
+      const p = S.played[i];
+      const cls = p ? "" : i === S.stage ? "now" : "later";
+      let h = `<li><div class="top"><span class="${cls}">${i + 1} · ${esc(r.name)}</span><span class="meta">${WHO[r.round]}</span></div>`;
+      if (p) {
+        const pay = payoff(p.move);
+        h += `<div class="cellrow"><span class="cells" aria-hidden="true">${Array.from(
+          { length: POT },
+          (_, k) =>
+            `<span data-side="${p.move.door ? (k < DOOR ? "mine" : "toll") : k < pay.kept ? "mine" : "theirs"}"></span>`,
+        ).join(
+          "",
+        )}</span><span class="num">${p.move.door ? "door" : `$${pay.sent}`}</span></div><p class="r">${esc(roundReading(p.round, p.move))}</p>`;
+      } else
+        h += `<p class="r ${cls}">${i === S.stage ? "now" : "not yet"}</p>`;
+      return h + `</li>`;
+    }).join("");
+  }
+
+  function play(move) {
+    const r = ROUNDS[S.stage];
+    S.played.push({ round: r.round, move });
+    // each later round starts where the reader left the envelope: give stays
+    if (r.round === "envelope") S.chose = S.give;
+    S.stage++;
+    renderRound();
+    renderReceipt();
+  }
+
+  /* the room */
+  const room = $("room");
+  room.setAttribute("viewBox", `0 0 ${COLS * 10} ${(ROOM / COLS) * 10}`);
+  const NS = "http://www.w3.org/2000/svg";
+  const seats = Array.from({ length: ROOM }, (_, i) => {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", 5 + (i % COLS) * 10);
+    c.setAttribute("cy", 5 + Math.floor(i / COLS) * 10);
+    c.setAttribute("r", 3.2);
+    room.appendChild(c);
+    return c;
+  });
+
+  function renderSignal() {
+    const o = outcome(S.rules);
+    $("chain")
+      .querySelectorAll(".chip")
+      .forEach((b, i) => b.setAttribute("aria-pressed", String(S.step === i)));
+    const t = $("stepText");
+    t.textContent = S.step === null ? "Your own rules." : CHAIN[S.step].text;
+    for (const k of ["worth", "ifSo", "ifNot"]) {
+      $(`d-${k}`).value = S.rules[k];
+      $(`v-${k}`).textContent = `$${S.rules[k]}`;
+    }
+    $("back").disabled = S.step === 0;
+    const more = S.step !== null && S.step < CHAIN.length - 1;
+    $("next").textContent = more ? "next rule" : "from the top";
+    $("next").classList.toggle("acc", more);
+    $("tells").innerHTML =
+      o.tells === null
+        ? `—<small> no one does it</small>`
+        : `${Math.round(o.tells * 100)}<small> in 100</small>`;
+    $("m-so").style.width = `${o.doers ? (o.so / o.doers) * 100 : 0}%`;
+    $("m-not").style.width = `${o.doers ? (o.not / o.doers) * 100 : 0}%`;
+    $("k-so").textContent = `${o.so} it is so for`;
+    $("k-not").textContent = `${o.not} it is not`;
+    $("spent").textContent = `$${fmt(o.spent)}`;
+    $("story").textContent = roomStory(S.rules);
+    for (let i = 0; i < ROOM; i++) {
+      const so = i < SO;
+      const does = so ? o.so > 0 : o.not > 0;
+      const c = seats[SEATS[i]];
+      c.classList.toggle("so", so);
+      c.classList.toggle("does", does);
+    }
+  }
+
+  function walk(to, replay = true) {
+    const i = Math.max(0, Math.min(CHAIN.length - 1, to));
+    const changed = S.step !== i;
+    S.step = i;
+    S.rules = { ...CHAIN[i].rules };
+    renderSignal();
+    if (changed && replay) {
+      const t = $("stepText");
+      t.style.animation = "none";
+      void t.offsetWidth;
+      t.style.animation = "";
+    }
+  }
+
+  /* ── wiring ── */
+
+  $("lead1").textContent = LEAD[0];
+  $("lead2").textContent = LEAD[1];
+  $("signal1").textContent = SIGNAL[0];
+  $("signal2").textContent = SIGNAL[1];
+  $("chain").innerHTML = CHAIN.map(
+    (c, i) =>
+      `<button type="button" class="chip" data-step="${i}"><span class="i num">${i + 1}</span>${esc(c.name)}</button>`,
+  ).join("");
+  $("elsewhere").innerHTML = ELSEWHERE.map(
+    (b) =>
+      `<div><dt class="meta">${esc(b.where)}</dt><dd>${esc(b.how)}</dd></div>`,
+  ).join("");
+  $("leaves").textContent = LEAVES;
+  $("numbers").textContent = NUMBERS_NOTE;
+  $("sources").innerHTML = SOURCES.map(
+    (s) =>
+      `<li>${s.href ? `<a href="${esc(s.href)}" rel="noreferrer">${esc(s.cite)}</a>` : esc(s.cite)}</li>`,
+  ).join("");
+
+  $("round").addEventListener("click", (e) => {
+    const coin = e.target.closest("button.coin");
+    if (coin) {
+      const i = +coin.dataset.i;
+      setGive(coin.dataset.side === "mine" ? POT - i : POT - i - 1);
+      return;
+    }
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === "send") play({ door: false, give: S.give });
+    else if (act === "door") play({ door: true });
+    else if (act === "stay") play({ door: false, give: S.chose });
+    else if (act === "again") {
+      S.played = [];
+      S.stage = 0;
+      S.give = 0;
+      S.chose = 0;
+      renderRound();
+      renderReceipt();
+    }
+  });
+  $("round").addEventListener("input", (e) => {
+    if (e.target.id === "giveDial") setGive(+e.target.value);
+  });
+
+  $("chain").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-step]");
+    if (b) walk(+b.dataset.step);
+  });
+  $("back").addEventListener("click", () => walk((S.step ?? 0) - 1));
+  $("next").addEventListener("click", () =>
+    walk(S.step === null || S.step >= CHAIN.length - 1 ? 0 : S.step + 1),
+  );
+  for (const k of ["worth", "ifSo", "ifNot"])
+    $(`d-${k}`).addEventListener("input", (e) => {
+      S.rules = { ...S.rules, [k]: +e.target.value };
+      S.step = null;
+      renderSignal();
+    });
+
+  // → and ← change the room's rules a step, unless the reader is in a field or on a dial
+  window.addEventListener("keydown", (e) => {
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    walk((S.step ?? 0) + (e.key === "ArrowRight" ? 1 : -1));
+  });
+
+  renderRound();
+  renderReceipt();
+  renderSignal();
+</script>

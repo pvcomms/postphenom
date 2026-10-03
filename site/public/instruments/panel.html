@@ -1,0 +1,2810 @@
+<title>Panel</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A garden of notes read as eight markers over time, the way a blood panel is read: each on its own line, none added to another, none with a direction it is meant to go."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* niwa's two palettes as tokens. Paper: ink on bone. Sumi: the same garden after dark.
+     Every line is ink on a wash of itself; the accent is only ever the week being read. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #625c53;
+    --faint: #857d71;
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --grain-blend: multiply;
+    --grain: 0.06;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #847d70;
+      --rule: #302e25;
+      --rule-2: #4a473b;
+      --accent: #d9763f;
+      --grain-blend: screen;
+      --grain: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #847d70;
+    --rule: #302e25;
+    --rule-2: #4a473b;
+    --accent: #d9763f;
+    --grain-blend: screen;
+    --grain: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 3.4vw, 40px);
+    padding-block: 0 80px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .label,
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .label {
+    color: var(--muted);
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .hand {
+    font-style: italic;
+    letter-spacing: 0.003em;
+  }
+  .small {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 22px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 20px 0 0;
+    font-size: clamp(19px, 2.2vw, 23px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 33ch;
+    font-style: italic;
+  }
+  .garden {
+    margin: 0;
+    padding: 18px 20px 16px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .garden .label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+  }
+  .garden .tag {
+    color: var(--accent);
+  }
+  .garden .count {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .garden .small {
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    margin-top: 14px;
+  }
+  .go {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    padding: 10px 15px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  .go:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
+  }
+  .quiet {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    padding: 4px 0;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .quiet:hover {
+    color: var(--ink);
+  }
+  .status {
+    margin-top: 10px !important;
+    font-style: italic;
+  }
+  .status:empty {
+    display: none;
+  }
+
+  /* A pen line laid over the element it sits in. */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .draw {
+    stroke: white;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* sheets */
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24rem;
+    gap: 24px;
+    margin-top: 24px;
+    align-items: start;
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .sheet {
+    position: relative;
+    padding: clamp(20px, 3vw, 32px);
+    background: var(--surface);
+    border-radius: 3px;
+  }
+  .sheet.tight {
+    padding: clamp(18px, 2vw, 22px);
+  }
+  .sheet .meta.accent {
+    color: var(--accent);
+  }
+  .lead {
+    margin: 16px 0 0;
+    max-width: 40rem;
+    font-size: clamp(25px, 2.8vw, 31px);
+    line-height: 1.22;
+    letter-spacing: -0.015em;
+  }
+  .method {
+    margin: 16px 0 0;
+    max-width: 42rem;
+    font-size: 16.5px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .growth {
+    margin: 24px 0 0;
+    max-width: 42rem;
+    font-size: 20px;
+    line-height: 1.38;
+    color: var(--accent);
+    animation: rise 500ms var(--ease) both;
+  }
+
+  /* the checks */
+  .checks {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 5px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    transition:
+      color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    border-color: var(--rule-2);
+    color: var(--ink);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .checks p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--faint);
+  }
+  .left {
+    margin: 16px 0 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  .dating {
+    margin: 16px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--faint);
+  }
+
+  /* the markers */
+  .markers-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .legend .wk {
+    color: var(--ink);
+  }
+  .legend .bk {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pn-key-bulk {
+    display: inline-block;
+    width: 0;
+    height: 11px;
+    border-left: 1px dashed var(--faint);
+  }
+  .rows {
+    margin-top: 16px;
+  }
+  .pn-row {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr) 9.5rem;
+    gap: 8px 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    animation: rise 600ms var(--ease) both;
+  }
+  .pn-row .nm {
+    font-size: 22px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .pn-row .how {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .pn-row .cannot {
+    margin: 6px 0 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--faint);
+  }
+  .pn-row .cannot .meta {
+    margin-right: 6px;
+  }
+  .pn-row .mid {
+    align-self: center;
+  }
+  .pn-row .val {
+    align-self: center;
+    text-align: right;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .val .big {
+    white-space: nowrap;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .val .sub {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--faint);
+  }
+
+  /* One strip per marker. The line is ink and the ground a wash of it; the strokes keep one
+     width however far the strip is stretched. */
+  .pn-strip {
+    position: relative;
+    height: 64px;
+    container-type: inline-size;
+    cursor: crosshair;
+    touch-action: pan-y;
+  }
+  .pn-draw {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: rise 500ms var(--ease) both;
+  }
+  .pn-line {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .pn-area {
+    fill: color-mix(in srgb, var(--ink) 7%, transparent);
+  }
+  .pn-base {
+    stroke: var(--rule-2);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  /* A day planted in bulk: a faint tick through every strip at its week. */
+  .pn-bulk {
+    stroke: var(--faint);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+    vector-effect: non-scaling-stroke;
+  }
+  /* The cursor: the same week on every line. A zero-width track moved by a share of the
+     strip's own width, so only a transform is animated and nothing reaches past its edge. */
+  .pn-track {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    pointer-events: none;
+    transform: translateX(calc(var(--f) * 100cqw));
+    transition: transform 180ms var(--ease);
+  }
+  .pn-cursor {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    left: 0;
+    border-left: 1px solid var(--accent);
+  }
+  .pn-dot {
+    position: absolute;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--surface);
+    transform: translate(-50%, -50%);
+    transition: top 180ms var(--ease);
+  }
+  .months {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr) 9.5rem;
+    gap: 0 24px;
+    border-top: 1px solid var(--rule);
+  }
+  .months .axis {
+    position: relative;
+    height: 24px;
+  }
+  .months span {
+    position: absolute;
+    top: 6px;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* the days, the hubs */
+  .bulk-list,
+  .hubs {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+  }
+  .pn-pick {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: 4px 16px;
+    width: 100%;
+    padding: 10px 4px;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--rule);
+    transition: background-color 160ms var(--ease);
+  }
+  .pn-pick:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .pn-pick .meta {
+    padding-top: 3px;
+  }
+  .pn-pick.here .meta {
+    color: var(--accent);
+  }
+  .pn-pick span:last-child {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .none {
+    margin: 12px 0 0;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .hubs li {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .hubs .i,
+  .hubs .t {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+  }
+  .hubs .t {
+    color: var(--muted);
+  }
+  .hubs .h {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hubs.out .h {
+    color: var(--faint);
+    text-decoration: line-through;
+  }
+  .leaves {
+    margin: 12px 0 0;
+    font-size: 19px;
+    line-height: 1.35;
+  }
+  .lineage {
+    margin: 20px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--faint);
+  }
+  .mt {
+    margin-top: 32px;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* entry: translateY + opacity only */
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .growth,
+    .pn-row,
+    .pn-draw,
+    .draw {
+      animation: none;
+    }
+    .draw {
+      stroke-dashoffset: 0;
+    }
+    .pn-track,
+    .pn-dot,
+    .pn-pick {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 860px) {
+    .pn-row,
+    .months {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .months .gap {
+      display: none;
+    }
+    .pn-row .val {
+      text-align: left;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .val .sub {
+      margin: 0;
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      padding-top: 40px;
+    }
+    .pn-pick {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="rise">
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Panel</h1>
+      <p class="deck">
+        The garden read as eight markers over time, each on its own line. None
+        of them added up.
+      </p>
+    </div>
+    <section
+      class="garden rise"
+      style="animation-delay: 60ms"
+      aria-labelledby="g-name"
+    >
+      <p class="label">
+        <span id="g-name">Specimen garden</span
+        ><span class="tag" id="g-tag">synthetic</span>
+      </p>
+      <p class="count" id="g-count"></p>
+      <p class="small" id="g-note"></p>
+      <div class="actions">
+        <button class="go" id="open" type="button">
+          Open a folder of notes
+        </button>
+        <button class="quiet" id="restore" type="button" hidden>
+          Put the specimen back
+        </button>
+      </div>
+      <p
+        class="small status"
+        id="g-status"
+        role="status"
+        aria-live="polite"
+      ></p>
+      <input type="file" id="folder" webkitdirectory multiple hidden />
+    </section>
+  </header>
+
+  <div class="two">
+    <section
+      class="sheet rise"
+      id="lead-sheet"
+      style="animation-delay: 100ms"
+      aria-label="The panel"
+    >
+      <div class="meta accent">the panel</div>
+      <p class="lead" id="lead0"></p>
+      <p class="method" id="lead1"></p>
+      <p class="growth hand" id="growth" aria-live="polite"></p>
+    </section>
+    <aside class="side">
+      <section
+        class="sheet tight rise"
+        id="checks-sheet"
+        style="animation-delay: 140ms"
+        aria-label="The checks"
+      >
+        <div class="meta accent">count again without</div>
+        <div class="checks" id="checks"></div>
+        <p class="left" id="left" hidden></p>
+        <p class="dating" id="dating"></p>
+      </section>
+    </aside>
+  </div>
+
+  <section
+    class="sheet rise mt-s"
+    id="markers-sheet"
+    style="animation-delay: 180ms; margin-top: 24px"
+    aria-label="The markers"
+  >
+    <div class="markers-head">
+      <div class="meta accent">the markers</div>
+      <div class="legend">
+        <span class="wk" id="week" aria-live="polite"></span>
+        <span class="bk"><i class="pn-key-bulk"></i> planted in bulk</span>
+        <span>← → or point along a line</span>
+      </div>
+    </div>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <div class="two">
+    <section
+      class="sheet rise"
+      id="days-sheet"
+      style="animation-delay: 220ms"
+      aria-label="What moves the lines"
+    >
+      <div class="meta accent">planted in bulk</div>
+      <div id="bulk"></div>
+      <div class="mt">
+        <div class="meta accent">the ten most threaded</div>
+        <ol class="hubs" id="hubs"></ol>
+      </div>
+    </section>
+    <aside class="side">
+      <section
+        class="sheet tight rise"
+        id="leaves-sheet"
+        style="animation-delay: 260ms"
+        aria-label="What it leaves to you"
+      >
+        <div class="meta accent">what it leaves to you</div>
+        <p class="leaves hand" id="leaves"></p>
+        <p class="lineage" id="lineage"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="label">Panel · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+    // ---- the pen (niwa lib/hand.ts) ----
+  // Every path is deterministic for its seed, so a re-render never redraws a line differently.
+
+  /** mulberry32 */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /** FNV-1a: a stable seed from a string. */
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b: a cubic a little off the straight line. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics. */
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+
+  /** The circling: once round a w×h box and a little past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** Struck through: a line across the middle that rises a little to the right. */
+  function roughStrike(w, h, seed, { wobble = 0.9 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-2 - r() * 2, h * 0.58],
+      [w + 2 + r() * 2, h * 0.42],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** A path of M, C and L, sampled into points per subpath. */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+    /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** Where a hand would have set a stipple mark down: a little off, a little turned. */
+  function jitter(seed, amp = 0.6, turn = 14) {
+    const r = rand(seed);
+    return { dx: spread(r, amp), dy: spread(r, amp), rot: spread(r, turn) };
+  }
+
+  // ---- the garden (niwa lib/garden.ts, for files read in the page) ----
+  // The same rules, applied to one folder instead of four directories on one machine:
+  //   a file under a Glossary/ folder is a concept; a file with `source:` frontmatter is an
+  //   imported page (notion, readwise-reader → reading, anything else → garden), linked by
+  //   slug, treed by `parent:`, with `topics:` and `related:`; a file named with a memory
+  //   prefix (project_, feedback_, user_, reference_, routine_) or typed as one is a memory
+  //   stone, and MEMORY.md is their index; everything else is a note. A `~/Code/x` path is a
+  //   repo only where the caller names the repos: a page cannot see your code tree.
+
+  const MEMORY_PREFIXES = [
+    "project_",
+    "feedback_",
+    "user_",
+    "reference_",
+    "routine_",
+  ];
+  const MEMORY_KINDS = ["project", "feedback", "user", "reference", "routine"];
+
+  const KIND_ORDER = [
+    "project",
+    "concept",
+    "user",
+    "feedback",
+    "reference",
+    "routine",
+    "note",
+    "notion",
+    "garden",
+    "reading",
+    "meta",
+    "agent",
+    "repo",
+    "ghost",
+  ];
+  const KIND_LABEL = {
+    project: "Builds",
+    concept: "Concepts",
+    user: "Self",
+    feedback: "Rules",
+    reference: "Reference",
+    routine: "Routines",
+    note: "Fieldnotes",
+    notion: "Notion",
+    garden: "Garden notes",
+    reading: "Reading",
+    meta: "Root",
+    agent: "Agents",
+    repo: "Repos",
+    ghost: "Unwritten",
+  };
+  const STAGE_LABEL = {
+    fresh: "Fresh · 7d",
+    tended: "Tended · 30d",
+    settled: "Settled · 90d",
+    fallow: "Fallow",
+    unknown: "Undated",
+  };
+
+  const unq = (s) => s.replace(/^["']|["']$/g, "");
+
+  /** The lenient line reader garden.ts falls back to when YAML throws, plus `- item` lists. */
+  function frontmatter(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    let parent = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s*-\s+(.*)$/);
+      if (item && parent) {
+        if (!Array.isArray(data[parent])) data[parent] = [];
+        data[parent].push(unq(item[1].trim()));
+        continue;
+      }
+      const field = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, indent, key, rawValue] = field;
+      const value = unq(rawValue.trim());
+      if (indent.length > 0 && parent) {
+        if (
+          typeof data[parent] !== "object" ||
+          data[parent] === null ||
+          Array.isArray(data[parent])
+        )
+          data[parent] = {};
+        data[parent][key] = value;
+        continue;
+      }
+      if (!value) {
+        parent = key;
+        data[key] = {};
+        continue;
+      }
+      parent = null;
+      data[key] = value.startsWith("[")
+        ? value
+            .slice(1, -1)
+            .split(",")
+            .map((s) => unq(s.trim()))
+            .filter(Boolean)
+        : value;
+    }
+    return { data, content: m[2] };
+  }
+
+  /** Wikilinks are written four ways: project_suji, project-suji, suji, suji.md. */
+  const norm = (s) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\.md$/, "")
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+
+  const stripPrefix = (key) => {
+    for (const p of MEMORY_PREFIXES)
+      if (key.startsWith(p)) return key.slice(p.length);
+    return key;
+  };
+
+  /** The body with its code blanked, character for character: a [[ref]] in code names nothing. */
+  const proseOf = (body) => {
+    const blank = (code) => code.replace(/[^\n]/g, " ");
+    return body.replace(/```[\s\S]*?```/g, blank).replace(/`[^`\n]*`/g, blank);
+  };
+
+  function stageOf(iso, now) {
+    if (!iso) return "unknown";
+    const days = (now - new Date(iso).getTime()) / 86400000;
+    if (days <= 7) return "fresh";
+    if (days <= 30) return "tended";
+    if (days <= 90) return "settled";
+    return "fallow";
+  }
+
+  function frontmatterType(data) {
+    const t = data?.type ?? data?.metadata?.type;
+    return typeof t === "string" ? t.toLowerCase() : null;
+  }
+
+  function frontmatterModified(data, fallback) {
+    const raw = data?.metadata?.modified ?? data?.modified ?? data?.updated;
+    if (raw && typeof raw === "string") {
+      const d = new Date(raw);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+    return fallback;
+  }
+
+  function kindFromMemoryFile(base, fmType) {
+    if (fmType && MEMORY_KINDS.includes(fmType)) return fmType;
+    for (const p of MEMORY_PREFIXES)
+      if (base.startsWith(p)) return p.slice(0, -1);
+    return "meta";
+  }
+
+  /** Single-word terms only match capitalised, or `keep`/`still`/`edge` poison everything. */
+  function conceptMatchers(title, aliases) {
+    const terms = [title, ...aliases].filter((t) => t && t.length >= 4);
+    return terms.map((t) => {
+      const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const multiword = /\s/.test(t);
+      return new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`, multiword ? "i" : "");
+    });
+  }
+
+  const slugLike = (s) => /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(s);
+
+  /**
+   * files: [{ path: "Ideas/a note.md", text, mtime (ms) }]; repos: [{ name, mtime }].
+   * Returns { nodes, links } with every field the catalogue and the panel read:
+   * id, label, kind, description, body, file, modified, stage, signed, degree, source,
+   * parent, tags, slug.
+   */
+  function buildGarden(files, { repos = [], now = Date.now() } = {}) {
+    const nodes = new Map();
+    const links = [];
+    const byKey = new Map();
+    const byBare = new Map();
+    const bodies = new Map();
+    const iso = (d) => d.toISOString();
+
+    const register = (node, extraKeys = []) => {
+      nodes.set(node.id, node);
+      const keys = [norm(node.id), ...extraKeys.map(norm)];
+      for (const k of keys) {
+        if (k && !byKey.has(k)) byKey.set(k, node.id);
+        const bare = stripPrefix(k);
+        if (bare && !byBare.has(bare)) byBare.set(bare, node.id);
+      }
+    };
+    const stone = (id, label, kind, modified, more = {}) => ({
+      id,
+      label,
+      kind,
+      description: "",
+      body: "",
+      file: null,
+      modified: modified ? iso(modified) : null,
+      stage: modified ? stageOf(iso(modified), now) : "unknown",
+      signed: null,
+      degree: 0,
+      source: "inferred",
+      parent: null,
+      tags: [],
+      slug: null,
+      ...more,
+    });
+
+    const read = files.map((f) => {
+      const parts = f.path.split("/");
+      const base = parts[parts.length - 1].replace(/\.md$/, "");
+      const { data, content } = frontmatter(f.text);
+      const src = String(data.source ?? "").trim();
+      const fmType = frontmatterType(data);
+      const role = parts.slice(0, -1).includes("Glossary")
+        ? "concept"
+        : src && typeof data.source === "string"
+          ? "garden"
+          : base === "MEMORY" ||
+              MEMORY_PREFIXES.some((p) => base.startsWith(p)) ||
+              (fmType && MEMORY_KINDS.includes(fmType))
+            ? "memory"
+            : "note";
+      return {
+        path: f.path,
+        parts,
+        base,
+        rel: f.path.replace(/\.md$/, ""),
+        mtime: new Date(f.mtime),
+        data,
+        content,
+        src,
+        fmType,
+        role,
+      };
+    });
+    const unique = (id, rel, prefix) => (nodes.has(id) ? `${prefix}${rel}` : id);
+
+    // 1. memory: the index a person reads carries the real titles of slug-named files
+    const titles = new Map();
+    for (const r of read)
+      if (r.base === "MEMORY")
+        for (const m of r.content.matchAll(
+          /^\s*-\s*\[([^\]\n]+)\]\(([^)\s]+)\.md\)/gm,
+        )) {
+          const title = m[1].replace(/\*\*/g, "").trim();
+          if (title) titles.set(m[2].split("/").pop(), title);
+        }
+    for (const r of read.filter((x) => x.role === "memory")) {
+      const id = unique(r.base, r.rel, "memory:");
+      const kind = r.parts.includes("agents")
+        ? "agent"
+        : kindFromMemoryFile(r.base, r.fmType);
+      const name = typeof r.data.name === "string" ? r.data.name.trim() : "";
+      const label =
+        name && !slugLike(name)
+          ? name
+          : (titles.get(r.base) ??
+            r.base
+              .replace(/^(project|feedback|user|reference|routine)_/, "")
+              .replace(/[_-]/g, " "));
+      register(
+        stone(id, label, kind, frontmatterModified(r.data, r.mtime), {
+          description:
+            typeof r.data.description === "string" ? r.data.description : "",
+          body: r.content.trim(),
+          file: r.path,
+          source: "memory",
+        }),
+        [r.base, stripPrefix(norm(r.base)), name],
+      );
+      bodies.set(id, r.content);
+    }
+
+    // 2. the glossary: the controlled vocabulary
+    const concepts = [];
+    for (const r of read.filter((x) => x.role === "concept")) {
+      const id = unique(`concept:${r.base}`, r.rel, "concept:");
+      const aliases = Array.isArray(r.data.aliases)
+        ? r.data.aliases.filter((a) => typeof a === "string")
+        : [];
+      register(
+        stone(id, r.base, "concept", frontmatterModified(r.data, r.mtime), {
+          description: typeof r.data.meaning === "string" ? r.data.meaning : "",
+          body: r.content.trim(),
+          file: r.path,
+          signed: String(r.data.status ?? "").toLowerCase() === "mine",
+          source: "vault",
+        }),
+        [r.base, ...aliases],
+      );
+      bodies.set(id, r.content);
+      concepts.push({ id, matchers: conceptMatchers(r.base, aliases) });
+    }
+
+    // 3. notes
+    for (const r of read.filter((x) => x.role === "note")) {
+      const id = `note:${r.rel}`;
+      const sub = r.parts.length > 1 ? r.parts[0] : "";
+      register(
+        stone(id, r.base, "note", frontmatterModified(r.data, r.mtime), {
+          description:
+            typeof r.data.description === "string"
+              ? r.data.description
+              : sub || "Fieldnotes",
+          body: r.content.trim(),
+          file: r.path,
+          source: "vault",
+        }),
+        [r.base],
+      );
+      bodies.set(id, r.content);
+    }
+
+    // 3b. imported pages: kinded by `source:`, dated by `tended:`, linked by slug, treed by `parent:`
+    const gardenBySlug = new Map();
+    const related = new Map();
+    const parentSlug = new Map();
+    for (const r of read.filter((x) => x.role === "garden")) {
+      const slug = r.base;
+      const tended =
+        typeof r.data.tended === "string" ? new Date(r.data.tended) : null;
+      const modified =
+        tended && !Number.isNaN(tended.getTime()) ? tended : r.mtime;
+      const kind =
+        r.src === "notion"
+          ? "notion"
+          : r.src === "readwise-reader"
+            ? "reading"
+            : "garden";
+      const label =
+        typeof r.data.title === "string" && r.data.title.trim()
+          ? r.data.title.trim()
+          : slug;
+      const summary = typeof r.data.summary === "string" ? r.data.summary : "";
+      const id = `garden:${r.rel}`;
+      register(
+        stone(id, label, kind, modified, {
+          description: summary === label ? "" : summary,
+          body: r.content.trim(),
+          file: r.path,
+          source: "garden",
+          tags: Array.isArray(r.data.topics) ? r.data.topics.map(String) : [],
+          slug,
+        }),
+        [slug, label],
+      );
+      if (typeof r.data.parent === "string") parentSlug.set(id, r.data.parent);
+      bodies.set(id, r.content);
+      if (!gardenBySlug.has(slug)) gardenBySlug.set(slug, id);
+      if (Array.isArray(r.data.related))
+        related.set(
+          id,
+          r.data.related.filter((x) => typeof x === "string"),
+        );
+    }
+    // A parent is only kept if it is a note that exists; the tree stays a tree.
+    for (const [id, slug] of parentSlug) {
+      const parent = gardenBySlug.get(slug);
+      if (parent && parent !== id) nodes.get(id).parent = parent;
+    }
+
+    // 4. repos: only the ones the caller names
+    const repoIds = new Map();
+    for (const repo of repos) {
+      const id = `repo:${repo.name}`;
+      repoIds.set(repo.name.toLowerCase(), id);
+      nodes.set(
+        id,
+        stone(id, repo.name, "repo", new Date(repo.mtime), {
+          description: `~/Code/${repo.name}`,
+          file: `~/Code/${repo.name}`,
+          source: "code",
+        }),
+      );
+    }
+
+    // 5. edges
+    const seen = new Set();
+    const addLink = (source, target, kind) => {
+      if (source === target) return;
+      const key = `${source}→${target}:${kind}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      links.push({ source, target, kind });
+    };
+    const resolve = (ref) => {
+      const k = norm(ref);
+      if (!k) return null;
+      if (byKey.has(k)) return byKey.get(k);
+      const bare = stripPrefix(k);
+      if (byBare.has(bare)) return byBare.get(bare);
+      for (const p of MEMORY_PREFIXES)
+        if (byKey.has(p + k)) return byKey.get(p + k);
+      return null;
+    };
+    const resolveFrom = (from, ref) =>
+      (from.startsWith("garden:") && gardenBySlug.get(ref.trim())) ||
+      resolve(ref);
+    const repoRe = /~\/Code\/([A-Za-z0-9][A-Za-z0-9._-]*)/g;
+
+    for (const [id, refs] of related)
+      for (const ref of refs) {
+        const target = resolveFrom(id, ref);
+        if (target) addLink(id, target, "link");
+      }
+
+    for (const [id, body] of bodies) {
+      // explicit wikilinks; unresolved ones become ghosts, unless written inside code
+      const prose = proseOf(body);
+      for (const m of body.matchAll(
+        /\[\[([^\]\[\n`|#]{2,80})(?:[|#][^\]\n]*)?\]\]/g,
+      )) {
+        const ref = m[1].replace(/\\$/, "").trim();
+        if (!ref || /^[^A-Za-z0-9]/.test(ref)) continue;
+        const target = resolveFrom(id, ref);
+        if (target) addLink(id, target, "link");
+        else if (prose[m.index] === "[") {
+          const ghostId = `ghost:${norm(ref)}`;
+          if (!nodes.has(ghostId))
+            nodes.set(
+              ghostId,
+              stone(ghostId, ref, "ghost", null, {
+                description: "Linked to, never written.",
+              }),
+            );
+          addLink(id, ghostId, "seed");
+        }
+      }
+      // repo mentions
+      if (repoIds.size)
+        for (const m of body.matchAll(repoRe)) {
+          const name = m[1].replace(/[.,;:!?]+$/, "");
+          const repo = repoIds.get(name.toLowerCase());
+          if (repo) addLink(id, repo, "build");
+        }
+      // glossary vocabulary: where each concept is practised
+      for (const { id: conceptId, matchers } of concepts) {
+        if (conceptId === id) continue;
+        if (matchers.some((re) => re.test(body)))
+          addLink(conceptId, id, "concept");
+      }
+    }
+
+    // 6. relations nobody wrote down
+    const pair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const joined = new Set(links.map((l) => pair(l.source, l.target)));
+
+    // twin: the same title in two sources, or one a 24+ character prefix of the other
+    const PAGES = ["note", "notion", "garden", "reading"];
+    const titleKey = (s) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const pages = [...nodes.values()]
+      .filter((n) => PAGES.includes(n.kind))
+      .map((n) => ({ id: n.id, kind: n.kind, key: titleKey(n.label) }))
+      .filter((p) => p.key.length >= 10);
+    for (let i = 0; i < pages.length; i++)
+      for (let j = i + 1; j < pages.length; j++) {
+        const [a, b] = [pages[i], pages[j]];
+        const [short, long] =
+          a.key.length <= b.key.length ? [a.key, b.key] : [b.key, a.key];
+        const same =
+          a.kind !== b.kind &&
+          (short === long || (short.length >= 24 && long.startsWith(short)));
+        if (same && !joined.has(pair(a.id, b.id))) {
+          addLink(a.id, b.id, "twin");
+          joined.add(pair(a.id, b.id));
+        }
+      }
+
+    // mention: prose names another note by a title of two words and ten characters or more
+    const nameable = [...nodes.values()].filter(
+      (n) =>
+        !["concept", "repo", "ghost"].includes(n.kind) &&
+        /\s/.test(n.label.trim()) &&
+        n.label.trim().length >= 10 &&
+        /^[A-Za-z]/.test(n.label) &&
+        !/_/.test(n.label),
+    );
+    const named = nameable.map((n) => ({
+      id: n.id,
+      label: n.label.trim(),
+      lower: n.label.trim().toLowerCase(),
+      exact: n.label.trim().split(/\s+/).length <= 2,
+      re: null,
+    }));
+    for (const [id, body] of bodies) {
+      const prose = body
+        .replace(/\[\[[^\]\n]*\]\]/g, " ")
+        .replace(/\]\([^)\n]*\)/g, "]");
+      const lower = prose.toLowerCase();
+      for (const t of named) {
+        if (t.id === id || !lower.includes(t.lower)) continue;
+        if (joined.has(pair(id, t.id))) continue;
+        t.re ??= new RegExp(
+          `(?<![\\w-])${t.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`,
+          t.exact ? "" : "i",
+        );
+        if (t.re.test(prose)) {
+          addLink(id, t.id, "mention");
+          joined.add(pair(id, t.id));
+        }
+      }
+    }
+
+    for (const l of links) {
+      const s = nodes.get(l.source);
+      const t = nodes.get(l.target);
+      if (s) s.degree++;
+      if (t) t.degree++;
+    }
+    return { nodes: [...nodes.values()], links };
+  }
+
+  // ---- reading a folder: in the page, never sent ----
+  // Every markdown file under the folder, skipping dot-folders, _attachments and _-files,
+  // the same skips the garden's walk makes. Each keeps its path inside the folder.
+  async function readFolder(list) {
+    const all = [...list];
+    const name = ((all[0]?.webkitRelativePath || "").split("/")[0] || "").trim();
+    const picked = all
+      .map((f) => {
+        const segs = (f.webkitRelativePath || f.name).split("/");
+        return { f, path: (segs.length > 1 ? segs.slice(1) : segs).join("/") };
+      })
+      .filter(({ path }) => {
+        const segs = path.split("/");
+        return (
+          path.endsWith(".md") &&
+          !segs.some((s) => s.startsWith(".") || s.startsWith("_attachments")) &&
+          !segs[segs.length - 1].startsWith("_")
+        );
+      });
+    const files = await Promise.all(
+      picked.map(async ({ f, path }) => ({
+        path,
+        text: await f.text(),
+        mtime: f.lastModified,
+      })),
+    );
+    return { name, files };
+  }
+
+  // ---- the specimen: a made-up reader's garden ----
+  // The same made-up reader whose notes the Flow instrument opens on, a few months on: notes on
+  // attention, walking and the feed, a glossary of their own, a Notion workspace imported in one
+  // afternoon, two small pieces of code. Each file carries its own days, as ages so the specimen
+  // never goes stale: the day it first appeared, and every day it was changed after.
+  //   [path, first appeared (days ago), changed since (days ago), text]
+  const SPECIMEN = [
+    [
+      "Glossary/Slow Looking.md",
+      230,
+      [120, 35],
+      "---\nstatus: mine\naliases: [slow look]\nmeaning: Looking at one thing for longer than is comfortable.\n---\nLooking at one thing for longer than is comfortable, until it shows you something you did not bring to it.\n\nThe opposite of a glance is not a stare. It is coming back.",
+    ],
+    [
+      "Glossary/Attention Residue.md",
+      260,
+      [80],
+      "---\nstatus: borrowed\nmeaning: What is still thinking about the last thing.\n---\nWhat is still thinking about the last thing when you have already started the next. From [[The Cost of Switching]].",
+    ],
+    [
+      "Glossary/Desire Path.md",
+      140,
+      [50],
+      "---\nstatus: mine\naliases:\n  - desire paths\nmeaning: The line walked into the grass where the paving should have gone.\n---\nThe line walked into the grass where the paving should have gone. A route nobody planned and every pair of feet agreed on.",
+    ],
+    [
+      "Glossary/Keel.md",
+      60,
+      [9],
+      "---\nstatus: mine\nmeaning: What stays put when the room turns.\n---\nWhat stays put when the room turns. Not stubbornness: a position you would say out loud anywhere.",
+    ],
+    [
+      "Glossary/Fallow.md",
+      85,
+      [],
+      "---\nstatus: seed\nmeaning: Left unworked on purpose, so it can come back.\n---\nA field left unworked for a season on purpose. Borrowed from farming; not yet sure it is mine.",
+    ],
+    [
+      "Reader/the-cost-of-switching.md",
+      280,
+      [],
+      "---\ntitle: The Cost of Switching\nsource: readwise-reader\ntopics: [attention]\n---\nHighlights.\n\n> Every switch leaves attention residue behind.\n\n> An hour of small switches is an hour of half-attention.",
+    ],
+    [
+      "Reader/on-keeping-a-commonplace.md",
+      245,
+      [],
+      "---\ntitle: On Keeping a Commonplace\nsource: readwise-reader\ntopics: [notes]\n---\nHighlights.\n\n> Copy out the line, not the summary of the line. Your hand will remember the shape of it.",
+    ],
+    [
+      "Reader/notes-on-noticing.md",
+      240,
+      [],
+      "---\ntitle: Notes on Noticing\nsource: readwise-reader\ntopics: [attention, looking]\n---\nHighlights.\n\n> The case for slow looking: a painting, a hedge, a stranger's coat, held for ten minutes instead of ten seconds.",
+    ],
+    [
+      "Reader/against-the-feed-again.md",
+      150,
+      [],
+      "---\ntitle: Against the Feed, Again\nsource: readwise-reader\ntopics: [the feed]\n---\nHighlights.\n\n> The feed is less a place you visit than a climate you live in. Nobody decides to be rained on.",
+    ],
+    [
+      "Reader/paths-not-paved.md",
+      60,
+      [],
+      "---\ntitle: Paths Not Paved\nsource: readwise-reader\ntopics: [walking]\n---\nHighlights.\n\n> The campus that waited a year to see where people walked, then paved the desire paths.",
+    ],
+    [
+      "Reader/a-field-guide-to-boredom.md",
+      20,
+      [],
+      "---\ntitle: A Field Guide to Boredom\nsource: readwise-reader\ntopics: [attention]\n---\nHighlights.\n\n> Boredom as the feeling of attention coming back to you with nothing to hold on to.",
+    ],
+    [
+      "Journal/Winter list.md",
+      275,
+      [],
+      "Things to do before the clocks change:\n\n- [x] walk the canal to the lock\n- [x] finish the commonplace book\n- [ ] one morning a week without the phone\n- [ ] learn three birds by their song",
+    ],
+    [
+      "Ideas/Why I keep notes.md",
+      265,
+      [200],
+      "Not to remember. To find out what I think by seeing what I copied out. [[On Keeping a Commonplace]] says the hand remembers the shape; I think the folder does too.",
+    ],
+    [
+      "Journal/The first notebook.md",
+      250,
+      [],
+      "Bought a notebook with squared paper. Wrote the date and nothing else for a week. Then: [[Why I keep notes]].",
+    ],
+    [
+      "Ideas/Looking at one tree for a year.md",
+      225,
+      [45],
+      "The same oak from the kitchen window, once a day, for a year. Slow looking, the long version. Started after [[Notes on Noticing]].\n\n| month | what changed |\n| --- | --- |\n| March | a crow's nest I had not seen |\n| June | the shade reached the step |\n| October | the oak let go all at once |",
+    ],
+    [
+      "Ideas/The Feed as Weather.md",
+      200,
+      [150, 70, 12],
+      "Most of what I believe about the news I did not decide. It settled on me, the way weather does. [[Notes on Noticing]] made me want to look at it instead of through it, and Against the Feed, Again says it better than I can.\n\nIt is attention residue all day long, and no Keel to speak of. See [[Morning Walk]] and [[Phone in another room]], and the note I keep not writing, [[a weather report for attention]]. Counting it in ~/Code/feed-log.",
+    ],
+    [
+      "Journal/Lists I never finish.md",
+      170,
+      [],
+      "Half the lists in this folder stop at item three. Not a failing, I think. A list is a way of putting something down so I can stop carrying it.",
+    ],
+    [
+      "Notion/home.md",
+      190,
+      [],
+      "---\ntitle: Home\nsource: notion\n---\nThe top of the old workspace.\n\n- [[projects]]\n- [[reading-list]]\n- [[walks]]\n- [[kitchen]]\n- [[someday]]",
+    ],
+    [
+      "Notion/projects.md",
+      190,
+      [],
+      "---\ntitle: Projects\nsource: notion\nparent: home\n---\n- [[walking-map-plan]]\n- [[feed-log-plan]]\n- [[phone-free-mornings]]\n- [[meeting-notes]]",
+    ],
+    [
+      "Notion/walking-map-plan.md",
+      190,
+      [],
+      "---\ntitle: Walking Map, the Plan\nsource: notion\nparent: projects\ntopics: [walking]\n---\nEvery walk as a line. Shade by how long without the phone. Later this became the [[Walking map]].",
+    ],
+    [
+      "Notion/feed-log-plan.md",
+      190,
+      [],
+      "---\ntitle: Feed Log\nsource: notion\nparent: projects\ntopics: [the feed]\n---\nCount the minutes, not the posts. Kept in ~/Code/feed-log.",
+    ],
+    [
+      "Notion/phone-free-mornings.md",
+      190,
+      [],
+      "---\ntitle: Phone-free Mornings\nsource: notion\nparent: projects\n---\n",
+    ],
+    [
+      "Notion/meeting-notes.md",
+      190,
+      [],
+      "---\ntitle: Meeting Notes\nsource: notion\nparent: projects\n---\n",
+    ],
+    [
+      "Notion/reading-list.md",
+      190,
+      [],
+      "---\ntitle: Reading List\nsource: notion\nparent: home\ntopics: [reading]\n---\n[[notes-on-noticing]] · [[the-cost-of-switching]] · [[on-keeping-a-commonplace]] · [[the quiet hour]]\n\n- [[books-to-find]]\n- [[essays-half-read]]\n- [[against-the-feed-again]]",
+    ],
+    [
+      "Notion/books-to-find.md",
+      190,
+      [],
+      "---\ntitle: Books to Find\nsource: notion\nparent: reading-list\n---\n",
+    ],
+    [
+      "Notion/essays-half-read.md",
+      190,
+      [],
+      "---\ntitle: Essays Half Read\nsource: notion\nparent: reading-list\n---\nThe ones with a bookmark two thirds in.",
+    ],
+    [
+      "Notion/against-the-feed-again.md",
+      190,
+      [],
+      "---\ntitle: Against the Feed, Again\nsource: notion\nparent: reading-list\n---\nImported highlights page. Two passages marked to come back to.",
+    ],
+    [
+      "Notion/walks.md",
+      190,
+      [],
+      "---\ntitle: Walks\nsource: notion\nparent: home\ntopics: [walking]\n---\n- [[river-path]]\n- [[the-school-field]]\n- [[canal-to-the-lock]]\n- [[winter-routes]]",
+    ],
+    [
+      "Notion/river-path.md",
+      190,
+      [],
+      "---\ntitle: River Path\nsource: notion\nparent: walks\ntopics: [walking]\n---\nForty minutes there and back. Herons most mornings.",
+    ],
+    [
+      "Notion/the-school-field.md",
+      190,
+      [],
+      "---\ntitle: The School Field\nsource: notion\nparent: walks\ntopics: [walking]\n---\nThe desire path across the corner, where the fence was left open.",
+    ],
+    [
+      "Notion/canal-to-the-lock.md",
+      190,
+      [],
+      "---\ntitle: Canal to the Lock\nsource: notion\nparent: walks\n---\nTwo hours. Flat. Good for thinking, bad for shoes.",
+    ],
+    [
+      "Notion/winter-routes.md",
+      190,
+      [],
+      "---\ntitle: Winter Routes\nsource: notion\nparent: walks\n---\n",
+    ],
+    [
+      "Notion/kitchen.md",
+      190,
+      [],
+      "---\ntitle: Kitchen\nsource: notion\nparent: home\n---\n- [[bread-weekly]]\n- [[things-to-cook-slowly]]",
+    ],
+    [
+      "Notion/bread-weekly.md",
+      190,
+      [],
+      "---\ntitle: Bread, Weekly\nsource: notion\nparent: kitchen\n---\nSaturday. Four hundred grams of flour, a long rise, no timer.",
+    ],
+    [
+      "Notion/things-to-cook-slowly.md",
+      190,
+      [],
+      "---\ntitle: Things to Cook Slowly\nsource: notion\nparent: kitchen\n---\n",
+    ],
+    [
+      "Notion/someday.md",
+      190,
+      [],
+      "---\ntitle: Someday\nsource: notion\nparent: home\n---\n- [[a-year-of-one-tree]]\n- [[learn-the-birds]]\n- [[letters-unsent]]\n- [[a map of quiet places]]",
+    ],
+    [
+      "Notion/a-year-of-one-tree.md",
+      190,
+      [],
+      "---\ntitle: A Year of One Tree\nsource: notion\nparent: someday\ntopics: [looking]\n---\nPick a tree you can see from inside. Look at it every day.",
+    ],
+    [
+      "Notion/learn-the-birds.md",
+      190,
+      [],
+      "---\ntitle: Learn the Birds\nsource: notion\nparent: someday\n---\nBy song first, then by sight.",
+    ],
+    [
+      "Notion/letters-unsent.md",
+      190,
+      [],
+      "---\ntitle: Letters Unsent\nsource: notion\nparent: someday\n---\n",
+    ],
+    [
+      "Journal/First walk without the phone.md",
+      130,
+      [],
+      "My hand went to the empty pocket eleven times in the first hour. I counted. [[the quiet hour]] started here.",
+    ],
+    [
+      "MEMORY.md",
+      120,
+      [90, 14],
+      "# What I keep\n\n- [Phone in another room](feedback_phone-in-another-room.md) — where the phone sleeps, and why\n- [What I keep coming back to](user_what-i-keep.md) — the three things\n- [Walking map](project_walking-map.md) — every walk this year\n- [Walking routes](reference_walking-routes.md) — the loops, with times",
+    ],
+    [
+      "feedback_phone-in-another-room.md",
+      120,
+      [70],
+      "---\nname: Phone in another room\ntype: feedback\ndescription: The phone sleeps in the kitchen.\n---\nThe phone sleeps in the kitchen. Why: [[The Cost of Switching]]; every glance leaves attention residue. How to apply: mornings, and any hour I mean to write.",
+    ],
+    [
+      "user_what-i-keep.md",
+      110,
+      [40],
+      "---\nname: What I keep coming back to\ntype: user\ndescription: Looking slowly, walking without a destination, saying the same thing in every room.\n---\nLooking slowly, walking without a destination, and saying the same thing in every room. [[Slow Looking]], [[Keel]], [[Walking map]].",
+    ],
+    [
+      "Journal/Morning Walk.md",
+      100,
+      [40, 4],
+      "Left the phone at home and took the desire path behind the school instead of the road. Thinking about [[The Feed as Weather]] again: the weather lifts when I walk. The campus in [[Paths Not Paved]] would have paved this one by now. Same route as the [[First walk without the phone]].",
+    ],
+    [
+      "Journal/Two weeks without the feed.md",
+      95,
+      [],
+      "Day fourteen. The weather lifted around day five. [[Morning Walk]] most days. Less attention residue, more boredom, which [[A Field Guide to Boredom]] says is the point.",
+    ],
+    [
+      "project_walking-map.md",
+      90,
+      [45, 14],
+      "---\nname: Walking map\ntype: project\ndescription: Every walk this year, shaded by time without the phone.\n---\nA map of every walk this year, each line shaded by how long I went without the phone. Code at ~/Code/walk-map. Background: [[Morning Walk]], [[The Feed as Weather]], and the plan from the old workspace, [[Walking Map, the Plan]].",
+    ],
+    [
+      "Ideas/Notes are not the thought.md",
+      75,
+      [],
+      "A note is where a thought was put down, not the thought. Some of these will never be opened again, and that is all right.",
+    ],
+    [
+      "reference_walking-routes.md",
+      70,
+      [22],
+      "---\nname: Walking routes\ntype: reference\ndescription: The loops, with times.\n---\n- River path, 40 min\n- School field, 25 min, the desire path\n- Canal to the lock, 2 h\n\nSee [[Walking map]].",
+    ],
+    [
+      "Garden/the-phone-in-the-kitchen.md",
+      66,
+      [26],
+      "---\ntitle: The Phone in the Kitchen\nsource: garden\ntopics: [phones, attention]\nrelated: [phone-in-another-room]\n---\nA longer version of the rule, for anyone who asks. The kitchen because it is the room I am least likely to sit down in.\n\n## What changed\n\nThe first week I read more. The second I was bored. By the third the boredom had become something like room.",
+    ],
+    [
+      "Ideas/Saying it in every room.md",
+      58,
+      [28],
+      "A belief is one I would say at the family table and in the group chat alike. That is the Keel again. Against [[The Feed as Weather]]: the weather is the same in every room, and I am not.",
+    ],
+    [
+      "Garden/on-desire-paths.md",
+      52,
+      [21],
+      "---\ntitle: On Desire Paths\nsource: garden\ntopics: [walking]\nrelated: [paths-not-paved]\n---\nEvery desire path is a vote nobody counted. The school field has one; so does the corner by the bus stop. Walking them is a way of agreeing with strangers.",
+    ],
+    [
+      "Journal/Rain on the walk.md",
+      44,
+      [],
+      "Rain on the river path. Nobody else out. I did not reach for the pocket once, and only noticed afterwards. [[Morning Walk]].",
+    ],
+    [
+      "People/Conversation with my sister.md",
+      33,
+      [],
+      "She thinks the feed is fine if you choose it. I think nobody chooses the weather. Saying it in every room is easier with her than anywhere else.",
+    ],
+    [
+      "Ideas/Attention is composed.md",
+      30,
+      [2],
+      "Attention is not only taken. It can be composed, the way a walk or a page is. [[The Feed as Weather]] is the problem stated; [[Slow Looking]] and the [[Morning Walk]] are the practice. Keep at it long enough and you get something like a Keel.",
+    ],
+    [
+      "Ideas/Boredom is attention returning.md",
+      18,
+      [],
+      "[[A Field Guide to Boredom]]. Ten minutes on the bus with nothing in my hands, and [[the quiet hour]] again.",
+    ],
+    [
+      "Journal/Bus without headphones.md",
+      16,
+      [],
+      "Twenty minutes. I heard a whole argument about a dog. Filed under [[Boredom is attention returning]].",
+    ],
+    [
+      "Drafts/What the walk taught.md",
+      10,
+      [3],
+      "Essay draft. It starts from [[Attention is composed]] and ends on the [[Desire Path]], and in between it is mostly the [[Morning Walk]].\n\n## Outline\n\n1. The pocket, eleven times\n2. The path behind the school\n3. What came back",
+    ],
+    [
+      "Ideas/Where attention goes.md",
+      8,
+      [],
+      "Not a ledger. A map. The [[Walking map]] is the walking half; [[a weather report for attention]] would be the other.",
+    ],
+    [
+      "Drafts/Letter to R about phones.md",
+      6,
+      [],
+      "R, you asked why I am slower to answer now. Read The Feed as Weather in my notes if you like. The short version is that the phone lives in the kitchen.",
+    ],
+  ];
+  const SPECIMEN_REPOS = [
+    ["walk-map", 90, [14]],
+    ["feed-log", 200, [12]],
+  ];
+
+  const DAY_MS = 86400000;
+  const isoDay = (ms) => {
+    const d = new Date(ms);
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+
+  /** The specimen as files, each with its last change as mtime and its days kept beside it. */
+  function specimenFiles(now = Date.now()) {
+    const ago = (d) => now - d * DAY_MS;
+    return SPECIMEN.map(([path, born, changed, text]) => ({
+      path,
+      text,
+      mtime: ago(Math.min(born, ...changed)),
+      days: [born, ...changed].sort((a, b) => b - a).map((d) => isoDay(ago(d))),
+    }));
+  }
+  function specimenRepos(now = Date.now()) {
+    return SPECIMEN_REPOS.map(([name, born, changed]) => ({
+      name,
+      mtime: now - Math.min(born, ...changed) * DAY_MS,
+    }));
+  }
+    // ---- the panel (niwa lib/panel.ts) ----
+  // The garden read as a set of markers over time, the way a clinician reads a blood panel:
+  // each on its own line, none of them added to the others. Every stone is dated by the day
+  // it first appears, and a thread by the later of its two ends: the earliest day it could
+  // have been drawn.
+
+  /** The stones with words in them. Repos and unwritten ideas are counted apart. */
+  const CORPUS = new Set([
+    "concept",
+    "note",
+    "notion",
+    "garden",
+    "reading",
+    "project",
+    "user",
+    "feedback",
+    "reference",
+  ]);
+  /** Threads between two stones. `seed` and `build` reach an idea or a repo, not a stone. */
+  const THREAD = new Set(["link", "mention", "concept", "twin"]);
+  /** Threads a stone writes in its own words, so they have a direction. */
+  const WRITTEN = new Set(["link", "mention"]);
+  /** The index that lists every memory is structure, not a thread; nor are agents. */
+  const NOT_A_THREAD = new Set(["meta", "agent"]);
+  /** This many stones first appearing on one day is an import, not a day's work. */
+  const BULK = 20;
+  /** How many of the most threaded stones the check takes out. */
+  const HUBS = 10;
+  /** The window for "tended". */
+  const MONTH = 30;
+  /** Growth is read from the first week the garden held this many stones. */
+  const MIN_START = 10;
+
+  const MARKERS = [
+    "stones",
+    "threads",
+    "per",
+    "both",
+    "vocab",
+    "alone",
+    "tended",
+    "unplanted",
+  ];
+  /** Markers that are a share of the stones, read in a hundred and drawn on a fixed 0–100 scale. */
+  const SHARES = new Set(["vocab", "alone", "tended"]);
+
+  const PDAY = 86400000;
+  const ms = (d) => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  const addDays = (d, n) => new Date(ms(d) + n * PDAY).toISOString().slice(0, 10);
+
+  /** Week ends from today back to the first day, a week apart, oldest first. */
+  function weeksOf(first, today) {
+    const out = [];
+    for (let d = today; d >= first; d = addDays(d, -7)) out.push(d);
+    if (!out.length) out.push(today);
+    // One week before the first stone, so every line starts from nothing.
+    out.push(addDays(out[out.length - 1], -7));
+    return out.reverse();
+  }
+
+  const endId = (end) => (typeof end === "string" ? end : (end?.id ?? ""));
+
+  /** Days on which at least BULK stones first appear, with what kinds they were. */
+  function bulkDays(input) {
+    const byDay = new Map();
+    for (const n of input.nodes) {
+      const b = input.born[n.id];
+      if (!b || !CORPUS.has(n.kind)) continue;
+      const k = byDay.get(b) ?? new Map();
+      k.set(n.kind, (k.get(n.kind) ?? 0) + 1);
+      byDay.set(b, k);
+    }
+    return [...byDay.entries()]
+      .map(([day, k]) => ({
+        day,
+        count: [...k.values()].reduce((a, b) => a + b, 0),
+        kinds: [...k.entries()].sort(
+          (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+        ),
+      }))
+      .filter((b) => b.count >= BULK)
+      .sort((a, b) => a.day.localeCompare(b.day));
+  }
+
+  /** The stones with the most threads to other stones, as the garden stands today. */
+  function hubsOf(input, n = HUBS) {
+    const kind = new Map(input.nodes.map((s) => [s.id, s.kind]));
+    const label = new Map(input.nodes.map((s) => [s.id, s.label]));
+    const deg = new Map();
+    for (const l of input.links) {
+      if (!THREAD.has(l.kind)) continue;
+      const [s, t] = [endId(l.source), endId(l.target)];
+      if (!CORPUS.has(kind.get(s) ?? "") || !CORPUS.has(kind.get(t) ?? ""))
+        continue;
+      deg.set(s, (deg.get(s) ?? 0) + 1);
+      deg.set(t, (deg.get(t) ?? 0) + 1);
+    }
+    return [...deg.entries()]
+      .map(([k, threads]) => ({ id: k, label: label.get(k) ?? k, threads }))
+      .sort((a, b) => b.threads - a.threads || a.label.localeCompare(b.label))
+      .slice(0, n);
+  }
+
+  const later = (a, b) => (a > b ? a : b);
+  const minInto = (m, k, d) => {
+    const was = m.get(k);
+    if (!was || d < was) m.set(k, d);
+  };
+
+  /**
+   * The panel: every marker, week by week. `leave` takes stones out before anything is
+   * counted (the most threaded, or the ones planted in bulk) and with them every thread
+   * they held.
+   */
+  function panel(input, leave = { hubs: false, bulk: false }) {
+    const bulk = bulkDays(input);
+    const hubs = hubsOf(input);
+    const kind = new Map(input.nodes.map((s) => [s.id, s.kind]));
+
+    const out = new Set();
+    if (leave.hubs) for (const h of hubs) out.add(h.id);
+    if (leave.bulk) {
+      const days = new Set(bulk.map((b) => b.day));
+      for (const n of input.nodes)
+        if (CORPUS.has(n.kind) && days.has(input.born[n.id])) out.add(n.id);
+    }
+
+    const kept = input.nodes.filter(
+      (n) => CORPUS.has(n.kind) && input.born[n.id] && !out.has(n.id),
+    );
+    const keep = new Set(kept.map((n) => n.id));
+    const born = (k) => input.born[k];
+
+    // Every thread dated once, by the later of its ends.
+    const threadAt = [];
+    const written = new Map(); // "a|b" → day, a names b
+    const vocabAt = new Map(); // stone → first day a term reached it
+    const linkedAt = new Map(); // stone → first day anything joined it
+    const ghostAt = new Map(); // idea → first day a kept stone linked it
+
+    for (const l of input.links) {
+      const [s, t] = [endId(l.source), endId(l.target)];
+      const [ks, kt] = [kind.get(s) ?? "", kind.get(t) ?? ""];
+      if (NOT_A_THREAD.has(ks) || NOT_A_THREAD.has(kt)) continue;
+      const cs = CORPUS.has(ks);
+      const ct = CORPUS.has(kt);
+      // A thread to a stone that was left out goes with it.
+      if ((cs && !keep.has(s)) || (ct && !keep.has(t))) continue;
+      if (!cs && !ct) continue;
+
+      const at = cs && ct ? later(born(s), born(t)) : cs ? born(s) : born(t);
+      if (cs) minInto(linkedAt, s, at);
+      if (ct) minInto(linkedAt, t, at);
+
+      if (l.kind === "seed" && cs) minInto(ghostAt, t, at);
+      if (!(cs && ct) || !THREAD.has(l.kind)) continue;
+
+      threadAt.push(at);
+      if (WRITTEN.has(l.kind)) {
+        const key = `${s}|${t}`;
+        const was = written.get(key);
+        if (!was || at < was) written.set(key, at);
+      }
+      if (l.kind === "concept" && ks === "concept" && kt !== "concept")
+        minInto(vocabAt, t, at);
+    }
+
+    const bothAt = [];
+    for (const [key, at] of written) {
+      const [a, b] = key.split("|");
+      if (a >= b) continue;
+      const back = written.get(`${b}|${a}`);
+      if (back) bothAt.push(later(at, back));
+    }
+
+    const first = kept.reduce(
+      (m, n) => (born(n.id) < m ? born(n.id) : m),
+      input.today,
+    );
+    const weeks = weeksOf(first, input.today);
+    const series = Object.fromEntries(MARKERS.map((m) => [m, []]));
+
+    const upTo = (days, d) => {
+      let c = 0;
+      for (const x of days) if (x <= d) c++;
+      return c;
+    };
+
+    for (const d of weeks) {
+      const present = kept.filter((n) => born(n.id) <= d);
+      const words = present.filter((n) => n.kind !== "concept");
+      const since = addDays(d, -MONTH);
+
+      const stones = present.length;
+      const threads = upTo(threadAt, d);
+      const vocab = words.filter((n) => (vocabAt.get(n.id) ?? "~") <= d).length;
+      const alone = present.filter((n) => (linkedAt.get(n.id) ?? "~") > d).length;
+      const tended = present.filter((n) =>
+        (input.touched[n.id] ?? [born(n.id)]).some((t) => t > since && t <= d),
+      ).length;
+
+      series.stones.push(stones);
+      series.threads.push(threads);
+      series.per.push(stones ? threads / stones : 0);
+      series.both.push(upTo(bothAt, d));
+      series.vocab.push(words.length ? vocab / words.length : 0);
+      series.alone.push(stones ? alone / stones : 0);
+      series.tended.push(stones ? tended / stones : 0);
+      series.unplanted.push(upTo(ghostAt.values(), d));
+    }
+
+    // From the first week with MIN_START stones, else the first with any.
+    const full = series.stones.findIndex((s) => s >= MIN_START);
+    const any = series.stones.findIndex((s) => s > 0);
+    const start = full >= 0 ? full : Math.max(0, any);
+
+    return { weeks, series, bulk, hubs, left: out.size, start };
+  }
+
+  // ---- saying it ----
+
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  /** `2026-09-19` → `19 Sep`. */
+  const dayOf = (d) => `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}`;
+  const commas = (n) =>
+    String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  /** A marker's value as it is said: a count, a share in a hundred, or threads per stone to one place. */
+  function said(key, v) {
+    if (SHARES.has(key)) return `${Math.round(v * 100)} in 100`;
+    if (key === "per") return v.toFixed(1);
+    return commas(v);
+  }
+
+  /** How many times a thing grew, said plainly; from none, it only went from none. */
+  function times(from, to) {
+    if (from <= 0) return null;
+    const r = to / from;
+    return r >= 10 ? `${Math.round(r)} times` : `${r.toFixed(1)} times`;
+  }
+
+  /** The headline: the stones, the threads and the pairs written both ways, from the start to now. */
+  function growth(p) {
+    const s = p.start;
+    const last = p.weeks.length - 1;
+    const part = (k, name) => {
+      const [a, b] = [p.series[k][s], p.series[k][last]];
+      const t = times(a, b);
+      return t
+        ? `${name} from ${said(k, a)} to ${said(k, b)}, ${t} as many`
+        : `${name} from none to ${said(k, b)}`;
+    };
+    return `Since the week of ${dayOf(p.weeks[s])}: ${part("stones", "the stones")}; ${part("threads", "the threads")}; ${part("both", "the pairs written both ways")}.`;
+  }
+
+  /** One marker read at a week, beside four weeks before and the start. */
+  function reading(p, key, name, at) {
+    const v = p.series[key];
+    const back = Math.max(0, at - 4);
+    return `${name}: ${said(key, v[at])} in the week of ${dayOf(p.weeks[at])}; ${said(key, v[back])} four weeks before; ${said(key, v[p.start])} in the week of ${dayOf(p.weeks[p.start])}.`;
+  }
+
+  /** A day of planting in bulk, said. */
+  function bulkSaid(b) {
+    const [k, n] = b.kinds[0];
+    const rest = b.count - n;
+    const what = `${commas(n)} ${(KIND_LABEL[k] ?? k).toLowerCase()}`;
+    return `${commas(b.count)} stones first appear on ${dayOf(b.day)}: ${what}${rest ? ` and ${commas(rest)} more` : ""}.`;
+  }
+
+  /** Every sentence the view reads back, for the check that keeps verdicts out of them. */
+  function readings(p, names) {
+    const at = p.weeks.length - 1;
+    return [
+      growth(p),
+      ...MARKERS.map((k) => reading(p, k, names[k], at)),
+      ...p.bulk.map(bulkSaid),
+    ];
+  }
+
+  // ---- every word of the panel (niwa content/panel.ts) ----
+  // The method is the Community Archive's measure of serendipity (Epistemic Garden, "how to
+  // measure serendipity online", lab notes #5, 2026): markers rather than a KPI, relationships
+  // beside volume, pairs that reply both ways, and the same count with the ten largest
+  // accounts taken out. Here the accounts are stones and a reply is a thread.
+  const MARKER_WORDS = {
+    stones: {
+      name: "stones",
+      how: "Every note, page, term and memory with words in it, from the day it first appears in the record.",
+      cannot:
+        "When a thought began. A note enters the record on the day it is first dated, and an import plants a year of pages on one day.",
+    },
+    threads: {
+      name: "threads",
+      how: "Links, names in prose, shared terms and twins between two stones, each dated by the later of its two ends.",
+      cannot:
+        "When a thread was written. A link added to an old note today is dated by the note, so this is the earliest a thread could have been drawn.",
+    },
+    per: {
+      name: "threads per stone",
+      how: "The threads divided by the stones: whether what joins the garden grows faster than what is in it.",
+      cannot:
+        "Which threads carry weight. A page that names everything counts as many times as it names.",
+    },
+    both: {
+      name: "written both ways",
+      how: "Pairs in which each stone links to or names the other in its own words. The nearest thing the garden has to two people answering each other.",
+      cannot:
+        "What a term shares with a note. A glossary term cannot name a note back, so vocabulary is counted on its own line.",
+    },
+    vocab: {
+      name: "in the vocabulary",
+      how: "Of the stones that are not terms, how many use at least one term of the glossary.",
+      cannot:
+        "Whether a stone with no term is about something the glossary does not cover, or the same thing worded another way.",
+    },
+    alone: {
+      name: "alone",
+      how: "Of the stones, how many have no thread to another stone, a repo or an unwritten idea. The index that lists every memory is not counted as a thread.",
+      cannot:
+        "Why. A stone alone may be finished, new, or set aside, and the count is the same.",
+    },
+    tended: {
+      name: "tended in the month",
+      how: "Of the stones, how many were changed in the thirty days up to that week.",
+      cannot:
+        "What changed. A comma counts the same as a rewrite, and a change the record does not hold is not counted.",
+    },
+    unplanted: {
+      name: "unplanted",
+      how: "Ideas linked to and never written, from the first day a stone linked them.",
+      cannot:
+        "Ideas once unplanted and since written. A written idea leaves no trace of having waited, so the past of this line is always low.",
+    },
+  };
+  const NAMES = Object.fromEntries(
+    Object.entries(MARKER_WORDS).map(([k, w]) => [k, w.name]),
+  );
+  const LEAD = [
+    "Eight markers, each read week by week, each on its own line. None of them is added to another, and none has a direction it is meant to go.",
+    "The method is borrowed from a lab that measured an online community without a single number to push up: count the relationships beside the volume, count the pairs that answer each other, then count again with the largest hubs taken out to see whether a jump belongs to the whole or to a few.",
+  ];
+  const CHECKS = {
+    hubs: {
+      label: "leave out the ten most threaded",
+      note: "The ten stones with the most threads today, and every thread they hold, taken out of every week.",
+    },
+    bulk: {
+      label: "leave out what was planted in bulk",
+      note: "Every stone that first appears on a day when twenty or more did, taken out of every week.",
+    },
+  };
+  // niwa dated stones from git, or from their last change when deployed. A page cannot read
+  // git, so the record is the specimen's own days, or what a folder says about itself.
+  const DATING = {
+    specimen:
+      "The specimen carries its own record: the day each stone first appeared and every day it was changed after, counted back from today. It is made up.",
+    folder:
+      "Read from the folder: a stone is dated by a created: or date: line in its frontmatter where it has one, otherwise by its last change on disk, and changed on its last change. A folder keeps no earlier changes, so the past of the tended line is low, and a folder copied in one go first appears all on one day.",
+  };
+  const LEAVES =
+    "Read the lines against each other, not against a target. If the threads rise with the stones, the garden is joining what it gathers; if a line moves only when a day of planting is left in, the move belongs to that day. What any of it asks of you is yours to say.";
+  const LINEAGE =
+    "After the Community Archive's measure of serendipity: bidirectional replies, replies above a threshold, and the jump after a gathering checked again without the ten largest accounts (Epistemic Garden, lab notes #5).";
+
+  /** A folder's own record of a file: when it says it was made, else its last change. */
+  function folderDays(f) {
+    const { data } = frontmatter(f.text);
+    const said = [data.created, data.date, data.metadata?.created].find(
+      (v) => typeof v === "string" && !Number.isNaN(new Date(v).getTime()),
+    );
+    const tended =
+      typeof data.tended === "string" &&
+      !Number.isNaN(new Date(data.tended).getTime())
+        ? new Date(data.tended)
+        : null;
+    const last = isoDay(
+      (tended ?? frontmatterModified(data, new Date(f.mtime))).getTime(),
+    );
+    const born = said ? isoDay(new Date(said).getTime()) : last;
+    return [...new Set([born, last])].sort();
+  }
+</script>
+
+<script>
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const KEY = "pp-panel";
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  function el(tag, attrs = {}) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs))
+      if (v != null) e.setAttribute(k, v);
+    return e;
+  }
+
+  // ---- the pen, laid over an element (niwa components/Sketch.tsx) ----
+  let maskN = 0;
+  function sketch(host, { seed, color = "var(--pen)", draw = false }) {
+    const pen = 1.7;
+    const svg = el("svg", { class: "sketch", "aria-hidden": "true" });
+    const ink = el("path", { fill: color });
+    let mask = null;
+    let mpath = null;
+    if (draw && !REDUCE) {
+      const id = `sk${++maskN}`;
+      const defs = el("defs");
+      mask = el("mask", { id, maskUnits: "userSpaceOnUse" });
+      mpath = el("path", {
+        class: "draw",
+        pathLength: 1,
+        fill: "none",
+        "stroke-width": pen * 2 + 4,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+      });
+      mask.append(mpath);
+      defs.append(mask);
+      svg.append(defs);
+      ink.setAttribute("mask", `url(#${id})`);
+    }
+    svg.append(ink);
+    host.append(svg);
+    const paint = () => {
+      const w = host.offsetWidth;
+      const h = host.offsetHeight;
+      if (!w || !h) return;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const s = seedOf(seed);
+      const line = roughRect(w, h, s);
+      ink.setAttribute("d", ribbon(line, pen, s));
+      if (mpath) {
+        mpath.setAttribute("d", line);
+        mask.setAttribute("x", -40);
+        mask.setAttribute("y", -40);
+        mask.setAttribute("width", w + 80);
+        mask.setAttribute("height", h + 80);
+      }
+    };
+    new ResizeObserver(paint).observe(host);
+    paint();
+  }
+
+  // ---- what is kept: one key, this browser only ----
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || "null") || {};
+    } catch {
+      return {};
+    }
+  }
+  function keep(own) {
+    try {
+      if (own) localStorage.setItem(KEY, JSON.stringify({ own }));
+      else localStorage.removeItem(KEY);
+      return true;
+    } catch {
+      /* storage refused or full: the page still works, it just forgets on reload */
+      return false;
+    }
+  }
+
+  // ---- state ----
+  const S = {
+    source: "specimen",
+    name: "",
+    at: null,
+    count: 0,
+    input: null,
+    leave: { hubs: false, bulk: false },
+    cursor: null,
+    p: null,
+  };
+
+  /** The garden's stones and threads, with each stone's days, as the panel reads them. */
+  function setFiles(files, { source, name = "", at = null, repos = [] }) {
+    const now = Date.now();
+    const g = buildGarden(files, { repos, now });
+    const byPath = new Map(files.map((f) => [f.path, f]));
+    const born = {};
+    const touched = {};
+    for (const n of g.nodes) {
+      const f = n.file && byPath.get(n.file);
+      if (!f || !CORPUS.has(n.kind)) continue;
+      const days = f.days ?? folderDays(f);
+      born[n.id] = days[0];
+      touched[n.id] = days;
+    }
+    S.source = source;
+    S.name = name;
+    S.at = at;
+    S.count = files.length;
+    S.input = {
+      nodes: g.nodes.map((n) => ({ id: n.id, label: n.label, kind: n.kind })),
+      links: g.links,
+      born,
+      touched,
+      today: isoDay(now),
+    };
+    S.cursor = null;
+    renderSource(g);
+    compute();
+    return g;
+  }
+
+  function renderSource(g) {
+    const own = S.source === "own";
+    $("g-name").textContent = own
+      ? `Your notes${S.name ? ` · ${S.name}` : ""}`
+      : "Specimen garden";
+    $("g-tag").textContent = own ? "this browser only" : "synthetic";
+    const stones = g.nodes.filter((n) => CORPUS.has(n.kind)).length;
+    $("g-count").textContent =
+      `${plural(stones, "stone")} · ${plural(g.links.length, "thread")}`;
+    $("g-note").textContent = own
+      ? `Read in this page from ${S.count} markdown files. Nothing was uploaded; it is kept in this browser until you put the specimen back.`
+      : "A made-up reader's garden over forty weeks: notes on attention, walking and the feed, a glossary of their own, a Notion workspace imported in one afternoon. Open a folder of your own markdown notes and the same rules count it here. Nothing is uploaded.";
+    $("restore").hidden = !own;
+    $("dating").textContent = own ? DATING.folder : DATING.specimen;
+  }
+
+  function compute() {
+    S.p = panel(S.input, S.leave);
+    S.bulkAt = S.p.bulk.map((b) => S.p.weeks.findIndex((w) => w >= b.day));
+    render();
+  }
+
+  const last = () => S.p.weeks.length - 1;
+  const at = () => (S.cursor === null ? last() : Math.min(S.cursor, last()));
+
+  // ---- one marker drawn across the weeks (niwa Panel.tsx, Strip) ----
+  const W = 1000;
+  const H = 64;
+  function strip(k, values) {
+    const n = values.length;
+    const top = SHARES.has(k) ? 1 : Math.max(...values) * 1.08 || 1;
+    const x = (i) => (n > 1 ? (i / (n - 1)) * W : W / 2);
+    const y = (v) => H - 3 - (v / top) * (H - 8);
+    const line = values
+      .map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`)
+      .join("");
+    const area = `${line}L${x(n - 1)},${H}L${x(0)},${H}Z`;
+    const ticks = [...new Set(S.bulkAt)]
+      .filter((i) => i >= 0)
+      .map(
+        (i) =>
+          `<line x1="${x(i)}" x2="${x(i)}" y1="0" y2="${H}" class="pn-bulk" />`,
+      )
+      .join("");
+    return {
+      html: `<div class="pn-strip" data-k="${k}" role="img" aria-label="${esc(MARKER_WORDS[k].name)}, week by week">
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="pn-draw" aria-hidden="true">
+          <line x1="0" x2="${W}" y1="${H - 0.5}" y2="${H - 0.5}" class="pn-base" />${ticks}
+          <path d="${area}" class="pn-area" /><path d="${line}" class="pn-line" />
+        </svg>
+        <div class="pn-track" aria-hidden="true"><span class="pn-cursor"></span><span class="pn-dot"></span></div>
+      </div>`,
+      dot: (i) => (y(values[i] ?? 0) / H) * 100,
+    };
+  }
+
+  const MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  let dots = {};
+
+  function render() {
+    const p = S.p;
+    $("lead0").textContent = LEAD[0];
+    $("lead1").textContent = LEAD[1];
+    // The headline is set again, and rises again, only when what it counts changes.
+    const g = growth(p);
+    if ($("growth").textContent !== g) {
+      $("growth").textContent = g;
+      $("growth").style.animation = "none";
+      void $("growth").offsetWidth;
+      $("growth").style.animation = "";
+    }
+
+    $("checks").innerHTML = ["hubs", "bulk"]
+      .map(
+        (c) =>
+          `<div><button type="button" class="chip" data-leave="${c}" aria-pressed="${S.leave[c]}">${esc(CHECKS[c].label)}</button><p>${esc(CHECKS[c].note)}</p></div>`,
+      )
+      .join("");
+    $("left").hidden = !(p.left > 0);
+    $("left").textContent =
+      `${p.left} stones left out, and every thread they held.`;
+
+    dots = {};
+    $("rows").innerHTML =
+      MARKERS.map((k, i) => {
+        const w = MARKER_WORDS[k];
+        const s = strip(k, p.series[k]);
+        dots[k] = s.dot;
+        return `<div class="pn-row" style="animation-delay:${40 + i * 40}ms">
+          <div><div class="nm">${esc(w.name)}</div><p class="how">${esc(w.how)}</p><p class="cannot"><span class="meta">cannot see</span>${esc(w.cannot)}</p></div>
+          <div class="mid">${s.html}</div>
+          <div class="val" data-val="${k}"></div>
+        </div>`;
+      }).join("") +
+      `<div class="months"><div class="gap"></div><div class="axis" aria-hidden="true">${monthTicks()}</div><div class="gap"></div></div>`;
+
+    $("bulk").innerHTML = p.bulk.length
+      ? `<ul class="bulk-list">${p.bulk
+          .map(
+            (b, i) =>
+              `<li><button type="button" class="pn-pick" data-week="${S.bulkAt[i]}"><span class="meta">${esc(dayOf(b.day))}</span><span>${esc(bulkSaid(b))}</span></button></li>`,
+          )
+          .join("")}</ul>`
+      : `<p class="none">No day on which twenty or more stones first appear.</p>`;
+    $("hubs").className = `hubs${S.leave.hubs ? " out" : ""}`;
+    $("hubs").innerHTML = p.hubs
+      .map(
+        (h, i) =>
+          `<li><span class="i">${i + 1}</span><span class="h">${esc(h.label)}</span><span class="t">${h.threads} threads</span></li>`,
+      )
+      .join("");
+    $("leaves").textContent = LEAVES;
+    $("lineage").textContent = LINEAGE;
+    moveCursor();
+  }
+
+  function monthTicks() {
+    const p = S.p;
+    const out = [];
+    p.weeks.forEach((w, i) => {
+      const m = MONTHS[+w.slice(5, 7) - 1];
+      if (!out.length || out[out.length - 1].name !== m)
+        out.push({ i, name: m });
+    });
+    const pct = (i) =>
+      p.weeks.length > 1 ? (i / (p.weeks.length - 1)) * 100 : 50;
+    return out
+      .map((m) => `<span style="left:${pct(m.i).toFixed(2)}%">${m.name}</span>`)
+      .join("");
+  }
+
+  /** The same week on every line: the cursor, the dot, the value beside it. */
+  function moveCursor() {
+    const p = S.p;
+    const i = at();
+    const n = p.weeks.length;
+    const f = n > 1 ? i / (n - 1) : 0.5;
+    $("week").textContent = `week of ${dayOf(p.weeks[i])}`;
+    for (const k of MARKERS) {
+      const row = $("rows").querySelector(`[data-k="${k}"]`);
+      const track = row.querySelector(".pn-track");
+      track.style.setProperty("--f", f.toFixed(4));
+      track.querySelector(".pn-dot").style.top = `${dots[k](i).toFixed(2)}%`;
+      const v = p.series[k];
+      $("rows").querySelector(`[data-val="${k}"]`).innerHTML =
+        `<div class="big">${esc(said(k, v[i]))}</div><div class="sub">${
+          i !== last() ? `<div>now ${esc(said(k, v[last()]))}</div>` : ""
+        }<div>${esc(dayOf(p.weeks[p.start]))} ${esc(said(k, v[p.start]))}</div></div>`;
+    }
+    for (const b of $("bulk").querySelectorAll("[data-week]"))
+      b.classList.toggle("here", +b.dataset.week === i);
+  }
+
+  function setCursor(i) {
+    S.cursor = Math.max(0, Math.min(last(), i));
+    moveCursor();
+  }
+
+  // ---- wiring ----
+  const pick = (e) => {
+    const s = e.target.closest(".pn-strip");
+    if (!s) return;
+    const r = s.getBoundingClientRect();
+    const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    setCursor(Math.round(f * last()));
+  };
+  $("rows").addEventListener("pointermove", pick);
+  $("rows").addEventListener("pointerdown", pick);
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    if (t.dataset.leave) {
+      S.leave = { ...S.leave, [t.dataset.leave]: !S.leave[t.dataset.leave] };
+      compute();
+      const again = $("checks").querySelector(
+        `[data-leave="${t.dataset.leave}"]`,
+      );
+      again?.focus();
+    } else if (t.dataset.week !== undefined) setCursor(+t.dataset.week);
+  });
+  window.addEventListener("keydown", (e) => {
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowLeft") setCursor((S.cursor ?? last()) - 1);
+    if (e.key === "ArrowRight") setCursor((S.cursor ?? last()) + 1);
+  });
+
+  // ---- your own folder: read here, never sent ----
+  function specimen() {
+    const now = Date.now();
+    return setFiles(specimenFiles(now), {
+      source: "specimen",
+      repos: specimenRepos(now),
+    });
+  }
+  $("open").addEventListener("click", () => $("folder").click());
+  $("folder").addEventListener("change", async (e) => {
+    const input = e.target;
+    const list = [...input.files];
+    input.value = "";
+    if (!list.length) return;
+    const status = $("g-status");
+    $("open").disabled = true;
+    status.textContent = "Reading the folder…";
+    try {
+      const { name, files } = await readFolder(list);
+      if (!files.length) {
+        status.textContent =
+          "No markdown notes in that folder. Nothing was read.";
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 30));
+      const at = new Date().toISOString();
+      const g = setFiles(files, { source: "own", name, at });
+      const kept = keep({
+        name,
+        at,
+        files: files.map((f) => [f.path, f.mtime, f.text]),
+      });
+      const stones = g.nodes.filter((n) => CORPUS.has(n.kind)).length;
+      status.textContent =
+        `Read ${plural(files.length, "note")}: ${plural(stones, "stone")} over ${plural(S.p.weeks.length, "week")}.` +
+        (kept
+          ? ""
+          : " Too many to keep in this browser; open the folder again after a reload.");
+    } catch {
+      status.textContent =
+        "That folder could not be read here. Nothing was kept.";
+    } finally {
+      $("open").disabled = false;
+    }
+  });
+  $("restore").addEventListener("click", () => {
+    keep(null);
+    specimen();
+    $("g-status").textContent =
+      "Your notes are forgotten here. This is the specimen again.";
+  });
+
+  // ---- open ----
+  for (const id of [
+    "lead-sheet",
+    "checks-sheet",
+    "markers-sheet",
+    "days-sheet",
+    "leaves-sheet",
+  ])
+    sketch($(id), { seed: `panel-${id}`, draw: true });
+  {
+    const own = load().own;
+    let opened = false;
+    if (own?.files?.length) {
+      try {
+        setFiles(
+          own.files.map(([path, mtime, text]) => ({ path, mtime, text })),
+          { source: "own", name: own.name, at: own.at },
+        );
+        opened = true;
+      } catch {
+        opened = false;
+      }
+    }
+    if (!opened) specimen();
+  }
+</script>

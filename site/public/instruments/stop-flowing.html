@@ -1,0 +1,2232 @@
+<title>Stop Flowing</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Believe in something. Twelve positions, a crowd set against you, and a record of which ones moved, which way, and where you would still say them out loud."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a tide table. Buff chart paper, navy ink. Blue is only ever the current (the crowd);
+     red ochre is only ever the keel (a position that held). Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --paper: #eee8da;
+    --sheet: #f8f5ec;
+    --ink: #16202a;
+    --ink-2: #48535f;
+    --ink-3: #5c6773;
+    --rule: #d8d0bd;
+    --rule-2: #b0a68d;
+    --current: #23658a;
+    --current-wash: rgba(35, 101, 138, 0.16);
+    --keel: #a33b25;
+    --keel-wash: rgba(163, 59, 37, 0.1);
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #0d1318;
+      --sheet: #141c22;
+      --ink: #e4e6e1;
+      --ink-2: #a8b1b7;
+      --ink-3: #8a949b;
+      --rule: #222d36;
+      --rule-2: #3b4853;
+      --current: #62a8cb;
+      --current-wash: rgba(98, 168, 203, 0.2);
+      --keel: #e27d62;
+      --keel-wash: rgba(226, 125, 98, 0.12);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0d1318;
+    --sheet: #141c22;
+    --ink: #e4e6e1;
+    --ink-2: #a8b1b7;
+    --ink-3: #8a949b;
+    --rule: #222d36;
+    --rule-2: #3b4853;
+    --current: #62a8cb;
+    --current-wash: rgba(98, 168, 203, 0.2);
+    --keel: #e27d62;
+    --keel-wash: rgba(226, 125, 98, 0.12);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: var(--ink);
+  }
+  .wrap {
+    max-width: 920px;
+    margin-inline: auto;
+  }
+  .mono {
+    font-family: var(--mono);
+  }
+  .small {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  :focus-visible {
+    outline: 2px solid var(--current);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 40px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .specimen {
+    margin: 0;
+    padding: 20px 20px 14px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .specimen .label {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 10px;
+  }
+  .specimen .rows .row {
+    grid-template-columns: 76px minmax(0, 1fr) 62px;
+    gap: 8px;
+    padding-block: 1px;
+    border: 0;
+  }
+  .specimen .row-q {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-2);
+    letter-spacing: 0.02em;
+  }
+  .specimen .verdict {
+    font-size: 9.5px;
+  }
+  .specimen figcaption {
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* lede */
+  .lede {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 56px 24px;
+  }
+  .lede .body {
+    max-width: 64ch;
+  }
+  .claim {
+    font-size: clamp(22px, 2.7vw, 27px);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.1em;
+  }
+  .plan {
+    list-style: none;
+    margin: 28px 0 28px;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .plan li {
+    display: grid;
+    grid-template-columns: 40px 150px minmax(0, 1fr);
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 16.5px;
+  }
+  .plan .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    padding-top: 4px;
+  }
+  .plan b {
+    font-weight: 500;
+  }
+
+  /* stations */
+  .station {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 64px 24px;
+    border-top: 1px solid var(--rule-2);
+  }
+  .rail {
+    position: relative;
+  }
+  .rail .num {
+    display: block;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .rail .label {
+    display: block;
+    margin-top: 10px;
+  }
+  .station h2 {
+    font-size: clamp(32px, 4.4vw, 44px);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    margin-bottom: 18px;
+  }
+  .station .body > p {
+    max-width: 64ch;
+  }
+  .sealed {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-2);
+    padding: 14px 16px;
+    border: 1px dashed var(--rule-2);
+    border-radius: 4px;
+    max-width: 64ch;
+  }
+
+  /* the scale: seven marks between disagree and agree */
+  .scale {
+    border: 0;
+    margin: 0;
+    padding: 20px 0 18px;
+    border-bottom: 1px solid var(--rule);
+    min-width: 0;
+  }
+  .scale legend {
+    padding: 0;
+    float: left;
+    width: 100%;
+    font-size: 19px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .scale legend .dom {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+  }
+  .bubbles {
+    clear: both;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    max-width: 460px;
+  }
+  .bubbles label {
+    display: grid;
+    justify-items: center;
+    cursor: pointer;
+    padding-block: 4px;
+  }
+  .bubbles input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .bubbles .b {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule-2);
+    background: var(--sheet);
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    transition:
+      transform 180ms var(--ease),
+      background-color 180ms var(--ease),
+      border-color 180ms var(--ease),
+      color 180ms var(--ease);
+  }
+  .bubbles label:hover .b {
+    border-color: var(--ink-2);
+    transform: scale(1.06);
+  }
+  .bubbles input:checked + .b {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .bubbles input:focus-visible + .b {
+    outline: 2px solid var(--current);
+    outline-offset: 3px;
+  }
+  .bubbles input:disabled + .b {
+    cursor: default;
+  }
+  .bubbles label:has(input:disabled) {
+    cursor: default;
+  }
+  .bubbles label:has(input:disabled):hover .b {
+    transform: none;
+  }
+  .ends {
+    display: flex;
+    justify-content: space-between;
+    max-width: 460px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    padding-inline: 2px;
+    margin-top: 2px;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* buttons */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .go {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 12px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  .go:disabled {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+  }
+  .quiet {
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 12px 4px;
+    background: none;
+    border: 0;
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 4px;
+  }
+  .quiet:hover {
+    color: var(--ink);
+  }
+  .count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  /* the feed */
+  .feed {
+    max-width: 560px;
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .post {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .post .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    margin: 0 0 6px;
+  }
+  .post .meta b {
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .post.filler p.t {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .post .scale {
+    padding: 4px 0 2px;
+    border: 0;
+  }
+  .post .scale legend {
+    font-size: 19px;
+  }
+  .poll {
+    clear: both;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    max-width: 460px;
+    height: 44px;
+    margin: 4px 0 4px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .poll i {
+    display: block;
+    justify-self: center;
+    width: 44%;
+    height: calc(var(--h) * 100%);
+    min-height: 1px;
+    background: var(--current);
+    opacity: 0.55;
+    border-radius: 2px 2px 0 0;
+  }
+  .poll-read {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--current);
+    margin: 4px 0 10px;
+  }
+  .cmt {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    border-left: 2px solid var(--current);
+    background: var(--current-wash);
+    border-radius: 0 6px 6px 0;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .cmt .meta {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* rows: one position, alone vs in the current */
+  .rows {
+    display: grid;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 96px;
+    gap: 16px;
+    align-items: center;
+    padding-block: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .row-q {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.35;
+  }
+  .row-q .dom {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 2px;
+  }
+  .axis {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .axis .ax {
+    stroke: var(--rule-2);
+    stroke-width: 1;
+  }
+  .axis .tk {
+    stroke: var(--rule-2);
+    stroke-width: 1;
+  }
+  .axis .mid {
+    stroke: var(--ink-3);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+  }
+  .axis .cb {
+    fill: var(--current);
+    opacity: 0.28;
+  }
+  .axis .cm {
+    stroke: var(--current);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .axis .mv {
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+  }
+  .axis .hd {
+    fill: var(--ink);
+    opacity: 0;
+  }
+  .axis .pa {
+    fill: var(--sheet);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+  }
+  .axis .pb {
+    fill: var(--ink);
+  }
+  .axis .ring {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1.4;
+  }
+  .axis .ring.keel {
+    stroke: var(--keel);
+    stroke-width: 2;
+  }
+  .in .axis .mv,
+  .drawn .axis .mv {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 700ms var(--ease) 120ms;
+  }
+  .in .axis .hd,
+  .drawn .axis .hd {
+    opacity: 1;
+    transition: opacity 200ms var(--ease) 700ms;
+  }
+  .verdict {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    text-align: right;
+  }
+  .verdict.v-keel {
+    color: var(--keel);
+  }
+  .verdict.v-carried {
+    color: var(--current);
+  }
+  .group-head {
+    margin: 36px 0 4px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule-2);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 20px 0 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .key span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .key svg {
+    width: 22px;
+    height: 14px;
+    overflow: visible;
+  }
+
+  /* the figures */
+  .figs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: 32px 0 8px;
+    border-top: 1px solid var(--ink);
+  }
+  .fig {
+    padding: 16px 18px 18px 0;
+  }
+  .fig + .fig {
+    padding-left: 18px;
+    border-left: 1px solid var(--rule);
+  }
+  .fig .v {
+    display: block;
+    font-family: var(--mono);
+    font-size: clamp(30px, 4vw, 40px);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 6px 0 6px;
+  }
+  .fig .v.c {
+    color: var(--current);
+  }
+  .fig .v.k {
+    color: var(--keel);
+  }
+  .fig p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .reading {
+    font-size: clamp(20px, 2.4vw, 23px);
+    line-height: 1.42;
+    margin: 28px 0 24px;
+    padding-left: 18px;
+    border-left: 2px solid var(--ink);
+    max-width: 58ch;
+  }
+  .disclose {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-bottom: 8px;
+    max-width: 64ch;
+  }
+  .disclose p:last-child {
+    margin: 0;
+  }
+
+  /* IV: picks and rooms */
+  .picks {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
+    border-top: 1px solid var(--rule);
+  }
+  .picks label {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    font-size: 16.5px;
+    line-height: 1.4;
+  }
+  .picks input {
+    accent-color: var(--ink);
+    width: 16px;
+    height: 16px;
+    transform: translateY(2px);
+  }
+  .picks label:has(input:disabled) {
+    color: var(--ink-3);
+    cursor: default;
+  }
+  .picks .verdict {
+    font-size: 10px;
+  }
+  .rooms {
+    border: 0;
+    margin: 28px 0 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .rooms legend {
+    padding: 0;
+    font-size: 20px;
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+  .room {
+    display: grid;
+    grid-template-columns: minmax(130px, 190px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .room > span {
+    font-size: 16px;
+  }
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .opts label {
+    cursor: pointer;
+  }
+  .opts input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .opts span {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 11px;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--sheet);
+    transition:
+      background-color 160ms var(--ease),
+      color 160ms var(--ease),
+      border-color 160ms var(--ease);
+  }
+  .opts label:hover span {
+    border-color: var(--ink-2);
+    color: var(--ink);
+  }
+  .opts input:checked + span {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .opts input:focus-visible + span {
+    outline: 2px solid var(--current);
+    outline-offset: 2px;
+  }
+  .roomgrid {
+    margin-top: 28px;
+    overflow-x: auto;
+  }
+  .roomgrid table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 520px;
+    font-size: 15px;
+  }
+  .roomgrid th {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: var(--ink-2);
+    text-align: center;
+    padding: 0 6px 8px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .roomgrid th:first-child {
+    text-align: left;
+  }
+  .roomgrid td {
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+  .roomgrid td:first-child {
+    text-align: left;
+    line-height: 1.35;
+  }
+  .sq {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+  .sq.say {
+    background: var(--ink);
+  }
+  .sq.soft {
+    background: linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  }
+  .sq.quiet {
+    border-color: var(--rule-2);
+  }
+
+  /* V: articles */
+  .article {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule-2);
+    max-width: 640px;
+  }
+  .article .from {
+    font-size: 15.5px;
+    color: var(--ink-2);
+    margin: 0 0 14px;
+  }
+  .field {
+    display: block;
+    margin-bottom: 16px;
+  }
+  .field > span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+  }
+  textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 18px;
+    line-height: 1.45;
+    color: var(--ink);
+    background: var(--sheet);
+    border: 1px solid var(--rule-2);
+    border-radius: 4px;
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 64px;
+    transition: border-color 160ms var(--ease);
+  }
+  textarea:hover {
+    border-color: var(--ink-3);
+  }
+  textarea:focus-visible {
+    outline: 2px solid var(--current);
+    outline-offset: 1px;
+    border-color: var(--current);
+  }
+  textarea::placeholder {
+    color: var(--ink-3);
+    font-style: italic;
+  }
+  .creed {
+    margin-top: 36px;
+    padding: 28px clamp(18px, 4vw, 36px) 24px;
+    background: var(--sheet);
+    border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--keel);
+    border-radius: 4px;
+    max-width: 680px;
+  }
+  .creed h3 {
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    margin: 6px 0 20px;
+  }
+  .creed ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: art;
+  }
+  .creed li {
+    counter-increment: art;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .creed li::before {
+    content: counter(art, upper-roman);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--keel);
+    padding-top: 5px;
+  }
+  .creed .bel {
+    font-size: 21px;
+    line-height: 1.38;
+    margin: 0 0 8px;
+  }
+  .creed .sub {
+    font-size: 15.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    margin: 0 0 3px;
+  }
+  .creed .sub em {
+    color: var(--ink);
+  }
+  .creed .foot {
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .notes {
+    margin: 22px 0 0;
+    max-width: 64ch;
+  }
+  .notes p {
+    padding-left: 16px;
+    border-left: 2px solid var(--keel);
+  }
+
+  /* coda, sources */
+  .coda {
+    border-top: 1px solid var(--rule-2);
+    margin-top: 64px;
+    padding-top: 48px;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+  }
+  .coda .last {
+    font-size: clamp(22px, 2.8vw, 28px);
+    line-height: 1.38;
+    letter-spacing: -0.01em;
+    max-width: 34ch;
+  }
+  .refs {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .refs li {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .refs a {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .limits {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 64ch;
+  }
+  .limits li {
+    margin-bottom: 8px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 560ms var(--ease),
+      transform 560ms var(--ease);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .axis .mv {
+      stroke-dashoffset: 0;
+    }
+    .axis .hd {
+      opacity: 1;
+    }
+    .in .axis .mv,
+    .drawn .axis .mv,
+    .in .axis .hd,
+    .drawn .axis .hd {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      padding-top: 44px;
+    }
+    .lede,
+    .station,
+    .coda {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+    .rail {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .rail .num {
+      font-size: 32px;
+    }
+    .rail .label {
+      margin: 0;
+    }
+    .plan li {
+      grid-template-columns: 32px minmax(0, 1fr);
+    }
+    .plan li span:last-child {
+      grid-column: 2;
+    }
+    .row {
+      grid-template-columns: minmax(0, 1fr) 84px;
+      gap: 4px 12px;
+    }
+    .row .row-q {
+      grid-column: 1 / -1;
+    }
+    .specimen .rows .row {
+      grid-template-columns: 64px minmax(0, 1fr) 56px;
+    }
+    .specimen .rows .row .row-q {
+      grid-column: auto;
+    }
+    .figs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .fig + .fig {
+      padding-left: 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .room {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Stop Flowing</h1>
+      <p class="deck">
+        <em>Believe in something.</em> Twelve positions, a crowd set against
+        you, and a record of what moved.
+      </p>
+    </div>
+    <figure
+      class="specimen"
+      aria-label="A synthetic example of the chart this instrument draws at the end"
+    >
+      <p class="label"><span>Specimen run</span><span>synthetic</span></p>
+      <div class="rows" id="specimen"></div>
+      <figcaption>
+        One made-up person. Hollow is the answer given alone, filled is the
+        answer given in the feed, blue is where the crowd stood. Red rings are
+        the positions that held.
+      </figcaption>
+    </figure>
+  </header>
+
+  <section class="lede">
+    <div class="rail"><span class="label">The claim</span></div>
+    <div class="body">
+      <p class="claim">
+        A self put together from the feed has no keel. Its positions sit
+        wherever the current last left them. From the inside, a position you
+        drifted into feels exactly like one you hold. You can only tell them
+        apart by moving the crowd and watching which ones go with it.
+      </p>
+      <p>
+        Gen Z is the first cohort to grow up with the crowd in the room all the
+        time: a count under every post, a poll under every opinion, a separate
+        audience in every app and a separate self for each. Kenneth Gergen
+        described the condition in 1991, before any of it fit in a pocket, as a
+        self spread across more relationships than it can hold together. Zygmunt
+        Bauman called the period liquid. A liquid takes the shape of whatever it
+        is poured into, and it keeps no shape of its own.
+      </p>
+      <p>
+        On this account, believing in something is less a feeling than a
+        behaviour. It is a position that stays where it is when the room turns,
+        and that you would say out loud in every room you're in. Both halves can
+        be measured, roughly, on one person in one sitting.
+      </p>
+      <ol class="plan">
+        <li>
+          <span class="n">I</span><b>Alone</b
+          ><span>Twelve positions. Nobody else in the room.</span>
+        </li>
+        <li>
+          <span class="n">II</span><b>The current</b
+          ><span>The same twelve inside a feed. Six arrive with a crowd.</span>
+        </li>
+        <li>
+          <span class="n">III</span><b>The keel</b
+          ><span>What moved, which way, measured against your own noise.</span>
+        </li>
+        <li>
+          <span class="n">IV</span><b>The rooms</b
+          ><span
+            >The positions you'd defend, and where you'd actually say
+            them.</span
+          >
+        </li>
+        <li>
+          <span class="n">V</span><b>Articles</b
+          ><span>Write them down, with what would change your mind.</span>
+        </li>
+      </ol>
+      <p class="small">
+        Some of what you see in II is arranged, and III tells you exactly how.
+        Nothing you enter leaves this page and nothing is stored. Reload and it
+        is gone.
+      </p>
+      <div class="actions">
+        <button class="go" id="begin" type="button">Begin with I</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="s1" hidden>
+    <div class="rail">
+      <span class="num">I</span><span class="label">Alone</span>
+    </div>
+    <div class="body">
+      <h2>Alone</h2>
+      <p>
+        Answer as yourself, and don't deliberate. There are no right answers and
+        nobody is counting yet. When you continue, these twelve are sealed until
+        III.
+      </p>
+      <div id="formA"></div>
+      <div class="actions">
+        <button class="go" id="toII" type="button" disabled>
+          Seal and continue to II
+        </button>
+        <span class="count" id="countA">0 of 12</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="s2" hidden>
+    <div class="rail">
+      <span class="num">II</span><span class="label">The current</span>
+    </div>
+    <div class="body">
+      <h2>The current</h2>
+      <p>
+        A feed. Scroll it the way you would scroll one. The twelve questions
+        come back in a different order among the posts, and you answer each one
+        again. You don't have to remember what you said.
+      </p>
+      <div class="feed" id="feed"></div>
+      <div class="actions">
+        <button class="go" id="toIII" type="button" disabled>
+          Continue to III
+        </button>
+        <span class="count" id="countB">0 of 12</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="s3" hidden>
+    <div class="rail">
+      <span class="num">III</span><span class="label">The keel</span>
+    </div>
+    <div class="body">
+      <h2>The keel</h2>
+      <div class="disclose">
+        <p class="label" style="margin-bottom: 8px">What was arranged</p>
+        <p>
+          The polls in II were generated on this page after you finished I. Each
+          was placed on the opposite side of your first answer, with roughly
+          four votes in five against you, and its top comment was written to
+          argue that side. There were no voters. The six questions marked
+          <em>no votes yet</em> were the control: the same questions, asked
+          twice, with nobody in the room. One of each pair of topics got a
+          crowd, chosen at random.
+        </p>
+      </div>
+      <div class="figs" id="figs"></div>
+      <p class="reading" id="reading"></p>
+      <div class="key" aria-hidden="true">
+        <span
+          ><svg viewBox="0 0 22 14">
+            <circle
+              cx="11"
+              cy="7"
+              r="5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+            /></svg
+          >alone</span
+        >
+        <span
+          ><svg viewBox="0 0 22 14">
+            <circle cx="11" cy="7" r="5" fill="currentColor" /></svg
+          >in the current</span
+        >
+        <span style="color: var(--current)"
+          ><svg viewBox="0 0 22 14">
+            <line
+              x1="11"
+              y1="1"
+              x2="11"
+              y2="13"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            /></svg
+          >where the crowd stood</span
+        >
+        <span style="color: var(--keel)"
+          ><svg viewBox="0 0 22 14">
+            <circle
+              cx="11"
+              cy="7"
+              r="6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            /></svg
+          >held against it</span
+        >
+      </div>
+      <div id="chart"></div>
+      <p style="margin-top: 32px">
+        <em>Carried</em> means you moved toward the crowd.
+        <em>Pushed back</em> means you moved away from it. Neither one held. A
+        position that moves away from a crowd is still being placed by the
+        crowd. Jack Brehm called the push-back reactance in 1966: the urge to
+        take back a freedom that someone seems to be removing. The contrarian is
+        carried by the same current, only in the other direction.
+      </p>
+      <p>
+        None of this is new, only the scale of it. In Solomon Asch's
+        line-judging studies about a third of the answers on the critical trials
+        went with a unanimous, obviously wrong majority, and about a quarter of
+        people never went along at all. Deutsch and Gerard split the pull in
+        two. Informational influence says they probably know something.
+        Normative influence says you'd like them to like you. A feed runs both
+        at once, all day. When Salganik, Dodds and Watts let 14,341 people see
+        what others had downloaded, success in their music market became more
+        unequal and less predictable. The best songs rarely did badly and the
+        worst rarely did well, but anything in between could happen. On a news
+        site, a single planted up-vote made the next rating 32 percent more
+        likely to be positive, and the herding lifted final ratings by a
+        quarter. Planted down-votes got corrected.
+      </p>
+      <div class="actions">
+        <button class="go" id="toIV" type="button">Continue to IV</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="s4" hidden>
+    <div class="rail">
+      <span class="num">IV</span><span class="label">The rooms</span>
+    </div>
+    <div class="body">
+      <h2>The rooms</h2>
+      <p>
+        Holding a position is half of it. The other half is whether it comes
+        with you. The Center's working line is that coherence between your
+        online and offline self is the purest act of protest still available. So
+        choose up to three of the twelve that you would defend, and say what
+        you'd do with each in four rooms.
+      </p>
+      <ul class="picks" id="picks"></ul>
+      <div class="actions">
+        <button class="go" id="toRooms" type="button" disabled>
+          Take these into the rooms
+        </button>
+        <span class="count" id="countP">0 of 3</span>
+      </div>
+      <div id="roomForm" hidden></div>
+      <div class="actions" id="roomActions" hidden>
+        <button class="go" id="showRooms" type="button" disabled>
+          See the rooms
+        </button>
+      </div>
+      <div id="roomOut" hidden>
+        <div class="roomgrid" id="roomGrid"></div>
+        <p class="reading" id="roomReading"></p>
+        <p>
+          Alice Marwick and danah boyd called the problem of one post reaching
+          every audience at once <em>context collapse</em>. The usual fix is to
+          keep the rooms apart: an account for each audience and a version of
+          you for each account. It works. It also means no single room ever sees
+          the whole of you, and that includes you. The fragmentation is less in
+          what you believe than in where you let it show.
+        </p>
+        <div class="actions">
+          <button class="go" id="toV" type="button">Continue to V</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="s5" hidden>
+    <div class="rail">
+      <span class="num">V</span><span class="label">Articles</span>
+    </div>
+    <div class="body">
+      <h2>Articles</h2>
+      <p>
+        James Marcia sorted identity by two questions: have you looked around,
+        and have you committed? Diffusion is neither. Foreclosure is commitment
+        without looking, a belief handed to you whole. Achievement is both. So
+        each article asks for both at once: what you believe in your own words,
+        where it came from, and what would move it. A belief can say what would
+        change it. A current needs no reason to move, only a crowd.
+      </p>
+      <div id="artForm"></div>
+      <div class="actions">
+        <button class="go" id="setDown" type="button" disabled>
+          Set them down
+        </button>
+      </div>
+      <div id="creedOut" hidden>
+        <div class="creed" id="creed"></div>
+        <div class="actions">
+          <button class="go" id="copy" type="button">Copy the articles</button>
+          <button class="quiet" id="again" type="button">Start again</button>
+        </div>
+        <div class="notes" id="notes"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="coda" id="coda" hidden>
+    <div class="rail"><span class="label">Coda</span></div>
+    <div class="body">
+      <p class="last">
+        "Believe in something" ran as a Nike advertising line in September 2018.
+        The current will carry even the instruction to stand still. So the test
+        was never whether you believe in something. It is whether the thing
+        stays put when the room turns, and whether you would say it in every
+        room you are in.
+      </p>
+      <p class="label" style="margin-top: 40px">Honest limits</p>
+      <ul class="limits">
+        <li>
+          Twelve positions, one sitting. The noise estimate rests on six
+          questions, so it is rough, and the pull can come out at zero or
+          negative by chance.
+        </li>
+        <li>
+          The title warned you and the crowd is plainly a page's crowd. Asch's
+          participants had no warning. A warning makes people stiffer, so
+          whatever moved here moved with your guard up.
+        </li>
+        <li>
+          You may have remembered your first answers and matched them on
+          purpose. That counts. Choosing consistency is one of the ways a keel
+          gets built.
+        </li>
+        <li>
+          This measures where you stand on twelve statements. Your identity is a
+          much larger thing than that, and no page can put a number on it.
+        </li>
+      </ul>
+      <p class="label" style="margin-top: 40px">Sources</p>
+      <ul class="refs">
+        <li>
+          Asch, S. E. (1956). Studies of independence and conformity: I. A
+          minority of one against a unanimous majority.
+          <em>Psychological Monographs</em>, 70(9), 1–70.
+          <a href="https://doi.org/10.1037/h0093718">doi:10.1037/h0093718</a>
+        </li>
+        <li>
+          Deutsch, M., &amp; Gerard, H. B. (1955). A study of normative and
+          informational social influences upon individual judgment.
+          <em>Journal of Abnormal and Social Psychology</em>, 51(3), 629–636.
+          <a href="https://doi.org/10.1037/h0046408">doi:10.1037/h0046408</a>
+        </li>
+        <li>
+          Salganik, M. J., Dodds, P. S., &amp; Watts, D. J. (2006). Experimental
+          study of inequality and unpredictability in an artificial cultural
+          market. <em>Science</em>, 311(5762), 854–856.
+          <a href="https://doi.org/10.1126/science.1121066"
+            >doi:10.1126/science.1121066</a
+          >
+        </li>
+        <li>
+          Muchnik, L., Aral, S., &amp; Taylor, S. J. (2013). Social influence
+          bias: A randomized experiment. <em>Science</em>, 341(6146), 647–651.
+          <a href="https://doi.org/10.1126/science.1240466"
+            >doi:10.1126/science.1240466</a
+          >
+        </li>
+        <li>
+          Brehm, J. W. (1966). <em>A Theory of Psychological Reactance</em>.
+          Academic Press.
+        </li>
+        <li>
+          Marwick, A. E., &amp; boyd, d. (2011). I tweet honestly, I tweet
+          passionately: Twitter users, context collapse, and the imagined
+          audience. <em>New Media &amp; Society</em>, 13(1), 114–133.
+          <a href="https://doi.org/10.1177/1461444810365313"
+            >doi:10.1177/1461444810365313</a
+          >
+        </li>
+        <li>
+          Marcia, J. E. (1966). Development and validation of ego-identity
+          status. <em>Journal of Personality and Social Psychology</em>, 3(5),
+          551–558.
+          <a href="https://doi.org/10.1037/h0023281">doi:10.1037/h0023281</a>
+        </li>
+        <li>
+          Campbell, J. D., Trapnell, P. D., Heine, S. J., Katz, I. M., Lavallee,
+          L. F., &amp; Lehman, D. R. (1996). Self-concept clarity: Measurement,
+          personality correlates, and cultural boundaries.
+          <em>Journal of Personality and Social Psychology</em>, 70(1), 141–156.
+          <a href="https://doi.org/10.1037/0022-3514.70.1.141"
+            >doi:10.1037/0022-3514.70.1.141</a
+          >
+        </li>
+        <li>
+          Gergen, K. J. (1991).
+          <em>The Saturated Self: Dilemmas of Identity in Contemporary Life</em
+          >. Basic Books.
+        </li>
+        <li>Bauman, Z. (2000). <em>Liquid Modernity</em>. Polity.</li>
+      </ul>
+      <p class="small" style="margin-top: 18px">
+        Self-concept clarity (Campbell and colleagues) is the research name for
+        what this page calls a keel: how clearly and consistently your beliefs
+        about yourself are defined, and how stable they are over time.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label"
+      >Stop Flowing · CAPP · prototype, 30 September 2026</span
+    >
+    <span class="label">No network, no storage</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // Twelve positions, two per topic. Each carries the top comment a crowd on either side would post.
+  const P = [
+    {
+      id: "album",
+      d: "taste",
+      t: "An album should be heard start to finish, in order, at least once.",
+      agree:
+        "the album is the unit. shuffle is how you end up with no taste of your own",
+      disagree:
+        "nobody has fifty minutes for one artist. singles are the format now, let it go",
+    },
+    {
+      id: "taste",
+      d: "taste",
+      t: "Someone's music taste tells you something real about them.",
+      agree:
+        "show me your top five and i'll tell you who you are. it's never wrong",
+      disagree:
+        "judging people by playlists is so 2014. your taste is whatever the algorithm fed you that year",
+    },
+    {
+      id: "product",
+      d: "the feed",
+      t: "If a product keeps turning up in your feed, it's probably good.",
+      agree:
+        "if everyone's buying it there's a reason. the crowd isn't that dumb",
+      disagree:
+        "it's in your feed because someone paid for it to be. that's the whole trick",
+    },
+    {
+      id: "brand",
+      d: "the feed",
+      t: "Paying more for the brand gets you something real.",
+      agree:
+        "quality, resale, how people read you. it's not nothing, it's the point",
+      disagree: "you're paying for the logo and the ad budget. same factory",
+    },
+    {
+      id: "take",
+      d: "the news cycle",
+      t: "You should have a view on the big story of the week.",
+      agree:
+        "silence is a position. if you're not saying anything you've already picked a side",
+      disagree:
+        "you don't owe anyone a take on something you read about for four minutes",
+    },
+    {
+      id: "reply",
+      d: "the news cycle",
+      t: "A message deserves a reply within the hour.",
+      agree:
+        "leaving people on read for a day is a choice and everyone knows it",
+      disagree:
+        "being reachable all the time isn't a virtue. reply when you have something to say",
+    },
+    {
+      id: "meaning",
+      d: "work",
+      t: "Work should mean something, even if it pays less.",
+      agree:
+        "life's too short to sell your hours to something you don't care about",
+      disagree:
+        "meaning is a luxury. get paid, find the meaning on the weekend",
+    },
+    {
+      id: "public",
+      d: "work",
+      t: "Posting your work in public is part of doing it.",
+      agree:
+        "if no one sees it, it didn't happen. build in public or don't build",
+      disagree: "the best work i know was done by people nobody was watching",
+    },
+    {
+      id: "friend",
+      d: "people",
+      t: "One close friend is worth more than a wide circle.",
+      agree:
+        "one person who'd pick up at 3am beats four hundred followers. not close",
+      disagree:
+        "putting everything on one person is fragile. a wide circle is how people actually get through things",
+    },
+    {
+      id: "there",
+      d: "people",
+      t: "Being at the thing matters more than being seen at it.",
+      agree: "put the phone away. if you were filming it you weren't there",
+      disagree:
+        "if you didn't post it, half the people you'd have met there never find you",
+    },
+    {
+      id: "same",
+      d: "self",
+      t: "Who you are online and who you are offline should be the same person.",
+      agree:
+        "if your account and your actual self would hate each other, that's a problem",
+      disagree:
+        "everyone has an online version. different rooms, different selves. that's just being a person",
+    },
+    {
+      id: "mind",
+      d: "self",
+      t: "Changing your mind often is better than being set in your ways.",
+      agree:
+        "strong opinions, loosely held. if you haven't changed your mind this year you weren't paying attention",
+      disagree:
+        "people who change their minds every week don't have minds, they have feeds",
+    },
+  ];
+  const BY = Object.fromEntries(P.map((p) => [p.id, p]));
+
+  // The current between the questions. All invented.
+  const FILLER = [
+    { k: "Trending", t: "“main character energy” is back", m: "1.1M posts" },
+    {
+      k: "Sponsored",
+      t: "The only notebook you'll need this year.",
+      m: "38,000 sold this week",
+    },
+    {
+      k: "Breaking",
+      t: "Everyone is talking about it. Here's what to think.",
+      m: "updated 4 min ago",
+    },
+    {
+      k: "For you",
+      t: "“if you're still doing this in 2026 we need to talk”",
+      m: "212k likes",
+    },
+    {
+      k: "Sponsored",
+      t: "Your friends already switched.",
+      m: "9 people you know",
+    },
+    {
+      k: "Trending",
+      t: "Take of the day, quoted 48,000 times.",
+      m: "you haven't weighed in",
+    },
+  ];
+
+  const ROOMS = [
+    ["chat", "the group chat"],
+    ["family", "the family table"],
+    ["post", "a public post"],
+    ["stranger", "someone you just met"],
+  ];
+  const DOINGS = [
+    ["say", "say it"],
+    ["soft", "soften it"],
+    ["quiet", "keep quiet"],
+  ];
+  const SOURCES = [
+    ["lived", "something that happened to me"],
+    ["person", "someone I trust"],
+    ["study", "something I read or studied"],
+    ["feed", "the feed"],
+    ["unsure", "I can't say"],
+  ];
+
+  const S = { a: {}, b: {}, crowd: {}, picks: [], rooms: {}, art: {} };
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const shuffle = (xs) => {
+    const a = xs.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const fmt = (x) => (Math.round(x * 10) / 10).toFixed(1);
+  const signed = (x) =>
+    (x > 0.04 ? "+" : x < -0.04 ? "−" : "") + fmt(Math.abs(x));
+  const k1 = (n) =>
+    n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : String(n);
+
+  // ---- the scale ----
+  function scaleHTML(p, phase) {
+    const name = phase + "-" + p.id;
+    let h = `<fieldset class="scale" data-id="${p.id}" data-phase="${phase}">`;
+    h += `<legend><span class="dom">${esc(p.d)}</span>${esc(p.t)}</legend><div class="bubbles">`;
+    const words = [
+      "strongly disagree",
+      "disagree",
+      "slightly disagree",
+      "unsure",
+      "slightly agree",
+      "agree",
+      "strongly agree",
+    ];
+    for (let k = 1; k <= 7; k++) {
+      h += `<label><input type="radio" name="${name}" value="${k}" /><span class="b" aria-hidden="true">${k}</span><span class="sr">${k}, ${words[k - 1]}</span></label>`;
+    }
+    h += `</div><div class="ends" aria-hidden="true"><span>disagree</span><span>unsure</span><span>agree</span></div></fieldset>`;
+    return h;
+  }
+
+  // ---- one row of the chart: alone, in the current, the crowd ----
+  const X = (k) => 20 + (k - 1) * 73.33;
+  function rowSVG(a, b, c, keel) {
+    let s = `<svg class="axis" viewBox="0 0 480 44" aria-hidden="true">`;
+    if (c) {
+      const mx = Math.max(...c.shares);
+      c.shares.forEach((sh, i) => {
+        const h = (sh / mx) * 22;
+        s += `<rect class="cb" x="${X(i + 1) - 11}" y="${38 - h}" width="22" height="${h}" rx="1.5"/>`;
+      });
+    }
+    s += `<line class="ax" x1="${X(1)}" x2="${X(7)}" y1="38" y2="38"/>`;
+    for (let k = 1; k <= 7; k++)
+      s += `<line class="${k === 4 ? "mid" : "tk"}" x1="${X(k)}" x2="${X(k)}" y1="${k === 4 ? 8 : 35}" y2="41"/>`;
+    if (c)
+      s += `<line class="cm" x1="${X(c.mean)}" x2="${X(c.mean)}" y1="6" y2="40"/>`;
+    const y = 22;
+    if (a === b) {
+      s += `<circle class="ring${keel ? " keel" : ""}" cx="${X(a)}" cy="${y}" r="11"/>`;
+      s += `<circle class="pb" cx="${X(b)}" cy="${y}" r="6.5"/>`;
+    } else {
+      const dir = b > a ? 1 : -1;
+      const x1 = X(a) + dir * 9;
+      const x2 = X(b) - dir * 10;
+      const len = Math.abs(x2 - x1) + 1;
+      s += `<path class="mv" style="--len:${len}" d="M${x1} ${y} L${x2} ${y}"/>`;
+      s += `<path class="hd" d="M${x2 + dir * 1} ${y} l${-dir * 7} -4.5 v9 z"/>`;
+      s += `<circle class="pa" cx="${X(a)}" cy="${y}" r="6.5"/>`;
+      s += `<circle class="pb" cx="${X(b)}" cy="${y}" r="6.5"/>`;
+    }
+    return s + `</svg>`;
+  }
+
+  function verdictOf(id) {
+    const a = S.a[id],
+      b = S.b[id],
+      c = S.crowd[id];
+    if (!c) return a === b ? { k: "held", cls: "" } : { k: "wobbled", cls: "" };
+    const toward = (b - a) * Math.sign(c.mean - a);
+    if (toward > 0) return { k: "carried", cls: "v-carried" };
+    if (toward < 0) return { k: "pushed back", cls: "" };
+    return { k: "held", cls: "v-keel" };
+  }
+
+  // ---- the crowd, made on the spot, on the other side of you ----
+  function makeCrowd(a) {
+    const side = a > 4 ? -1 : a < 4 ? 1 : Math.random() < 0.5 ? -1 : 1;
+    const centre =
+      side < 0 ? 1.9 + Math.random() * 0.6 : 6.1 - Math.random() * 0.6;
+    const w = [];
+    for (let k = 1; k <= 7; k++)
+      w.push(Math.exp(-((k - centre) ** 2) / (2 * 1.15 ** 2)) + 0.03);
+    const sum = w.reduce((x, y) => x + y, 0);
+    const shares = w.map((x) => x / sum);
+    const mean = shares.reduce((m, sh, i) => m + sh * (i + 1), 0);
+    const against =
+      side < 0
+        ? shares[0] + shares[1] + shares[2]
+        : shares[4] + shares[5] + shares[6];
+    return {
+      side,
+      shares,
+      mean,
+      n: 1600 + Math.floor(Math.random() * 2800),
+      pct: Math.round(against * 100),
+      likes: 900 + Math.floor(Math.random() * 7000),
+    };
+  }
+
+  // ---- specimen (masthead): a made-up run, domain labels only ----
+  function specimen() {
+    const rows = [
+      ["taste", 6, 6, 2.3],
+      ["taste", 5, 5, null],
+      ["the feed", 2, 4, 5.8],
+      ["the feed", 3, 3, null],
+      ["news", 5, 3, 2.1],
+      ["news", 4, 5, null],
+      ["work", 7, 7, 2.2],
+      ["work", 3, 4, null],
+      ["people", 6, 6, null],
+      ["people", 5, 6, 2.4],
+      ["self", 6, 6, 1.9],
+      ["self", 3, 2, null],
+    ];
+    let h = "";
+    for (const [d, a, b, m] of rows) {
+      let c = null;
+      if (m) {
+        const w = [];
+        for (let k = 1; k <= 7; k++)
+          w.push(Math.exp(-((k - m) ** 2) / 2.6) + 0.03);
+        const s = w.reduce((x, y) => x + y, 0);
+        c = { shares: w.map((x) => x / s), mean: m };
+      }
+      let v;
+      if (!c) v = a === b ? "held" : "wobbled";
+      else {
+        const t = (b - a) * Math.sign(m - a);
+        v = t > 0 ? "carried" : t < 0 ? "pushed" : "held";
+      }
+      const cls =
+        c && v === "held" ? "v-keel" : v === "carried" ? "v-carried" : "";
+      h += `<div class="row"><p class="row-q">${d}</p>${rowSVG(a, b, c, !!c && a === b)}<span class="verdict ${cls}">${v}</span></div>`;
+    }
+    $("specimen").innerHTML = h;
+    void $("specimen").offsetWidth;
+    $("specimen").classList.add("drawn");
+  }
+
+  // ---- I ----
+  function buildA() {
+    $("formA").innerHTML = P.map((p) => scaleHTML(p, "a")).join("");
+    $("formA").addEventListener("change", (e) => {
+      const f = e.target.closest("fieldset");
+      if (!f) return;
+      S.a[f.dataset.id] = +e.target.value;
+      const n = Object.keys(S.a).length;
+      $("countA").textContent = `${n} of 12`;
+      $("toII").disabled = n < 12;
+    });
+  }
+
+  // ---- II ----
+  function buildB() {
+    // one of each topic pair gets a crowd
+    const topics = [...new Set(P.map((p) => p.d))];
+    for (const d of topics) {
+      const pair = P.filter((p) => p.d === d);
+      const pick = pair[Math.floor(Math.random() * pair.length)];
+      S.crowd[pick.id] = makeCrowd(S.a[pick.id]);
+    }
+    const order = shuffle(P);
+    const fill = shuffle(FILLER);
+    let h = "";
+    order.forEach((p, i) => {
+      if (i % 2 === 0 && fill.length) {
+        const f = fill.pop();
+        h += `<article class="post filler"><p class="meta"><b>${esc(f.k)}</b> · ${esc(f.m)}</p><p class="t">${esc(f.t)}</p></article>`;
+      }
+      const c = S.crowd[p.id];
+      h += `<article class="post">`;
+      if (c) {
+        const mx = Math.max(...c.shares);
+        h += `<p class="meta"><b>Poll</b> · ${c.n.toLocaleString("en-GB")} votes · most under 30</p>`;
+        h += scaleHTML(p, "b").replace('<div class="bubbles">', () => {
+          const bars = c.shares
+            .map((sh) => `<i style="--h:${(sh / mx).toFixed(3)}"></i>`)
+            .join("");
+          const word = c.side < 0 ? "disagree" : "agree";
+          const cm = c.side < 0 ? p.disagree : p.agree;
+          return (
+            `<div class="poll" aria-hidden="true">${bars}</div><p class="poll-read">${c.pct}% ${word}</p>` +
+            `<p class="cmt"><span class="meta">Top comment · ${k1(c.likes)} likes</span>${esc(cm)}</p><div class="bubbles">`
+          );
+        });
+      } else {
+        h += `<p class="meta"><b>Poll</b> · no votes yet</p>`;
+        h += scaleHTML(p, "b");
+      }
+      h += `</article>`;
+    });
+    $("feed").innerHTML = h;
+    $("feed").addEventListener("change", (e) => {
+      const f = e.target.closest("fieldset");
+      if (!f) return;
+      S.b[f.dataset.id] = +e.target.value;
+      const n = Object.keys(S.b).length;
+      $("countB").textContent = `${n} of 12`;
+      $("toIII").disabled = n < 12;
+    });
+  }
+
+  // ---- III ----
+  function buildIII() {
+    const crowdIds = P.filter((p) => S.crowd[p.id]).map((p) => p.id);
+    const ctrlIds = P.filter((p) => !S.crowd[p.id]).map((p) => p.id);
+    const noise =
+      ctrlIds.reduce((m, id) => m + Math.abs(S.b[id] - S.a[id]), 0) /
+      ctrlIds.length;
+    const pull =
+      crowdIds.reduce(
+        (m, id) =>
+          m + (S.b[id] - S.a[id]) * Math.sign(S.crowd[id].mean - S.a[id]),
+        0,
+      ) / crowdIds.length;
+    const tally = { held: 0, carried: 0, "pushed back": 0 };
+    crowdIds.forEach((id) => tally[verdictOf(id).k]++);
+    S.tally = tally;
+
+    $("figs").innerHTML =
+      `<div class="fig"><span class="label">Noise</span><span class="v">${fmt(noise)}</span><p>points your answers moved, on average, on the six questions nobody voted on.</p></div>` +
+      `<div class="fig"><span class="label">Pull</span><span class="v c">${signed(pull)}</span><p>points they moved toward the crowd, on average, on the six that had one.</p></div>` +
+      `<div class="fig"><span class="label">Held in the current</span><span class="v k">${tally.held} of 6</span><p>${tally.carried} carried, ${tally["pushed back"]} pushed back.</p></div>`;
+
+    let r;
+    if (pull > noise + 0.25 && pull > 0.3) {
+      r = `The crowd moved you further than asking twice does. On this run, some of what you'd have called your view was sitting where the room put it.`;
+    } else if (pull < -0.3) {
+      r = `You moved away from the crowd. That can feel like independence, but the crowd still decided where you went. It just decided backwards.`;
+    } else if (tally.held >= 5) {
+      r = `The crowd barely touched you. ${tally.held} of the six positions it leaned on stayed exactly where you put them alone.`;
+    } else {
+      r = `The crowd didn't move you beyond your own noise on this run. Where you did move, you moved about as much as you do when nobody is watching.`;
+    }
+    $("reading").textContent = r;
+
+    const row = (id) => {
+      const p = BY[id],
+        v = verdictOf(id);
+      const keel = !!S.crowd[id] && v.k === "held";
+      return `<div class="row"><p class="row-q"><span class="dom">${esc(p.d)}</span>${esc(p.t)}</p>${rowSVG(S.a[id], S.b[id], S.crowd[id], keel)}<span class="verdict ${v.cls}">${v.k}</span></div>`;
+    };
+    $("chart").innerHTML =
+      `<div class="group-head"><span class="label">With a crowd</span><span class="label">${crowdIds.length} positions</span></div>` +
+      `<div class="rows reveal">${crowdIds.map(row).join("")}</div>` +
+      `<div class="group-head"><span class="label">Without one, the control</span><span class="label">${ctrlIds.length} positions</span></div>` +
+      `<div class="rows reveal">${ctrlIds.map(row).join("")}</div>`;
+    observe($("chart"));
+  }
+
+  // ---- IV ----
+  function buildIV() {
+    $("picks").innerHTML = P.map((p) => {
+      const v = verdictOf(p.id);
+      return `<li><label><input type="checkbox" value="${p.id}" /><span>${esc(p.t)}</span><span class="verdict ${v.cls}">${v.k}</span></label></li>`;
+    }).join("");
+    $("picks").addEventListener("change", () => {
+      const boxes = [...$("picks").querySelectorAll("input")];
+      const on = boxes.filter((b) => b.checked);
+      boxes.forEach((b) => (b.disabled = !b.checked && on.length >= 3));
+      S.picks = on.map((b) => b.value);
+      $("countP").textContent = `${on.length} of 3`;
+      $("toRooms").disabled = on.length === 0;
+    });
+  }
+
+  function buildRooms() {
+    S.rooms = {};
+    let h = "";
+    for (const id of S.picks) {
+      h += `<fieldset class="rooms" data-id="${id}"><legend>${esc(BY[id].t)}</legend>`;
+      for (const [rk, rn] of ROOMS) {
+        h += `<div class="room" role="radiogroup" aria-label="${esc(rn)}"><span>In ${esc(rn)}</span><div class="opts">`;
+        for (const [dk, dn] of DOINGS) {
+          h += `<label><input type="radio" name="r-${id}-${rk}" value="${dk}" data-room="${rk}" /><span>${dn}</span></label>`;
+        }
+        h += `</div></div>`;
+      }
+      h += `</fieldset>`;
+    }
+    $("roomForm").innerHTML = h;
+    $("roomForm").hidden = false;
+    $("roomActions").hidden = false;
+    $("showRooms").disabled = true;
+    $("roomOut").hidden = true;
+    $("picks")
+      .querySelectorAll("input")
+      .forEach((b) => (b.disabled = true));
+    $("toRooms").disabled = true;
+    $("roomForm").onchange = (e) => {
+      const f = e.target.closest("fieldset");
+      if (!f) return;
+      (S.rooms[f.dataset.id] ||= {})[e.target.dataset.room] = e.target.value;
+      const done = S.picks.every(
+        (id) => S.rooms[id] && Object.keys(S.rooms[id]).length === ROOMS.length,
+      );
+      $("showRooms").disabled = !done;
+    };
+    $("roomForm").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function showRooms() {
+    let h = `<table><thead><tr><th>Position</th>${ROOMS.map(([, n]) => `<th>${esc(n)}</th>`).join("")}</tr></thead><tbody>`;
+    let whole = 0,
+      hiddenSomewhere = 0;
+    for (const id of S.picks) {
+      const r = S.rooms[id];
+      if (ROOMS.every(([k]) => r[k] === "say")) whole++;
+      if (ROOMS.some(([k]) => r[k] === "quiet")) hiddenSomewhere++;
+      h += `<tr><td>${esc(BY[id].t)}</td>${ROOMS.map(([k]) => {
+        const d = r[k];
+        const word = DOINGS.find(([x]) => x === d)[1];
+        return `<td><span class="sq ${d}" role="img" aria-label="${word}"></span></td>`;
+      }).join("")}</tr>`;
+    }
+    h += `</tbody></table><div class="key" aria-hidden="true"><span><span class="sq say"></span>say it</span><span><span class="sq soft"></span>soften it</span><span><span class="sq quiet"></span>keep quiet</span></div>`;
+    $("roomGrid").innerHTML = h;
+    const n = S.picks.length;
+    let r;
+    if (whole === n)
+      r = `All ${n === 1 ? "of it" : n} you'd say in every room. The same person walks into each one.`;
+    else if (whole === 0)
+      r = `None of ${n === 1 ? "it" : "them"} goes into every room intact. You hold ${n === 1 ? "it" : "them"}, and a different version of you speaks for ${n === 1 ? "it" : "them"} depending on who's listening.`;
+    else
+      r = `${whole} of ${n} you'd say in every room. The rest change shape at the door.`;
+    if (hiddenSomewhere && whole !== n)
+      r +=
+        hiddenSomewhere === 1
+          ? ` One goes quiet somewhere.`
+          : hiddenSomewhere === n
+            ? ` Every one goes quiet somewhere.`
+            : ` ${hiddenSomewhere} of ${n} go quiet somewhere.`;
+    $("roomReading").textContent = r;
+    S.whole = whole;
+    $("roomOut").hidden = false;
+    $("roomForm")
+      .querySelectorAll("input")
+      .forEach((i) => (i.disabled = true));
+    $("roomActions").hidden = true;
+  }
+
+  // ---- V ----
+  function buildV() {
+    let h = "";
+    for (const id of S.picks) {
+      const p = BY[id],
+        v = verdictOf(id);
+      h += `<div class="article" data-id="${id}">`;
+      h += `<p class="from">From: <em>${esc(p.t)}</em> You answered ${S.a[id]} alone and ${S.b[id]} in the feed, ${S.crowd[id] ? "with a crowd against you" : "with no crowd shown"}: ${v.k}.</p>`;
+      h += `<label class="field"><span>I believe</span><textarea data-f="bel" rows="2" placeholder="In your own words, not the statement's."></textarea></label>`;
+      h += `<div class="field"><span>I got here through</span><div class="opts" role="radiogroup" aria-label="I got here through">`;
+      for (const [sk, sn] of SOURCES)
+        h += `<label><input type="radio" name="src-${id}" value="${sk}" data-f="src" /><span>${sn}</span></label>`;
+      h += `</div></div>`;
+      h += `<label class="field"><span>I'd change my mind if</span><textarea data-f="chg" rows="2" placeholder="What evidence, not whose opinion."></textarea></label>`;
+      h += `</div>`;
+    }
+    $("artForm").innerHTML = h;
+    const check = () => {
+      S.art = {};
+      let ok = true;
+      $("artForm")
+        .querySelectorAll(".article")
+        .forEach((el) => {
+          const id = el.dataset.id;
+          const bel = el.querySelector('[data-f="bel"]').value.trim();
+          const src = el.querySelector('[data-f="src"]:checked');
+          const chg = el.querySelector('[data-f="chg"]').value.trim();
+          S.art[id] = { bel, src: src ? src.value : "", chg };
+          if (!bel || !src) ok = false;
+        });
+      $("setDown").disabled = !ok;
+    };
+    $("artForm").addEventListener("input", check);
+    $("artForm").addEventListener("change", check);
+  }
+
+  function clean(s) {
+    s = s.replace(/\s+/g, " ").trim();
+    return /[.!?]$/.test(s) ? s : s + ".";
+  }
+  // lower-case the first letter so it reads on from "I believe", but leave the pronoun I alone
+  const lower1 = (s) => (/^I\b/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
+
+  function setDown() {
+    const date = new Date().toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const leaned = S.picks.filter((id) => S.crowd[id]);
+    const heldN = leaned.filter((id) => verdictOf(id).k === "held").length;
+    const how = (k) =>
+      k === "unsure" ? "I can't say how I got here." : `I got here through ${srcWord(k)}.`;
+    let h = `<p class="label">Articles · ${esc(date)}</p><h3>What I'd still say</h3><ol>`;
+    let txt = `ARTICLES · ${date}\n\n`;
+    const srcWord = (k) => SOURCES.find(([x]) => x === k)[1];
+    S.picks.forEach((id, i) => {
+      const a = S.art[id];
+      const bel = clean(a.bel.replace(/^i (believe|think)( that)?\s+/i, ""));
+      const chg = a.chg
+        ? clean(a.chg.replace(/^i'?d change my mind if\s+/i, ""))
+        : "";
+      h += `<li><div><p class="bel">I believe ${esc(lower1(bel))}</p>`;
+      h +=
+        a.src === "unsure"
+          ? `<p class="sub">${how(a.src)}</p>`
+          : `<p class="sub">I got here through <em>${esc(srcWord(a.src))}</em>.</p>`;
+      h += chg
+        ? `<p class="sub">I'd change my mind if <em>${esc(lower1(chg))}</em></p>`
+        : `<p class="sub">Nothing named would change my mind.</p>`;
+      h += `</div></li>`;
+      txt += `${["I", "II", "III"][i]}. I believe ${lower1(bel)}\n   ${how(a.src)}\n   ${chg ? "I'd change my mind if " + lower1(chg) : "Nothing named would change my mind."}\n\n`;
+    });
+    const foot =
+      (leaned.length
+        ? `Held when a crowd leaned on it: ${heldN} of ${leaned.length}. `
+        : `No crowd leaned on these on this run. `) +
+      `Said in every room: ${S.whole} of ${S.picks.length}.`;
+    h += `</ol><p class="foot">${foot}</p>`;
+    txt += foot + "\n";
+    $("creed").innerHTML = h;
+    S.txt = txt;
+
+    const notes = [];
+    const fromFeed = S.picks.filter((id) => S.art[id].src === "feed").length;
+    const unsure = S.picks.filter((id) => S.art[id].src === "unsure").length;
+    const unmovable = S.picks.filter((id) => !S.art[id].chg).length;
+    if (fromFeed)
+      notes.push(
+        `${fromFeed === 1 ? "One of these" : fromFeed + " of these"} came in on the feed. Worth knowing: a position that arrived on the current can leave on it, unless you give it a reason to stay that isn't the current.`,
+      );
+    if (unsure)
+      notes.push(
+        `${unsure === 1 ? "One" : unsure} you can't source. Most of what anyone believes is like that. It is also where the current gets in.`,
+      );
+    if (unmovable)
+      notes.push(
+        `Nothing would change your mind on ${unmovable === 1 ? "one of these" : unmovable + " of these"}. If nothing could move it, you aren't holding it. It's holding you.`,
+      );
+    if (!notes.length)
+      notes.push(
+        `Every article names what would move it. That is the difference between a keel and an anchor: a keel lets you turn when there's a reason to, and keeps you from being turned when there isn't one.`,
+      );
+    $("notes").innerHTML = notes.map((n) => `<p>${esc(n)}</p>`).join("");
+
+    $("artForm")
+      .querySelectorAll("textarea, input")
+      .forEach((el) => (el.disabled = true));
+    $("setDown").hidden = true;
+    $("creedOut").hidden = false;
+    $("coda").hidden = false;
+    observe($("coda"));
+    $("creed").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---- flow ----
+  // Sections fade in as they open. Nothing waits on scroll position, so nothing can be left invisible.
+  function observe(root) {
+    const els = root.classList.contains("reveal")
+      ? [root]
+      : [...root.querySelectorAll(".reveal")];
+    els.forEach((el) => {
+      void el.offsetWidth; // commit the hidden state so the transition runs
+      el.classList.add("in");
+    });
+  }
+  function open(id) {
+    const el = $(id);
+    el.hidden = false;
+    el.classList.add("reveal");
+    observe(el);
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  $("begin").addEventListener("click", () => {
+    $("begin").closest(".actions").hidden = true;
+    open("s1");
+  });
+  $("toII").addEventListener("click", () => {
+    $("formA").innerHTML =
+      `<p class="sealed">Twelve answered. Sealed until III.</p>`;
+    $("toII").closest(".actions").hidden = true;
+    buildB();
+    open("s2");
+  });
+  $("toIII").addEventListener("click", () => {
+    $("feed")
+      .querySelectorAll("input")
+      .forEach((i) => (i.disabled = true));
+    $("toIII").closest(".actions").hidden = true;
+    buildIII();
+    open("s3");
+  });
+  $("toIV").addEventListener("click", () => {
+    $("toIV").closest(".actions").hidden = true;
+    buildIV();
+    open("s4");
+  });
+  $("toRooms").addEventListener("click", buildRooms);
+  $("showRooms").addEventListener("click", showRooms);
+  $("toV").addEventListener("click", () => {
+    $("toV").closest(".actions").hidden = true;
+    buildV();
+    open("s5");
+  });
+  $("setDown").addEventListener("click", setDown);
+  $("copy").addEventListener("click", async () => {
+    const btn = $("copy");
+    try {
+      await navigator.clipboard.writeText(S.txt);
+      btn.textContent = "Copied";
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents($("creed"));
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      btn.textContent = "Selected. Copy with your keyboard";
+    }
+    setTimeout(() => (btn.textContent = "Copy the articles"), 2400);
+  });
+  $("again").addEventListener("click", () => location.reload());
+
+  buildA();
+  specimen();
+</script>

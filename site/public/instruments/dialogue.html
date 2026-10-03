@@ -1,0 +1,3844 @@
+<title>Dialogue</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A thesis of yours, questioned in the open across six families of question, until it stands clearer. You answer; nothing here does."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a sheet on the left where the thesis is put and questioned, turn under turn, and a desk on the
+     right that reads it: the six families as a wheel, the assumptions as a ledger, the form, the terms, the
+     reading. Ink on bone, after niwa's paper; one accent, burnt orange, only ever for the thing in hand —
+     a family, an assumption that fell, a row against the conclusion. Panels are drawn, not ruled. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed; /* niwa bg */
+    --sheet: #faf9f6; /* surface */
+    --ink: #23211e;
+    --ink-2: #6b655c; /* muted */
+    --ink-3: #777064; /* faint, let up for legibility */
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --accent: #b5532a;
+    --accent-wash: rgba(181, 83, 42, 0.1);
+    --pen: color-mix(in srgb, var(--ink) 82%, var(--paper));
+    --grain: multiply;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f; /* niwa sumi */
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --ink-2: #a39c8e;
+      --ink-3: #8a8374;
+      --rule: #302e25;
+      --rule-2: #4a473b;
+      --accent: #d9763f;
+      --accent-wash: rgba(217, 118, 63, 0.14);
+      --grain: screen;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --ink-2: #a39c8e;
+    --ink-3: #8a8374;
+    --rule: #302e25;
+    --rule-2: #4a473b;
+    --accent: #d9763f;
+    --accent-wash: rgba(217, 118, 63, 0.14);
+    --grain: screen;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.05;
+    mix-blend-mode: var(--grain);
+  }
+  ::selection {
+    background: var(--accent-wash);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ol,
+  ul,
+  dl,
+  dd {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: inherit;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .acc {
+    color: var(--accent);
+  }
+  .ink {
+    color: var(--ink);
+  }
+  .faint {
+    color: var(--ink-3);
+  }
+  .hand {
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  .hand.faint {
+    color: var(--ink-3);
+  }
+  .display {
+    font-family: var(--serif);
+    letter-spacing: -0.015em;
+  }
+  .mono {
+    font-family: var(--mono);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 56px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 22px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(19px, 2.2vw, 23px);
+    line-height: 1.36;
+    color: var(--ink-2);
+    max-width: 32ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .claim {
+    font-size: clamp(19px, 2vw, 21px);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    margin: 0 0 16px;
+    max-width: 46ch;
+  }
+  .steps {
+    border-top: 1px solid var(--rule);
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15.5px;
+    line-height: 1.45;
+  }
+  .steps .n {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    padding-top: 2px;
+  }
+
+  /* the work: a sheet and a desk */
+  .work {
+    padding-top: 32px;
+    scroll-margin-top: 16px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 24px;
+    align-items: start;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 18px;
+    min-width: 0;
+  }
+  .panel.big {
+    padding: clamp(20px, 3vw, 30px);
+  }
+  .panel.sk {
+    border-color: transparent;
+  }
+  .panel > * {
+    position: relative;
+    z-index: 2;
+  }
+  .panel > svg.sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  svg.sketch path {
+    fill: none;
+    stroke: var(--pen);
+    stroke-width: 1.35;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  svg.sketch.hollow path {
+    stroke: var(--ink-3);
+    stroke-dasharray: 4 4;
+  }
+  svg.sketch.draw path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 620ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    animation: rise 560ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 12px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* chips: the only buttons on the sheet */
+  .chip {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: var(--ink-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    padding: 6px 11px;
+    background: transparent;
+    transition:
+      color 200ms var(--ease),
+      border-color 200ms var(--ease),
+      background-color 200ms var(--ease),
+      opacity 200ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--ink-2);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip.solid {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .chip.solid:not(:disabled):hover {
+    color: var(--paper);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  label.chip {
+    cursor: pointer;
+  }
+  label.chip:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .x {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    padding: 2px 6px;
+    border-radius: 2px;
+    transition: color 160ms var(--ease);
+  }
+  .x:hover,
+  .x.acc {
+    color: var(--accent);
+  }
+
+  /* fields: written on, a hairline under */
+  .field {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule-2);
+    border-radius: 0;
+    padding: 4px 0;
+    color: var(--ink);
+    resize: none;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  .field::placeholder {
+    color: var(--ink-3);
+    opacity: 1;
+    font-style: italic;
+  }
+  .field:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .field[readonly] {
+    border-bottom-color: var(--rule);
+  }
+  .field[readonly]:focus {
+    box-shadow: none;
+  }
+  .field.mono {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  select.chip {
+    appearance: none;
+    padding-right: 11px;
+    cursor: pointer;
+  }
+  select.chip option {
+    background: var(--sheet);
+    color: var(--ink);
+  }
+
+  /* the list of dialogues */
+  .thesis-in {
+    font-size: clamp(22px, 3vw, 28px);
+    line-height: 1.25;
+    margin-top: 10px;
+    padding: 8px 0;
+  }
+  .rows {
+    margin-top: 8px;
+  }
+  .rows li + li {
+    border-top: 1px solid var(--rule);
+  }
+  .row-btn {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+    width: 100%;
+    padding: 10px 8px;
+    border-radius: 3px;
+    transition: background-color 180ms var(--ease);
+  }
+  .row-btn:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .row-title {
+    font-size: 19px;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+  .fams {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .fams dt {
+    color: var(--ink);
+  }
+  .fams dd {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* the open dialogue */
+  .thesis {
+    font-size: clamp(24px, 3.2vw, 31px);
+    line-height: 1.22;
+    margin: 12px 0 0;
+    max-width: 40ch;
+  }
+  .now-in {
+    font-size: 17px;
+    line-height: 1.5;
+    margin-top: 6px;
+  }
+  .turns {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .q {
+    font-size: clamp(20px, 2.5vw, 24px);
+    line-height: 1.25;
+    margin: 8px 0 0;
+    max-width: 38ch;
+  }
+  .turn.hollow .q {
+    color: var(--ink-2);
+    border-bottom: 1px dashed var(--rule-2);
+    padding-bottom: 8px;
+  }
+  .answer {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+  .bank {
+    margin-top: 12px;
+  }
+  .bank button {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    width: 100%;
+    padding: 7px 8px;
+    border-radius: 3px;
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--ink);
+    transition:
+      background-color 180ms var(--ease),
+      color 180ms var(--ease);
+  }
+  .bank button:not(:disabled):hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .bank button:disabled {
+    color: var(--ink-3);
+    text-decoration: line-through;
+    cursor: default;
+  }
+  .own {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .own .field {
+    flex: 1 1 14rem;
+    width: auto;
+  }
+  .note {
+    margin-top: 6px;
+    font-size: 15px;
+  }
+
+  /* the wheel */
+  .wheel {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 6px;
+  }
+  .wheel path {
+    fill: var(--ink);
+    stroke: var(--ink);
+    stroke-width: 1;
+    stroke-opacity: 0.9;
+    transition:
+      fill-opacity 320ms var(--ease),
+      stroke 220ms var(--ease);
+  }
+  .wheel .unasked path {
+    stroke-dasharray: 3 3;
+    stroke-opacity: 0.5;
+  }
+  .wheel .lit path {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-opacity: 1;
+  }
+  .wheel.live g {
+    cursor: pointer;
+  }
+  .wheel.live g:hover path {
+    stroke: var(--accent);
+  }
+  .wheel.live g:focus-visible {
+    outline: none;
+  }
+  .wheel.live g:focus-visible path {
+    stroke: var(--accent);
+    stroke-width: 2.4;
+  }
+  .wheel text {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    fill: var(--ink-3);
+    pointer-events: none;
+  }
+  .wheel .asked text {
+    fill: var(--ink);
+  }
+
+  /* the ledger of assumptions */
+  .ledger {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ledger li {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .a-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .dot {
+    flex: none;
+    width: 9px;
+    height: 9px;
+    margin-top: 9px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    background: transparent;
+  }
+  .dot.hollow {
+    border-style: dashed;
+  }
+  .dot.holds {
+    background: var(--ink);
+  }
+  .dot.fell {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .dot.cannot {
+    background: var(--ink-3);
+  }
+  .a-under {
+    padding-left: 17px;
+    margin-top: 6px;
+  }
+  .a-under .chips {
+    gap: 5px;
+  }
+  .a-form {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 6px;
+  }
+  .a-form .field {
+    width: 8.5rem;
+    flex: none;
+    font-size: 12.5px;
+  }
+  .a-note {
+    font-style: italic;
+    color: var(--ink-2);
+    font-size: 15px;
+    margin-top: 4px;
+  }
+  .add {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .add .field {
+    flex: 1 1 8rem;
+    width: auto;
+    font-size: 15px;
+  }
+  .add .field.word {
+    flex: 0 1 7rem;
+  }
+
+  /* the form */
+  .letters {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lt {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 15px;
+  }
+  .lt .field.letter {
+    width: 1.6rem;
+    flex: none;
+    text-align: center;
+    font-family: var(--mono);
+  }
+  .premises {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pr {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .pr .n {
+    width: 1.6rem;
+    flex: none;
+    text-align: center;
+  }
+  .pr.therefore {
+    border-top: 1px solid var(--ink);
+    padding-top: 6px;
+  }
+  .reads {
+    padding-left: calc(1.6rem + 8px);
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .reads .mono {
+    color: var(--ink);
+  }
+  .reads .bad {
+    color: var(--accent);
+    font-style: italic;
+    font-size: 14px;
+  }
+  .truth {
+    margin-top: 14px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-2) transparent;
+  }
+  .truth table {
+    font-family: var(--mono);
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  .truth th {
+    font-weight: 400;
+    color: var(--ink-2);
+    padding: 0 7px 4px;
+  }
+  .truth td {
+    padding: 0 7px;
+    text-align: center;
+    color: var(--ink-3);
+  }
+  .truth tr.live td {
+    color: var(--ink);
+  }
+  .truth tr.against td {
+    color: var(--accent);
+  }
+  .truth tr.against td:first-child {
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+  .truth .div {
+    border-left: 1px solid var(--rule-2);
+  }
+  .lines {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  /* terms */
+  .terms {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .terms > div {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .terms dt {
+    font-style: italic;
+    color: var(--ink);
+    flex: none;
+    max-width: 45%;
+  }
+  .terms dd {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink-2);
+  }
+
+  /* the reading */
+  .reading {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .reading li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .reading li:last-child {
+    border-bottom: 0;
+  }
+  .alert {
+    margin-top: 12px;
+    color: var(--accent);
+  }
+
+  /* coda */
+  .coda {
+    margin-top: 72px;
+    padding-top: 40px;
+    border-top: 1px solid var(--rule-2);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px 56px;
+  }
+  .coda h2 {
+    font-size: clamp(24px, 3vw, 30px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .coda p,
+  .coda li {
+    font-size: 16px;
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
+  .coda ul {
+    list-style: disc;
+    padding-left: 18px;
+  }
+  .coda li {
+    margin-bottom: 8px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise {
+      animation: none;
+    }
+    svg.sketch.draw path {
+      animation: none;
+      stroke-dasharray: none;
+      stroke-dashoffset: 0;
+    }
+    .chip,
+    .field,
+    .wheel path {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 40px;
+    }
+    .coda {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .panel {
+      padding: 16px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Dialogue</h1>
+      <p class="deck">
+        A thesis of yours, questioned in the open, until it stands clearer.
+        <em>You answer; nothing here does.</em>
+      </p>
+    </div>
+    <div>
+      <p class="claim">
+        A thesis you hold arrives whole, and from the inside it feels like
+        something you know. Asked what you mean, what you assume, how you know,
+        who would put it differently, what follows and why you are asking, it
+        comes apart into words that carry weight, assumptions you had not
+        written down, and reasons that reached you secondhand. Only you can
+        answer those questions, so nothing here does.
+      </p>
+      <ol class="steps">
+        <li>
+          <span class="n">1</span
+          ><span>Put the thesis down, in your words.</span>
+        </li>
+        <li>
+          <span class="n">2</span
+          ><span
+            >Take a question from the bank or your own hand, and answer it
+            before the next.</span
+          >
+        </li>
+        <li>
+          <span class="n">3</span
+          ><span>Surface an assumption as you hear it; examine it.</span>
+        </li>
+        <li>
+          <span class="n">4</span
+          ><span>Re-put the thesis, and read what it gained and lost.</span>
+        </li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="work" id="work" aria-live="off"></main>
+
+  <section class="coda">
+    <div>
+      <h2>What the desk reads</h2>
+      <p>
+        Which families have been asked and which not, where the questions came
+        from, the assumptions surfaced and how each went, the terms clarified,
+        what the form shows, and what the thesis gained and lost when you re-put
+        it. Counts, never a verdict.
+      </p>
+      <p>
+        The form is the one place the page does more than count. Give each
+        sentence a letter and write the argument over the letters. The rows show
+        whether there is a case where every premise holds and the conclusion
+        does not, and which premises and assumptions cannot be held together.
+        That is about shape. Whether a sentence is so stays yours.
+      </p>
+    </div>
+    <div>
+      <h2>What it never does</h2>
+      <ul>
+        <li>
+          Answer, agree, disagree, or say whether the thesis holds. No sentence
+          the desk writes contains true, false, valid, sound, right or wrong.
+        </li>
+        <li>
+          Ask a question that can be answered yes or no. Your own questions are
+          checked for that before they go on the sheet.
+        </li>
+        <li>
+          Send anything anywhere. Dialogues stay in this browser, under one key.
+          Copy one out as markdown to keep it elsewhere.
+        </li>
+      </ul>
+      <p>
+        The six families follow the shape Socratic questioning has taken in
+        teaching since Richard Paul and Linda Elder set it out. The bank is a
+        starter. Open your own <span class="mono">questions.md</span> beside it
+        and yours are dealt first.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Dialogue · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the logic, ported by hand from niwa lib/dialogue.ts, lib/form.ts and the helpers they import ── */
+
+  const FAMILIES = [
+    "clarify",
+    "assume",
+    "evidence",
+    "viewpoint",
+    "consequence",
+    "question",
+  ];
+
+  const FAMILY_LABEL = {
+    clarify: "clarifying",
+    assume: "assumptions",
+    evidence: "reasons and evidence",
+    viewpoint: "other viewpoints",
+    consequence: "implications",
+    question: "the question itself",
+  };
+
+  const FAMILY_BLURB = {
+    clarify: "what is meant — the words, an example, the thing itself",
+    assume: "what is taken for granted for this to be said at all",
+    evidence: "how it is known — what it rests on, what would change it",
+    viewpoint: "who would put it differently, and what they would say",
+    consequence: "what follows if it is so — and if it is not",
+    question: "why this is being asked, and what the asking is for",
+  };
+
+  const BY = ["you", "bank", "garden", "proposed"];
+  const BY_LABEL = {
+    you: "you",
+    bank: "the bank",
+    garden: "the garden",
+    proposed: "proposed",
+  };
+
+  const EXAMINED_LABEL = {
+    "": "not examined",
+    holds: "holds",
+    fell: "fell",
+    cannot: "cannot say",
+  };
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  const emptyDialogue = (today) => ({
+    slug: "",
+    title: "",
+    thesis: "",
+    now: "",
+    stone: null,
+    opened: today,
+    touched: today,
+    turns: [],
+    assumptions: [],
+    terms: [],
+    letters: [],
+    premises: [],
+    conclusion: "",
+    note: "",
+  });
+
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  /* hand to hand: what a wording gained and lost (niwa lib/provenance.ts) */
+  const STOP = new Set(
+    "a an the and or but if then than that this these those there here it its i i'm i've i'd my me we our you your he she they them their his her is are was were be been being am do does did done have has had not no nor so as at by for from in into of on to with about over under after before again once also very too just when where why how what which who whom whose because while during through between out up down off".split(
+      " ",
+    ),
+  );
+
+  function wordsOf(text) {
+    const m = new Map();
+    for (const raw of text.toLowerCase().split(/[^a-z0-9'’%-]+/)) {
+      const w = raw.replace(/^['’-]+|['’-]+$/g, "");
+      if (!w || STOP.has(w)) continue;
+      if (!/\d/.test(w) && w.length < 3) continue;
+      m.set(w, (m.get(w) ?? 0) + 1);
+    }
+    return m;
+  }
+
+  function gainedLost(next, prev) {
+    const a = wordsOf(next);
+    const b = wordsOf(prev);
+    const num = (w) => (/\d/.test(w) ? 1 : 0);
+    const pick = (x, y) =>
+      [...x.entries()]
+        .filter(([w]) => !y.has(w))
+        .sort(
+          (p, q) =>
+            q[1] - p[1] ||
+            num(q[0]) - num(p[0]) ||
+            q[0].length - p[0].length ||
+            p[0].localeCompare(q[0]),
+        )
+        .map(([w]) => w)
+        .slice(0, 12);
+    return { gained: pick(a, b), lost: pick(b, a) };
+  }
+
+  /* open questions */
+  const CLOSED =
+    /^(is|are|was|were|do|does|did|can|could|will|would|should|has|have|had|am|isn't|aren't|don't|doesn't|didn't|can't|couldn't|won't|wouldn't|shouldn't)\b/i;
+  const WH =
+    /^(how|why|what|which|where|when|who|whose|whom|in what|to what|by what)\b/i;
+  const CLOSED_CLAUSE =
+    /[,;—-]\s*(would|could|does|do|is|are|did|can|will|should|has|have|might) (that|this|it|you|they|we|there|he|she)\b/i;
+
+  /** A Socratic question is open: it asks, and it cannot be answered with yes or no. */
+  function isOpen(q) {
+    const t = q.trim();
+    if (!t) return false;
+    if (!t.includes("?") && !WH.test(t)) return false;
+    const wh = /\b(how|why|what|which|where|when|who|whose|whom)\b/i;
+    if (CLOSED.test(t)) return wh.test(t.replace(CLOSED, ""));
+    if (CLOSED_CLAUSE.test(t) && !wh.test(t)) return false;
+    return true;
+  }
+
+  /* the bank */
+  const emptyBank = () => ({
+    clarify: [],
+    assume: [],
+    evidence: [],
+    viewpoint: [],
+    consequence: [],
+    question: [],
+  });
+
+  const familyOf = (heading) => {
+    const h = heading.toLowerCase().trim();
+    for (const f of FAMILIES)
+      if (
+        h === f ||
+        h === FAMILY_LABEL[f] ||
+        h.startsWith(f) ||
+        FAMILY_LABEL[f].startsWith(h)
+      )
+        return f;
+    return null;
+  };
+
+  /** The reader's own bank: a markdown file with one heading per family and one question per line under it. */
+  function parseBank(raw) {
+    const bank = emptyBank();
+    const content = raw.replace(
+      /^\uFEFF?---\r?\n[\s\S]*?\r?\n---[ \t]*(\r?\n|$)/,
+      "",
+    );
+    let cur = null;
+    for (const line of content.split(/\r?\n/)) {
+      const h = line.match(/^#{1,3}\s+(.+?)\s*$/);
+      if (h) {
+        cur = familyOf(h[1]);
+        continue;
+      }
+      const t = line.replace(/^\s*[-*]\s+/, "").trim();
+      if (cur && t && !t.startsWith("#")) bank[cur].push(t);
+    }
+    return bank;
+  }
+
+  /* the tally and the readings */
+  const kept = (t) => t.kept;
+
+  function tally(d) {
+    const byFamily = {
+      clarify: 0,
+      assume: 0,
+      evidence: 0,
+      viewpoint: 0,
+      consequence: 0,
+      question: 0,
+    };
+    const bySource = { you: 0, bank: 0, garden: 0, proposed: 0 };
+    let answered = 0;
+    const stones = new Set();
+    for (const t of d.turns) {
+      if (!kept(t)) continue;
+      byFamily[t.family]++;
+      bySource[t.by]++;
+      if (t.answer.trim()) answered++;
+      if (t.stone) stones.add(t.stone);
+    }
+    const a = d.assumptions.filter((x) => x.kept);
+    return {
+      turns: d.turns.filter(kept).length,
+      answered,
+      hollow: d.turns.filter((t) => !t.kept).length,
+      byFamily,
+      unasked: FAMILIES.filter((f) => !byFamily[f]),
+      bySource,
+      assumptions: {
+        surfaced: a.length,
+        hollow: d.assumptions.filter((x) => !x.kept).length,
+        holds: a.filter((x) => x.examined === "holds").length,
+        fell: a.filter((x) => x.examined === "fell").length,
+        cannot: a.filter((x) => x.examined === "cannot").length,
+        open: a.filter((x) => !x.examined).length,
+      },
+      terms: d.terms.length,
+      stones: stones.size,
+      drift:
+        d.now.trim() && d.thesis.trim() ? gainedLost(d.now, d.thesis) : null,
+    };
+  }
+
+  const list = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+  const quoted = (xs) => xs.map((w) => `'${w}'`);
+
+  /** What is so about the dialogue, none of it a verdict on the thesis. */
+  function readings(d, t) {
+    const out = [];
+    if (!t.turns) out.push("no question kept yet");
+    else
+      out.push(
+        `${t.turns} question${t.turns === 1 ? "" : "s"} kept, ${t.answered} answered` +
+          (t.hollow ? ` · ${t.hollow} proposed and still hollow` : ""),
+      );
+    const askedIn = FAMILIES.filter((f) => t.byFamily[f]);
+    if (askedIn.length)
+      out.push(
+        `asked across ${askedIn.length} of 6 families: ${askedIn.map((f) => `${FAMILY_LABEL[f]} ×${t.byFamily[f]}`).join(", ")}` +
+          (t.unasked.length
+            ? ` — ${list(t.unasked.map((f) => FAMILY_LABEL[f]))} not yet asked`
+            : " — every family asked"),
+      );
+    if (t.turns) {
+      const src = BY.filter((b) => t.bySource[b]).map(
+        (b) =>
+          `${b === "proposed" ? "proposed and kept" : BY_LABEL[b]} ${t.bySource[b]}`,
+      );
+      out.push(`the questions came from: ${src.join(", ")}`);
+    }
+    if (t.assumptions.surfaced || t.assumptions.hollow) {
+      const ex =
+        t.assumptions.holds + t.assumptions.fell + t.assumptions.cannot;
+      const parts = [
+        t.assumptions.holds ? `${t.assumptions.holds} held` : "",
+        t.assumptions.fell ? `${t.assumptions.fell} fell` : "",
+        t.assumptions.cannot ? `${t.assumptions.cannot} cannot be said` : "",
+      ].filter(Boolean);
+      out.push(
+        `${t.assumptions.surfaced} assumption${t.assumptions.surfaced === 1 ? "" : "s"} surfaced` +
+          (ex ? `, ${ex} examined: ${parts.join(", ")}` : "") +
+          (t.assumptions.open
+            ? `; ${t.assumptions.open} not yet examined`
+            : "") +
+          (t.assumptions.hollow
+            ? ` · ${t.assumptions.hollow} proposed and hollow`
+            : ""),
+      );
+    } else out.push("no assumption surfaced yet");
+    if (t.terms)
+      out.push(
+        `${t.terms} term${t.terms === 1 ? "" : "s"} clarified: ${list(quoted(d.terms.map((x) => x.word)))}`,
+      );
+    if (t.stones)
+      out.push(
+        `${t.stones} stone${t.stones === 1 ? "" : "s"} of the garden drawn in`,
+      );
+    out.push(...formReadings(d));
+    if (t.drift) {
+      const g = t.drift.gained.slice(0, 6);
+      const l = t.drift.lost.slice(0, 6);
+      out.push(
+        "as it stands now, the thesis " +
+          [
+            g.length ? `gained ${list(quoted(g))}` : "",
+            l.length ? `lost ${list(quoted(l))}` : "",
+          ]
+            .filter(Boolean)
+            .join(" and ") || "as it stands now, the thesis keeps its words",
+      );
+    } else out.push("the thesis is not yet re-put");
+    return out;
+  }
+
+  /* the form: an argument's shape in propositional logic, written by the reader (niwa lib/form.ts) */
+  const MAX_LETTERS = 10;
+  const WORDS = {
+    not: "not",
+    and: "and",
+    or: "or",
+    implies: "if",
+    iff: "iff",
+    if: "ifw",
+    then: "then",
+  };
+  const SYMBOLS = [
+    ["<->", "iff"],
+    ["<=>", "iff"],
+    ["->", "if"],
+    ["=>", "if"],
+    ["&&", "and"],
+    ["||", "or"],
+    ["↔", "iff"],
+    ["≡", "iff"],
+    ["→", "if"],
+    ["⊃", "if"],
+    ["∧", "and"],
+    ["&", "and"],
+    ["∨", "or"],
+    ["|", "or"],
+    ["¬", "not"],
+    ["~", "not"],
+    ["!", "not"],
+    ["(", "("],
+    ["[", "("],
+    [")", ")"],
+    ["]", ")"],
+  ];
+
+  function lex(src) {
+    const out = [];
+    let i = 0;
+    while (i < src.length) {
+      const c = src[i];
+      if (/\s/.test(c)) {
+        i++;
+        continue;
+      }
+      const sym = SYMBOLS.find(([s]) => src.startsWith(s, i));
+      if (sym) {
+        out.push({ t: sym[1] });
+        i += sym[0].length;
+        continue;
+      }
+      const w = src.slice(i).match(/^[A-Za-z]+/);
+      if (w) {
+        const word = w[0].toLowerCase();
+        if (word.length === 1) out.push({ t: "atom", a: word });
+        else if (WORDS[word]) out.push({ t: WORDS[word] });
+        else return `‘${w[0]}’ is not a letter — give each sentence one letter`;
+        i += w[0].length;
+        continue;
+      }
+      return `‘${c}’ is not part of the notation`;
+    }
+    return out;
+  }
+
+  /** Read a formula. Not binds tightest, then and, then or, then if … then (to the right), then iff. */
+  function parse(src) {
+    const toks = lex(src);
+    if (typeof toks === "string") return { ok: false, error: toks };
+    if (!toks.length) return { ok: false, error: "nothing written yet" };
+    let p = 0;
+    const peek = () => toks[p]?.t;
+    const fail = (m) => {
+      throw new Error(m);
+    };
+    const iff = () => {
+      let l = imp();
+      while (peek() === "iff") {
+        p++;
+        l = { k: "iff", l, r: imp() };
+      }
+      return l;
+    };
+    const imp = () => {
+      if (peek() === "ifw") {
+        p++;
+        const l = iff();
+        if (peek() !== "then") fail("an ‘if’ is waiting for its ‘then’");
+        p++;
+        return { k: "if", l, r: imp() };
+      }
+      const l = or();
+      if (peek() === "if") {
+        p++;
+        return { k: "if", l, r: imp() };
+      }
+      return l;
+    };
+    const or = () => {
+      let l = and();
+      while (peek() === "or") {
+        p++;
+        l = { k: "or", l, r: and() };
+      }
+      return l;
+    };
+    const and = () => {
+      let l = un();
+      while (peek() === "and") {
+        p++;
+        l = { k: "and", l, r: un() };
+      }
+      return l;
+    };
+    const un = () => {
+      const t = toks[p];
+      if (!t) return fail("it stops before it finishes");
+      if (t.t === "not") {
+        p++;
+        return { k: "not", x: un() };
+      }
+      if (t.t === "atom") {
+        p++;
+        return { k: "atom", a: t.a };
+      }
+      if (t.t === "(") {
+        p++;
+        const f = iff();
+        if (peek() !== ")") fail("a bracket is opened and never closed");
+        p++;
+        return f;
+      }
+      if (t.t === ")") return fail("a bracket closes that was never opened");
+      if (t.t === "then") return fail("a ‘then’ with no ‘if’");
+      return fail("a connective with nothing before it");
+    };
+    try {
+      const f = iff();
+      if (p < toks.length)
+        return {
+          ok: false,
+          error:
+            toks[p].t === ")"
+              ? "a bracket closes that was never opened"
+              : "two things side by side with no connective between them",
+        };
+      return { ok: true, f };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  function lettersOf(f, into = new Set()) {
+    if (f.k === "atom") into.add(f.a);
+    else if (f.k === "not") lettersOf(f.x, into);
+    else {
+      lettersOf(f.l, into);
+      lettersOf(f.r, into);
+    }
+    return into;
+  }
+
+  function holds(f, row) {
+    switch (f.k) {
+      case "atom":
+        return row[f.a] === true;
+      case "not":
+        return !holds(f.x, row);
+      case "and":
+        return holds(f.l, row) && holds(f.r, row);
+      case "or":
+        return holds(f.l, row) || holds(f.r, row);
+      case "if":
+        return !holds(f.l, row) || holds(f.r, row);
+      case "iff":
+        return holds(f.l, row) === holds(f.r, row);
+    }
+  }
+
+  /** Every row over the letters, in the textbook order: the first letter held in the top half. */
+  function rowsOf(letters) {
+    const n = letters.length;
+    const out = [];
+    for (let i = 0; i < 1 << n; i++) {
+      const row = {};
+      letters.forEach((l, j) => (row[l] = !((i >> (n - 1 - j)) & 1)));
+      out.push(row);
+    }
+    return out;
+  }
+
+  const PREC = { iff: 1, if: 2, or: 3, and: 4, not: 5, atom: 6 };
+  const GLYPH = { and: "∧", or: "∨", if: "→", iff: "↔" };
+
+  /** The formula in the usual symbols, with only the brackets it needs. */
+  function show(f) {
+    if (f.k === "atom") return f.a;
+    if (f.k === "not") {
+      const inner = show(f.x);
+      return f.x.k === "atom" || f.x.k === "not" ? `¬${inner}` : `¬(${inner})`;
+    }
+    const side = (c, right) => {
+      const s = show(c);
+      if (PREC[c.k] > PREC[f.k]) return s;
+      if (c.k === f.k && (f.k === "and" || f.k === "or")) return s;
+      if (c.k === f.k && f.k === "if" && right) return s;
+      return `(${s})`;
+    };
+    return `${side(f.l, false)} ${GLYPH[f.k]} ${side(f.r, true)}`;
+  }
+
+  /** Premises and a conclusion, as written, set out over every row. Only what the rows show; no verdict. */
+  function argumentForm(premises, conclusion, order = []) {
+    const written = premises.filter((p) => p.src.trim());
+    if (!written.length || !conclusion.src.trim()) return { state: "empty" };
+    const unread = [];
+    const read = (l) => {
+      const r = parse(l.src);
+      if (!r.ok) unread.push({ label: l.label, error: r.error });
+      return r.ok ? r.f : null;
+    };
+    const fs = written.map(read);
+    const c = read(conclusion);
+    if (unread.length) return { state: "unread", unread };
+    const set = new Set();
+    for (const f of [...fs, c]) lettersOf(f, set);
+    const rank = (l) => (order.includes(l) ? order.indexOf(l) : order.length);
+    const letters = [...set].sort(
+      (x, y) => rank(x) - rank(y) || (x < y ? -1 : 1),
+    );
+    if (letters.length > MAX_LETTERS) return { state: "wide", letters };
+    const rows = rowsOf(letters);
+    const live = [];
+    const against = [];
+    let always = true;
+    rows.forEach((row, i) => {
+      const ch = holds(c, row);
+      if (!ch) always = false;
+      if (fs.every((f) => holds(f, row))) {
+        live.push(i);
+        if (!ch) against.push(i);
+      }
+    });
+    return { state: "read", letters, rows, live, against, always };
+  }
+
+  function together(fs) {
+    const set = new Set();
+    for (const f of fs) lettersOf(f, set);
+    const letters = [...set].sort();
+    if (letters.length > MAX_LETTERS) return { can: true, letters, rows: 0 };
+    const rows = rowsOf(letters);
+    return {
+      can: rows.some((r) => fs.every((f) => holds(f, r))),
+      letters,
+      rows: rows.length,
+    };
+  }
+
+  /** The smallest sets — one, two or three at a time — that can't all be held in any row. */
+  function clashes(items) {
+    const read = items
+      .map((x) => ({ id: x.id, p: parse(x.src) }))
+      .filter((x) => x.p.ok);
+    const out = [];
+    const contains = (ids) =>
+      out.some((c) => c.ids.every((i) => ids.includes(i)));
+    const n = read.length;
+    const tryIt = (idx) => {
+      const ids = idx.map((i) => read[i].id);
+      if (contains(ids)) return;
+      const t = together(idx.map((i) => read[i].p.f));
+      if (!t.can) out.push({ ids, letters: t.letters, rows: t.rows });
+    };
+    for (let i = 0; i < n; i++) tryIt([i]);
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) tryIt([i, j]);
+    if (n <= 24)
+      for (let i = 0; i < n; i++)
+        for (let j = i + 1; j < n; j++)
+          for (let k = j + 1; k < n; k++) tryIt([i, j, k]);
+    const all = n ? together(read.map((x) => x.p.f)) : null;
+    return {
+      clashes: out,
+      whole: all && all.letters.length <= MAX_LETTERS ? all.can : null,
+    };
+  }
+
+  /** The formula said back with each letter's sentence in its place. */
+  function inWords(f, key) {
+    const s = (g, top = false) => {
+      if (g.k === "atom")
+        return key[g.a]?.trim()
+          ? `‘${key[g.a].trim().replace(/[.!?]+$/, "")}’`
+          : g.a;
+      if (g.k === "not") return `not ${s(g.x)}`;
+      const inner =
+        g.k === "if"
+          ? `if ${s(g.l)}, then ${s(g.r)}`
+          : g.k === "iff"
+            ? `${s(g.l)} just when ${s(g.r)}`
+            : `${s(g.l)} ${g.k} ${s(g.r)}`;
+      return top ? inner : `(${inner})`;
+    };
+    return s(f, true);
+  }
+
+  /** The argument's form, and which of the premises and the kept assumptions can't be held together. */
+  function formOf(d) {
+    const argument = argumentForm(
+      d.premises.map((p, i) => ({ label: `premise ${i + 1}`, src: p.form })),
+      { label: "the conclusion", src: d.conclusion },
+      d.letters.map((l) => l.letter),
+    );
+    const label = new Map();
+    const pool = [];
+    d.premises.forEach((p, i) => {
+      if (!p.form.trim()) return;
+      label.set(p.id, `premise ${i + 1}`);
+      pool.push({ id: p.id, src: p.form });
+    });
+    const assumed = new Set();
+    d.assumptions.forEach((a, i) => {
+      if (!a.kept || !a.form.trim()) return;
+      label.set(a.id, `assumption ${i + 1}`);
+      assumed.add(a.id);
+      pool.push({ id: a.id, src: a.form });
+    });
+    const c = clashes(pool);
+    return {
+      argument,
+      clashes: c.clashes.filter((x) => x.ids.some((id) => assumed.has(id))),
+      whole: assumed.size && !c.clashes.length ? c.whole : null,
+      label,
+    };
+  }
+
+  const rowWords = (letters, row) =>
+    letters.map((l) => (row[l] ? `${l} holds` : `${l} does not`)).join(", ");
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+  function formReadings(d, f = formOf(d)) {
+    const out = [];
+    const a = f.argument;
+    if (a.state === "unread")
+      out.push(
+        `the form: ${plural(a.unread.length, "line")} not yet read (${a.unread.map((u) => u.label).join(", ")})`,
+      );
+    else if (a.state === "wide")
+      out.push(
+        `the form: ${a.letters.length} letters, more than the rows can be set out for`,
+      );
+    else if (a.state === "read") {
+      const n = a.rows.length;
+      if (!a.live.length)
+        out.push(
+          `the form: no row of the ${n} has every premise holding together`,
+        );
+      else if (a.against.length)
+        out.push(
+          `the form: ${a.against.length} of the ${n} rows ${a.against.length === 1 ? "has" : "have"} every premise holding and the conclusion not — ${rowWords(a.letters, a.rows[a.against[0]])}`,
+        );
+      else
+        out.push(
+          `the form: in ${a.live.length === 1 ? "the one row" : `each of the ${a.live.length} rows`} of ${n} where every premise holds, the conclusion holds too` +
+            (a.always ? " — as it does in every row, premises or none" : ""),
+        );
+    }
+    const name = (id) => f.label.get(id) ?? id;
+    for (const c of f.clashes.slice(0, 4)) {
+      const names = list(c.ids.map(name));
+      out.push(
+        c.ids.length === 1
+          ? `${names} holds in no row of its ${c.rows}`
+          : `${names} cannot ${c.ids.length === 2 ? "both" : "all"} be held — no row of ${c.rows} has ${c.ids.length === 2 ? "both" : `all ${c.ids.length}`}`,
+      );
+    }
+    if (f.clashes.length > 4)
+      out.push(
+        `and ${plural(f.clashes.length - 4, "set")} more that cannot be held together`,
+      );
+    if (f.whole === false && !f.clashes.length)
+      out.push(
+        "the premises and assumptions written in the form cannot all be held together, though no three of them clash",
+      );
+    return out;
+  }
+
+  /* the file: a dialogue as niwa wrote it beside the notes, for copying out */
+  function titleOf(d) {
+    if (d.title.trim()) return d.title.trim();
+    const first = sentencesOf(d.thesis)[0] ?? d.thesis.trim();
+    const t = first.replace(/[.!?…]+$/, "").trim();
+    return t.length > 72 ? `${t.slice(0, 69).trim()}…` : t || "a dialogue";
+  }
+
+  const y = (s) => JSON.stringify(s);
+
+  function serialiseDialogue(d) {
+    const lines = [`title: ${y(d.title)}`];
+    if (d.stone) lines.push(`stone: ${y(d.stone)}`);
+    lines.push(`opened: ${y(d.opened)}`, `touched: ${y(d.touched)}`);
+    if (d.assumptions.length) {
+      lines.push("assumptions:");
+      for (const a of d.assumptions)
+        lines.push(
+          `  - { id: ${y(a.id)}, text: ${y(a.text)}, turn: ${y(a.turn)}, by: ${y(a.by)}, kept: ${a.kept}, examined: ${y(a.examined)}, note: ${y(a.note)}${a.form ? `, form: ${y(a.form)}` : ""} }`,
+        );
+    }
+    if (d.terms.length) {
+      lines.push("terms:");
+      for (const t of d.terms)
+        lines.push(
+          `  - { id: ${y(t.id)}, word: ${y(t.word)}, meaning: ${y(t.meaning)}, turn: ${y(t.turn)} }`,
+        );
+    }
+    if (d.letters.length) {
+      lines.push("letters:");
+      for (const l of d.letters)
+        lines.push(`  - { letter: ${y(l.letter)}, text: ${y(l.text)} }`);
+    }
+    if (d.premises.length) {
+      lines.push("premises:");
+      for (const p of d.premises)
+        lines.push(`  - { id: ${y(p.id)}, form: ${y(p.form)} }`);
+    }
+    if (d.conclusion) lines.push(`conclusion: ${y(d.conclusion)}`);
+    const body = [
+      `## the thesis, as first said\n\n${d.thesis.trim()}`,
+      `## as it stands now\n\n${d.now.trim()}`,
+    ];
+    if (d.turns.length)
+      body.push(
+        "## turns\n\n" +
+          d.turns
+            .map(
+              (t) =>
+                `### q ${t.id} · ${t.family} · ${t.by} · ${t.on}${t.stone ? ` · stone ${t.stone}` : ""}${t.kept ? "" : " · hollow"}\n\n${t.question.trim()}\n\n#### answer\n\n${t.answer.trim()}`,
+            )
+            .join("\n\n"),
+      );
+    if (d.note.trim()) body.push(`## note\n\n${d.note.trim()}`);
+    return `---\n${lines.join("\n")}\n---\n\n${body.join("\n\n")}\n`;
+  }
+
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+
+  /** Validation at the boundary: a dialogue arrives from this browser's storage. */
+  function validateDialogue(input, today) {
+    const r = input ?? {};
+    const thesis =
+      typeof r.thesis === "string" ? r.thesis.trim().slice(0, 4000) : "";
+    if (!thesis) throw new Error("a dialogue needs a thesis, in your words");
+    const day = (v) => (typeof v === "string" && DAY.test(v) ? v : today);
+    const turns = (Array.isArray(r.turns) ? r.turns : [])
+      .slice(0, 200)
+      .map((x) => {
+        const o = x ?? {};
+        const family = str(o.family, 20);
+        const by = str(o.by, 10);
+        return {
+          id: str(o.id, 24) || uid(),
+          family: FAMILIES.includes(family) ? family : "clarify",
+          question: str(o.question, 600),
+          by: BY.includes(by) ? by : "you",
+          kept: o.kept !== false,
+          answer:
+            typeof o.answer === "string" ? o.answer.trim().slice(0, 6000) : "",
+          stone: str(o.stone, 200) || null,
+          on: typeof o.on === "string" && DAY.test(o.on) ? o.on : today,
+        };
+      })
+      .filter((t) => t.question);
+    const ids = new Set(turns.map((t) => t.id));
+    const assumptions = (Array.isArray(r.assumptions) ? r.assumptions : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        const ex = str(o.examined, 10);
+        const turn = str(o.turn, 24);
+        return {
+          id: str(o.id, 24) || uid(),
+          text: str(o.text, 400),
+          turn: turn && ids.has(turn) ? turn : null,
+          by: o.by === "proposed" ? "proposed" : "you",
+          kept: o.kept !== false,
+          examined: ["", "holds", "fell", "cannot"].includes(ex) ? ex : "",
+          note: str(o.note, 600),
+          form: str(o.form, 200),
+        };
+      })
+      .filter((a) => a.text);
+    const terms = (Array.isArray(r.terms) ? r.terms : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        const turn = str(o.turn, 24);
+        return {
+          id: str(o.id, 24) || uid(),
+          word: str(o.word, 120),
+          meaning: str(o.meaning, 600),
+          turn: turn && ids.has(turn) ? turn : null,
+        };
+      })
+      .filter((t) => t.word);
+    const seen = new Set();
+    const letters = (Array.isArray(r.letters) ? r.letters : [])
+      .slice(0, 26)
+      .map((x) => {
+        const o = x ?? {};
+        return {
+          letter: str(o.letter, 1).toLowerCase(),
+          text: str(o.text, 400),
+        };
+      })
+      .filter(
+        (l) =>
+          /^[a-z]$/.test(l.letter) && !seen.has(l.letter) && seen.add(l.letter),
+      );
+    const premises = (Array.isArray(r.premises) ? r.premises : [])
+      .slice(0, 12)
+      .map((x) => {
+        const o = x ?? {};
+        return { id: str(o.id, 24) || uid(), form: str(o.form, 200) };
+      });
+    const d = {
+      slug: str(r.slug, 120),
+      title: str(r.title, 120),
+      thesis,
+      now: typeof r.now === "string" ? r.now.trim().slice(0, 4000) : "",
+      stone: str(r.stone, 200) || null,
+      opened: day(r.opened),
+      touched: day(r.touched),
+      turns,
+      assumptions,
+      terms,
+      letters,
+      premises,
+      conclusion: str(r.conclusion, 200),
+      note: typeof r.note === "string" ? r.note.trim().slice(0, 4000) : "",
+    };
+    d.title = titleOf(d);
+    if (!d.slug) d.slug = slugOf(d.title, d.opened);
+    return d;
+  }
+
+  /* ── end of the logic ── */
+
+  /* The starter bank: open questions, six families, after the shape Socratic questioning has taken in
+     teaching since Paul and Elder set it out. Dealt after the reader's own, when they have opened one. */
+  const STARTER_BANK = {
+    clarify: [
+      "What do you mean by that, exactly — say it again in other words.",
+      "What is an example of it? And what is something close that does not count?",
+      "Which word in the thesis is carrying the most weight, and what does it mean here?",
+      "How does this relate to what you said before it?",
+      "What is the thing itself, apart from your account of it?",
+      "If you had to draw it, what would be in the picture?",
+    ],
+    assume: [
+      "What has to be so for this to be said at all?",
+      "What are you taking for granted here that you have not written down?",
+      "How did you come to assume that? When did it start?",
+      "What if the opposite were the case — what would you have to give up?",
+      "Whose assumption is it, first — yours, or someone you heard it from?",
+      "What does this thesis need to be true about you?",
+    ],
+    evidence: [
+      "How do you know? What is it resting on?",
+      "What would you have to see to give it up?",
+      "Where did the reasons come from, and how did each reach you?",
+      "Which of your reasons is on the record, and which is only in your head?",
+      "What is the strongest thing that could be said against it, in your own words?",
+      "What would count as having checked?",
+    ],
+    viewpoint: [
+      "Who would put this differently, and what would their first sentence be?",
+      "How would someone who does not share your values read this?",
+      "What does it look like from the position of the person it is about?",
+      "What did you believe about this a year ago, and what changed?",
+      "Whose interest does this way of putting it serve?",
+      "What would the fallow version of you — the one who wrote the old notes — say?",
+    ],
+    consequence: [
+      "If this is so, what follows? What would you do differently this month?",
+      "What else would have to be so if this is?",
+      "What happens to the things that rest on it if it fell?",
+      "How does this fit with what you already know — and where does it not?",
+      "Who is affected, and how would they describe the effect?",
+      "What is the cost of being wrong about it, and who pays?",
+    ],
+    question: [
+      "Why did this need asking today?",
+      "What was the point of the question — what will you do with the answer?",
+      "Is this the real question, or the one that was easier to ask? What is the real one?",
+      "What would an answer have to look like for you to stop asking?",
+      "Who else is asking this, and why now?",
+      "What does the way you asked it already assume?",
+    ],
+  };
+
+  /* The specimen: a synthetic life examining a claim it met on the feed. Every turn here is fiction. */
+  const SPECIMEN = {
+    slug: "2026-09-20-remote-workers-are-always-the-first-to-go",
+    title: "Remote workers are always the first to go",
+    thesis:
+      "Remote workers are always the first to go when a company cuts — everyone knows it, the data shows it.",
+    now: "At some firms, by some managers' own account, working remotely is one of the things that can count against you when a company cuts. I do not know whether it counts at mine.",
+    stone: null,
+    opened: "2026-09-20",
+    touched: "2026-09-22",
+    turns: [
+      {
+        id: "sd1",
+        family: "clarify",
+        question:
+          "What do you mean by 'first to go' — first in time, or most likely at all?",
+        by: "bank",
+        kept: true,
+        answer:
+          "Most likely, I think. That when the list is drawn up, the remote names are near the top. I did not mean literally the first day.",
+        stone: null,
+        on: "2026-09-20",
+      },
+      {
+        id: "sd2",
+        family: "evidence",
+        question:
+          "You wrote 'the data shows it'. Which data, and how did it reach you?",
+        by: "you",
+        kept: true,
+        answer:
+          "A post on the feed quoting a survey. When I traced it, the survey said 31% of managers called location one factor among several. That is not the same sentence.",
+        stone: null,
+        on: "2026-09-20",
+      },
+      {
+        id: "sd3",
+        family: "assume",
+        question:
+          "You said 'everyone knows it'. Who is everyone, and what would they have to have seen to know it?",
+        by: "proposed",
+        kept: true,
+        answer:
+          "The people in my feed, mostly. Three or four of whom I actually know. None of them has run a layoff.",
+        stone: null,
+        on: "2026-09-21",
+      },
+      {
+        id: "sd4",
+        family: "viewpoint",
+        question: "How would a manager who has drawn up such a list put it?",
+        by: "bank",
+        kept: true,
+        answer:
+          "Probably: we looked at who we could do without. Some of those people were remote. Some were not. I have never asked one.",
+        stone: null,
+        on: "2026-09-21",
+      },
+      {
+        id: "sd5",
+        family: "consequence",
+        question:
+          "If it is so at your firm, what would you do differently this month that you are not doing now?",
+        by: "garden",
+        kept: true,
+        answer:
+          "Be in the office two days a week, I suppose. Which I have been considering anyway, for other reasons. So the thesis may have been doing that work for me.",
+        stone: null,
+        on: "2026-09-22",
+      },
+      {
+        id: "sd6",
+        family: "question",
+        question:
+          "What made this a question today rather than in March, when you first saw the post?",
+        by: "proposed",
+        kept: false,
+        answer: "",
+        stone: null,
+        on: "2026-09-22",
+      },
+    ],
+    assumptions: [
+      {
+        id: "sa1",
+        text: "A survey of managers' stated factors predicts what firms actually do.",
+        turn: "sd2",
+        by: "you",
+        kept: true,
+        examined: "fell",
+        note: "the survey asked about intentions, not outcomes; I have no outcome data",
+        form: "",
+      },
+      {
+        id: "sa2",
+        text: "My firm behaves like the firms in the survey.",
+        turn: "sd5",
+        by: "proposed",
+        kept: true,
+        examined: "cannot",
+        note: "it has never cut staff while I have been here",
+        form: "s",
+      },
+      {
+        id: "sa3",
+        text: "The people saying it know something I do not.",
+        turn: "sd3",
+        by: "proposed",
+        kept: true,
+        examined: "",
+        note: "",
+        form: "",
+      },
+      {
+        id: "sa4",
+        text: "My firm is nothing like the firms in the survey.",
+        turn: "sd5",
+        by: "you",
+        kept: true,
+        examined: "",
+        note: "",
+        form: "~s",
+      },
+    ],
+    terms: [
+      {
+        id: "st1",
+        word: "first to go",
+        meaning: "most likely to be cut, not earliest",
+        turn: "sd1",
+      },
+      {
+        id: "st2",
+        word: "the data",
+        meaning: "one survey of stated intentions, 412 managers, 2024",
+        turn: "sd2",
+      },
+    ],
+    letters: [
+      { letter: "r", text: "I work remotely." },
+      { letter: "c", text: "My firm is cutting staff." },
+      { letter: "l", text: "I am on the list." },
+      { letter: "s", text: "My firm behaves like the firms in the survey." },
+    ],
+    premises: [
+      { id: "sp1", form: "r & c -> l" },
+      { id: "sp2", form: "r" },
+    ],
+    conclusion: "l",
+    note: "",
+  };
+
+  /* ── keeping: one key in this browser, and nothing anywhere else ── */
+
+  const KEY = "pp-dialogue";
+  const localToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const today = localToday();
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+
+  const S = {
+    dialogues: [],
+    bank: null, // the reader's own, parsed from their questions.md
+    bankName: "",
+    open: null,
+    spec: false,
+    fam: null,
+    sure: null,
+    ownFam: "clarify",
+    trouble: null,
+    drafts: { thesis: "", ownQ: "", newA: "", newWord: "", newMeaning: "" },
+  };
+
+  function load() {
+    let raw = null;
+    try {
+      raw = JSON.parse(localStorage.getItem(KEY) || "null");
+    } catch {
+      raw = null;
+    }
+    if (!raw || typeof raw !== "object") return { openSlug: SPECIMEN.slug };
+    const ds = [];
+    for (const x of Array.isArray(raw.dialogues) ? raw.dialogues : []) {
+      try {
+        const d = validateDialogue(x, today);
+        if (d.slug !== SPECIMEN.slug && !ds.some((o) => o.slug === d.slug))
+          ds.push(d);
+      } catch {
+        /* a dialogue with no thesis is skipped, as niwa skips a file it cannot read */
+      }
+    }
+    ds.sort((a, b) =>
+      a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
+    );
+    S.dialogues = ds;
+    if (raw.bank && typeof raw.bank === "object") {
+      const b = emptyBank();
+      for (const f of FAMILIES)
+        b[f] = (Array.isArray(raw.bank[f]) ? raw.bank[f] : [])
+          .filter((q) => typeof q === "string" && q.trim())
+          .slice(0, 200);
+      if (FAMILIES.some((f) => b[f].length)) {
+        S.bank = b;
+        S.bankName =
+          typeof raw.bankName === "string"
+            ? raw.bankName.slice(0, 120)
+            : "questions.md";
+      }
+    }
+    return { openSlug: typeof raw.open === "string" ? raw.open : null };
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          dialogues: S.dialogues,
+          bank: S.bank,
+          bankName: S.bankName,
+          open: S.open ? S.open.slug : null,
+        }),
+      );
+      if (S.trouble) {
+        S.trouble = null;
+        showTrouble();
+      }
+    } catch {
+      S.trouble =
+        "this browser would not keep it — storage is off here, so the dialogue lasts until the page closes";
+      showTrouble();
+    }
+  }
+
+  /** Keep the open dialogue: touched today, written to storage. The specimen is never kept. */
+  function keepOpen() {
+    if (!S.open || S.spec) return;
+    S.open.touched = today;
+    save();
+  }
+
+  /* ── drawing: a pen line round a panel (after niwa lib/hand.ts) ── */
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+  function roughRect(w, h, seed) {
+    const r = rand(seed);
+    const i = 0.5;
+    const x1 = w - i;
+    const y1 = h - i;
+    return [
+      stroke([i, i], [x1, i], r, 1.1, 3),
+      stroke([x1, i], [x1, y1], r, 1.1, 3),
+      stroke([x1, y1], [i, y1], r, 1.1, 3),
+      stroke([i, y1], [i, i], r, 1.1, 3),
+    ].join("");
+  }
+
+  const SVG = "http://www.w3.org/2000/svg";
+  const drawn = new Set();
+  let observers = [];
+
+  /** Lay a drawn border over a panel. It draws on the first time that panel appears, and only then. */
+  function sketch(panel, seed, hollow = false) {
+    panel.classList.add("sk");
+    const svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute(
+      "class",
+      `sketch${hollow ? " hollow" : ""}${drawn.has(seed) ? "" : " draw"}`,
+    );
+    svg.setAttribute("aria-hidden", "true");
+    drawn.add(seed);
+    const path = document.createElementNS(SVG, "path");
+    if (!hollow) path.setAttribute("pathLength", "1");
+    svg.appendChild(path);
+    panel.prepend(svg);
+    let last = "";
+    const measure = () => {
+      const w = panel.offsetWidth;
+      const h = panel.offsetHeight;
+      if (!w || !h || `${w}x${h}` === last) return;
+      last = `${w}x${h}`;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      path.setAttribute("d", roughRect(w, h, seedOf(seed)));
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(panel);
+    observers.push(ro);
+    return panel;
+  }
+
+  /* ── the page ── */
+
+  const work = document.getElementById("work");
+  const risen = new Set();
+  let derive = [];
+  let troubleEl = null;
+
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    if (props)
+      for (const [k, v] of Object.entries(props)) {
+        if (v == null || v === false) continue;
+        if (k === "class") el.className = v;
+        else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+        else if (k === "value" || k === "disabled" || k === "readOnly")
+          el[k] = v;
+        else el.setAttribute(k, v === true ? "" : v);
+      }
+    for (const c of kids.flat(Infinity))
+      if (c != null && c !== false) el.append(c);
+    return el;
+  }
+  const svgEl = (tag, attrs = {}) => {
+    const el = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    return el;
+  };
+
+  /** Rise once: an element keyed here animates in the first time it is drawn, never again. */
+  function rise(el, key, i = 0) {
+    if (risen.has(key)) return el;
+    risen.add(key);
+    el.classList.add("rise");
+    el.style.setProperty("--i", String(Math.min(i, 8)));
+    return el;
+  }
+
+  const chip = (
+    text,
+    onclick,
+    { on, acc, solid, disabled, key, title, label } = {},
+  ) =>
+    h(
+      "button",
+      {
+        type: "button",
+        class: `chip${on ? " on" : ""}${acc ? " acc" : ""}${solid ? " solid" : ""}`,
+        onclick,
+        disabled: !!disabled,
+        "data-key": key,
+        title,
+        "aria-label": label,
+        "aria-pressed": on === undefined ? null : String(!!on),
+      },
+      text,
+    );
+
+  const rowsFor = (text, min = 2, max = 8) =>
+    Math.max(min, Math.min(max, Math.ceil(text.length / 90) + 1));
+
+  function render() {
+    const a = document.activeElement;
+    const focusKey = a && a.dataset ? a.dataset.key : null;
+    const sel =
+      a && "selectionStart" in a && typeof a.selectionStart === "number"
+        ? [a.selectionStart, a.selectionEnd]
+        : null;
+    observers.forEach((o) => o.disconnect());
+    observers = [];
+    derive = [];
+    work.replaceChildren(S.open ? openView() : listView());
+    refresh();
+    if (focusKey) {
+      const el = work.querySelector(`[data-key="${CSS.escape(focusKey)}"]`);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (sel && "setSelectionRange" in el) {
+          try {
+            el.setSelectionRange(sel[0], sel[1]);
+          } catch {
+            /* not a text field */
+          }
+        }
+      }
+    }
+  }
+
+  /** Everything read off the dialogue as it is typed: the drift, the form, the reading. */
+  function refresh() {
+    for (const f of derive) f();
+  }
+
+  function showTrouble() {
+    if (!troubleEl) return;
+    troubleEl.textContent = S.trouble || "";
+    troubleEl.hidden = !S.trouble;
+  }
+
+  /* ── the dialogues, and a thesis to begin one ── */
+
+  function listView() {
+    const begin = chip("begin the dialogue", beginDialogue, {
+      key: "begin",
+      solid: !!S.drafts.thesis.trim(),
+      disabled: !S.drafts.thesis.trim(),
+    });
+    const thesis = h("textarea", {
+      class: "field display thesis-in",
+      rows: 4,
+      "data-key": "thesis",
+      id: "thesis",
+      "aria-label": "The thesis",
+      placeholder:
+        "put it down as you would say it to someone who disagreed — one or two sentences, in your words",
+      value: S.drafts.thesis,
+      oninput: (e) => {
+        S.drafts.thesis = e.target.value;
+        const on = !!e.target.value.trim();
+        begin.disabled = !on;
+        begin.classList.toggle("solid", on);
+      },
+      onkeydown: (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          beginDialogue();
+        }
+      },
+    });
+
+    const row = (d, spec) => {
+      const tt = tally(d);
+      return h(
+        "li",
+        null,
+        h(
+          "button",
+          {
+            type: "button",
+            class: "row-btn",
+            "data-key": `open-${d.slug}`,
+            onclick: () => openOne(spec ? SPECIMEN : d, spec),
+          },
+          h(
+            "span",
+            { class: "row-title display" },
+            d.title,
+            spec ? [" ", h("span", { class: "tag" }, "specimen")] : null,
+          ),
+          h(
+            "span",
+            { class: "meta plain" },
+            `${d.opened} · ${tt.turns} asked · ${tt.assumptions.surfaced} assumptions${d.now.trim() ? " · re-put" : ""}`,
+          ),
+        ),
+      );
+    };
+
+    const sheet = sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel big", "aria-label": "Begin a dialogue" },
+          h("p", { class: "meta acc", style: "margin:0" }, "the thesis"),
+          thesis,
+          h(
+            "div",
+            { class: "chips", style: "margin-top:12px" },
+            begin,
+            h(
+              "span",
+              { class: "hand faint" },
+              "the first question will be yours to choose",
+            ),
+          ),
+          h("p", { class: "meta", style: "margin:32px 0 0" }, "dialogues kept"),
+          S.dialogues.length
+            ? h(
+                "ol",
+                { class: "rows" },
+                S.dialogues.map((d) => row(d, false)),
+              )
+            : h(
+                "p",
+                { class: "hand faint", style: "margin:8px 0 0" },
+                "no dialogue kept yet — the first one begins above",
+              ),
+          h(
+            "p",
+            { class: "meta", style: "margin:28px 0 0" },
+            "the specimen's dialogue",
+          ),
+          h("ol", { class: "rows" }, row(SPECIMEN, true)),
+          h(
+            "p",
+            { class: "hand faint", style: "margin:6px 0 0" },
+            "one made-up person's dialogue, so you can see what the desk reads before you write anything of your own",
+          ),
+        ),
+        "list-sheet",
+      ),
+      "dialogue-begin",
+    );
+
+    const file = h("input", {
+      type: "file",
+      accept: ".md,.markdown,.txt,text/markdown,text/plain",
+      class: "sr",
+      style:
+        "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none",
+      onchange: (e) => openBank(e.target.files && e.target.files[0]),
+    });
+    const bankLine = S.bank
+      ? [
+          h(
+            "p",
+            { class: "meta plain", style: "margin:16px 0 8px" },
+            `your own questions: ${FAMILIES.reduce((n, f) => n + S.bank[f].length, 0)} from ${S.bankName}, dealt before the bank's`,
+          ),
+          h(
+            "div",
+            { class: "chips" },
+            h(
+              "label",
+              { class: "chip", "data-key": "bank-open" },
+              "open another",
+              file,
+            ),
+            chip("forget them", forgetBank, { key: "bank-forget" }),
+          ),
+        ]
+      : [
+          h(
+            "p",
+            { class: "meta plain", style: "margin:16px 0 8px" },
+            "kept in this browser only · your own questions can go in a questions.md, one heading per family, one question per line",
+          ),
+          h(
+            "div",
+            { class: "chips" },
+            h(
+              "label",
+              { class: "chip", "data-key": "bank-open" },
+              "open your questions.md",
+              file,
+            ),
+          ),
+        ];
+
+    const fams = sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "The six families" },
+          h(
+            "p",
+            { class: "meta acc", style: "margin:0" },
+            "six families of question",
+          ),
+          h(
+            "dl",
+            { class: "fams" },
+            FAMILIES.map((f) =>
+              h(
+                "div",
+                null,
+                h("dt", { class: "meta ink" }, FAMILY_LABEL[f]),
+                h("dd", null, FAMILY_BLURB[f]),
+              ),
+            ),
+          ),
+          h(
+            "p",
+            { class: "hand faint", style: "margin:16px 0 0" },
+            "the discipline is to ask across all six, and to answer each in your own words before the next",
+          ),
+          bankLine,
+        ),
+        "list-fams",
+        1,
+      ),
+      "dialogue-families",
+    );
+
+    return h(
+      "div",
+      { class: "grid" },
+      h("div", { class: "col" }, sheet),
+      h("aside", { class: "col" }, fams),
+    );
+  }
+
+  function beginDialogue() {
+    const t = S.drafts.thesis.trim();
+    if (!t) return;
+    const d = validateDialogue({ ...emptyDialogue(today), thesis: t }, today);
+    // A fresh one whose slug is taken gets a numbered one.
+    const taken = new Set([SPECIMEN.slug, ...S.dialogues.map((x) => x.slug)]);
+    const base = d.slug;
+    let n = 2;
+    while (taken.has(d.slug)) d.slug = `${base}-${n++}`;
+    S.dialogues.unshift(d);
+    S.drafts.thesis = "";
+    openOne(d, false);
+  }
+
+  function openOne(d, spec) {
+    S.open = spec ? clone(SPECIMEN) : d;
+    S.spec = spec;
+    S.fam = null;
+    S.sure = null;
+    save();
+    render();
+    work.scrollIntoView({ block: "start" });
+  }
+
+  function close() {
+    S.open = null;
+    S.spec = false;
+    S.sure = null;
+    S.fam = null;
+    S.dialogues.sort((a, b) =>
+      a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0,
+    );
+    save();
+    render();
+  }
+
+  function openBank(f) {
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const b = parseBank(String(r.result || ""));
+      if (!FAMILIES.some((x) => b[x].length)) {
+        S.trouble = `no questions found in ${f.name} — it wants a heading per family (clarifying, assumptions, reasons and evidence, other viewpoints, implications, the question itself) and a question per line under each`;
+        render();
+        return;
+      }
+      S.bank = b;
+      S.bankName = f.name.slice(0, 120);
+      save();
+      render();
+    };
+    r.readAsText(f);
+  }
+
+  function forgetBank() {
+    S.bank = null;
+    S.bankName = "";
+    save();
+    render();
+  }
+
+  /* ── the open dialogue ── */
+
+  function openView() {
+    const d = S.open;
+    const writable = !S.spec;
+    const t = tally(d);
+    const bank = S.bank
+      ? Object.fromEntries(
+          FAMILIES.map((f) => [f, [...S.bank[f], ...STARTER_BANK[f]]]),
+        )
+      : STARTER_BANK;
+    const asked = new Set(d.turns.map((x) => x.question.trim().toLowerCase()));
+
+    /* the thesis */
+    const drift = h("p", { class: "hand", style: "margin:8px 0 0" });
+    derive.push(() => {
+      const dr =
+        d.now.trim() && d.thesis.trim() ? gainedLost(d.now, d.thesis) : null;
+      drift.hidden = !dr;
+      if (!dr) return;
+      const g = dr.gained
+        .slice(0, 8)
+        .map((w) => `'${w}'`)
+        .join(", ");
+      const l = dr.lost
+        .slice(0, 8)
+        .map((w) => `'${w}'`)
+        .join(", ");
+      drift.textContent =
+        (g ? `gained ${g}` : "") +
+        (g && l ? " · " : "") +
+        (l ? `lost ${l}` : "") +
+        (!g && !l ? "the same words, so far" : "");
+    });
+    const nowIn = h("textarea", {
+      class: "field now-in",
+      rows: 3,
+      "data-key": "now",
+      "aria-label": "The thesis as it stands now",
+      readOnly: !writable,
+      value: d.now,
+      placeholder: writable
+        ? "re-put it when you are ready — the same claim, in the light of what was asked; the desk will read what it gained and lost"
+        : "",
+      oninput: (e) => {
+        d.now = e.target.value;
+        keepOpen();
+        refresh();
+      },
+    });
+    const thesisPanel = sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel big", "aria-label": "The thesis" },
+          h(
+            "div",
+            { class: "head" },
+            h(
+              "p",
+              { class: "meta acc", style: "margin:0" },
+              `the thesis · as first said · ${d.opened}`,
+            ),
+            h(
+              "div",
+              { class: "chips" },
+              S.spec ? h("span", { class: "tag" }, "specimen · fiction") : null,
+              chip("all dialogues", close, { key: "close" }),
+            ),
+          ),
+          h("p", { class: "thesis display" }, d.thesis),
+          h(
+            "p",
+            { class: "meta acc", style: "margin:24px 0 0" },
+            "as it stands now",
+          ),
+          nowIn,
+          drift,
+        ),
+        `thesis-${d.slug}`,
+      ),
+      `thesis-${d.slug || "fresh"}`,
+    );
+
+    /* the turns */
+    const turns = d.turns.length
+      ? h(
+          "ol",
+          { class: "turns", "aria-label": "The turns" },
+          d.turns.map((turn, i) => {
+            const by = turn.kept
+              ? BY_LABEL[turn.by]
+              : "proposed · hollow until kept";
+            const acts = !writable
+              ? null
+              : !turn.kept
+                ? h(
+                    "div",
+                    { class: "chips" },
+                    chip("keep", () => keepTurn(turn.id), {
+                      on: true,
+                      key: `keep-${turn.id}`,
+                    }),
+                    chip("drop", () => dropTurn(turn.id), {
+                      key: `drop-${turn.id}`,
+                    }),
+                  )
+                : h(
+                    "div",
+                    { class: "chips" },
+                    chip(
+                      S.sure === turn.id ? "take it back — sure?" : "take back",
+                      () =>
+                        S.sure === turn.id
+                          ? dropTurn(turn.id)
+                          : setSure(turn.id),
+                      {
+                        acc: S.sure === turn.id,
+                        key: `back-${turn.id}`,
+                      },
+                    ),
+                  );
+            const ans = turn.kept
+              ? h("textarea", {
+                  class: "field answer",
+                  id: `ans-${turn.id}`,
+                  "data-key": `ans-${turn.id}`,
+                  "aria-label": "Your answer",
+                  rows: rowsFor(turn.answer),
+                  readOnly: !writable,
+                  value: turn.answer,
+                  placeholder: writable
+                    ? "answer in your own words — then the next question"
+                    : "",
+                  oninput: (e) => {
+                    turn.answer = e.target.value;
+                    e.target.rows = rowsFor(turn.answer);
+                    keepOpen();
+                    refresh();
+                  },
+                })
+              : null;
+            const li = h(
+              "li",
+              { class: `panel turn${turn.kept ? "" : " hollow"}` },
+              h(
+                "div",
+                { class: "head" },
+                h(
+                  "p",
+                  { class: "meta", style: "margin:0" },
+                  h("span", { class: "acc" }, FAMILY_LABEL[turn.family]),
+                  ` · ${by}`,
+                  turn.on ? ` · ${turn.on}` : "",
+                ),
+                acts,
+              ),
+              h("p", { class: "q display" }, turn.question),
+              ans,
+            );
+            return sketch(
+              rise(li, `turn-${turn.id}`, i),
+              `turn-${turn.id}`,
+              !turn.kept,
+            );
+          }),
+        )
+      : null;
+
+    /* the next question, or what the specimen is */
+    let next;
+    if (writable) {
+      const ownIn = h("input", {
+        class: "field",
+        "data-key": "ownq",
+        "aria-label": "Your own question",
+        placeholder: "an open question — one that cannot be answered yes or no",
+        value: S.drafts.ownQ,
+        oninput: (e) => {
+          S.drafts.ownQ = e.target.value;
+          ownState();
+        },
+        onkeydown: (e) => {
+          if (
+            e.key === "Enter" &&
+            S.drafts.ownQ.trim() &&
+            isOpen(S.drafts.ownQ)
+          ) {
+            e.preventDefault();
+            askOwn();
+          }
+        },
+      });
+      const sel = h(
+        "select",
+        {
+          class: "chip",
+          "data-key": "ownfam",
+          "aria-label": "Its family",
+          onchange: (e) => (S.ownFam = e.target.value),
+        },
+        FAMILIES.map((f) => {
+          const o = h("option", { value: f }, FAMILY_LABEL[f]);
+          if (f === S.ownFam) o.selected = true;
+          return o;
+        }),
+      );
+      const askBtn = chip("ask it", askOwn, { key: "askown" });
+      const warn = h(
+        "p",
+        { class: "hand acc", style: "margin:6px 0 0;font-size:15px" },
+        "that can be answered yes or no — ask how, why, what or which instead",
+      );
+      const ownState = () => {
+        const q = S.drafts.ownQ;
+        const ok = !!q.trim() && isOpen(q);
+        askBtn.disabled = !ok;
+        askBtn.classList.toggle("on", ok);
+        askBtn.title =
+          q.trim() && !ok
+            ? "that one can be answered yes or no — open it up"
+            : "";
+        warn.hidden = !(q.trim() && !ok);
+      };
+      ownState();
+      troubleEl = h("p", { class: "meta alert", role: "alert" });
+      next = sketch(
+        rise(
+          h(
+            "section",
+            {
+              class: "panel big",
+              id: "next",
+              "aria-label": "The next question",
+            },
+            h(
+              "div",
+              { class: "head" },
+              h(
+                "p",
+                { class: "meta acc", style: "margin:0" },
+                "the next question",
+              ),
+              h(
+                "span",
+                { class: "hand faint" },
+                t.unasked.length
+                  ? `not yet asked: ${t.unasked.map((f) => FAMILY_LABEL[f]).join(", ")}`
+                  : "every family asked at least once",
+              ),
+            ),
+            h(
+              "div",
+              { class: "chips", style: "margin-top:12px" },
+              FAMILIES.map((f) =>
+                chip(
+                  `${FAMILY_LABEL[f]}${t.byFamily[f] ? ` · ${t.byFamily[f]}` : ""}`,
+                  () => pickFam(f),
+                  { on: S.fam === f, key: `fam-${f}` },
+                ),
+              ),
+            ),
+            S.fam
+              ? h(
+                  "ul",
+                  {
+                    class: "bank",
+                    "aria-label": `The bank: ${FAMILY_LABEL[S.fam]}`,
+                  },
+                  bank[S.fam].length
+                    ? bank[S.fam].map((q, i) =>
+                        h(
+                          "li",
+                          null,
+                          h(
+                            "button",
+                            {
+                              type: "button",
+                              "data-key": `bank-${S.fam}-${i}`,
+                              disabled: asked.has(q.trim().toLowerCase()),
+                              onclick: () => ask(q, S.fam, "bank"),
+                            },
+                            q,
+                          ),
+                        ),
+                      )
+                    : h(
+                        "li",
+                        { class: "hand faint", style: "padding:4px 8px" },
+                        "nothing in the bank for this family yet",
+                      ),
+                )
+              : null,
+            h(
+              "p",
+              { class: "meta", style: "margin:22px 0 0" },
+              "or in your own words",
+            ),
+            h("div", { class: "own" }, ownIn, sel, askBtn),
+            warn,
+            h(
+              "p",
+              { class: "hand faint", style: "margin:16px 0 0;font-size:15px" },
+              "nothing here proposes a question or an answer — every turn on this sheet is one you chose",
+            ),
+            troubleEl,
+          ),
+          "next",
+        ),
+        "dialogue-next",
+      );
+      showTrouble();
+    } else {
+      troubleEl = null;
+      next = sketch(
+        rise(
+          h(
+            "section",
+            { class: "panel big", "aria-label": "About the specimen" },
+            h(
+              "p",
+              { class: "meta acc", style: "margin:0" },
+              "this is the specimen",
+            ),
+            h(
+              "p",
+              { style: "margin:10px 0 0;max-width:58ch" },
+              "One made-up person, examining a claim they met on the feed. Every turn is fiction. It is here so you can see what the desk reads before you write anything of your own, and it is read-only.",
+            ),
+            h(
+              "p",
+              { class: "hand", style: "margin:0 0 16px;max-width:58ch" },
+              "Where it came from, a garden of notes, the questions could also come from the garden's own record and from a model on the person's machine, hollow until kept. This page has neither: your questions come from the bank and from your own hand.",
+            ),
+            h(
+              "div",
+              { class: "chips" },
+              chip(
+                "begin your own",
+                () => {
+                  close();
+                  document.getElementById("thesis")?.focus();
+                },
+                { solid: true, key: "begin-own" },
+              ),
+            ),
+          ),
+          "spec-note",
+        ),
+        "dialogue-specimen",
+      );
+    }
+
+    const main = h(
+      "section",
+      { class: "col", "aria-label": "The dialogue" },
+      thesisPanel,
+      turns,
+      next,
+    );
+
+    /* ── the desk ── */
+    const wheel = sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "The six families" },
+          h("p", { class: "meta acc", style: "margin:0" }, "the six families"),
+          Wheel(t.byFamily, writable ? pickFam : null, S.fam),
+          h(
+            "p",
+            {
+              class: "hand faint",
+              style: "margin:2px 0 0;text-align:center;font-size:15px",
+            },
+            writable
+              ? "dashed where not yet asked · press one to see its questions"
+              : "dashed where not yet asked",
+          ),
+        ),
+        `wheel-${d.slug}`,
+        1,
+      ),
+      "dialogue-wheel",
+    );
+
+    const desk = h(
+      "aside",
+      { class: "col", "aria-label": "The desk" },
+      wheel,
+      Ledger(d, writable),
+      FormPanel(d, writable),
+      Terms(d, writable),
+      Reading(d, writable),
+    );
+
+    return h("div", { class: "grid" }, main, desk);
+  }
+
+  function setSure(id) {
+    S.sure = id;
+    render();
+  }
+
+  function pickFam(f) {
+    S.fam = S.fam === f ? null : f;
+    render();
+    if (S.fam) {
+      const n = document.getElementById("next");
+      const r = n && n.getBoundingClientRect();
+      if (r && (r.top > innerHeight || r.bottom < 0))
+        n.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }
+
+  function ask(question, family, by) {
+    const d = S.open;
+    const q = question.trim();
+    if (!d || S.spec || !q) return;
+    const turn = {
+      id: uid(),
+      family,
+      question: q,
+      by,
+      kept: true,
+      answer: "",
+      stone: null,
+      on: today,
+    };
+    d.turns.push(turn);
+    S.fam = null;
+    keepOpen();
+    render();
+    const el = document.getElementById(`ans-${turn.id}`);
+    if (el) {
+      el.focus({ preventScroll: true });
+      el.scrollIntoView({
+        block: "center",
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
+    }
+  }
+
+  function askOwn() {
+    const q = S.drafts.ownQ;
+    if (!q.trim() || !isOpen(q)) return;
+    S.drafts.ownQ = "";
+    ask(q, S.ownFam, "you");
+  }
+
+  function keepTurn(id) {
+    const d = S.open;
+    d.turns = d.turns.map((t) => (t.id === id ? { ...t, kept: true } : t));
+    keepOpen();
+    render();
+  }
+
+  function dropTurn(id) {
+    const d = S.open;
+    d.turns = d.turns.filter((t) => t.id !== id);
+    d.assumptions = d.assumptions.map((a) =>
+      a.turn === id ? { ...a, turn: null } : a,
+    );
+    d.terms = d.terms.map((x) => (x.turn === id ? { ...x, turn: null } : x));
+    S.sure = null;
+    keepOpen();
+    render();
+  }
+
+  /** Six segments round a ring: filled by how often a family was asked, dashed where it never was. */
+  function Wheel(by, onPick, lit) {
+    const R = 70;
+    const r = 42;
+    const cx = 150;
+    const cy = 100;
+    const pt = (rad, a) =>
+      `${(cx + rad * Math.cos(a)).toFixed(1)} ${(cy + rad * Math.sin(a)).toFixed(1)}`;
+    const seg = (i) => {
+      const a0 = -Math.PI / 2 + (i * Math.PI) / 3 + 0.04;
+      const a1 = -Math.PI / 2 + ((i + 1) * Math.PI) / 3 - 0.04;
+      return `M ${pt(R, a0)} A ${R} ${R} 0 0 1 ${pt(R, a1)} L ${pt(r, a1)} A ${r} ${r} 0 0 0 ${pt(r, a0)} Z`;
+    };
+    const short = {
+      clarify: "clarify",
+      assume: "assume",
+      evidence: "evidence",
+      viewpoint: "viewpoint",
+      consequence: "follows",
+      question: "question",
+    };
+    const svg = svgEl("svg", {
+      class: `wheel${onPick ? " live" : ""}`,
+      viewBox: "0 0 300 200",
+      role: onPick ? "group" : "img",
+      "aria-label": "How often each family has been asked",
+    });
+    FAMILIES.forEach((f, i) => {
+      const n = by[f];
+      const a = -Math.PI / 2 + ((i + 0.5) * Math.PI) / 3;
+      const x = cx + (R + 12) * Math.cos(a);
+      const yy = cy + (R + 12) * Math.sin(a);
+      const anchor =
+        Math.cos(a) > 0.3 ? "start" : Math.cos(a) < -0.3 ? "end" : "middle";
+      const g = svgEl("g", {
+        class: `${n ? "asked" : "unasked"}${lit === f ? " lit" : ""}`,
+      });
+      const p = svgEl("path", { d: seg(i) });
+      p.style.fillOpacity = String(n ? Math.min(0.1 + n * 0.12, 0.7) : 0);
+      const tx = svgEl("text", {
+        x: x.toFixed(1),
+        y: (yy + 3).toFixed(1),
+        "text-anchor": anchor,
+      });
+      tx.textContent = `${short[f]}${n ? ` ${n}` : ""}`;
+      g.append(p, tx);
+      if (onPick) {
+        g.setAttribute("tabindex", "0");
+        g.setAttribute("role", "button");
+        g.setAttribute("aria-pressed", String(lit === f));
+        g.setAttribute(
+          "aria-label",
+          `${FAMILY_LABEL[f]}, asked ${n} time${n === 1 ? "" : "s"}`,
+        );
+        g.dataset.key = `wheel-${f}`;
+        g.addEventListener("click", () => onPick(f));
+        g.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onPick(f);
+          }
+        });
+      }
+      svg.append(g);
+    });
+    return svg;
+  }
+
+  /* the assumptions on the table */
+  function Ledger(d, writable) {
+    const lastTurn = d.turns.filter((t) => t.kept).at(-1)?.id ?? null;
+    const setA = (a, patch, structural) => {
+      Object.assign(a, patch);
+      keepOpen();
+      if (structural) render();
+      else refresh();
+    };
+    const dropA = (id) => {
+      d.assumptions = d.assumptions.filter((a) => a.id !== id);
+      S.sure = null;
+      keepOpen();
+      render();
+    };
+    const items = d.assumptions.map((a) => {
+      const dot = h("span", {
+        class: `dot${a.kept ? "" : " hollow"}${a.kept && a.examined ? ` ${a.examined}` : ""}`,
+        title: EXAMINED_LABEL[a.examined],
+        "aria-hidden": "true",
+      });
+      const lineRows = (s) => Math.max(1, Math.min(5, Math.ceil(s.length / 34)));
+      const text = h("textarea", {
+        class: "field",
+        "data-key": `a-${a.id}`,
+        "aria-label": "An assumption",
+        rows: lineRows(a.text),
+        readOnly: !writable,
+        value: a.text,
+        style: a.kept ? null : "color:var(--ink-2);border-bottom-style:dashed",
+        oninput: (e) => {
+          e.target.rows = lineRows(e.target.value);
+          setA(a, { text: e.target.value, by: "you" });
+        },
+      });
+      let under;
+      if (!a.kept && writable)
+        under = h(
+          "div",
+          { class: "chips" },
+          chip("keep", () => setA(a, { kept: true }, true), {
+            on: true,
+            key: `akeep-${a.id}`,
+          }),
+          chip("drop", () => dropA(a.id), { key: `adrop-${a.id}` }),
+          h("span", { class: "meta" }, "proposed"),
+        );
+      else {
+        const turnN = a.turn
+          ? Math.max(1, d.turns.findIndex((x) => x.id === a.turn) + 1)
+          : 0;
+        under = h(
+          "div",
+          { class: "chips" },
+          ["holds", "fell", "cannot"].map((x) =>
+            chip(
+              EXAMINED_LABEL[x],
+              () =>
+                writable &&
+                setA(a, { examined: a.examined === x ? "" : x }, true),
+              {
+                on: a.examined === x,
+                acc: x === "fell" && a.examined === x,
+                disabled: !writable,
+                key: `ex-${a.id}-${x}`,
+              },
+            ),
+          ),
+          turnN
+            ? h("span", { class: "meta plain" }, `heard in turn ${turnN}`)
+            : null,
+          writable
+            ? h(
+                "button",
+                {
+                  type: "button",
+                  class: `x${S.sure === a.id ? " acc" : ""}`,
+                  style: "margin-left:auto",
+                  "data-key": `ax-${a.id}`,
+                  "aria-label":
+                    S.sure === a.id ? "Drop it — sure?" : "Drop the assumption",
+                  onclick: () =>
+                    S.sure === a.id ? dropA(a.id) : setSure(a.id),
+                },
+                S.sure === a.id ? "sure?" : "×",
+              )
+            : null,
+        );
+      }
+      const note =
+        a.kept && (a.examined || a.note)
+          ? h("input", {
+              class: "field a-note",
+              "data-key": `an-${a.id}`,
+              "aria-label": "How it was examined",
+              placeholder: "how you examined it",
+              readOnly: !writable,
+              value: a.note,
+              oninput: (e) => setA(a, { note: e.target.value }),
+            })
+          : null;
+      let formRow = null;
+      if (a.kept && (writable || a.form)) {
+        const reads = h("span", { class: "meta plain" });
+        derive.push(() => {
+          if (!a.form.trim()) {
+            reads.textContent = "";
+            return;
+          }
+          const r = parse(a.form);
+          reads.textContent = r.ok ? show(r.f) : r.error;
+          reads.classList.toggle("acc", !r.ok);
+        });
+        formRow = h(
+          "div",
+          { class: "a-form" },
+          h("input", {
+            class: "field mono",
+            "data-key": `af-${a.id}`,
+            "aria-label": "Its form",
+            placeholder: "its form, over the letters",
+            readOnly: !writable,
+            value: a.form,
+            oninput: (e) => setA(a, { form: e.target.value }),
+          }),
+          reads,
+        );
+      }
+      return h(
+        "li",
+        null,
+        h("div", { class: "a-line" }, dot, text),
+        h("div", { class: "a-under" }, under, note, formRow),
+      );
+    });
+
+    let add = null;
+    if (writable) {
+      const btn = chip("surface", () => surface(), {
+        key: "surface",
+        disabled: !S.drafts.newA.trim(),
+        on: !!S.drafts.newA.trim(),
+      });
+      const surface = () => {
+        const text = S.drafts.newA.trim();
+        if (!text) return;
+        d.assumptions.push({
+          id: uid(),
+          text,
+          turn: lastTurn,
+          by: "you",
+          kept: true,
+          examined: "",
+          note: "",
+          form: "",
+        });
+        S.drafts.newA = "";
+        keepOpen();
+        render();
+      };
+      add = h(
+        "div",
+        { class: "add" },
+        h("input", {
+          class: "field",
+          "data-key": "newA",
+          "aria-label": "A new assumption",
+          placeholder: "something taken for granted, as a plain statement",
+          value: S.drafts.newA,
+          oninput: (e) => {
+            S.drafts.newA = e.target.value;
+            const on = !!e.target.value.trim();
+            btn.disabled = !on;
+            btn.classList.toggle("on", on);
+          },
+          onkeydown: (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              surface();
+            }
+          },
+        }),
+        btn,
+      );
+    }
+
+    return sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "Assumptions" },
+          h(
+            "p",
+            { class: "meta acc", style: "margin:0" },
+            "assumptions on the table",
+          ),
+          d.assumptions.length
+            ? h("ol", { class: "ledger" }, items)
+            : h(
+                "p",
+                { class: "hand faint", style: "margin:8px 0 0" },
+                "none surfaced yet — write one as you hear it in your own answers",
+              ),
+          add,
+        ),
+        `ledger-${d.slug}`,
+        2,
+      ),
+      "dialogue-assumptions",
+    );
+  }
+
+  /* the form: the argument written over letters, and the rows */
+  const SHOW_ALL = 16;
+  const nextLetter = (used) =>
+    [..."pqrstuvwabcdefghijklmnoxyz"].find((l) => !used.has(l)) ?? "";
+
+  function FormPanel(d, writable) {
+    const blank = !d.letters.length && !d.premises.length && !d.conclusion;
+    if (blank && !writable) return null;
+    const keyOf = () =>
+      Object.fromEntries(d.letters.map((l) => [l.letter, l.text]));
+    const change = (structural) => {
+      keepOpen();
+      if (structural) render();
+      else refresh();
+    };
+
+    /** A formula as written, then as read: in symbols and said back in words, or why it does not read. */
+    const Reads = (src) => {
+      const p = h("p", { class: "reads" });
+      derive.push(() => {
+        const s = src();
+        p.replaceChildren();
+        p.hidden = !s.trim();
+        if (!s.trim()) return;
+        const r = parse(s);
+        if (!r.ok) p.append(h("span", { class: "bad" }, r.error));
+        else
+          p.append(
+            h("span", { class: "mono" }, show(r.f)),
+            h(
+              "span",
+              { class: "hand", style: "font-size:14px" },
+              ` — ${inWords(r.f, keyOf())}`,
+            ),
+          );
+      });
+      return p;
+    };
+
+    const letters = h(
+      "div",
+      { class: "letters" },
+      d.letters.map((l, i) =>
+        h(
+          "div",
+          { class: "lt" },
+          h("input", {
+            class: "field letter",
+            "data-key": `lt-${i}`,
+            "aria-label": "The letter",
+            readOnly: !writable,
+            value: l.letter,
+            oninput: (e) => {
+              l.letter = e.target.value.slice(-1).toLowerCase();
+              e.target.value = l.letter;
+              change(false);
+            },
+          }),
+          h("input", {
+            class: "field",
+            "data-key": `lx-${i}`,
+            "aria-label": `What ${l.letter} stands for`,
+            placeholder: "the sentence it stands for",
+            readOnly: !writable,
+            value: l.text,
+            oninput: (e) => {
+              l.text = e.target.value;
+              change(false);
+            },
+          }),
+          writable
+            ? h(
+                "button",
+                {
+                  type: "button",
+                  class: "x",
+                  "aria-label": `Drop the letter ${l.letter}`,
+                  onclick: () => {
+                    d.letters = d.letters.filter((_, j) => j !== i);
+                    change(true);
+                  },
+                },
+                "×",
+              )
+            : null,
+        ),
+      ),
+    );
+
+    const premises = h(
+      "ol",
+      { class: "premises" },
+      d.premises.map((p, i) =>
+        h(
+          "li",
+          null,
+          h(
+            "div",
+            { class: "pr" },
+            h("span", { class: "meta n" }, String(i + 1)),
+            h("input", {
+              class: "field mono",
+              "data-key": `pr-${p.id}`,
+              "aria-label": `Premise ${i + 1}`,
+              placeholder: "a premise, e.g. p -> q",
+              readOnly: !writable,
+              value: p.form,
+              oninput: (e) => {
+                p.form = e.target.value;
+                change(false);
+              },
+            }),
+            writable
+              ? h(
+                  "button",
+                  {
+                    type: "button",
+                    class: "x",
+                    "aria-label": `Drop premise ${i + 1}`,
+                    onclick: () => {
+                      d.premises = d.premises.filter((x) => x.id !== p.id);
+                      change(true);
+                    },
+                  },
+                  "×",
+                )
+              : null,
+          ),
+          Reads(() => p.form),
+        ),
+      ),
+      h(
+        "li",
+        null,
+        h(
+          "div",
+          { class: "pr therefore" },
+          h("span", { class: "n mono", style: "font-size:13px" }, "∴"),
+          h("input", {
+            class: "field mono",
+            "data-key": "conclusion",
+            "aria-label": "The conclusion",
+            placeholder: "the conclusion",
+            readOnly: !writable,
+            value: d.conclusion,
+            oninput: (e) => {
+              d.conclusion = e.target.value;
+              change(false);
+            },
+          }),
+        ),
+        Reads(() => d.conclusion),
+      ),
+    );
+
+    const adds = writable
+      ? h(
+          "div",
+          { class: "chips", style: "margin-top:12px" },
+          chip(
+            "a letter",
+            () => {
+              d.letters.push({
+                letter: nextLetter(new Set(d.letters.map((l) => l.letter))),
+                text: "",
+              });
+              change(true);
+              work
+                .querySelector(`[data-key="lx-${d.letters.length - 1}"]`)
+                ?.focus();
+            },
+            { key: "add-letter" },
+          ),
+          chip(
+            "a premise",
+            () => {
+              const p = { id: uid(), form: "" };
+              d.premises.push(p);
+              change(true);
+              work.querySelector(`[data-key="pr-${p.id}"]`)?.focus();
+            },
+            { key: "add-premise" },
+          ),
+        )
+      : null;
+
+    const rows = h("div", { class: "truth" });
+    const lines = h("ul", { class: "lines" });
+    derive.push(() => {
+      const form = formOf(d);
+      const a = form.argument;
+      rows.replaceChildren();
+      rows.hidden = a.state !== "read";
+      if (a.state === "read") {
+        const cols = [
+          ...d.premises
+            .map((p, i) => ({ label: `${i + 1}`, r: parse(p.form) }))
+            .filter((c) => c.r.ok),
+          { label: "∴", r: parse(d.conclusion) },
+        ];
+        const shown =
+          a.rows.length <= SHOW_ALL ? a.rows.map((_, i) => i) : a.live;
+        const table = h(
+          "table",
+          { "aria-label": "The rows" },
+          h(
+            "thead",
+            null,
+            h(
+              "tr",
+              null,
+              a.letters.map((l) => h("th", null, l)),
+              cols.map((c, j) =>
+                h("th", { class: j === 0 ? "div" : null }, c.label),
+              ),
+            ),
+          ),
+          h(
+            "tbody",
+            null,
+            shown.map((i) => {
+              const row = a.rows[i];
+              const cls = a.against.includes(i)
+                ? "against"
+                : a.live.includes(i)
+                  ? "live"
+                  : null;
+              return h(
+                "tr",
+                { class: cls },
+                a.letters.map((l) => h("td", null, row[l] ? "●" : "○")),
+                cols.map((c, j) =>
+                  h(
+                    "td",
+                    { class: j === 0 ? "div" : null },
+                    holds(c.r.f, row) ? "●" : "○",
+                  ),
+                ),
+              );
+            }),
+          ),
+        );
+        rows.append(
+          table,
+          h(
+            "p",
+            { class: "meta plain", style: "margin:6px 0 0" },
+            "● holds · ○ does not" +
+              (a.rows.length > SHOW_ALL
+                ? ` · the ${a.live.length} rows of ${a.rows.length} where every premise holds`
+                : " · full ink where every premise holds"),
+          ),
+        );
+      }
+      const ls = formReadings(d, form);
+      lines.replaceChildren(...ls.map((l) => h("li", null, l)));
+      lines.hidden = !ls.length;
+    });
+
+    return sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "The form" },
+          h("p", { class: "meta acc", style: "margin:0" }, "the form"),
+          h(
+            "p",
+            { class: "hand faint", style: "margin:6px 0 0;font-size:15px" },
+            "give each sentence a letter, then write the argument over the letters — not, and, or, if … then, iff, or ¬ ∧ ∨ → ↔. The rows show what the form does; whether a sentence is so stays yours.",
+          ),
+          letters,
+          premises,
+          adds,
+          rows,
+          lines,
+        ),
+        `form-${d.slug}`,
+        3,
+      ),
+      "dialogue-form",
+    );
+  }
+
+  /* the terms clarified */
+  function Terms(d, writable) {
+    const lastTurn = d.turns.filter((t) => t.kept).at(-1)?.id ?? null;
+    let add = null;
+    if (writable) {
+      const btn = chip("keep", () => keepTerm(), {
+        key: "keep-term",
+        disabled: !S.drafts.newWord.trim(),
+        on: !!S.drafts.newWord.trim(),
+      });
+      const keepTerm = () => {
+        const word = S.drafts.newWord.trim();
+        if (!word) return;
+        d.terms.push({
+          id: uid(),
+          word,
+          meaning: S.drafts.newMeaning.trim(),
+          turn: lastTurn,
+        });
+        S.drafts.newWord = "";
+        S.drafts.newMeaning = "";
+        keepOpen();
+        render();
+      };
+      add = h(
+        "div",
+        { class: "add" },
+        h("input", {
+          class: "field word",
+          "data-key": "newWord",
+          "aria-label": "A term",
+          placeholder: "the word",
+          value: S.drafts.newWord,
+          oninput: (e) => {
+            S.drafts.newWord = e.target.value;
+            const on = !!e.target.value.trim();
+            btn.disabled = !on;
+            btn.classList.toggle("on", on);
+          },
+        }),
+        h("input", {
+          class: "field",
+          "data-key": "newMeaning",
+          "aria-label": "Its meaning here",
+          placeholder: "what it means here",
+          value: S.drafts.newMeaning,
+          oninput: (e) => (S.drafts.newMeaning = e.target.value),
+          onkeydown: (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              keepTerm();
+            }
+          },
+        }),
+        btn,
+      );
+    }
+    return sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "Terms clarified" },
+          h("p", { class: "meta acc", style: "margin:0" }, "terms clarified"),
+          d.terms.length
+            ? h(
+                "dl",
+                { class: "terms" },
+                d.terms.map((x) =>
+                  h(
+                    "div",
+                    null,
+                    h("dt", null, `‘${x.word}’`),
+                    h("dd", null, x.meaning || "—"),
+                    writable
+                      ? h(
+                          "button",
+                          {
+                            type: "button",
+                            class: "x",
+                            "aria-label": "Drop the term",
+                            onclick: () => {
+                              d.terms = d.terms.filter((y) => y.id !== x.id);
+                              keepOpen();
+                              render();
+                            },
+                          },
+                          "×",
+                        )
+                      : null,
+                  ),
+                ),
+              )
+            : h(
+                "p",
+                { class: "hand faint", style: "margin:8px 0 0" },
+                "none yet — when an answer says what a word means here, keep it",
+              ),
+          add,
+        ),
+        `terms-${d.slug}`,
+        4,
+      ),
+      "dialogue-terms",
+    );
+  }
+
+  /* the reading */
+  function Reading(d, writable) {
+    const out = h("ul", { class: "reading", "aria-live": "polite" });
+    derive.push(() =>
+      out.replaceChildren(
+        ...readings(d, tally(d)).map((l) => h("li", null, l)),
+      ),
+    );
+    const copy = chip(
+      "copy as markdown",
+      async () => {
+        try {
+          await navigator.clipboard.writeText(serialiseDialogue(d));
+          copy.textContent = "copied";
+        } catch {
+          copy.textContent = "the browser would not copy";
+        }
+        setTimeout(() => (copy.textContent = "copy as markdown"), 1800);
+      },
+      { key: "copy" },
+    );
+    const remove = () => {
+      S.dialogues = S.dialogues.filter((x) => x !== d);
+      close();
+    };
+    return sketch(
+      rise(
+        h(
+          "section",
+          { class: "panel", "aria-label": "The reading" },
+          h("p", { class: "meta acc", style: "margin:0" }, "the reading"),
+          out,
+          h(
+            "div",
+            { class: "chips", style: "margin-top:14px" },
+            copy,
+            writable
+              ? chip(
+                  S.sure === "dialogue"
+                    ? "take the dialogue back — sure?"
+                    : "take the dialogue back",
+                  () =>
+                    S.sure === "dialogue" ? remove() : setSure("dialogue"),
+                  { acc: S.sure === "dialogue", key: "remove" },
+                )
+              : null,
+          ),
+          h(
+            "p",
+            { class: "meta plain", style: "margin:14px 0 0" },
+            writable
+              ? `kept in this browser as ${d.slug}, and nowhere else`
+              : "fiction — a made-up person's dialogue, read-only",
+          ),
+        ),
+        `reading-${d.slug}`,
+        5,
+      ),
+      "dialogue-reading",
+    );
+  }
+
+  /* ── begin: on what was open last, or on the specimen ── */
+  const { openSlug } = load();
+  if (openSlug === SPECIMEN.slug) {
+    S.open = clone(SPECIMEN);
+    S.spec = true;
+  } else if (openSlug) {
+    S.open = S.dialogues.find((x) => x.slug === openSlug) ?? null;
+  }
+  render();
+</script>

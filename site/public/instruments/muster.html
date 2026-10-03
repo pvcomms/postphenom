@@ -1,0 +1,4578 @@
+<title>Muster</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Four ways to hold a view: after what is so or after your side, fighting for it or keeping the peace. Put a claim to all four, then run a room of them."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a muster roll on bone paper. Moss is only ever after what is so (the scout and the
+     paladin); ochre is only ever after its side (the soldier and the pacifist); rust is only ever
+     the reader's line — where they would act — and what is shown up. Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed;
+    --sheet: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8a8276;
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --accent: #b5532a;
+    --so: #56764a;
+    --side: #b07a32;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--paper));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f;
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d766a;
+      --rule: #302e25;
+      --rule-2: #4a463a;
+      --accent: #d9763f;
+      --so: #8fb27a;
+      --side: #d6a35a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d766a;
+    --rule: #302e25;
+    --rule-2: #4a463a;
+    --accent: #d9763f;
+    --so: #8fb27a;
+    --side: #d6a35a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1320px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .meta.lower {
+    text-transform: none;
+    letter-spacing: 0.06em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .faint {
+    color: var(--faint);
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .meta {
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin-top: 20px;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .claim-lede {
+    font-size: clamp(19px, 2vw, 22px);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    max-width: 46ch;
+  }
+  .claim-lede + p {
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 58ch;
+  }
+
+  /* the sheet and the desk */
+  .bench {
+    display: grid;
+    gap: 24px;
+    margin-top: 28px;
+  }
+  @media (min-width: 1080px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  .panel {
+    position: relative;
+    background: var(--sheet);
+    border-radius: 3px;
+    min-width: 0;
+  }
+  .sheet {
+    padding: clamp(18px, 3vw, 30px);
+    container-type: inline-size;
+    animation: rise 600ms var(--ease) 60ms both;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px 18px;
+    animation: rise 600ms var(--ease) both;
+  }
+  .desk .panel:nth-child(1) {
+    animation-delay: 100ms;
+  }
+  .desk .panel:nth-child(2) {
+    animation-delay: 140ms;
+  }
+  .desk .panel:nth-child(3) {
+    animation-delay: 180ms;
+  }
+  .desk .read {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .desk .cite {
+    margin-top: 12px;
+    color: var(--faint);
+  }
+
+  /* a pen line laid over the element it sits in */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .sheet-head,
+  .part-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .note {
+    margin-top: 4px;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--muted);
+  }
+  .note.faint {
+    color: var(--faint);
+  }
+  .part {
+    margin-top: 26px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* chips: the buttons */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 5px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--rule-2);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.45;
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.on-accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* a choice written out as words, the one chosen inked and underlined by hand */
+  .seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 4px;
+  }
+  .seg-b {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .seg-b[aria-pressed="true"] {
+    color: var(--ink);
+  }
+  .seg-b:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .seg-b:disabled {
+    opacity: 0.8;
+  }
+  .seg-b[aria-pressed="true"]:disabled {
+    opacity: 1;
+  }
+  .seg .dot {
+    padding-inline: 6px;
+    font-size: 11px;
+    color: var(--faint);
+  }
+
+  /* what is typed in place */
+  .case {
+    display: block;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0;
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case[readonly] {
+    border-bottom-color: transparent;
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  textarea.case {
+    resize: none;
+    overflow: hidden;
+    width: 100%;
+  }
+  .claim-in {
+    margin-top: 8px;
+    font-size: clamp(25px, 3.4vw, 31px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .num {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    padding: 0;
+    text-align: center;
+    line-height: 1.1;
+    font-family: var(--serif);
+    font-style: italic;
+    transition: border-color 160ms var(--ease);
+  }
+  .num:not([readonly]):hover {
+    border-bottom-color: var(--faint);
+    cursor: text;
+  }
+  .num:focus {
+    outline: none;
+    border-bottom: 1px solid var(--accent);
+  }
+  .num.unset {
+    color: var(--faint);
+  }
+  .pct {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .pct .pc {
+    color: var(--muted);
+  }
+
+  .before {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+  }
+  .would {
+    flex: 1 1 12rem;
+    min-width: 0;
+    font-size: 18px;
+    line-height: 1.25;
+  }
+
+  /* the path */
+  .path-wrap {
+    margin-top: 10px;
+    position: relative;
+    width: 100%;
+  }
+  .path-wrap svg {
+    display: block;
+    overflow: visible;
+    touch-action: pan-y;
+  }
+  .svg-mono {
+    font-family: var(--mono);
+  }
+  .svg-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .handle {
+    cursor: ns-resize;
+    touch-action: none;
+  }
+  .you-ring.handle {
+    cursor: grab;
+  }
+  .dragging,
+  .dragging * {
+    cursor: grabbing !important;
+  }
+  .ms-you {
+    transition: opacity 420ms var(--ease);
+  }
+  .legend {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .order-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .link {
+    transition:
+      color 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .link:not(:disabled):hover {
+    color: var(--accent) !important;
+  }
+  .link:disabled {
+    opacity: 0.35;
+  }
+
+  /* the pieces */
+  .pieces {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .ms-row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .piece {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .piece .k {
+    width: 24px;
+    flex: none;
+    text-align: right;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+  }
+  .piece .body {
+    flex: 1;
+    min-width: 0;
+  }
+  .piece-text,
+  .add-in {
+    font-size: 19px;
+    line-height: 1.25;
+  }
+  .piece .marks {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 20px;
+  }
+  .then {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .off {
+    margin-top: 6px;
+    flex: none;
+    padding: 0 4px;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .add {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .add .gut {
+    width: 24px;
+    flex: none;
+  }
+  .add .add-in {
+    flex: 1;
+    min-width: 0;
+  }
+  .setdown {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+  }
+
+  /* in company */
+  .company {
+    margin-top: 12px;
+    display: grid;
+    gap: 16px 32px;
+  }
+  @container (min-width: 820px) {
+    .company {
+      grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+    }
+  }
+  .field-col {
+    width: 100%;
+    max-width: 26rem;
+    margin-inline: auto;
+    min-width: 0;
+  }
+  .field-col svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    touch-action: pan-y;
+  }
+  .field-say {
+    margin-top: 4px;
+    min-height: 2.6em;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--faint);
+    transition: color 200ms var(--ease);
+  }
+  .self-say {
+    margin-top: 4px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--muted);
+  }
+  .room-col {
+    min-width: 0;
+  }
+  .round-head {
+    margin-bottom: 8px;
+    min-height: 3.4em;
+  }
+  .round-words {
+    margin-top: 2px;
+    font-size: 17px;
+    line-height: 1.28;
+  }
+  .ms-arrive {
+    animation: rise 360ms var(--ease) both;
+  }
+  .lanes {
+    position: relative;
+    width: 100%;
+  }
+  .lanes svg {
+    display: block;
+    overflow: visible;
+  }
+  .lane-label {
+    position: absolute;
+    left: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .lane-label .who {
+    font-size: 17px;
+    line-height: 1;
+  }
+  .lane-label .count {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .lane-label .count button {
+    padding: 0 3px;
+    color: var(--faint);
+  }
+  .chips {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .scrub {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .scrub input {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent);
+    height: 14px;
+  }
+  .knobs {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .knobs .line {
+    gap: 4px 12px;
+  }
+  .room-read {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .rules {
+    margin-top: 8px;
+  }
+  .rules summary {
+    cursor: pointer;
+    list-style: none;
+    color: var(--muted);
+    width: fit-content;
+  }
+  .rules summary::-webkit-details-marker {
+    display: none;
+  }
+  .rules summary::before {
+    content: "+ ";
+  }
+  .rules[open] summary::before {
+    content: "− ";
+  }
+  .rules ol {
+    margin-top: 8px;
+    padding-left: 20px;
+    list-style: decimal;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .beside {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+  }
+  @container (min-width: 540px) {
+    .beside {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @container (min-width: 860px) {
+    .beside {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .beside figure {
+    margin: 0;
+    min-width: 0;
+  }
+  .beside svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .beside figcaption {
+    margin-top: 2px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .beside figcaption .hand {
+    font-size: 15.5px;
+    line-height: 1.2;
+  }
+
+  /* who else, afterwards */
+  .two {
+    display: grid;
+    gap: 24px 32px;
+  }
+  @container (min-width: 640px) {
+    .two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .others {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .other-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .other-top .case {
+    flex: 1;
+    min-width: 0;
+    font-size: 18px;
+    line-height: 1.25;
+  }
+  .after-lines {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15px;
+  }
+  .after-text {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  /* the record */
+  .record {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .record button {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .record button:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .record .claim-t {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+  .record .sub {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .record-head {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    color: var(--muted);
+  }
+
+  /* the room's motion */
+  .ms-quarter {
+    cursor: copy;
+  }
+  .ms-member {
+    cursor: pointer;
+    transition: opacity 160ms var(--ease);
+  }
+  .ms-member:hover {
+    opacity: 0.6;
+  }
+  .ms-fill,
+  .ms-bead {
+    transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+    transition-delay: var(--ms-lag, 0ms);
+  }
+  .ms-drop {
+    animation: ms-drop 1000ms var(--ease) both;
+  }
+  @keyframes ms-drop {
+    0% {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    35% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+  }
+  .ms-ripple {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ms-ripple 1100ms var(--ease) both;
+  }
+  .ms-ripple.ms-loud {
+    animation-name: ms-ripple-loud;
+  }
+  @keyframes ms-ripple {
+    from {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+  }
+  @keyframes ms-ripple-loud {
+    from {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(4.4);
+    }
+  }
+  .ms-argue {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: ms-argue 1200ms var(--ease) both;
+  }
+  @keyframes ms-argue {
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 0.95;
+    }
+    45% {
+      stroke-dashoffset: 0;
+      opacity: 0.95;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  .ms-strike {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ms-strike 1300ms var(--ease) both;
+  }
+  @keyframes ms-strike {
+    0% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    80% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      padding-block: 40px 28px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sheet,
+    .desk .panel,
+    .ms-row,
+    .ms-arrive {
+      animation: none;
+    }
+    .sketch .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .ms-drop,
+    .ms-ripple,
+    .ms-argue,
+    .ms-strike {
+      animation: none;
+      opacity: 0;
+    }
+    .ms-fill,
+    .ms-bead,
+    .ms-you,
+    .ms-member {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Muster</h1>
+      <p class="deck">
+        <em>Four ways to hold a view:</em> after what is so or after your side,
+        fighting for it or keeping the peace.
+      </p>
+    </div>
+    <div>
+      <p class="claim-lede">
+        Wanting a side and fighting for it are two different things. Alone with
+        the same evidence, the scout and the paladin move as one, and only in a
+        room do they part.
+      </p>
+      <p>
+        Put a claim to all four: your prior, the evidence as it came, the line
+        you would act at. Then run a room of them. The page opens on a specimen
+        claim; make your own when you have read it. Whatever you set down stays
+        in this browser.
+      </p>
+    </div>
+  </header>
+
+  <div class="bench">
+    <section class="panel sheet" id="sheet" aria-label="The claim">
+      <div class="sheet-head">
+        <div class="meta accent" id="sheetMeta"></div>
+        <button class="chip" id="newChip" type="button" hidden></button>
+      </div>
+      <textarea
+        id="claim"
+        class="case claim-in"
+        rows="1"
+        placeholder="what do you hold to be so? a claim, in a line"
+        aria-label="The claim"
+      ></textarea>
+      <p class="hand note faint" id="exampleNote" hidden>
+        an example, drawn so the sheet is on the table — write over it, or start
+        a new claim
+      </p>
+      <p class="hand note faint" id="specimenNote" hidden>
+        Specimen A's claim, from a life that never happened. It reads but does
+        not change, though you can seat and run the room; make your own to put a
+        claim of yours to the four.
+      </p>
+
+      <div class="before">
+        <p class="line">
+          <span>Before anything came in you put it at</span
+          ><span id="priorPct"></span><span class="muted">— from</span
+          ><span id="fromSeg"></span>
+        </p>
+        <p class="line">
+          <span>You would rather it were</span><span id="likeSeg"></span>
+        </p>
+        <p class="line">
+          <span>You would act at</span><span id="actPct"></span
+          ><input
+            id="would"
+            class="case hand would"
+            placeholder="and do what?"
+            aria-label="What you would do"
+          />
+        </p>
+      </div>
+
+      <div class="part">
+        <div class="part-head">
+          <div class="meta accent">alone with the evidence</div>
+          <span class="order-btns" id="orderBtns">
+            <button class="link meta" id="asCame" type="button">
+              as it came</button
+            ><button class="link meta" id="reorder" type="button">
+              in another order
+            </button>
+          </span>
+        </div>
+        <p class="hand note" id="pathNote"></p>
+        <div class="path-wrap" id="path"></div>
+        <p class="legend" id="legend"></p>
+      </div>
+
+      <div class="part">
+        <div class="meta accent">what came in</div>
+        <p class="hand note">
+          each piece as it came: which way it points, how much more likely you
+          would see it if that way were so, how you met it, and where you stood
+          after.
+        </p>
+        <ol class="pieces" id="pieces"></ol>
+        <div class="add" id="addPiece">
+          <span class="gut" aria-hidden="true"></span
+          ><input
+            id="pieceIn"
+            class="case hand add-in"
+            aria-label="Another piece"
+          /><button class="chip" id="pieceAdd" type="button">add</button>
+        </div>
+        <div class="setdown" id="setDown">
+          <button class="chip on-accent" id="setDownBtn" type="button">
+            set it down</button
+          ><span class="hand faint" style="font-size: 15px"
+            >nothing is kept until you set it down</span
+          >
+        </div>
+      </div>
+
+      <div class="part" id="company">
+        <div class="meta accent">in company</div>
+        <p class="hand note">
+          alone, the scout and the paladin move as one. they part in a room.
+          seat one by clicking its quarter, see one out by clicking it, and run
+          the room on dealt evidence — most of it pointing at what is so, some
+          of it fool's gold.
+        </p>
+        <div class="company" id="companyGrid">
+          <div class="field-col">
+            <div id="field"></div>
+            <p class="hand field-say" id="fieldSay" aria-live="polite"></p>
+            <p class="hand self-say" id="selfSay"></p>
+          </div>
+          <div class="room-col">
+            <div class="round-head">
+              <div class="meta faint" id="roundHead"></div>
+              <div id="roundWordsBox"></div>
+            </div>
+            <div class="lanes" id="lanes"></div>
+            <div class="chips">
+              <button class="chip" id="play" type="button"></button
+              ><button class="chip" id="step" type="button">a round</button
+              ><button class="chip" id="toStart" type="button">
+                back to the start</button
+              ><button class="chip" id="dealAgain" type="button">
+                deal again
+              </button>
+            </div>
+            <label class="scrub">
+              <span class="meta faint" id="roundLabel">round 0</span>
+              <input
+                type="range"
+                id="roundRange"
+                min="0"
+                max="20"
+                value="0"
+                aria-label="Round"
+              />
+              <span class="meta faint">20</span>
+            </label>
+            <div class="knobs">
+              <div class="line">
+                <span>suppose it is</span><span id="truthSeg"></span>
+              </div>
+              <div class="line">
+                <span>fool's gold</span><span id="goldSeg"></span>
+              </div>
+              <div class="line">
+                <span>the room is</span><span id="courtSeg"></span
+                ><span class="hand faint" id="courtNote"></span>
+              </div>
+            </div>
+            <p class="room-read" id="roomRead"></p>
+            <details class="rules">
+              <summary class="link meta">the rules the room runs on</summary>
+              <ol>
+                <li>
+                  Each round one of the room is dealt a piece, a little or some.
+                  Most point at what is so, the stronger the more often; fool's
+                  gold looks like some and points either way.
+                </li>
+                <li>
+                  The paladin and the scout say what they have — the paladin to
+                  everyone, the scout to half the room. The soldier says only
+                  what is for its side. The pacifist says nothing; it notices a
+                  third of what comes to it and hears a third of what is said.
+                </li>
+                <li>
+                  The soldier and the paladin fight: each challenges what goes
+                  against its side. A challenge shows fool's gold up two times
+                  in three; real evidence holds.
+                </li>
+                <li>
+                  In a court what is shown up is struck for everyone, and
+                  whoever challenged a piece that held takes the whole of it —
+                  they fought it and lost. On a stage nothing is ruled: those
+                  after what is so drop what was shown up, and those after their
+                  side drop whatever against them was challenged at all.
+                </li>
+                <li>
+                  Whoever is after what is so moves by a piece's weight, either
+                  way. Whoever is after its side moves by the whole of what is
+                  for it and a quarter of what is against.
+                </li>
+                <li>
+                  Every other paladin starts on the far side, for the credit of
+                  being right where the others were not — marked with a dot.
+                </li>
+                <li>
+                  The room starts around your prior; the line is the one you
+                  would act at. It is a model: the rules are written out here so
+                  they can be argued with.
+                </li>
+              </ol>
+            </details>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px">
+          <div class="meta accent">the same deal, five rooms</div>
+          <p class="hand note">
+            this room beside rooms of one kind each, the same size, dealt the
+            same pieces — the line is the room's middle, the shading where most
+            of it stands
+          </p>
+          <div class="beside" id="beside"></div>
+        </div>
+      </div>
+
+      <div class="part two">
+        <div style="min-width: 0">
+          <div class="meta accent">who else holds a view</div>
+          <ul class="others" id="others"></ul>
+          <div class="add" id="addOther" style="margin-top: 12px">
+            <input
+              id="otherIn"
+              class="case hand add-in"
+              style="font-size: 18px"
+              placeholder="someone who holds a view on it"
+              aria-label="Someone who holds a view"
+            /><button class="chip" id="otherAdd" type="button">add</button>
+          </div>
+          <p class="hand note" id="noOthers" hidden>no one set down</p>
+        </div>
+        <div style="min-width: 0">
+          <div class="meta accent">afterwards</div>
+          <div class="after-lines">
+            <p class="line" style="gap: 4px 12px">
+              <span class="muted">did you act?</span
+              ><span class="hand" id="actedSay" style="font-size: 17px"></span
+              ><button class="link meta faint" id="actedUndo" type="button">
+                undo</button
+              ><button class="chip" id="actedChip" type="button">
+                I acted today
+              </button>
+            </p>
+            <p class="line" style="gap: 4px 12px">
+              <span class="muted">how did it come out?</span
+              ><span id="cameSeg"></span
+              ><span class="meta lower faint" id="cameOn"></span>
+            </p>
+          </div>
+          <textarea
+            id="after"
+            class="case after-text"
+            rows="2"
+            placeholder="afterwards, in your words"
+            aria-label="Afterwards"
+          ></textarea>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px" id="offBox">
+        <button class="chip" id="offChip" type="button"></button>
+      </div>
+      <p
+        class="meta accent"
+        id="trouble"
+        role="alert"
+        style="margin-top: 12px"
+        hidden
+      ></p>
+    </section>
+
+    <aside class="desk">
+      <section class="panel" id="readingPanel" aria-label="The reading">
+        <div class="meta accent">the reading</div>
+        <p class="read" id="reading"></p>
+      </section>
+      <section class="panel" id="recordPanel" aria-label="The record">
+        <div class="meta accent" id="recordLabel">the record</div>
+        <p class="read" id="recordRead"></p>
+        <ol class="record" id="recordMine"></ol>
+        <div class="meta record-head" id="specHead">
+          the specimen · Specimen A, fiction
+        </div>
+        <ol class="record" id="recordSpec"></ol>
+      </section>
+      <section
+        class="panel"
+        id="lawsPanel"
+        aria-label="What the muster holds to"
+      >
+        <div class="meta accent">what the muster holds to</div>
+        <p class="read">
+          The four quarters are Amanda Askell's. Julia Galef split reasoning
+          into the soldier's, which defends a side, and the scout's, which wants
+          to see what is there; Askell pointed out that the soldier does two
+          things — it is after what it would like to be so, and it fights — and
+          crossed them. The paladin fights and is after what is so; the pacifist
+          is after its side and keeps the peace.
+        </p>
+        <p class="read">
+          The sheet multiplies your own weights and sets the product beside your
+          own marks, and runs the four figures' rules on the same pieces. It
+          never places you in a quarter — you put yourself there — and never
+          says a move was too large or too small. The room is a model with its
+          rules written out; its numbers are the instrument's, not Askell's.
+        </p>
+        <p class="meta lower cite">
+          Amanda Askell, Paladin, pacifist, soldier, scout (2022) · Julia Galef,
+          The Scout Mindset (2021)
+        </p>
+        <p class="meta lower cite" id="keptWhere"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Muster · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ══ LOGIC START — a hand port of niwa's lib/muster.ts, lib/hand.ts and dayWords ══ */
+
+  /* ── days ── */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+
+  /* ── the hand: every path deterministic for its seed ── */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const hf = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${hf(s[0])} ${hf(s[1])}C${hf(c1[0])} ${hf(c1[1])} ${hf(c2[0])} ${hf(c2[1])} ${hf(e[0])} ${hf(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${hf(pts[0][0])} ${hf(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${hf(c1[0])} ${hf(c1[1])} ${hf(c2[0])} ${hf(c2[1])} ${hf(p2[0])} ${hf(p2[1])}`;
+    }
+    return d;
+  }
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${hf(q[0])} ${hf(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /* ── the muster ── */
+  const WAYS = ["for", "against"];
+  const WAY_LABEL = { for: "for", against: "against" };
+  const WEIGHTS = [1.5, 3, 8, 30];
+  const WEIGHT_LABEL = {
+    1.5: "a little",
+    3: "some",
+    8: "a lot",
+    30: "overwhelming",
+  };
+  const METS = ["argued", "took", "passed"];
+  const MET_LABEL = {
+    argued: "argued with it",
+    took: "took it in",
+    passed: "let it pass",
+  };
+  const FROMS = ["base", "seen", "told", "hunch"];
+  const FROM_LABEL = {
+    base: "a base rate",
+    seen: "what I've seen",
+    told: "what I was told",
+    hunch: "a hunch",
+  };
+  const FROM_WORDS = {
+    base: "from a base rate",
+    seen: "from what you had seen",
+    told: "from what you were told",
+    hunch: "on a hunch",
+  };
+  const LIKE_LABEL = { so: "so", not: "not so", "": "either way" };
+  const FACES = ["argued", "talked", "kept"];
+  const FACE_LABEL = {
+    argued: "argued it out",
+    talked: "talked it over",
+    kept: "kept it to myself",
+  };
+  const KINDS = ["soldier", "paladin", "pacifist", "scout"];
+  const FIGHTS = {
+    soldier: true,
+    paladin: true,
+    pacifist: false,
+    scout: false,
+  };
+  const AFTER_SO = {
+    soldier: false,
+    paladin: true,
+    pacifist: false,
+    scout: true,
+  };
+  const PLURAL = {
+    soldier: "soldiers",
+    paladin: "paladins",
+    pacifist: "pacifists",
+    scout: "scouts",
+  };
+  const ROOM = { soldier: 3, paladin: 3, pacifist: 3, scout: 3 };
+  const ROOM_MAX = 6;
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+  const emptyMuster = (day) => ({
+    slug: "",
+    put: day,
+    touched: day,
+    claim: "",
+    prior: 50,
+    from: "",
+    like: "",
+    act: 70,
+    would: "",
+    acted: "",
+    pieces: [],
+    others: [],
+    self: null,
+    room: { ...ROOM },
+    came: "",
+    cameOn: "",
+    after: "",
+  });
+  const newPiece = (text, day) => ({
+    id: uid(),
+    on: day,
+    text,
+    way: "for",
+    weight: 3,
+    met: "took",
+    at: null,
+  });
+  const newOther = (name) => ({ id: uid(), name, at: null, met: "talked" });
+
+  /* odds */
+  const LO = 1;
+  const HI = 99;
+  const clampPct = (v) => Math.min(HI, Math.max(LO, v));
+  const logit = (p) => Math.log(p / (100 - p));
+  const pctOf = (l) => 100 / (1 + Math.exp(-l));
+  const clampL = (l) => Math.max(-6.9, Math.min(6.9, l));
+  const sign = (x) => (x > 0 ? 1 : x < 0 ? -1 : 0);
+  const stepOf = (p) => (p.way === "for" ? 1 : -1) * Math.log(p.weight);
+  function pw(p) {
+    if (p < 0.5) return "under 1%";
+    if (p > 99.5) return "over 99%";
+    return `${Math.round(p)}%`;
+  }
+  const ORD = ["", "1st", "2nd", "3rd"];
+  const ordinal = (k) => ORD[k] ?? `${k}th`;
+
+  /* the four, alone with the reader's pieces */
+  const RULES = {
+    against: 0.25,
+    notice: 1 / 3,
+    quiet: 0.5,
+    show: 2 / 3,
+    spread: 0.9,
+  };
+  const sideOf = (like, l) =>
+    like === "so" ? 1 : like === "not" ? -1 : sign(l);
+  function taken(kind, like, l, s) {
+    const side = sideOf(like, l);
+    const own = AFTER_SO[kind] || side === 0 || sign(s) === side;
+    return own ? s : RULES.against * s;
+  }
+  function pathsOf(m, order) {
+    const idx = order ?? m.pieces.map((_, i) => i);
+    const l0 = logit(clampPct(m.prior));
+    const out = {
+      weights: [m.prior],
+      soldier: [m.prior],
+      pacifist: [m.prior],
+      you: [m.prior],
+    };
+    let w = l0;
+    let so = l0;
+    let pa = l0;
+    for (const i of idx) {
+      const s = stepOf(m.pieces[i]);
+      w += s;
+      so += taken("soldier", m.like, so, s);
+      pa += RULES.notice * taken("pacifist", m.like, pa, s);
+      out.weights.push(pctOf(w));
+      out.soldier.push(pctOf(so));
+      out.pacifist.push(pctOf(pa));
+      out.you.push(order ? null : m.pieces[i].at);
+    }
+    return out;
+  }
+  function standings(m) {
+    const out = [];
+    let last = m.prior;
+    for (const p of m.pieces) {
+      out.push(last);
+      if (p.at !== null) last = p.at;
+    }
+    return out;
+  }
+  function yourWay(m) {
+    const before = standings(m);
+    return m.pieces.map((p, i) => {
+      const side = sideOf(m.like, logit(clampPct(before[i])));
+      return side === 0 ? null : sign(stepOf(p)) === side;
+    });
+  }
+  function movesOf(m) {
+    const way = yourWay(m);
+    let prevKnown = true;
+    let prev = m.prior;
+    const acc = {
+      own: { n: 0, moved: 0, weight: 0 },
+      against: { n: 0, moved: 0, weight: 0 },
+    };
+    let counted = 0;
+    let skipped = 0;
+    m.pieces.forEach((p, i) => {
+      const s = stepOf(p);
+      if (p.at !== null && prevKnown && way[i] !== null) {
+        const a = logit(clampPct(p.at)) - logit(clampPct(prev));
+        const g = way[i] ? acc.own : acc.against;
+        g.n++;
+        g.moved += a * sign(s);
+        g.weight += Math.abs(s);
+        counted++;
+      } else skipped++;
+      prevKnown = p.at !== null;
+      if (p.at !== null) prev = p.at;
+    });
+    const share = (g) =>
+      g.n ? { n: g.n, share: g.weight ? g.moved / g.weight : 0 } : null;
+    return {
+      counted,
+      skipped,
+      own: share(acc.own),
+      against: share(acc.against),
+    };
+  }
+  function endsInAnyOrder(m) {
+    const n = m.pieces.length;
+    const orders = [];
+    if (n <= 7) {
+      const perm = (pre, rest) => {
+        if (!rest.length) orders.push(pre);
+        else
+          rest.forEach((x, i) =>
+            perm(
+              [...pre, x],
+              rest.filter((_, j) => j !== i),
+            ),
+          );
+      };
+      perm(
+        [],
+        m.pieces.map((_, i) => i),
+      );
+    } else {
+      const r = rand(seedOf(`${m.slug}-orders`));
+      for (let t = 0; t < 3000; t++) {
+        const o = m.pieces.map((_, i) => i);
+        for (let i = o.length - 1; i > 0; i--) {
+          const j = Math.floor(r() * (i + 1));
+          [o[i], o[j]] = [o[j], o[i]];
+        }
+        orders.push(o);
+      }
+    }
+    const out = {
+      weights: [Infinity, -Infinity],
+      soldier: [Infinity, -Infinity],
+      pacifist: [Infinity, -Infinity],
+    };
+    for (const o of orders) {
+      const p = pathsOf(m, o);
+      for (const k of ["weights", "soldier", "pacifist"]) {
+        const v = p[k][n];
+        out[k][0] = Math.min(out[k][0], v);
+        out[k][1] = Math.max(out[k][1], v);
+      }
+    }
+    return out;
+  }
+  function shuffled(n, seed) {
+    const r = rand(seed);
+    const o = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [o[i], o[j]] = [o[j], o[i]];
+    }
+    return o;
+  }
+  function quarterOf(x, y) {
+    const right = x >= 0.5;
+    const top = y >= 0.5;
+    const kind = top
+      ? right
+        ? "paladin"
+        : "soldier"
+      : right
+        ? "scout"
+        : "pacifist";
+    const nearX = Math.abs(x - 0.5) < 0.04;
+    const nearY = Math.abs(y - 0.5) < 0.04;
+    const between = nearX
+      ? top
+        ? right
+          ? "soldier"
+          : "paladin"
+        : right
+          ? "pacifist"
+          : "scout"
+      : nearY
+        ? right
+          ? top
+            ? "scout"
+            : "paladin"
+          : top
+            ? "pacifist"
+            : "soldier"
+        : null;
+    return { kind, between };
+  }
+
+  /* the readings */
+  const nn = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const share = (x) => `${Math.round(x * 100)}%`;
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max).replace(/\s+\S*$/, "")}…`;
+  function made(m) {
+    const parts = [
+      `set down ${dayWords(m.put)}`,
+      `put at ${pw(m.prior)} before anything came in${m.from ? `, ${FROM_WORDS[m.from]}` : ""}`,
+    ];
+    if (m.like) parts.push(`you would rather it were ${LIKE_LABEL[m.like]}`);
+    return parts.join(" · ");
+  }
+  function sideSince(line, act) {
+    const vals = [];
+    let last = line[0] ?? 50;
+    for (const v of line) {
+      if (v !== null) last = v;
+      vals.push(last);
+    }
+    const over = vals[vals.length - 1] >= act;
+    let since = vals.length - 1;
+    while (since > 0 && vals[since - 1] >= act === over) since--;
+    return { over, since };
+  }
+  function actWords(m, paths) {
+    const head = `you would act at ${pw(m.act)}`;
+    const acted = m.acted ? ` · you acted ${dayWords(m.acted)}` : "";
+    if (!m.pieces.length)
+      return `${head}${m.prior >= m.act ? ": you are over it from the start" : ""}${acted}`;
+    const where = (x) =>
+      x.since === 0
+        ? x.over
+          ? "over it from the start"
+          : "under it all along"
+        : `${x.over ? "over" : "under"} it since the ${ordinal(x.since)} piece`;
+    const w = sideSince(paths.weights, m.act);
+    const y = sideSince(paths.you, m.act);
+    const body =
+      w.over === y.over && w.since === y.since
+        ? `you and your weights are both ${where(w)}`
+        : `you are ${where(y)}; your weights are ${where(w)}`;
+    return `${head}: ${body}${acted}`;
+  }
+  const ratio = (r) =>
+    r < 10 ? `${Math.round(r * 10) / 10}` : `${Math.round(r)}`;
+  function distance(m, at, came) {
+    const who = came ? "your weights" : "your prior";
+    const gap =
+      logit(clampPct(m.act)) - logit(Math.min(99.9, Math.max(0.1, at)));
+    return gap > 0
+      ? `${who} would reach your line on a piece weighing ${ratio(Math.exp(gap))} to 1 for it`
+      : `${who} would go back under your line on a piece weighing ${ratio(Math.exp(-gap))} to 1 against it`;
+  }
+  function readings(m) {
+    const out = [made(m)];
+    const paths = pathsOf(m);
+    const k = m.pieces.length;
+    if (!k) out.push("nothing has come in yet");
+    else {
+      const f = m.pieces.filter((p) => p.way === "for").length;
+      out.push(`${nn(k, "piece")} came in: ${f} for, ${k - f} against`);
+      const last = [...m.pieces].reverse().find((p) => p.at !== null);
+      out.push(
+        `by your weights, ${pw(paths.weights[k])} · ${last ? `you: ${pw(last.at)}` : "you have not said where you stand since"}`,
+      );
+      const mv = movesOf(m);
+      const parts = [];
+      if (mv.own)
+        parts.push(
+          `${share(mv.own.share)} on the ${mv.own.n === 1 ? "one" : mv.own.n} that went your way`,
+        );
+      if (mv.against)
+        parts.push(
+          `${share(mv.against.share)} on the ${mv.against.n === 1 ? "one" : mv.against.n} that went against you`,
+        );
+      if (parts.length)
+        out.push(
+          `of the weight you gave them, you moved ${parts.join(" and ")}${mv.skipped ? ` (${nn(mv.skipped, "piece")} without a mark on both sides left out)` : ""}`,
+        );
+      const way = yourWay(m);
+      const argued = m.pieces.filter((p) => p.met === "argued");
+      const ag = m.pieces.filter((_, i) => way[i] === false);
+      const own = m.pieces.filter((_, i) => way[i] === true);
+      const arguedOf = (xs) => xs.filter((p) => p.met === "argued").length;
+      const passed = m.pieces.filter((p) => p.met === "passed").length;
+      out.push(
+        argued.length
+          ? `you argued with ${argued.length} of the ${k}: ${arguedOf(ag)} of the ${ag.length} that went against you, ${arguedOf(own)} of the ${own.length} that went your way${passed ? ` · let ${passed} pass` : ""}`
+          : `you argued with none of them${passed ? ` · let ${passed} pass` : ""}`,
+      );
+    }
+    out.push(actWords(m, paths));
+    out.push(distance(m, paths.weights[k], k > 0));
+    if (k) {
+      const same =
+        Math.round(paths.soldier[k]) === Math.round(paths.weights[k]);
+      out.push(
+        `alone with these pieces: the scout and the paladin at ${pw(paths.weights[k])}, the soldier ${same ? "with them" : `at ${pw(paths.soldier[k])}`}, the pacifist at ${pw(paths.pacifist[k])}`,
+      );
+      if (k > 1) {
+        const e = endsInAnyOrder(m);
+        const spans = ["soldier", "pacifist"]
+          .filter((f) => Math.round(e[f][1]) - Math.round(e[f][0]) >= 1)
+          .map(
+            (f) => `the ${f} anywhere from ${pw(e[f][0])} to ${pw(e[f][1])}`,
+          );
+        if (spans.length)
+          out.push(
+            `in another order, ${spans.join(", ")}; the scout and the paladin end at ${pw(paths.weights[k])} in any order`,
+          );
+      }
+    }
+    if (m.others.length) {
+      const ats = m.others.map((o) => o.at).filter((x) => x !== null);
+      const where = ats.length
+        ? ats.length === 1
+          ? `, at ${pw(ats[0])}`
+          : `, from ${pw(Math.min(...ats))} to ${pw(Math.max(...ats))}`
+        : "";
+      const met = FACES.map((f) => [
+        f,
+        m.others.filter((o) => o.met === f).length,
+      ])
+        .filter(([, c]) => c)
+        .map(([f, c]) =>
+          f === "kept"
+            ? `kept it to yourself with ${c}`
+            : `${FACE_LABEL[f]} with ${c}`,
+        );
+      out.push(
+        `${nn(m.others.length, "other")} ${m.others.length === 1 ? "holds" : "hold"} a view${where}: ${met.join(", ")}`,
+      );
+    }
+    if (m.self) {
+      const q = quarterOf(m.self[0], m.self[1]);
+      out.push(
+        q.between
+          ? `you put yourself on the line between the ${PLURAL[q.kind]} and the ${PLURAL[q.between]}`
+          : `you put yourself among the ${PLURAL[q.kind]}`,
+      );
+    } else out.push("you have not put yourself on the field");
+    out.push(
+      m.came
+        ? `how it came out: ${m.came === "so" ? "so" : "not so"}${m.cameOn ? `, ${dayWords(m.cameOn)}` : ""}`
+        : "it has not come out yet",
+    );
+    return out;
+  }
+
+  /* the room */
+  const GOLD = [0, 0.2, 0.4];
+  const GOLD_LABEL = { 0: "none", 0.2: "some", 0.4: "a lot" };
+  const ROUNDS = 20;
+  const u = (seed, ...k) => rand(seedOf(`${seed}|${k.join("|")}`))();
+  function normal(seed, ...k) {
+    const a = Math.max(1e-9, u(seed, ...k, "a"));
+    const b = u(seed, ...k, "b");
+    return Math.sqrt(-2 * Math.log(a)) * Math.cos(2 * Math.PI * b);
+  }
+  const HEAR = { soldier: 1, paladin: 1, scout: 1, pacifist: RULES.notice };
+  const seatsOf = (room) =>
+    KINDS.flatMap((k) => Array(Math.max(0, room[k])).fill(k));
+
+  function runRoom(s) {
+    const kinds = seatsOf(s.room);
+    const size = kinds.length;
+    const truth = s.truth === "so" ? 1 : -1;
+    const l0 = logit(clampPct(s.prior));
+    let paladins = 0;
+    const members = kinds.map((kind, seat) => {
+      const far = kind === "paladin" && paladins++ % 2 === 0;
+      const l = clampL(
+        (far ? -l0 : l0) + RULES.spread * normal(s.seed, "start", seat),
+      );
+      return { seat, kind, start: pctOf(l), far };
+    });
+    const l = members.map((m) => logit(m.start));
+    const rounds = [{ at: l.map(pctOf), dealt: [], events: [] }];
+    const take = (j, step, whole = false) => {
+      const before = l[j];
+      l[j] = clampL(l[j] + (whole ? step : taken(kinds[j], "", l[j], step)));
+      return l[j] - before;
+    };
+    for (let r = 1; r <= s.rounds; r++) {
+      const dealt = [];
+      const events = [];
+      if (size) {
+        const seat = Math.min(size - 1, Math.floor(u(s.seed, "who", r) * size));
+        const gold = u(s.seed, "gold", r) < s.gold;
+        const pick = u(s.seed, "weight", r);
+        const weight = gold ? 3 : pick < 0.6 ? 1.5 : 3;
+        const toward = u(s.seed, "way", r);
+        const way = gold
+          ? toward < 0.5
+            ? 1
+            : -1
+          : toward < weight / (1 + weight)
+            ? truth
+            : -truth;
+        dealt.push({ id: `r${r}`, seat, way, weight, gold });
+      }
+      for (const d of dealt) {
+        const holder = kinds[d.seat];
+        const noticed =
+          holder !== "pacifist" ||
+          u(s.seed, "notice", r, d.seat) < RULES.notice;
+        events.push({ e: "deal", seat: d.seat, piece: d.id, noticed });
+        if (!noticed) continue;
+        const step = d.way * Math.log(d.weight);
+        const side = sign(l[d.seat]);
+        const kept = take(d.seat, step);
+        const says =
+          holder === "paladin" ||
+          holder === "scout" ||
+          (holder === "soldier" && (side === 0 || side === d.way));
+        if (!says) {
+          events.push({ e: "keep", seat: d.seat, piece: d.id });
+          continue;
+        }
+        const loud = FIGHTS[holder];
+        events.push({ e: "say", seat: d.seat, piece: d.id, loud });
+        const heard = kinds.map(
+          (k, j) =>
+            j !== d.seat &&
+            u(s.seed, "hear", r, d.seat, j) <
+              HEAR[k] * (loud ? 1 : RULES.quiet),
+        );
+        let shown = false;
+        const fought = new Set();
+        kinds.forEach((k, j) => {
+          if (!heard[j] || !FIGHTS[k]) return;
+          const sj = sign(l[j]);
+          if (sj === 0 || sj === d.way) return;
+          const hit = d.gold && u(s.seed, "show", r, d.seat, j) < RULES.show;
+          fought.add(j);
+          shown ||= hit;
+          events.push({ e: "challenge", seat: j, piece: d.id, shown: hit });
+        });
+        const challenged = fought.size > 0;
+        if (shown && s.court) {
+          l[d.seat] = clampL(l[d.seat] - kept);
+          events.push({ e: "strike", piece: d.id });
+          continue;
+        }
+        if (shown && AFTER_SO[holder]) l[d.seat] = clampL(l[d.seat] - kept);
+        kinds.forEach((k, j) => {
+          if (!heard[j]) return;
+          if (AFTER_SO[k]) {
+            if (!shown) take(j, step);
+            return;
+          }
+          const sj = sign(l[j]);
+          const against = sj !== 0 && sj !== d.way;
+          if (!s.court && challenged && against) return;
+          take(j, step, s.court && fought.has(j));
+        });
+      }
+      rounds.push({ at: l.map(pctOf), dealt, events });
+    }
+    return { members, rounds, truth };
+  }
+
+  const quantile = (xs, q) => {
+    if (!xs.length) return 50;
+    const s = [...xs].sort((a, b) => a - b);
+    const i = (s.length - 1) * q;
+    const lo = Math.floor(i);
+    const hi = Math.ceil(i);
+    return s[lo] + (s[hi] - s[lo]) * (i - lo);
+  };
+  const middleOf = (at) => quantile(at, 0.5);
+  const bandOf = (at) => [quantile(at, 0.1), quantile(at, 0.9)];
+
+  function roundWords(run, r, court) {
+    const round = run.rounds[r];
+    const d = round?.dealt[0];
+    if (!d)
+      return r ? "nothing was dealt" : "the room before anything is dealt";
+    const kind = run.members[d.seat]?.kind ?? "scout";
+    const what = `${d.gold ? "fool's gold" : "a piece"} ${d.way === 1 ? "for" : "against"} the claim (${d.gold ? "looks like " : ""}${WEIGHT_LABEL[d.weight] ?? `×${d.weight}`})`;
+    const out = [`a ${kind} was dealt ${what}`];
+    const ev = round.events.filter((e) => "piece" in e && e.piece === d.id);
+    const deal = ev.find((e) => e.e === "deal");
+    if (deal && !deal.noticed) {
+      out.push("did not notice it");
+      return out.join(" · ");
+    }
+    if (ev.some((e) => e.e === "keep")) out.push("kept it quiet");
+    const say = ev.find((e) => e.e === "say");
+    if (say)
+      out.push(say.loud ? "said it to the room" : "said it to half the room");
+    const ch = ev.filter((e) => e.e === "challenge");
+    if (ch.length) {
+      const by = KINDS.map((k) => [
+        k,
+        ch.filter((c) => run.members[c.seat]?.kind === k).length,
+      ])
+        .filter(([, c]) => c)
+        .map(([k, c]) => (c === 1 ? `a ${k}` : `${c} ${PLURAL[k]}`));
+      const shown = ch.find((c) => c.shown);
+      const words = `challenged by ${by.join(" and ")}`;
+      if (shown)
+        out.push(
+          `${words}; shown up by a ${run.members[shown.seat]?.kind} · ${court ? "struck for everyone" : "dropped by those after what is so"}`,
+        );
+      else
+        out.push(
+          `${words}; ${d.gold ? "it got through" : "it held"}${court ? ` · ${ch.length === 1 ? "the challenger takes" : "the challengers take"} it whole` : ""}`,
+        );
+    } else if (say) out.push("no one challenged it");
+    return out.join(" · ");
+  }
+
+  function roomTally(run, act, upto = run.rounds.length - 1) {
+    const kinds = run.members.map((m) => m.kind);
+    const at = run.rounds[upto].at;
+    const byKind = {};
+    for (const k of KINDS) {
+      const xs = at.filter((_, i) => kinds[i] === k);
+      if (xs.length) byKind[k] = middleOf(xs);
+    }
+    let dealt = 0;
+    let noticed = 0;
+    let said = 0;
+    let quiet = 0;
+    let quietTrue = 0;
+    let gold = 0;
+    let shown = 0;
+    const shownBy = {};
+    let crossed = null;
+    for (let r = 1; r <= upto; r++) {
+      const round = run.rounds[r];
+      const pieces = new Map(round.dealt.map((d) => [d.id, d]));
+      dealt += round.dealt.length;
+      gold += round.dealt.filter((d) => d.gold).length;
+      const struck = new Set();
+      for (const ev of round.events) {
+        if (ev.e === "deal" && ev.noticed) noticed++;
+        if (ev.e === "say") said++;
+        if (ev.e === "keep") {
+          quiet++;
+          const d = pieces.get(ev.piece);
+          if (d && !d.gold && d.way === run.truth) quietTrue++;
+        }
+        if (ev.e === "challenge" && ev.shown && !struck.has(ev.piece)) {
+          struck.add(ev.piece);
+          shown++;
+          const k = kinds[ev.seat];
+          shownBy[k] = (shownBy[k] ?? 0) + 1;
+        }
+      }
+      if (crossed === null && middleOf(round.at) >= act) crossed = r;
+    }
+    if (crossed === null && upto >= 0 && middleOf(run.rounds[0].at) >= act)
+      crossed = 0;
+    const [low, high] = bandOf(at);
+    return {
+      round: upto,
+      size: at.length,
+      middle: middleOf(at),
+      low,
+      high,
+      byKind,
+      dealt,
+      noticed,
+      said,
+      quiet,
+      quietTrue,
+      gold,
+      shown,
+      shownBy,
+      crossed,
+      acting: at.filter((x) => x >= act).length,
+    };
+  }
+
+  function roomReadings(t, truth, act, rounds) {
+    if (!t.size) return ["no one in the room"];
+    const out = [
+      `round ${t.round} of ${rounds} · the room's middle at ${pw(t.middle)}${t.size > 2 ? `, most of it between ${pw(t.low)} and ${pw(t.high)}` : ""} · in this room it is ${truth === "so" ? "so" : "not so"}`,
+    ];
+    const kinds = KINDS.filter((k) => t.byKind[k] !== undefined);
+    if (kinds.length > 1)
+      out.push(
+        kinds.map((k) => `the ${PLURAL[k]} at ${pw(t.byKind[k])}`).join(", "),
+      );
+    if (t.round) {
+      out.push(
+        `${nn(t.dealt, "piece")} dealt, ${t.noticed} noticed, ${t.said} said aloud${t.quiet ? ` · ${t.quiet} kept quiet, ${t.quietTrue} of them pointing at what is so` : ""}`,
+      );
+      if (t.gold)
+        out.push(
+          `fool's gold: ${t.gold} dealt, ${t.shown} shown up${
+            t.shown
+              ? ` (${KINDS.filter((k) => t.shownBy[k])
+                  .map(
+                    (k) =>
+                      `${t.shownBy[k]} by ${t.shownBy[k] === 1 ? `a ${k}` : PLURAL[k]}`,
+                  )
+                  .join(", ")})`
+              : ""
+          }`,
+        );
+    }
+    out.push(
+      t.crossed === null
+        ? `the room's middle has not reached your line at ${pw(act)} · ${t.acting} of ${t.size} would act`
+        : `the room's middle reached your line at ${pw(act)} ${t.crossed === 0 ? "before anything was dealt" : `in round ${t.crossed}`} · ${t.acting} of ${t.size} would act`,
+    );
+    return out;
+  }
+
+  function roomsBeside(s) {
+    const size = seatsOf(s.room).length;
+    const rooms = [
+      { label: "this room", room: s.room },
+      ...KINDS.map((k) => ({
+        label: `${size} ${size === 1 ? k : PLURAL[k]}`,
+        room: { soldier: 0, paladin: 0, pacifist: 0, scout: 0, [k]: size },
+      })),
+    ];
+    return rooms.map(({ label, room }) => {
+      const run = runRoom({ ...s, room });
+      return {
+        label,
+        room,
+        middle: run.rounds.map((r) => middleOf(r.at)),
+        low: run.rounds.map((r) => bandOf(r.at)[0]),
+        high: run.rounds.map((r) => bandOf(r.at)[1]),
+      };
+    });
+  }
+
+  /* the record */
+  function tally(ms) {
+    const t = {
+      n: ms.length,
+      pieces: 0,
+      for: 0,
+      own: { n: 0, argued: 0, moved: 0, weight: 0 },
+      against: { n: 0, argued: 0, moved: 0, weight: 0 },
+      acted: 0,
+      came: [],
+      self: {},
+    };
+    for (const m of ms) {
+      t.pieces += m.pieces.length;
+      t.for += m.pieces.filter((p) => p.way === "for").length;
+      const way = yourWay(m);
+      m.pieces.forEach((p, i) => {
+        if (way[i] === null) return;
+        const g = way[i] ? t.own : t.against;
+        g.n++;
+        if (p.met === "argued") g.argued++;
+      });
+      const mv = movesOf(m);
+      const add = (g, x, pieces) => {
+        if (!x) return;
+        const w = pieces.reduce((a, p) => a + Math.abs(stepOf(p)), 0);
+        g.moved += x.share * w;
+        g.weight += w;
+      };
+      const counted = (own) => {
+        const out = [];
+        let prevKnown = true;
+        m.pieces.forEach((p, i) => {
+          if (p.at !== null && prevKnown && way[i] === own) out.push(p);
+          prevKnown = p.at !== null;
+        });
+        return out;
+      };
+      add(t.own, mv.own, counted(true));
+      add(t.against, mv.against, counted(false));
+      if (m.acted) t.acted++;
+      if (m.came) {
+        const last = [...m.pieces].reverse().find((p) => p.at !== null);
+        t.came.push({
+          claim: m.claim,
+          came: m.came,
+          you: last ? last.at : m.prior,
+          weights: pathsOf(m).weights.at(-1),
+        });
+      }
+      if (m.self) {
+        const q = quarterOf(m.self[0], m.self[1]);
+        t.self[q.kind] = (t.self[q.kind] ?? 0) + 1;
+      }
+    }
+    return t;
+  }
+  function recordReadings(t) {
+    if (!t.n) return ["no claims mustered yet"];
+    const out = [
+      `${nn(t.n, "claim")} mustered · ${t.pieces ? `${nn(t.pieces, "piece")} came in, ${t.for} for, ${t.pieces - t.for} against` : "nothing has come in yet"}`,
+    ];
+    const own = t.own.weight ? t.own.moved / t.own.weight : null;
+    const ag = t.against.weight ? t.against.moved / t.against.weight : null;
+    if (own !== null || ag !== null)
+      out.push(
+        `of the weight you gave them, across the record you moved ${[
+          own !== null ? `${share(own)} on what went your way` : "",
+          ag !== null ? `${share(ag)} on what went against you` : "",
+        ]
+          .filter(Boolean)
+          .join(" and ")}`,
+      );
+    if (t.own.n || t.against.n)
+      out.push(
+        `you argued with ${t.against.argued} of the ${t.against.n} that went against you and ${t.own.argued} of the ${t.own.n} that went your way`,
+      );
+    if (t.acted) out.push(`acted on ${t.acted}`);
+    if (t.came.length) {
+      const so = t.came.filter((c) => c.came === "so").length;
+      out.push(
+        `came out: ${t.came.length} (${so} so, ${t.came.length - so} not so) — ${t.came
+          .slice(0, 4)
+          .map(
+            (c) =>
+              `${clip(c.claim.replace(/[.!?]+$/, ""), 40)}: ${c.came === "so" ? "so" : "not so"}, with you at ${c.you === null ? "no mark" : pw(c.you)} and your weights at ${pw(c.weights)}`,
+          )
+          .join("; ")}`,
+      );
+    }
+    const placed = KINDS.filter((k) => t.self[k]);
+    if (placed.length)
+      out.push(
+        `where you put yourself: ${placed.map((k) => `among the ${PLURAL[k]} ${t.self[k]}`).join(", ")}`,
+      );
+    return out;
+  }
+
+  /* what is kept, read back through the same checks the garden's file went through */
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const dayIn = (v, or) => (typeof v === "string" && DAY.test(v) ? v : or);
+  const pctIn = (v, or) => {
+    const x = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof x === "number" && Number.isFinite(x)
+      ? Math.round(clampPct(x))
+      : or;
+  };
+  const pctOrNull = (v) =>
+    v === null || v === undefined || v === "" ? null : pctIn(v, 50);
+  const round2 = (x) => Math.round(x * 100) / 100;
+  const weightIn = (v) => {
+    const x = typeof v === "string" ? Number(v) : v;
+    return typeof x === "number" && Number.isFinite(x)
+      ? round2(Math.min(1000, Math.max(1.05, x)))
+      : 3;
+  };
+  const ID = /^[a-z0-9]{1,24}$/;
+  const oneOf = (v, xs, or) => (xs.includes(String(v)) ? v : or);
+  function validateMuster(input) {
+    const r = input ?? {};
+    const claim = str(r.claim, 300);
+    if (!claim) throw new Error("a claim needs saying, in a line");
+    const today = new Date().toISOString().slice(0, 10);
+    const put = dayIn(r.put, today);
+    const list = (v, max) => (Array.isArray(v) ? v : []).slice(0, max);
+    const pieces = list(r.pieces, 24)
+      .filter((p) => p && (p.way === "for" || p.way === "against"))
+      .map((p, i) => ({
+        id: typeof p.id === "string" && ID.test(p.id) ? p.id : `p${i + 1}`,
+        on: dayIn(p.on, put),
+        text: str(p.text, 400),
+        way: p.way,
+        weight: weightIn(p.weight),
+        met: oneOf(p.met, METS, "took"),
+        at: pctOrNull(p.at),
+      }));
+    const others = list(r.others, 12)
+      .filter((o) => str(o?.name, 80))
+      .map((o, i) => ({
+        id: typeof o.id === "string" && ID.test(o.id) ? o.id : `o${i + 1}`,
+        name: str(o.name, 80),
+        at: pctOrNull(o.at),
+        met: oneOf(o.met, FACES, "talked"),
+      }));
+    const self =
+      Array.isArray(r.self) &&
+      r.self.length === 2 &&
+      r.self.every((v) => typeof v === "number" && Number.isFinite(v))
+        ? [
+            Math.min(1, Math.max(0, r.self[0])),
+            Math.min(1, Math.max(0, r.self[1])),
+          ]
+        : null;
+    const rr = r.room ?? {};
+    const room = Object.fromEntries(
+      KINDS.map((k) => {
+        const v = Number(rr[k]);
+        return [
+          k,
+          Number.isFinite(v)
+            ? Math.min(ROOM_MAX, Math.max(0, Math.round(v)))
+            : ROOM[k],
+        ];
+      }),
+    );
+    if (!seatsOf(room).length) Object.assign(room, ROOM);
+    const m = {
+      slug: str(r.slug, 120),
+      put,
+      touched: dayIn(r.touched, put),
+      claim,
+      prior: pctIn(r.prior, 50),
+      from: oneOf(r.from, ["", ...FROMS], ""),
+      like: oneOf(r.like, ["", "so", "not"], ""),
+      act: pctIn(r.act, 70),
+      would: long(r.would, 600),
+      acted: dayIn(r.acted, ""),
+      pieces,
+      others,
+      self,
+      room,
+      came: oneOf(r.came, ["", "so", "not"], ""),
+      cameOn: dayIn(r.cameOn, ""),
+      after: long(r.after, 2000),
+    };
+    if (!m.came) m.cameOn = "";
+    if (!m.slug) m.slug = slugOf(m.claim, m.put);
+    return m;
+  }
+
+  /* ── the specimen: two of Specimen A's claims, and the walk an empty sheet draws ── */
+  const SPECIMEN_MUSTERS = [
+    {
+      slug: "2026-09-14-the-quiet-junior-is-ready-to-run-a-client-account-on-her-own",
+      put: "2026-09-14",
+      touched: "2026-09-26",
+      claim: "The quiet junior is ready to run a client account on her own.",
+      prior: 40,
+      from: "seen",
+      like: "so",
+      act: 65,
+      would: "Hand her the Aldgate account from October.",
+      acted: "",
+      pieces: [
+        {
+          id: "p1",
+          on: "2026-09-14",
+          text: "She rebuilt the Harlow deck overnight and nobody had to touch it.",
+          way: "for",
+          weight: 3,
+          met: "took",
+          at: 67,
+        },
+        {
+          id: "p2",
+          on: "2026-09-17",
+          text: "She froze when the client pushed back on the fee, and I took the call over.",
+          way: "against",
+          weight: 8,
+          met: "argued",
+          at: 62,
+        },
+        {
+          id: "p3",
+          on: "2026-09-21",
+          text: "Two clients asked for her by name this month.",
+          way: "for",
+          weight: 1.5,
+          met: "took",
+          at: 71,
+        },
+        {
+          id: "p4",
+          on: "2026-09-24",
+          text: "Marta says she has never once pushed back on a client in two years.",
+          way: "against",
+          weight: 3,
+          met: "argued",
+          at: 69,
+        },
+        {
+          id: "p5",
+          on: "2026-09-26",
+          text: "She ran Tuesday's review without me, and her notes were better than mine.",
+          way: "for",
+          weight: 3,
+          met: "took",
+          at: 86,
+        },
+      ],
+      others: [
+        { id: "o1", name: "Marta", at: 30, met: "argued" },
+        { id: "o2", name: "Tom", at: 75, met: "talked" },
+      ],
+      self: [0.72, 0.7],
+      room: { soldier: 3, paladin: 3, pacifist: 3, scout: 3 },
+      came: "",
+      cameOn: "",
+      after: "",
+    },
+    {
+      slug: "2026-08-18-the-new-rates-will-lose-us-harlow",
+      put: "2026-08-18",
+      touched: "2026-09-16",
+      claim: "The new rates will lose us Harlow.",
+      prior: 35,
+      from: "hunch",
+      like: "not",
+      act: 50,
+      would: "Ring Harlow's producer before the invoice goes out.",
+      acted: "",
+      pieces: [
+        {
+          id: "p1",
+          on: "2026-08-20",
+          text: "Their producer went quiet for a week after the rates went out.",
+          way: "for",
+          weight: 3,
+          met: "argued",
+          at: 38,
+        },
+        {
+          id: "p2",
+          on: "2026-08-29",
+          text: "They asked for the next job in two halves, billed separately.",
+          way: "for",
+          weight: 1.5,
+          met: "passed",
+          at: 40,
+        },
+        {
+          id: "p3",
+          on: "2026-09-09",
+          text: "Their finance lead signed the new rates without a comment.",
+          way: "against",
+          weight: 8,
+          met: "took",
+          at: 9,
+        },
+      ],
+      others: [{ id: "o1", name: "Ben", at: 60, met: "talked" }],
+      self: [0.34, 0.3],
+      room: { soldier: 3, paladin: 3, pacifist: 3, scout: 3 },
+      came: "not",
+      cameOn: "2026-09-16",
+      after:
+        "They renewed for the year. The quiet week was the producer's holiday.",
+    },
+  ];
+  const EXAMPLE_MUSTER = {
+    slug: "",
+    put: "",
+    touched: "",
+    claim: "It will be dry enough to walk the ridge on Saturday.",
+    prior: 50,
+    from: "base",
+    like: "so",
+    act: 70,
+    would: "Book the early train.",
+    acted: "",
+    pieces: [
+      {
+        id: "p1",
+        on: "",
+        text: "Tuesday's forecast gave Saturday a thirty per cent chance of rain.",
+        way: "for",
+        weight: 3,
+        met: "took",
+        at: 72,
+      },
+      {
+        id: "p2",
+        on: "",
+        text: "The path was mud all the way up last weekend.",
+        way: "against",
+        weight: 1.5,
+        met: "passed",
+        at: 70,
+      },
+      {
+        id: "p3",
+        on: "",
+        text: "The farmer at the bottom says the ridge holds water for days after a wet week.",
+        way: "against",
+        weight: 3,
+        met: "argued",
+        at: 66,
+      },
+      {
+        id: "p4",
+        on: "",
+        text: "Thursday's forecast moved the front to Sunday.",
+        way: "for",
+        weight: 8,
+        met: "took",
+        at: 93,
+      },
+    ],
+    others: [],
+    self: null,
+    room: { soldier: 3, paladin: 3, pacifist: 3, scout: 3 },
+    came: "",
+    cameOn: "",
+    after: "",
+  };
+
+  /* ══ LOGIC END ══ */
+
+  /* ── the page ─────────────────────────────────────────────────────────── */
+
+  const KEY = "pp-muster";
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = (s) => document.querySelector(s);
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function sv(tag, attrs = {}) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  const esc = (t) =>
+    String(t).replace(
+      /[&<>"]/g,
+      (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+    );
+  const fmt = (n) => String(Math.round(n * 10) / 10);
+  const f1 = (n) => Math.round(n * 10) / 10;
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const localToday = () => {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const reducedMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const grow = (t) => {
+    t.style.height = "auto";
+    t.style.height = `${t.scrollHeight}px`;
+  };
+
+  const FIGURE_WORDS = {
+    soldier:
+      "after its side, and fights. says only what is for its side, challenges what goes against it, and takes a quarter of what goes against it.",
+    paladin:
+      "after what is so, and fights. says all it has, challenges what goes against it, and moves by a piece's weight either way. one in two starts on the far side.",
+    pacifist:
+      "after its side, and keeps the peace. says nothing, notices a third of what comes to it, and takes a quarter of what goes against it.",
+    scout:
+      "after what is so, and keeps the peace. says what it has to half the room, challenges nothing, and moves by a piece's weight either way.",
+  };
+  const HUE = {
+    soldier: "var(--side)",
+    pacifist: "var(--side)",
+    paladin: "var(--so)",
+    scout: "var(--so)",
+  };
+
+  /* one pen line through the points, each span bowed a little off straight */
+  function handPath(pts, seed, wobble = 0.9) {
+    if (!pts.length) return "";
+    const r = rand(seed);
+    let d = `M${fmt(pts[0][0])} ${fmt(pts[0][1])}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1];
+      const [x1, y1] = pts[i];
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const b = (r() * 2 - 1) * wobble;
+      d += `C${fmt(x0 + dx / 3 + nx * b)} ${fmt(y0 + dy / 3 + ny * b)} ${fmt(x0 + (2 * dx) / 3 + nx * b * 0.7)} ${fmt(y0 + (2 * dy) / 3 + ny * b * 0.7)} ${fmt(x1)} ${fmt(y1)}`;
+    }
+    return d;
+  }
+  /* one strand of two twisted round each other */
+  function strand(pts, amp, phase) {
+    if (pts.length < 2) return pts;
+    const out = [pts[0]];
+    for (let i = 1; i < pts.length; i++) {
+      const [ax, ay] = pts[i - 1];
+      const [bx, by] = pts[i];
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const s = (i % 2 ? 1 : -1) * phase * amp;
+      out.push([
+        (ax + bx) / 2 - (dy / len) * s,
+        (ay + by) / 2 + (dx / len) * s,
+      ]);
+      out.push([bx, by]);
+    }
+    return out;
+  }
+
+  /* a pen line laid over the element it sits in, drawn on as it appears */
+  let maskN = 0;
+  const PEN = { box: 1.7, underline: 1.5 };
+  function sketch(
+    parent,
+    { kind = "box", seed, color = "var(--pen)", draw = true },
+  ) {
+    const svg = sv("svg", { class: "sketch", "aria-hidden": "true" });
+    parent.appendChild(svg);
+    const pen = PEN[kind];
+    let last = "";
+    const paint = () => {
+      const w = parent.offsetWidth;
+      const h = parent.offsetHeight;
+      if (!w || !h) return;
+      const k = `${w}x${h}`;
+      if (k === last) return;
+      const first = !last;
+      last = k;
+      const s = seedOf(seed);
+      const line =
+        kind === "box"
+          ? roughRect(w, h, s)
+          : roughUnderline(w, s, { y: h - 0.5 });
+      const ink = ribbon(line, pen, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const id = `pm${++maskN}`;
+      const mask =
+        draw && first && !reducedMotion()
+          ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path d="${line}" pathLength="1" fill="none" stroke="white" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round" class="draw"/></mask></defs>`
+          : "";
+      svg.innerHTML = `${mask}<path d="${ink}" fill="${color}"${mask ? ` mask="url(#${id})"` : ""}/>`;
+    };
+    const ro = new ResizeObserver(paint);
+    ro.observe(parent);
+    paint();
+    svg._ro = ro;
+    return svg;
+  }
+
+  /* ── state ── */
+  const S = {
+    mine: [],
+    open: null,
+    kept: false,
+    example: false,
+    specimen: false,
+    trouble: null,
+    sure: null,
+    order: null,
+    shuffles: 0,
+    truth: "so",
+    gold: 0.2,
+    court: true,
+    deal: 0,
+    round: 0,
+    playing: false,
+  };
+  const writable = () => !S.specimen;
+
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return { musters: [], open: "" };
+      const d = JSON.parse(raw);
+      const musters = (Array.isArray(d?.musters) ? d.musters : [])
+        .map((x) => {
+          try {
+            return validateMuster(x);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      return { musters, open: typeof d?.open === "string" ? d.open : "" };
+    } catch {
+      return { musters: [], open: "" };
+    }
+  }
+  function persist(list) {
+    try {
+      const open = S.open && S.kept ? S.open.slug : "";
+      localStorage.setItem(KEY, JSON.stringify({ musters: list, open }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  const remember = () => persist(S.mine);
+
+  /* ── keeping ── */
+  function save(m) {
+    const isFresh = !S.kept;
+    let v;
+    try {
+      v = validateMuster({
+        ...m,
+        slug: isFresh ? "" : m.slug,
+        touched: localToday(),
+      });
+    } catch (e) {
+      S.trouble = e.message;
+      return null;
+    }
+    if (isFresh) {
+      const base = v.slug;
+      let k = 2;
+      while (S.mine.some((x) => x.slug === v.slug)) v.slug = `${base}-${k++}`;
+    }
+    const next = [v, ...S.mine.filter((x) => x.slug !== v.slug)];
+    const was = S.kept;
+    S.kept = true;
+    S.open = { ...S.open, slug: v.slug, put: v.put, touched: v.touched };
+    if (!persist(next)) {
+      S.kept = was;
+      S.trouble = "not kept — this browser would not keep it";
+      return null;
+    }
+    S.mine = next;
+    S.example = false;
+    S.trouble = null;
+    return v;
+  }
+  function patch(p) {
+    if (!S.open) return;
+    S.open = { ...S.open, ...p };
+    S.example = false;
+    update();
+  }
+  function commit() {
+    if (S.open && S.kept && writable()) save(S.open);
+    update();
+  }
+  function set(p) {
+    if (!S.open) return;
+    S.open = { ...S.open, ...p };
+    S.example = false;
+    if (S.kept && writable()) save(S.open);
+    update();
+  }
+  function setPiece(id, p, keep = true) {
+    if (!S.open) return;
+    S.open = {
+      ...S.open,
+      pieces: S.open.pieces.map((x) => (x.id === id ? { ...x, ...p } : x)),
+    };
+    S.example = false;
+    if (keep && S.kept && writable()) save(S.open);
+    update();
+  }
+  function setOther(id, p, keep = true) {
+    if (!S.open) return;
+    S.open = {
+      ...S.open,
+      others: S.open.others.map((x) => (x.id === id ? { ...x, ...p } : x)),
+    };
+    S.example = false;
+    if (keep && S.kept && writable()) save(S.open);
+    update();
+  }
+  function resetSheet() {
+    S.sure = null;
+    S.trouble = null;
+    S.order = null;
+  }
+  function fresh(asExample = false) {
+    const day = localToday();
+    S.kept = false;
+    S.specimen = false;
+    S.example = asExample;
+    S.open = asExample
+      ? {
+          ...clone(EXAMPLE_MUSTER),
+          put: day,
+          touched: day,
+          pieces: EXAMPLE_MUSTER.pieces.map((p) => ({ ...p, on: day })),
+        }
+      : emptyMuster(day);
+    resetSheet();
+    remember();
+    update();
+  }
+  function load(m, specimen = false) {
+    S.kept = true;
+    S.specimen = specimen;
+    S.example = false;
+    S.open = clone(m);
+    resetSheet();
+    remember();
+    update();
+  }
+  function seat(k) {
+    const m = S.open;
+    if (!m || m.room[k] >= ROOM_MAX) return;
+    set({ room: { ...m.room, [k]: m.room[k] + 1 } });
+  }
+  function unseat(k) {
+    const m = S.open;
+    if (!m || !m.room[k] || seatsOf(m.room).length <= 1) return;
+    set({ room: { ...m.room, [k]: m.room[k] - 1 } });
+  }
+
+  /* ── small parts: a percent typed in place, a choice written out as words ── */
+  const binds = [];
+  function pct({ get, onCommit, label, size = 22, empty = false, into }) {
+    const wrap = el("span", "pct");
+    const input = el("input", "num");
+    input.inputMode = "numeric";
+    input.setAttribute("aria-label", label);
+    input.style.fontSize = `${size}px`;
+    const pc = el("span", "hand pc", "%");
+    pc.style.fontSize = `${size * 0.8}px`;
+    wrap.append(input, pc);
+    let text = null;
+    const shown = () => text ?? (get() === null ? "—" : String(get()));
+    const paint = () => {
+      if (text === null) input.value = shown();
+      input.readOnly = !writable();
+      input.style.width = `${Math.max(1.1, shown().length * 0.5 + 0.2)}em`;
+      input.classList.toggle("unset", get() === null);
+    };
+    input.addEventListener("focus", () => {
+      if (!writable()) return;
+      text = get() === null ? "" : String(get());
+      input.value = text;
+      input.select();
+    });
+    input.addEventListener("input", () => {
+      if (text === null) return;
+      text = input.value.replace(/[^\d.]/g, "");
+      input.value = text;
+      input.style.width = `${Math.max(1.1, shown().length * 0.5 + 0.2)}em`;
+    });
+    input.addEventListener("blur", () => {
+      const t = text;
+      text = null;
+      if (t !== null) {
+        if (!t.trim()) {
+          if (empty && get() !== null) return onCommit(null);
+        } else {
+          const v = Math.round(clampPct(Number(t)));
+          if (Number.isFinite(v) && v !== get()) return onCommit(v);
+        }
+      }
+      paint();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") input.blur();
+      if (e.key === "Escape") {
+        text = null;
+        input.blur();
+      }
+    });
+    if (into) into.replaceChildren(wrap);
+    if (S.open) paint();
+    return { el: wrap, paint };
+  }
+  function seg({ label, options, labels, get, onPick, disabled, into }) {
+    const g = el("span", "seg");
+    g.setAttribute("role", "group");
+    g.setAttribute("aria-label", label);
+    const btns = options.map((o, i) => {
+      const b = el("button", "seg-b", labels[String(o)]);
+      b.type = "button";
+      b.addEventListener("click", () => onPick(o));
+      const cell = el("span");
+      cell.style.display = "inline-flex";
+      cell.style.alignItems = "baseline";
+      cell.append(b);
+      if (i < options.length - 1) {
+        const dot = el("span", "dot", "·");
+        dot.setAttribute("aria-hidden", "true");
+        cell.append(dot);
+      }
+      g.append(cell);
+      return { o, b, line: null };
+    });
+    const paint = () => {
+      const v = get();
+      for (const x of btns) {
+        const on = v === x.o;
+        x.b.setAttribute("aria-pressed", String(on));
+        x.b.disabled = !!disabled?.();
+        if (on && !x.line)
+          x.line = sketch(x.b, {
+            kind: "underline",
+            seed: `${label}-${x.o}`,
+            color: "var(--accent)",
+          });
+        if (!on && x.line) {
+          x.line._ro.disconnect();
+          x.line.remove();
+          x.line = null;
+        }
+      }
+    };
+    if (into) into.replaceChildren(g);
+    if (S.open) paint();
+    return { el: g, paint };
+  }
+
+  /* keyed rows: built once per key, painted on every change, never moved while focused */
+  function keyed(box, items, keyOf, make) {
+    const old = box._rows || new Map();
+    const next = new Map();
+    items.forEach((it, i) => {
+      const k = keyOf(it);
+      let row = old.get(k);
+      if (!row) row = make(k);
+      next.set(k, row);
+      row.paint(it, i);
+      if (box.children[i] !== row.el)
+        box.insertBefore(row.el, box.children[i] ?? null);
+    });
+    old.forEach((row, k) => {
+      if (!next.has(k)) row.el.remove();
+    });
+    box._rows = next;
+  }
+
+  /* ── the sheet: the parts that are built once ── */
+  const claimIn = $("#claim");
+  claimIn.addEventListener("input", () => {
+    grow(claimIn);
+    patch({ claim: claimIn.value });
+  });
+  claimIn.addEventListener("blur", commit);
+  const wouldIn = $("#would");
+  wouldIn.addEventListener("input", () => patch({ would: wouldIn.value }));
+  wouldIn.addEventListener("blur", commit);
+  const afterIn = $("#after");
+  afterIn.addEventListener("input", () => {
+    grow(afterIn);
+    patch({ after: afterIn.value });
+  });
+  afterIn.addEventListener("blur", commit);
+
+  binds.push(
+    pct({
+      get: () => S.open.prior,
+      label: "Your prior, in percent",
+      onCommit: (v) => v !== null && set({ prior: v }),
+      into: $("#priorPct"),
+    }).paint,
+    seg({
+      label: "where the prior came from",
+      options: FROMS,
+      labels: FROM_LABEL,
+      get: () => S.open.from,
+      disabled: () => !writable(),
+      onPick: (f) => set({ from: S.open.from === f ? "" : f }),
+      into: $("#fromSeg"),
+    }).paint,
+    seg({
+      label: "which way you would rather",
+      options: ["so", "not", ""],
+      labels: { so: "so", not: "not so", "": "either way" },
+      get: () => S.open.like,
+      disabled: () => !writable(),
+      onPick: (l) => set({ like: l }),
+      into: $("#likeSeg"),
+    }).paint,
+    pct({
+      get: () => S.open.act,
+      label: "The line you would act at, in percent",
+      onCommit: (v) => v !== null && set({ act: v }),
+      into: $("#actPct"),
+    }).paint,
+    seg({
+      label: "suppose it is",
+      options: ["so", "not"],
+      labels: { so: "so", not: "not so" },
+      get: () => S.truth,
+      onPick: (v) => {
+        S.truth = v;
+        update();
+      },
+      into: $("#truthSeg"),
+    }).paint,
+    seg({
+      label: "fool's gold",
+      options: GOLD,
+      labels: GOLD_LABEL,
+      get: () => S.gold,
+      onPick: (v) => {
+        S.gold = v;
+        update();
+      },
+      into: $("#goldSeg"),
+    }).paint,
+    seg({
+      label: "the room is",
+      options: ["court", "stage"],
+      labels: { court: "a court", stage: "a stage" },
+      get: () => (S.court ? "court" : "stage"),
+      onPick: (v) => {
+        S.court = v === "court";
+        update();
+      },
+      into: $("#courtSeg"),
+    }).paint,
+    seg({
+      label: "how it came out",
+      options: ["so", "not"],
+      labels: { so: "so", not: "not so" },
+      get: () => S.open.came,
+      disabled: () => !writable(),
+      onPick: (c) =>
+        S.open.came === c
+          ? set({ came: "", cameOn: "" })
+          : set({ came: c, cameOn: S.open.cameOn || localToday() }),
+      into: $("#cameSeg"),
+    }).paint,
+  );
+
+  $("#newChip").addEventListener("click", () =>
+    S.specimen ? fresh(S.mine.length === 0) : fresh(),
+  );
+  $("#asCame").addEventListener("click", () => {
+    S.order = null;
+    update();
+  });
+  $("#reorder").addEventListener("click", () => {
+    const s = S.shuffles + 1;
+    S.shuffles = s;
+    S.order = shuffled(
+      S.open.pieces.length,
+      seedOf(`${S.open.slug || S.open.claim}-${s}`),
+    );
+    update();
+  });
+  const pieceIn = $("#pieceIn");
+  const addPiece = () => {
+    const t = pieceIn.value.trim();
+    if (!t || !S.open) return;
+    pieceIn.value = "";
+    S.order = null;
+    set({ pieces: [...S.open.pieces, newPiece(t, localToday())] });
+  };
+  pieceIn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addPiece();
+  });
+  pieceIn.addEventListener(
+    "input",
+    () => ($("#pieceAdd").disabled = !pieceIn.value.trim()),
+  );
+  $("#pieceAdd").addEventListener("click", addPiece);
+  const otherIn = $("#otherIn");
+  const addOther = () => {
+    const t = otherIn.value.trim();
+    if (!t || !S.open) return;
+    otherIn.value = "";
+    set({ others: [...S.open.others, newOther(t)] });
+  };
+  otherIn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addOther();
+  });
+  otherIn.addEventListener(
+    "input",
+    () => ($("#otherAdd").disabled = !otherIn.value.trim()),
+  );
+  $("#otherAdd").addEventListener("click", addOther);
+  $("#setDownBtn").addEventListener("click", () => {
+    if (!S.open || !writable()) return;
+    if (!S.open.claim.trim()) S.trouble = "say the claim, in a line";
+    else save(S.open);
+    update();
+  });
+  $("#actedChip").addEventListener("click", () => set({ acted: localToday() }));
+  $("#actedUndo").addEventListener("click", () => set({ acted: "" }));
+  $("#offChip").addEventListener("click", () => {
+    if (!S.open || !writable() || !S.kept) return;
+    if (S.sure !== "off") {
+      S.sure = "off";
+      return update();
+    }
+    const next = S.mine.filter((x) => x.slug !== S.open.slug);
+    if (!persist(next)) {
+      S.trouble = "not taken off — this browser would not let go of it";
+      return update();
+    }
+    S.mine = next;
+    fresh();
+  });
+
+  /* the room's controls */
+  let timer = null;
+  const stopPlay = () => {
+    S.playing = false;
+    clearTimeout(timer);
+    timer = null;
+  };
+  $("#play").addEventListener("click", () => {
+    if (S.playing) stopPlay();
+    else {
+      if (S.round >= ROUNDS) S.round = 0;
+      S.playing = true;
+    }
+    update();
+  });
+  $("#step").addEventListener("click", () => {
+    stopPlay();
+    S.round = Math.min(ROUNDS, S.round + 1);
+    update();
+  });
+  $("#toStart").addEventListener("click", () => {
+    stopPlay();
+    S.round = 0;
+    update();
+  });
+  $("#dealAgain").addEventListener("click", () => {
+    S.deal++;
+    update();
+  });
+  $("#roundRange").addEventListener("input", (e) => {
+    stopPlay();
+    S.round = Number(e.target.value);
+    update();
+  });
+  function schedule() {
+    if (!S.playing || timer) return;
+    if (S.round >= ROUNDS) {
+      S.playing = false;
+      return;
+    }
+    timer = setTimeout(
+      () => {
+        timer = null;
+        S.round = Math.min(ROUNDS, S.round + 1);
+        if (S.round >= ROUNDS) S.playing = false;
+        update();
+      },
+      S.round === 0 ? 420 : reducedMotion() ? 700 : 1500,
+    );
+  }
+
+  /* drags on a drawing, in the drawing's own units */
+  function drag(e, svg, move, done) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    svg.classList.add("dragging");
+    const toSvg = (cx, cy) => {
+      const m = svg.getScreenCTM();
+      if (!m) return null;
+      const pt = svg.createSVGPoint();
+      pt.x = cx;
+      pt.y = cy;
+      return pt.matrixTransform(m.inverse());
+    };
+    const onMove = (ev) => {
+      const p = toSvg(ev.clientX, ev.clientY);
+      if (p) move(p);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      svg.classList.remove("dragging");
+      done();
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+  }
+
+  /* ── the path: alone with the evidence ── */
+  const LMAX = logit(99);
+  const P = {
+    wrap: $("#path"),
+    hover: null,
+    drawn: null,
+    tweenKey: "as-it-came",
+    raf: 0,
+    revealKey: null,
+    g: null,
+  };
+  P.wrap.innerHTML = `<svg role="img"><rect class="p-shade"/><g class="p-ticks"></g><g class="p-cols"></g><g class="p-hline"></g><clipPath id="msReveal"><rect class="p-rr" x="0" y="0"><animate attributeName="width" from="0" dur="1.5s" begin="indefinite" fill="remove" calcMode="spline" keyTimes="0;1" keySplines="0.65 0 0.35 1"/></rect></clipPath><g class="p-lines" pointer-events="none" clip-path="url(#msReveal)"></g><g class="p-act"></g><g class="p-marks"></g><g class="p-prior"></g><g class="p-glyphs" pointer-events="none"></g><g class="p-ends" pointer-events="none"></g><g class="p-hover" pointer-events="none"></g></svg>`;
+  const psvg = P.wrap.firstChild;
+  const pq = (c) => psvg.querySelector(c);
+  psvg.addEventListener("pointerover", (e) => {
+    const t = e.target.closest("[data-k]");
+    if (!t) return;
+    const k = Number(t.dataset.k);
+    if (k !== P.hover) {
+      P.hover = k;
+      renderHover();
+    }
+  });
+  psvg.addEventListener("pointerleave", () => {
+    P.hover = null;
+    renderHover();
+  });
+  psvg.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-col]");
+    if (t) pickPiece(Number(t.dataset.col));
+  });
+  psvg.addEventListener("pointerdown", (e) => {
+    const t = e.target.closest("[data-drag]");
+    if (!t || !writable() || !P.g) return;
+    const what = t.dataset.drag;
+    const g = P.g;
+    if (what === "prior")
+      drag(e, psvg, (p) => patch({ prior: g.pOf(p.y) }), commit);
+    else if (what === "act")
+      drag(e, psvg, (p) => patch({ act: g.pOf(p.y) }), commit);
+    else {
+      const i = Number(what.slice(5));
+      const id = S.open.pieces[i]?.id;
+      if (id)
+        drag(e, psvg, (p) => setPiece(id, { at: g.pOf(p.y) }, false), commit);
+    }
+  });
+  function pickPiece(i) {
+    const row = document.getElementById(`ms-piece-${i}`);
+    if (!row) return;
+    row.scrollIntoView({
+      behavior: reducedMotion() ? "auto" : "smooth",
+      block: "center",
+    });
+    row.querySelector("textarea")?.focus({ preventScroll: true });
+  }
+
+  /* numbers eased from where they were drawn to where they are now when the order changes */
+  function figuresFor(target, key) {
+    if (key === P.tweenKey || !P.drawn) {
+      P.tweenKey = key;
+      if (!P.raf) P.drawn = target;
+      return P.raf ? P.drawn : target;
+    }
+    P.tweenKey = key;
+    const from = P.drawn;
+    const same =
+      from.length === target.length &&
+      from.every((r, i) => r.length === target[i].length);
+    cancelAnimationFrame(P.raf);
+    P.raf = 0;
+    if (!same || reducedMotion()) {
+      P.drawn = target;
+      return target;
+    }
+    const t0 = performance.now();
+    const tick = (t) => {
+      const k = Math.min(1, (t - t0) / 820);
+      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      P.drawn = target.map((row, i) =>
+        row.map((v, j) => from[i][j] + (v - from[i][j]) * e),
+      );
+      if (k < 1) P.raf = requestAnimationFrame(tick);
+      else {
+        P.raf = 0;
+        P.drawn = target;
+      }
+      renderPath(S.open, P.drawn);
+      renderLegend(S.open, P.drawn);
+    };
+    P.raf = requestAnimationFrame(tick);
+    return from;
+  }
+
+  function renderPath(m, figures) {
+    const W = P.wrap.clientWidth;
+    const width = Math.max(300, W || 640);
+    const narrow = width < 540;
+    const H = narrow ? 250 : 292;
+    const PL = 40;
+    const PR = narrow ? 18 : 146;
+    const PT = 14;
+    const PB = 48;
+    const PW = width - PL - PR;
+    const PH = H - PT - PB;
+    const n = m.pieces.length;
+    const order = S.order;
+    const shuffledNow = order !== null;
+    const at = (k) => (order ? order[k - 1] : k - 1);
+    const step = n ? PW / n : PW;
+    const xOf = (k) => PL + k * step;
+    const yOf = (p) =>
+      PT +
+      (1 - (logit(Math.min(99.4, Math.max(0.6, p))) + LMAX) / (2 * LMAX)) * PH;
+    const pOf = (y) =>
+      Math.round(clampPct(pctOf(((1 - (y - PT) / PH) * 2 - 1) * LMAX)));
+    const [weights, soldier, pacifist] = figures;
+    const you = m.pieces.map((p) => p.at);
+    const seed = seedOf(m.slug || m.claim || "muster");
+    const writ = writable();
+    P.g = {
+      width,
+      H,
+      PL,
+      PW,
+      PT,
+      PH,
+      PB,
+      n,
+      at,
+      xOf,
+      yOf,
+      pOf,
+      weights,
+      soldier,
+      pacifist,
+      you,
+      shuffledNow,
+      seed,
+    };
+
+    psvg.setAttribute("viewBox", `0 0 ${width} ${H}`);
+    psvg.setAttribute("width", "100%");
+    psvg.setAttribute("height", H);
+    const lastMark = [...you].reverse().find((v) => v !== null) ?? null;
+    psvg.setAttribute(
+      "aria-label",
+      `Your prior at ${pw(m.prior)}, ${n} pieces, your weights ending at ${pw(weights[n])}, the soldier at ${pw(soldier[n])}, the pacifist at ${pw(pacifist[n])}${lastMark !== null ? `, you at ${pw(lastMark)}` : ""}; you would act at ${pw(m.act)}`,
+    );
+    const actY = yOf(m.act);
+    const shade = pq(".p-shade");
+    for (const [k, v] of Object.entries({
+      x: PL,
+      y: PT,
+      width: PW,
+      height: Math.max(0, actY - PT),
+      fill: "var(--accent)",
+      "fill-opacity": 0.05,
+    }))
+      shade.setAttribute(k, v);
+
+    pq(".p-ticks").innerHTML = [1, 10, 25, 50, 75, 90, 99]
+      .map(
+        (t) =>
+          `<line x1="${PL}" x2="${PL + PW}" y1="${fmt(yOf(t))}" y2="${fmt(yOf(t))}" stroke="var(--rule)" stroke-width="${t === 50 ? 1 : 0.6}"${t === 50 ? ' stroke-dasharray="4 4"' : ""}/><text x="${PL - 7}" y="${fmt(yOf(t) + 3)}" text-anchor="end" font-size="9" class="svg-mono" letter-spacing="0.04em" fill="var(--faint)">${t}%</text>`,
+      )
+      .join("");
+    pq(".p-cols").innerHTML = m.pieces
+      .map(
+        (_, i) =>
+          `<rect data-k="${i + 1}" data-col="${at(i + 1)}" x="${fmt(xOf(i + 1) - step / 2)}" y="${PT}" width="${fmt(step)}" height="${PH + PB}" fill="transparent" style="cursor:pointer"/>`,
+      )
+      .join("");
+
+    // the four, drawn on from the prior each time a claim is opened
+    const pts = (line) => line.map((v, k) => [xOf(k), yOf(v)]);
+    const w = pts(weights);
+    const lines = {
+      paladin: ribbon(
+        handPath(strand(w, 2.2, 1), seed + 1, 0.6),
+        2.3,
+        seed + 1,
+      ),
+      scout: handPath(strand(w, 2.2, -1), seed + 2, 0.6),
+      soldier: ribbon(handPath(pts(soldier), seed + 3), 2.3, seed + 3),
+      pacifist: handPath(pts(pacifist), seed + 4),
+    };
+    const known = [[xOf(0), yOf(m.prior)]];
+    const solid = [];
+    const gaps = [];
+    let last = known[0];
+    let gap = false;
+    you.forEach((v, i) => {
+      if (v === null) {
+        gap = true;
+        return;
+      }
+      const p = [xOf(i + 1), yOf(v)];
+      (gap ? gaps : solid).push(handPath([last, p], seed + 11 + i, 0.5));
+      last = p;
+      gap = false;
+    });
+    const yoursSolid = solid.length
+      ? ribbon(solid.join(""), 2.5, seed + 9)
+      : "";
+    pq(".p-lines").innerHTML =
+      `<path d="${lines.scout}" fill="none" stroke="var(--so)" stroke-width="1.1" opacity="0.9"/>` +
+      `<path d="${lines.paladin}" fill="var(--so)"/>` +
+      `<path d="${lines.pacifist}" fill="none" stroke="var(--side)" stroke-width="1.3" stroke-dasharray="4 3.5" stroke-linecap="round"/>` +
+      `<path d="${lines.soldier}" fill="var(--side)"/>` +
+      `<g class="ms-you" style="opacity:${shuffledNow ? 0 : 1}">${gaps.length ? `<path d="${gaps.join("")}" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="1.5 4" stroke-linecap="round"/>` : ""}${yoursSolid ? `<path d="${yoursSolid}" fill="var(--ink)"/>` : ""}</g>`;
+    const rr = pq(".p-rr");
+    rr.setAttribute("width", width);
+    rr.setAttribute("height", H);
+    rr.firstChild.setAttribute("to", String(width));
+    const opened = m.slug || `draft-${m.put}`;
+    if (opened !== P.revealKey) {
+      P.revealKey = opened;
+      if (!reducedMotion() && document.visibilityState === "visible")
+        rr.firstChild.beginElement();
+    }
+
+    // the line you would act at
+    pq(".p-act").innerHTML =
+      `<line x1="${PL}" x2="${PL + PW}" y1="${fmt(actY)}" y2="${fmt(actY)}" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="6 4" pointer-events="none"/>` +
+      `<text x="${PL + 6}" y="${fmt(actY - 5)}" font-size="9" class="svg-mono" letter-spacing="0.1em" fill="var(--accent)" pointer-events="none">ACT AT ${m.act}%</text>` +
+      `<g${writ ? ' class="handle" data-drag="act" role="slider"' : ""} aria-label="The line you would act at" aria-valuenow="${m.act}"><rect x="${PL}" y="${fmt(actY - 6)}" width="${PW}" height="12" fill="transparent"/><path d="M${PL + PW + 1} ${fmt(actY)} l-8 -4.5 0 9 Z" fill="var(--accent)"/></g>`;
+    // your marks
+    pq(".p-marks").innerHTML = shuffledNow
+      ? ""
+      : you
+          .map((v, i) =>
+            v === null
+              ? ""
+              : `<g data-k="${i + 1}"${writ ? ` class="handle" data-drag="mark-${i}"` : ""} transform="translate(${fmt(xOf(i + 1))} ${fmt(yOf(v))})"><circle r="11" fill="transparent"/><circle r="4.2" fill="var(--ink)" stroke="var(--sheet)" stroke-width="1.5"/></g>`,
+          )
+          .join("");
+    // the prior, where every line starts
+    pq(".p-prior").innerHTML =
+      `<g${writ ? ' class="handle" data-drag="prior" role="slider"' : ""} aria-label="Your prior" aria-valuenow="${m.prior}" transform="translate(${fmt(xOf(0))} ${fmt(yOf(m.prior))})"><circle r="13" fill="transparent"/><circle r="6.2" fill="var(--sheet)" stroke="var(--ink)" stroke-width="1.8"/><circle r="2.2" fill="var(--ink)"/></g>`;
+
+    // where each ends, its label nudged clear of the others
+    let ends = [];
+    if (!narrow && n) {
+      ends = [
+        {
+          text: `scout · paladin ${pw(weights[n])}`,
+          y: yOf(weights[n]),
+          color: "var(--so)",
+        },
+        {
+          text: `soldier ${pw(soldier[n])}`,
+          y: yOf(soldier[n]),
+          color: "var(--side)",
+        },
+        {
+          text: `pacifist ${pw(pacifist[n])}`,
+          y: yOf(pacifist[n]),
+          color: "var(--side)",
+        },
+      ];
+      if (!shuffledNow && lastMark !== null)
+        ends.push({
+          text: `you ${pw(lastMark)}`,
+          y: yOf(lastMark),
+          color: "var(--ink)",
+        });
+      ends.sort((a, b) => a.y - b.y);
+      for (let i = 1; i < ends.length; i++)
+        if (ends[i].y - ends[i - 1].y < 14) ends[i].y = ends[i - 1].y + 14;
+      const over = ends.at(-1).y - (PT + PH);
+      if (over > 0) for (const o of ends) o.y -= over;
+    }
+    pq(".p-ends").innerHTML =
+      ends
+        .map(
+          (e) =>
+            `<text x="${PL + PW + 18}" y="${fmt(e.y + 4)}" font-size="16" class="svg-hand" fill="${e.color}">${esc(e.text)}</text>`,
+        )
+        .join("") +
+      (!n
+        ? `<text x="${fmt(xOf(0) + 16)}" y="${fmt(yOf(m.prior) + 4)}" font-size="17" class="svg-hand" fill="var(--faint)">nothing has come in yet — every line starts here</text>`
+        : "");
+    renderHover();
+  }
+
+  /* the pieces along the foot, and what a hover shows */
+  function renderHover() {
+    const g = P.g;
+    if (!g || !S.open) return;
+    const m = S.open;
+    const { xOf, PT, PH, PL, PW, H, at, seed, n } = g;
+    const hover =
+      P.hover !== null && P.hover > 0 && P.hover <= n ? P.hover : null;
+    pq(".p-hline").innerHTML = hover
+      ? `<line x1="${fmt(xOf(hover))}" x2="${fmt(xOf(hover))}" y1="${PT}" y2="${PT + PH}" stroke="var(--faint)" stroke-width="0.8" stroke-dasharray="2 3" pointer-events="none"/>`
+      : "";
+    const base = PT + PH + 12;
+    pq(".p-glyphs").innerHTML = m.pieces
+      .map((_, i) => {
+        const p = m.pieces[at(i + 1)];
+        if (!p) return "";
+        const x = xOf(i + 1);
+        const len = 7 + 5 * Math.log(p.weight);
+        const r = rand(seed + 40 + i);
+        const up = p.way === "for";
+        const tip = up ? [x, base] : [x, base + len];
+        const tail = up ? [x, base + len] : [x, base];
+        const hh = up ? 4 : -4;
+        const shaft = stroke(tail, tip, r, 0.4, 0);
+        const head =
+          stroke(tip, [x - 3.2, tip[1] + hh], r, 0.2, 0) +
+          stroke(tip, [x + 3.2, tip[1] + hh], r, 0.2, 0);
+        const cross =
+          p.met === "argued"
+            ? stroke(
+                [x - 4, base + len / 2 - 3],
+                [x + 4, base + len / 2 + 3],
+                r,
+                0.2,
+                0,
+              ) +
+              stroke(
+                [x + 4, base + len / 2 - 3],
+                [x - 4, base + len / 2 + 3],
+                r,
+                0.2,
+                0,
+              )
+            : "";
+        const faint = p.met === "passed";
+        const on = hover === i + 1;
+        return `<g opacity="${on ? 1 : faint ? 0.45 : 0.8}"><path d="${shaft + head}" fill="none" stroke="var(--ink)" stroke-width="1.3" stroke-linecap="round"${faint ? ' stroke-dasharray="2 2.5"' : ""}/>${cross ? `<path d="${cross}" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round"/>` : ""}<text x="${fmt(x)}" y="${H - 3}" text-anchor="middle" font-size="9" class="svg-mono" fill="${on ? "var(--ink)" : "var(--faint)"}">${at(i + 1) + 1}</text></g>`;
+      })
+      .join("");
+    if (!hover) {
+      pq(".p-hover").innerHTML = "";
+      return;
+    }
+    const p = m.pieces[at(hover)];
+    const x = xOf(hover);
+    const rows = [
+      `${at(hover) + 1} · ${p.way} · ${WEIGHT_LABEL[p.weight] ?? `×${p.weight}`} · ${MET_LABEL[p.met]}`,
+      `weights ${pw(g.weights[hover])} · soldier ${pw(g.soldier[hover])} · pacifist ${pw(g.pacifist[hover])}${!g.shuffledNow && g.you[hover - 1] !== null ? ` · you ${pw(g.you[hover - 1])}` : ""}`,
+    ];
+    const right = x > PL + PW / 2;
+    pq(".p-hover").innerHTML = rows
+      .map(
+        (t, j) =>
+          `<text x="${fmt(right ? x - 8 : x + 8)}" y="${PT + 12 + j * 13}" text-anchor="${right ? "end" : "start"}" font-size="10" class="svg-mono" letter-spacing="0.02em" style="paint-order:stroke" stroke="var(--sheet)" stroke-width="4" stroke-linejoin="round" fill="${j ? "var(--muted)" : "var(--ink)"}">${esc(t)}</text>`,
+      )
+      .join("");
+  }
+
+  function renderLegend(m, figures) {
+    const n = m.pieces.length;
+    const last = [...m.pieces].reverse().find((p) => p.at !== null)?.at ?? null;
+    const item = (sw, text) =>
+      `<span><svg width="26" height="10" aria-hidden="true">${sw}</svg>${esc(text)}</span>`;
+    $("#legend").innerHTML =
+      (S.order
+        ? ""
+        : item(
+            '<path d="M1 5 L25 5" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>',
+            `you${last !== null ? `, ${pw(last)}` : ""}`,
+          )) +
+      item(
+        '<path d="M1 5 C7 1, 13 9, 19 5 S 25 3, 25 5" stroke="var(--so)" stroke-width="2.2" fill="none"/><path d="M1 5 C7 9, 13 1, 19 5 S 25 7, 25 5" stroke="var(--so)" stroke-width="1" fill="none"/>',
+        `the scout and the paladin, braided on your weights: ${pw(figures[0][n])}`,
+      ) +
+      item(
+        '<path d="M1 5 L25 5" stroke="var(--side)" stroke-width="2.4" stroke-linecap="round"/>',
+        `the soldier: ${pw(figures[1][n])}`,
+      ) +
+      item(
+        '<path d="M1 5 L25 5" stroke="var(--side)" stroke-width="1.3" stroke-dasharray="4 3"/>',
+        `the pacifist: ${pw(figures[2][n])}`,
+      );
+  }
+
+  /* ── what came in ── */
+  function makePiece(id) {
+    const li = el("li", "ms-row");
+    const row = el("div", "piece");
+    const k = el("span", "k");
+    const body = el("div", "body");
+    const ta = el("textarea", "case hand piece-text");
+    ta.rows = 1;
+    ta.placeholder = "what came in, in a line";
+    ta.addEventListener("input", () => {
+      grow(ta);
+      setPiece(id, { text: ta.value }, false);
+    });
+    ta.addEventListener("blur", commit);
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ta.blur();
+      }
+    });
+    const marks = el("div", "marks");
+    const cur = () => S.open.pieces.find((p) => p.id === id);
+    const way = seg({
+      label: `which way ${id}`,
+      options: WAYS,
+      labels: WAY_LABEL,
+      get: () => cur()?.way,
+      disabled: () => !writable(),
+      onPick: (w) => setPiece(id, { way: w }),
+    });
+    let weightOpts = "";
+    let weight = null;
+    const weightBox = el("span");
+    const met = seg({
+      label: `how you met ${id}`,
+      options: METS,
+      labels: MET_LABEL,
+      get: () => cur()?.met,
+      disabled: () => !writable(),
+      onPick: (v) => setPiece(id, { met: v }),
+    });
+    const then = el("span", "then");
+    then.append(el("span", null, "then"));
+    const at = pct({
+      get: () => cur()?.at ?? null,
+      size: 19,
+      empty: true,
+      label: "Where you stood after this piece",
+      onCommit: (v) => setPiece(id, { at: v }),
+    });
+    then.append(at.el);
+    marks.append(way.el, weightBox, met.el, then);
+    const on = el("div", "meta lower faint");
+    on.style.marginTop = "4px";
+    body.append(ta, marks, on);
+    const off = el("button", "link off", "×");
+    off.type = "button";
+    off.setAttribute("aria-label", "Take this piece off");
+    off.title = "take this piece off";
+    off.addEventListener("click", () =>
+      set({ pieces: S.open.pieces.filter((x) => x.id !== id) }),
+    );
+    row.append(k, body, off);
+    li.append(row);
+    return {
+      el: li,
+      paint(p, i) {
+        li.id = `ms-piece-${i}`;
+        li.style.setProperty("--i", i);
+        k.textContent = i + 1;
+        ta.setAttribute("aria-label", `Piece ${i + 1}`);
+        if (document.activeElement !== ta) ta.value = p.text;
+        ta.readOnly = !writable();
+        grow(ta);
+        // a weight the reader typed by hand stays among the choices
+        const opts = WEIGHTS.includes(p.weight)
+          ? WEIGHTS
+          : [...WEIGHTS, p.weight];
+        if (opts.join() !== weightOpts) {
+          weightOpts = opts.join();
+          weight = seg({
+            label: `how much ${id}`,
+            options: opts,
+            labels: {
+              ...WEIGHT_LABEL,
+              [p.weight]: WEIGHT_LABEL[p.weight] ?? `×${p.weight}`,
+            },
+            get: () => cur()?.weight,
+            disabled: () => !writable(),
+            onPick: (w) => setPiece(id, { weight: w }),
+            into: weightBox,
+          });
+        }
+        way.paint();
+        weight.paint();
+        met.paint();
+        at.paint();
+        on.textContent = p.on ? dayWords(p.on) : "";
+        on.hidden = !p.on;
+        off.hidden = !writable();
+      },
+    };
+  }
+
+  function makeOther(id) {
+    const li = el("li", "ms-row");
+    const top = el("div", "other-top");
+    const name = el("input", "case hand");
+    name.setAttribute("aria-label", "Who");
+    name.addEventListener("input", () =>
+      setOther(id, { name: name.value }, false),
+    );
+    name.addEventListener("blur", commit);
+    const cur = () => S.open.others.find((o) => o.id === id);
+    const at = pct({
+      get: () => cur()?.at ?? null,
+      size: 18,
+      empty: true,
+      label: "Where they stand",
+      onCommit: (v) => setOther(id, { at: v }),
+    });
+    const off = el("button", "link off", "×");
+    off.type = "button";
+    off.style.marginTop = "0";
+    off.setAttribute("aria-label", "Take them off");
+    off.title = "take them off";
+    off.addEventListener("click", () =>
+      set({ others: S.open.others.filter((x) => x.id !== id) }),
+    );
+    top.append(name, at.el, off);
+    const face = seg({
+      label: `how you met ${id}`,
+      options: FACES,
+      labels: FACE_LABEL,
+      get: () => cur()?.met,
+      disabled: () => !writable(),
+      onPick: (k) => setOther(id, { met: k }),
+    });
+    const fw = el("div");
+    fw.style.marginTop = "4px";
+    fw.append(face.el);
+    li.append(top, fw);
+    return {
+      el: li,
+      paint(o, i) {
+        li.style.setProperty("--i", i);
+        if (document.activeElement !== name) name.value = o.name;
+        name.readOnly = !writable();
+        at.paint();
+        face.paint();
+        off.hidden = !writable();
+      },
+    };
+  }
+
+  /* ── the field: the four quarters, and a room of them ── */
+  const FV = 440;
+  const X0 = 30;
+  const Y0 = 26;
+  const SQ = 380;
+  const Q = SQ / 2;
+  const CORNER = {
+    soldier: [X0, Y0],
+    paladin: [X0 + Q, Y0],
+    pacifist: [X0, Y0 + Q],
+    scout: [X0 + Q, Y0 + Q],
+  };
+  const SEAT_AT = {
+    soldier: [10, 14],
+    paladin: [-10, 14],
+    pacifist: [10, -14],
+    scout: [-10, -14],
+  };
+  function seatXY(kind, j, count) {
+    const [cx0, cy0] = CORNER[kind];
+    const [ox, oy] = SEAT_AT[kind];
+    const cols = Math.min(3, count);
+    const rows = Math.ceil(count / 3);
+    const col = j % 3;
+    const row = Math.floor(j / 3);
+    const inRow = row === rows - 1 ? count - row * 3 : cols;
+    return [
+      cx0 + Q / 2 + ox + (col - (inRow - 1) / 2) * 56,
+      cy0 + Q / 2 + oy + (row - (rows - 1) / 2) * 54,
+    ];
+  }
+  const fieldXY = (x, y) => [X0 + x * SQ, Y0 + (1 - y) * SQ];
+  const RINGS = Array.from({ length: 24 }, (_, i) =>
+    roughEllipse(28, 28, seedOf(`muster-member-${i}`), {
+      pad: 1,
+      wobble: 0.7,
+      steps: 12,
+    }),
+  );
+  const YOU_RING = roughEllipse(30, 30, seedOf("muster-you"), {
+    pad: 1,
+    wobble: 1,
+    steps: 14,
+  });
+
+  const F = {
+    over: null,
+    eventsKey: null,
+    run: null,
+    axesFor: null,
+    members: new Map(),
+    pos: [],
+  };
+  (function buildField() {
+    const s = seedOf("muster-field");
+    const r = rand(s);
+    const up = stroke([X0 + Q, Y0 + SQ + 8], [X0 + Q, Y0 - 6], r, 1.2, 2);
+    const right = stroke([X0 - 8, Y0 + Q], [X0 + SQ + 6, Y0 + Q], r, 1.2, 2);
+    const heads =
+      stroke([X0 + Q, Y0 - 7], [X0 + Q - 6, Y0 + 3], r, 0.3, 0) +
+      stroke([X0 + Q, Y0 - 7], [X0 + Q + 6, Y0 + 3], r, 0.3, 0) +
+      stroke([X0 + SQ + 7, Y0 + Q], [X0 + SQ - 3, Y0 + Q - 6], r, 0.3, 0) +
+      stroke([X0 + SQ + 7, Y0 + Q], [X0 + SQ - 3, Y0 + Q + 6], r, 0.3, 0);
+    $("#field").innerHTML = `<svg viewBox="0 0 ${FV} ${FV + 20}" role="img">
+      <defs><pattern id="fHatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--ink)" stroke-width="0.6" opacity="0.07"/></pattern><g class="f-clips"></g></defs>
+      <rect x="${X0}" y="${Y0}" width="${Q}" height="${SQ}" fill="var(--side)" fill-opacity="0.08"/>
+      <rect x="${X0 + Q}" y="${Y0}" width="${Q}" height="${SQ}" fill="var(--so)" fill-opacity="0.08"/>
+      <rect x="${X0}" y="${Y0}" width="${SQ}" height="${Q}" fill="url(#fHatch)"/>
+      ${KINDS.map((q) => `<rect class="ms-quarter" data-q="${q}" x="${CORNER[q][0]}" y="${CORNER[q][1]}" width="${Q}" height="${Q}" fill="transparent"><title></title></rect>`).join("")}
+      <path d="${ribbon(up, 1.8, s)}" fill="var(--pen)" pointer-events="none"/>
+      <path d="${ribbon(right, 1.8, s + 1)}" fill="var(--pen)" pointer-events="none"/>
+      <path d="${heads}" fill="none" stroke="var(--pen)" stroke-width="1.6" stroke-linecap="round" pointer-events="none"/>
+      <g class="f-axes svg-mono" pointer-events="none" fill="var(--faint)"></g>
+      <g class="f-members"></g>
+      <g class="f-events" pointer-events="none"></g>
+      <g class="f-you" aria-label="Where you put yourself"><circle r="19" fill="transparent"/><path d="${YOU_RING}" transform="translate(-15 -15)" fill="none" stroke="var(--ink)" stroke-width="1.3"/><text class="svg-hand" text-anchor="middle" fill="var(--ink)">you</text></g>
+    </svg>`;
+  })();
+  const fsvg = $("#field svg");
+  const fq = (c) => fsvg.querySelector(c);
+  fsvg.querySelectorAll(".ms-quarter").forEach((r) => {
+    const q = r.dataset.q;
+    r.addEventListener("click", () => seat(q));
+    r.addEventListener("pointerenter", () => setOver(q));
+    r.addEventListener("pointerleave", () => F.over === q && setOver(null));
+  });
+  function setOver(q) {
+    F.over = q;
+    const say = $("#fieldSay");
+    say.style.color = q ? HUE[q] : "";
+    say.textContent = q
+      ? `the ${q}: ${FIGURE_WORDS[q]}`
+      : "hover a quarter for what its figure does";
+  }
+  setOver(null);
+  fq(".f-you").addEventListener("pointerdown", (e) => {
+    if (!writable()) return;
+    drag(
+      e,
+      fsvg,
+      (p) =>
+        patch({
+          self: [
+            Math.min(1, Math.max(0, (p.x - X0) / SQ)),
+            Math.min(1, Math.max(0, 1 - (p.y - Y0) / SQ)),
+          ],
+        }),
+      commit,
+    );
+  });
+
+  function makeMember(key) {
+    const g = sv("g", { class: "ms-member" });
+    const title = sv("title");
+    const hit = sv("circle", { r: 20, fill: "transparent" });
+    const clipP = sv("clipPath", { id: `fc-${key}` });
+    const cc = sv("circle", { r: 13.6 });
+    clipP.append(cc);
+    fq(".f-clips").append(clipP);
+    const rect = sv("rect", {
+      width: 28,
+      height: 28,
+      class: "ms-fill",
+      "clip-path": `url(#fc-${key})`,
+    });
+    const ring = sv("path");
+    const far = sv("circle", { r: 2.8, fill: "var(--accent)" });
+    g.append(title, hit, rect, ring, far);
+    g.addEventListener("click", (e) => {
+      e.stopPropagation();
+      unseat(g.dataset.kind);
+    });
+    g.addEventListener("pointerenter", () => setOver(g.dataset.kind));
+    return { g, title, rect, ring, far, cc, clipP };
+  }
+
+  function renderField(run, round, room, self) {
+    const W = $("#field").clientWidth;
+    const k = FV / Math.max(240, W || FV);
+    const t = (px) => px * k;
+    const narrowField = !!W && W < 360;
+    const axisPx = narrowField ? 8 : 9;
+    const kinds = seatsOf(room);
+    const at = run.rounds[Math.min(round, run.rounds.length - 1)].at;
+    const idx = { soldier: 0, paladin: 0, pacifist: 0, scout: 0 };
+    const pos = kinds.map((q) => seatXY(q, idx[q]++, room[q]));
+    F.pos = pos;
+    fsvg.setAttribute(
+      "aria-label",
+      `The four quarters, with a room of ${kinds.length}: ${KINDS.filter(
+        (q) => room[q],
+      )
+        .map((q) => `${room[q]} ${room[q] === 1 ? q : PLURAL[q]}`)
+        .join(", ")}`,
+    );
+    fsvg.querySelectorAll(".ms-quarter").forEach((r) => {
+      const q = r.dataset.q;
+      r.firstChild.textContent =
+        room[q] < ROOM_MAX ? `seat another ${q}` : `the ${PLURAL[q]} are full`;
+    });
+    // the axes, in Askell's words, set to stay legible at any width
+    const axesKey = `${f1(k)}`;
+    if (F.axesFor !== axesKey) {
+      F.axesFor = axesKey;
+      const ls = narrowField ? "0.04em" : "0.12em";
+      fq(".f-axes").innerHTML =
+        `<text x="${fmt(X0 + Q + t(9))}" y="${fmt(Y0 + t(8))}" font-size="${fmt(t(9))}" letter-spacing="${ls}">COMBATIVE</text>` +
+        `<text x="${fmt(X0 + Q + t(9))}" y="${fmt(Y0 + SQ - t(4))}" font-size="${fmt(t(9))}" letter-spacing="${ls}">NOT COMBATIVE</text>` +
+        `<text x="${fmt(X0 + SQ - t(2))}" y="${fmt(Y0 + Q + t(15))}" font-size="${fmt(t(axisPx))}" text-anchor="end" letter-spacing="${ls}">ACCURACY-MOTIVATED</text>` +
+        `<text x="${fmt(X0 + t(3))}" y="${fmt(Y0 + Q - t(7))}" font-size="${fmt(t(axisPx))}" letter-spacing="${ls}">NOT ACCURACY-MOTIVATED</text>` +
+        KINDS.map((q) => {
+          const left = q === "soldier" || q === "pacifist";
+          const top = q === "soldier" || q === "paladin";
+          return `<text x="${fmt(left ? X0 + t(10) : X0 + SQ - t(10))}" y="${fmt(top ? Y0 + t(34) : Y0 + SQ - t(22))}" text-anchor="${left ? "start" : "end"}" font-size="${fmt(t(25))}" class="svg-hand" fill="${HUE[q]}" letter-spacing="0">${q}</text>`;
+        }).join("");
+      const you = fq(".f-you text");
+      you.setAttribute("y", fmt(t(5)));
+      you.setAttribute("font-size", fmt(t(15)));
+    }
+    // the room, keyed by who it is, so seating another fills and drains in place
+    const box = fq(".f-members");
+    const next = new Map();
+    const nth = { soldier: 0, paladin: 0, pacifist: 0, scout: 0 };
+    kinds.forEach((q, seat) => {
+      const key = `${q}-${nth[q]++}`;
+      let mm = F.members.get(key);
+      if (!mm) mm = makeMember(key);
+      next.set(key, mm);
+      const [x, y] = pos[seat];
+      const v = at[seat] ?? 50;
+      const member = run.members[seat];
+      mm.g.dataset.kind = q;
+      mm.title.textContent = `a ${q}${member?.far ? ", who started on the far side" : ""}: ${pw(v)}`;
+      mm.g.children[1].setAttribute("cx", x);
+      mm.g.children[1].setAttribute("cy", y);
+      mm.cc.setAttribute("cx", x);
+      mm.cc.setAttribute("cy", y);
+      mm.rect.setAttribute("x", x - 14);
+      mm.rect.setAttribute("y", y - 14);
+      mm.rect.setAttribute("fill", HUE[q]);
+      mm.rect.setAttribute("opacity", FIGHTS[q] ? 0.55 : 0.32);
+      mm.rect.style.transformOrigin = `${x}px ${y + 13.6}px`;
+      mm.rect.style.transform = `scaleY(${f1(v / 100)})`;
+      const ringKey = `${seat}-${q}`;
+      if (mm.ringKey !== ringKey) {
+        mm.ringKey = ringKey;
+        if (FIGHTS[q]) {
+          mm.ring.setAttribute(
+            "d",
+            ribbon(RINGS[seat % 24], 2.2, seedOf(`muster-member-${seat}`)),
+          );
+          mm.ring.setAttribute("fill", HUE[q]);
+          mm.ring.removeAttribute("stroke");
+        } else {
+          mm.ring.setAttribute("d", RINGS[seat % 24]);
+          mm.ring.setAttribute("fill", "none");
+          mm.ring.setAttribute("stroke", HUE[q]);
+          mm.ring.setAttribute("stroke-width", "1.15");
+        }
+      }
+      mm.ring.setAttribute("transform", `translate(${x - 14} ${y - 14})`);
+      mm.far.setAttribute("cx", x + 13);
+      mm.far.setAttribute("cy", y - 13);
+      mm.far.style.display = member?.far ? "" : "none";
+      if (mm.g.parentNode !== box) box.append(mm.g);
+    });
+    F.members.forEach((mm, key) => {
+      if (!next.has(key)) {
+        mm.g.remove();
+        mm.clipP.remove();
+      }
+    });
+    F.members = next;
+
+    // what happened this round, replayed when the round or the deal changes
+    const evKey = `${round}-${S.deal}-${S.truth}-${S.gold}-${S.court}`;
+    if (evKey !== F.eventsKey || run !== F.run) {
+      F.eventsKey = evKey;
+      F.run = run;
+      const events = round > 0 ? (run.rounds[round]?.events ?? []) : [];
+      const posOf = (seat) => pos[seat] ?? [0, 0];
+      fq(".f-events").innerHTML = events
+        .slice(0, 48)
+        .map((ev, i) => {
+          const delay = `${ev.e === "deal" ? 0 : ev.e === "say" || ev.e === "keep" ? 260 : ev.e === "challenge" ? 520 + Math.min(8, i) * 70 : 1000}ms`;
+          if (ev.e === "deal") {
+            const [x, y] = posOf(ev.seat);
+            const d = run.rounds[round].dealt.find((p) => p.id === ev.piece);
+            const miss = ev.noticed ? 0 : 15;
+            return d?.gold
+              ? `<path class="ms-drop" style="animation-delay:${delay}" d="M${x + miss} ${y - 4} l3.5 4 -3.5 4 -3.5 -4 Z" fill="none" stroke="var(--accent)" stroke-width="1.3"/>`
+              : `<circle class="ms-drop" style="animation-delay:${delay}" cx="${x + miss}" cy="${y}" r="2.6" fill="var(--ink)"/>`;
+          }
+          if (ev.e === "say") {
+            const [x, y] = posOf(ev.seat);
+            return `<circle class="ms-ripple${ev.loud ? " ms-loud" : ""}" style="animation-delay:${delay}" cx="${x}" cy="${y}" r="16" fill="none" stroke="${HUE[kinds[ev.seat]]}" stroke-width="${ev.loud ? 1.4 : 0.9}"/>`;
+          }
+          if (ev.e === "challenge") {
+            const piece = run.rounds[round].dealt.find(
+              (p) => p.id === ev.piece,
+            );
+            if (!piece) return "";
+            const d = handPath(
+              [posOf(ev.seat), posOf(piece.seat)],
+              seedOf(`${ev.piece}-${ev.seat}`),
+              5,
+            );
+            return `<path class="ms-argue" style="animation-delay:${delay}" d="${d}" pathLength="1" fill="none" stroke="${ev.shown ? "var(--accent)" : "var(--muted)"}" stroke-width="${ev.shown ? 1.5 : 0.9}" stroke-linecap="round"/>`;
+          }
+          if (ev.e === "strike") {
+            const piece = run.rounds[round].dealt.find(
+              (p) => p.id === ev.piece,
+            );
+            if (!piece) return "";
+            const [x, y] = posOf(piece.seat);
+            return `<path class="ms-strike" style="animation-delay:${delay}" d="M${x - 7} ${y - 7} L${x + 7} ${y + 7} M${x + 7} ${y - 7} L${x - 7} ${y + 7}" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>`;
+          }
+          return "";
+        })
+        .join("");
+    }
+
+    // where you put yourself
+    const you = fq(".f-you");
+    const selfAt = self
+      ? fieldXY(self[0], self[1])
+      : [X0 + SQ - 8, Y0 + SQ + 22];
+    you.setAttribute(
+      "transform",
+      `translate(${fmt(selfAt[0])} ${fmt(selfAt[1])})`,
+    );
+    you.setAttribute("class", writable() ? "f-you handle you-ring" : "f-you you-ring");
+    if (writable()) you.setAttribute("role", "slider");
+    else you.removeAttribute("role");
+    you.children[1].setAttribute("stroke-dasharray", self ? "none" : "3 3");
+  }
+
+  /* ── the lanes: each quarter's members as beads from not so to so ── */
+  const L = { beads: new Map(), labels: null, width: 0 };
+  (function buildLanes() {
+    const box = $("#lanes");
+    box.innerHTML = `<svg role="img"><g class="l-static"></g><g class="l-beads"></g><g class="ms-bead l-mid"><path d="M0 0 L-5 9 L5 9 Z" fill="var(--ink)"/></g><text class="l-midt svg-mono" font-size="9" letter-spacing="0.1em" fill="var(--muted)"></text></svg>`;
+    L.labels = KINDS.map((q) => {
+      const d = el("div", "lane-label");
+      const who = el("span", "hand who", PLURAL[q]);
+      who.style.color = HUE[q];
+      const count = el("span", "count");
+      const minus = el("button", "link", "−");
+      minus.type = "button";
+      minus.setAttribute("aria-label", `One fewer ${q}`);
+      minus.addEventListener("click", () => unseat(q));
+      const num = el("span");
+      const plus = el("button", "link", "+");
+      plus.type = "button";
+      plus.setAttribute("aria-label", `One more ${q}`);
+      plus.addEventListener("click", () => seat(q));
+      count.append(minus, num, plus);
+      d.append(who, count);
+      box.append(d);
+      return { q, d, minus, num, plus };
+    });
+  })();
+  const lsvg = $("#lanes svg");
+  function renderLanes(run, round, act, truth, room) {
+    const W = $("#lanes").clientWidth;
+    const width = Math.max(260, W || 420);
+    const LX0 = 108;
+    const LX1 = width - 12;
+    const TOP = 28;
+    const LANE = 42;
+    const H = TOP + 4 * LANE + 30;
+    const xOf = (p) => LX0 + (p / 100) * (LX1 - LX0);
+    const kinds = seatsOf(room);
+    const at = run.rounds[Math.min(round, run.rounds.length - 1)].at;
+    const mid = middleOf(at);
+    const laneY = (q) => TOP + KINDS.indexOf(q) * LANE + LANE / 2;
+    lsvg.setAttribute("viewBox", `0 0 ${width} ${H}`);
+    lsvg.setAttribute("width", "100%");
+    lsvg.setAttribute("height", H);
+    lsvg.setAttribute(
+      "aria-label",
+      `Where the room stands in round ${round}: the middle at ${pw(mid)}`,
+    );
+    const r = rand(seedOf("muster-lanes"));
+    const rule = KINDS.map((q) =>
+      stroke([LX0, laneY(q)], [LX1, laneY(q)], r, 0.5, 1),
+    ).join("");
+    const lab = (x, txt, anchor = "start", y = 12, fill = "var(--faint)") =>
+      `<text x="${fmt(x)}" y="${y}" text-anchor="${anchor}" font-size="9" class="svg-mono" letter-spacing="0.1em" fill="${fill}">${txt}</text>`;
+    lsvg.querySelector(".l-static").innerHTML =
+      lab(LX0, "NOT SO") +
+      lab(LX1, "SO", "end") +
+      lab(xOf(50), "50%", "middle") +
+      `<line x1="${fmt(xOf(truth === "so" ? 100 : 0))}" x2="${fmt(xOf(truth === "so" ? 100 : 0))}" y1="${TOP - 8}" y2="${TOP + 4 * LANE}" stroke="var(--ink)" stroke-width="2" opacity="0.35"/>` +
+      `<line x1="${fmt(xOf(50))}" x2="${fmt(xOf(50))}" y1="${TOP - 6}" y2="${TOP + 4 * LANE}" stroke="var(--rule)" stroke-dasharray="3 4"/>` +
+      `<line x1="${fmt(xOf(act))}" x2="${fmt(xOf(act))}" y1="${TOP - 6}" y2="${TOP + 4 * LANE + 6}" stroke="var(--accent)" stroke-width="1.1" stroke-dasharray="5 4"/>` +
+      lab(
+        xOf(act) + 4,
+        `ACT ${act}%`,
+        "start",
+        TOP + 4 * LANE + 14,
+        "var(--accent)",
+      ) +
+      `<path d="${rule}" fill="none" stroke="var(--rule)" stroke-width="1.2"/>`;
+    const beads = lsvg.querySelector(".l-beads");
+    const nth = { soldier: 0, paladin: 0, pacifist: 0, scout: 0 };
+    const next = new Map();
+    kinds.forEach((q, seat) => {
+      const j = nth[q]++;
+      const key = `${q}-${j}`;
+      let b = L.beads.get(key);
+      if (!b) {
+        b = sv("g", { class: "ms-bead" });
+        b.innerHTML = `<circle r="5.4" stroke-width="1.3" opacity="0.92"/><circle cx="4.5" cy="-4.5" r="1.8" fill="var(--accent)"/>`;
+        beads.append(b);
+      }
+      next.set(key, b);
+      const y = laneY(q) + (j - (room[q] - 1) / 2) * 5.5;
+      const v = at[seat] ?? 50;
+      b.style.transform = `translate(${f1(xOf(v))}px, ${f1(y)}px)`;
+      b.firstChild.setAttribute("fill", FIGHTS[q] ? HUE[q] : "var(--sheet)");
+      b.firstChild.setAttribute("stroke", HUE[q]);
+      b.lastChild.style.display = run.members[seat]?.far ? "" : "none";
+    });
+    L.beads.forEach((b, key) => {
+      if (!next.has(key)) b.remove();
+    });
+    L.beads = next;
+    lsvg.querySelector(".l-mid").style.transform =
+      `translate(${f1(xOf(mid))}px, ${TOP + 4 * LANE + 4}px)`;
+    const mt = lsvg.querySelector(".l-midt");
+    mt.setAttribute("x", fmt(Math.min(LX1 - 40, Math.max(LX0, xOf(mid) - 18))));
+    mt.setAttribute("y", H - 2);
+    mt.textContent = `MIDDLE ${Math.round(mid)}%`;
+    for (const x of L.labels) {
+      x.d.style.top = `${laneY(x.q) - 13}px`;
+      x.d.style.width = `${LX0 - 10}px`;
+      x.num.textContent = room[x.q];
+      x.minus.disabled = !room[x.q] || kinds.length <= 1;
+      x.plus.disabled = room[x.q] >= ROOM_MAX;
+    }
+  }
+
+  /* ── the same deal, five rooms ── */
+  const B = { figs: [] };
+  function renderBeside(comps, round, act, truth) {
+    const BW = 170;
+    const BH = 86;
+    const x = (r) => 6 + (r / ROUNDS) * (BW - 12);
+    const y = (p) => 6 + (1 - p / 100) * (BH - 14);
+    const box = $("#beside");
+    comps.forEach((c, i) => {
+      let f = B.figs[i];
+      if (!f) {
+        f = { fig: el("figure", "ms-row") };
+        f.fig.style.setProperty("--i", i);
+        f.fig.innerHTML = `<svg viewBox="0 0 ${BW} ${BH}" role="img"></svg><figcaption><span class="hand"></span><span class="meta lower muted"></span></figcaption>`;
+        box.append(f.fig);
+        B.figs[i] = f;
+      }
+      const only = KINDS.find(
+        (k) => c.room[k] && KINDS.every((o) => o === k || !c.room[o]),
+      );
+      const st =
+        c.label === "this room" || !only
+          ? { color: "var(--ink)", width: 2.2 }
+          : {
+              color: HUE[only],
+              width: FIGHTS[only] ? 2.2 : 1.3,
+              dash: only === "pacifist" ? "4 3" : null,
+            };
+      const pts = c.middle.map((v, r) => [x(r), y(v)]);
+      const band =
+        `M${c.high.map((v, r) => `${fmt(x(r))} ${fmt(y(v))}`).join("L")}` +
+        `L${[...c.low]
+          .reverse()
+          .map((v, r) => `${fmt(x(ROUNDS - r))} ${fmt(y(v))}`)
+          .join("L")}Z`;
+      const end = c.middle[Math.min(round, ROUNDS)];
+      const svg = f.fig.firstChild;
+      svg.setAttribute(
+        "aria-label",
+        `${c.label}: the middle at ${pw(end)} in round ${round}`,
+      );
+      svg.innerHTML =
+        `<rect x="6" y="6" width="${BW - 12}" height="${BH - 14}" fill="none" stroke="var(--rule)" stroke-width="0.8"/>` +
+        `<line x1="6" x2="${BW - 6}" y1="${y(truth === "so" ? 100 : 0)}" y2="${y(truth === "so" ? 100 : 0)}" stroke="var(--ink)" stroke-width="1.6" opacity="0.3"/>` +
+        `<line x1="6" x2="${BW - 6}" y1="${fmt(y(act))}" y2="${fmt(y(act))}" stroke="var(--accent)" stroke-width="0.9" stroke-dasharray="4 3"/>` +
+        `<path d="${band}" fill="${st.color}" opacity="0.12"/>` +
+        `<path d="${handPath(pts, seedOf(`beside-${c.label}`), 0.4)}" fill="none" stroke="${st.color}" stroke-width="${st.width}"${st.dash ? ` stroke-dasharray="${st.dash}"` : ""} stroke-linecap="round"/>` +
+        `<line x1="${fmt(x(round))}" x2="${fmt(x(round))}" y1="6" y2="${BH - 8}" stroke="var(--faint)" stroke-width="0.8" stroke-dasharray="2 2"/>` +
+        `<circle cx="${fmt(x(round))}" cy="${fmt(y(end))}" r="3" fill="${st.color}"/>`;
+      const cap = f.fig.lastChild;
+      cap.firstChild.textContent = c.label;
+      cap.firstChild.style.color = st.color;
+      cap.lastChild.textContent = pw(end);
+    });
+  }
+
+  /* ── the record ── */
+  function makeRecordRow(m, specimen) {
+    const li = el("li", "ms-row");
+    const b = el("button");
+    b.type = "button";
+    const top = el("span", "meta lower");
+    const claim = el("span", "claim-t");
+    const sub = el("span", "hand sub");
+    b.append(top, claim, sub);
+    li.append(b);
+    let cur = m;
+    b.addEventListener("click", () => load(cur, specimen));
+    return {
+      el: li,
+      paint(x, i) {
+        cur = x;
+        li.style.setProperty("--i", i);
+        const on = S.kept && S.open?.slug === x.slug && S.specimen === specimen;
+        if (on) b.setAttribute("aria-current", "true");
+        else b.removeAttribute("aria-current");
+        top.style.color = on ? "var(--accent)" : "var(--faint)";
+        top.textContent = `${dayWords(x.put)} · ${x.came ? `came out ${x.came === "so" ? "so" : "not so"}` : "open"}`;
+        claim.textContent = x.claim;
+        const w = pathsOf(x).weights.at(-1);
+        const last =
+          [...x.pieces].reverse().find((p) => p.at !== null)?.at ?? null;
+        sub.textContent = x.pieces.length
+          ? `your weights ${pw(w)}${last !== null ? ` · you ${pw(last)}` : ""}`
+          : `put at ${pw(x.prior)}, nothing in yet`;
+      },
+    };
+  }
+
+  /* ── one pass over everything derived ── */
+  const R = { key: null, run: null, beside: null };
+  function update() {
+    const m = S.open;
+    if (!m) return;
+    const n = m.pieces.length;
+    if (S.order && S.order.length !== n) S.order = null;
+    const writ = writable();
+    $("#sheet").classList.toggle("is-specimen", S.specimen);
+
+    // the head of the sheet
+    $("#sheetMeta").textContent = S.specimen
+      ? `a specimen claim · set down ${dayWords(m.put)}`
+      : S.kept
+        ? `a claim · set down ${dayWords(m.put)}`
+        : S.example
+          ? "an example — a walk on Saturday"
+          : "now";
+    const chip = $("#newChip");
+    chip.hidden = !(S.specimen || S.kept || S.example);
+    chip.textContent = S.specimen ? "make your own" : "a new claim";
+    if (document.activeElement !== claimIn) claimIn.value = m.claim;
+    claimIn.readOnly = !writ;
+    grow(claimIn);
+    $("#exampleNote").hidden = !S.example;
+    $("#specimenNote").hidden = !S.specimen;
+    if (document.activeElement !== wouldIn) wouldIn.value = m.would;
+    wouldIn.readOnly = !writ;
+    for (const b of binds) b();
+
+    // alone with the evidence
+    $("#orderBtns").hidden = n <= 1;
+    $("#asCame").style.color = S.order ? "var(--muted)" : "var(--ink)";
+    $("#asCame").setAttribute("aria-pressed", String(!S.order));
+    $("#reorder").style.color = S.order ? "var(--ink)" : "var(--muted)";
+    $("#reorder").textContent = S.order ? "another order" : "in another order";
+    $("#pathNote").textContent = S.order
+      ? `the same pieces in another order: ${S.order.map((i) => i + 1).join(", ")}. the scout and the paladin end where they did — the soldier and the pacifist may not. your marks stay with the order they came in.`
+      : writ
+        ? "the same pieces through each figure's rule. drag your prior, the line you would act at, or where you stood after a piece."
+        : "the same pieces through each figure's rule. hover a piece for where each stood after it.";
+    const paths = pathsOf(m, S.order ?? undefined);
+    const target = [paths.weights, paths.soldier, paths.pacifist];
+    const figures = figuresFor(
+      target,
+      S.order ? `order-${S.shuffles}` : "as-it-came",
+    );
+    renderPath(m, figures);
+    renderLegend(m, figures);
+
+    // what came in
+    keyed($("#pieces"), m.pieces, (p) => p.id, makePiece);
+    $("#addPiece").hidden = !writ;
+    pieceIn.placeholder = n
+      ? "another piece, as it came"
+      : "the first piece of evidence, in a line";
+    $("#pieceAdd").disabled = !pieceIn.value.trim();
+    $("#setDown").hidden = S.kept || !writ;
+
+    // in company
+    const setup = {
+      room: m.room,
+      prior: m.prior,
+      act: m.act,
+      truth: S.truth,
+      gold: S.gold,
+      court: S.court,
+      rounds: ROUNDS,
+      seed: seedOf(m.slug || m.claim || "muster") + S.deal,
+    };
+    const key = JSON.stringify(setup);
+    if (key !== R.key) {
+      R.key = key;
+      R.run = runRoom(setup);
+      R.beside = roomsBeside(setup);
+    }
+    $("#companyGrid").style.setProperty(
+      "--ms-lag",
+      S.playing ? "560ms" : "0ms",
+    );
+    renderField(R.run, S.round, m.room, m.self);
+    const q = m.self ? quarterOf(m.self[0], m.self[1]) : null;
+    const selfSay = $("#selfSay");
+    selfSay.textContent = m.self
+      ? q.between
+        ? `you put yourself on the line between the ${PLURAL[q.kind]} and the ${PLURAL[q.between]}`
+        : `you put yourself among the ${PLURAL[q.kind]}`
+      : writ
+        ? "where would you put yourself, on this one? drag your ring onto the field"
+        : "not put on the field";
+    if (m.self && writ) {
+      selfSay.append(" · ");
+      const off = el("button", "link hand faint", "take it off");
+      off.type = "button";
+      off.style.fontSize = "inherit";
+      off.addEventListener("click", () => set({ self: null }));
+      selfSay.append(off);
+    }
+    $("#roundHead").textContent = S.round
+      ? `round ${S.round} of ${ROUNDS}`
+      : "before the first round";
+    const rwKey = `${S.round}-${S.deal}`;
+    const rwBox = $("#roundWordsBox");
+    const words = roundWords(R.run, S.round, S.court);
+    if (rwBox.dataset.key !== rwKey) {
+      rwBox.dataset.key = rwKey;
+      rwBox.replaceChildren(el("p", "hand round-words ms-arrive", words));
+    } else rwBox.firstChild.textContent = words;
+    renderLanes(R.run, S.round, m.act, S.truth, m.room);
+    $("#play").textContent = S.playing
+      ? "pause"
+      : S.round >= ROUNDS
+        ? "run it again"
+        : S.round
+          ? "go on"
+          : "run the room";
+    $("#play").setAttribute("aria-pressed", String(S.playing));
+    $("#step").disabled = S.round >= ROUNDS;
+    $("#toStart").disabled = !S.round;
+    $("#roundRange").value = S.round;
+    $("#roundLabel").textContent = `round ${S.round}`;
+    $("#courtNote").textContent = S.court
+      ? "what is shown up is struck for everyone; whoever fought what held takes it whole"
+      : "nothing is ruled; each takes a challenge as it likes";
+    $("#roomRead").textContent = roomReadings(
+      roomTally(R.run, m.act, S.round),
+      S.truth,
+      m.act,
+      ROUNDS,
+    ).join(" · ");
+    renderBeside(R.beside, S.round, m.act, S.truth);
+
+    // who else, afterwards
+    keyed($("#others"), m.others, (o) => o.id, makeOther);
+    $("#addOther").hidden = !writ;
+    $("#otherAdd").disabled = !otherIn.value.trim();
+    $("#noOthers").hidden = writ || m.others.length > 0;
+    $("#actedSay").textContent = m.acted
+      ? `you acted ${dayWords(m.acted)}`
+      : "";
+    $("#actedSay").hidden = !m.acted;
+    $("#actedUndo").hidden = !m.acted || !writ;
+    $("#actedChip").hidden = !!m.acted;
+    $("#actedChip").disabled = !writ;
+    $("#cameOn").textContent = m.came && m.cameOn ? dayWords(m.cameOn) : "";
+    if (document.activeElement !== afterIn) afterIn.value = m.after;
+    afterIn.readOnly = !writ;
+    grow(afterIn);
+    $("#offBox").hidden = !(S.kept && writ);
+    const off = $("#offChip");
+    off.textContent =
+      S.sure === "off"
+        ? "take it off the record — sure?"
+        : "take it off the record";
+    off.classList.toggle("on-accent", S.sure === "off");
+    $("#trouble").hidden = !S.trouble;
+    $("#trouble").textContent = S.trouble ?? "";
+
+    // the desk
+    const r = readings(m);
+    if (!S.kept)
+      r[0] = r[0].replace(/^set down [^·]*?(?= · |$)/, "not set down yet");
+    $("#reading").textContent = r.join(" · ");
+    const mineNow = S.mine.length > 0;
+    $("#recordLabel").textContent = mineNow
+      ? "the record"
+      : "the record · the specimen's";
+    $("#recordRead").textContent = recordReadings(
+      tally(mineNow ? S.mine : SPECIMEN_MUSTERS),
+    ).join(" · ");
+    keyed(
+      $("#recordMine"),
+      S.mine.slice(0, 24),
+      (x) => x.slug,
+      (k) =>
+        makeRecordRow(
+          S.mine.find((x) => x.slug === k),
+          false,
+        ),
+    );
+    keyed(
+      $("#recordSpec"),
+      SPECIMEN_MUSTERS,
+      (x) => x.slug,
+      (k) =>
+        makeRecordRow(
+          SPECIMEN_MUSTERS.find((x) => x.slug === k),
+          true,
+        ),
+    );
+    $("#keptWhere").textContent = S.specimen
+      ? "fiction, like the rest of the specimen"
+      : `kept in this browser only, under ${KEY}; it never leaves it`;
+
+    schedule();
+  }
+
+  /* ── open: the reader's own claim if they have one going, else the specimen ── */
+  sketch($("#sheet"), { seed: "muster-fresh" });
+  sketch($("#readingPanel"), { seed: "muster-reading" });
+  sketch($("#recordPanel"), { seed: "muster-record" });
+  sketch($("#lawsPanel"), { seed: "muster-laws" });
+  (function boot() {
+    const st = readStore();
+    S.mine = st.musters;
+    const wanted = st.open ? S.mine.find((x) => x.slug === st.open) : null;
+    const spec = st.open
+      ? SPECIMEN_MUSTERS.find((x) => x.slug === st.open)
+      : null;
+    const going = S.mine.find((x) => !x.came);
+    if (wanted) load(wanted);
+    else if (spec) load(spec, true);
+    else if (going) load(going);
+    else load(SPECIMEN_MUSTERS[0], true);
+  })();
+  let rz = 0;
+  let sheetW = 0;
+  new ResizeObserver(() => {
+    const w = $("#sheet").clientWidth;
+    if (w === sheetW) return;
+    sheetW = w;
+    cancelAnimationFrame(rz);
+    rz = requestAnimationFrame(update);
+  }).observe($("#sheet"));
+</script>

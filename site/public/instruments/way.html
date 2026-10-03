@@ -1,0 +1,2778 @@
+<title>Way</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Say where you are, and where you mean to be as if it were already so. Count the sentences that still look ahead, keep the steps you would actually take, then stand at the then and look back."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Ink on bone. The accent is only ever the then and what had to be true
+     before it; ink is the now and the first moves from it. The six lane hues
+     mark what changes, and nothing else. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --rule-2: #cdc7ba;
+    --accent: #b5532a;
+    --value-0: #b08a3e;
+    --value-1: #4f5f8a;
+    --value-2: #5e7a4e;
+    --value-3: #7e5a78;
+    --value-4: #3f6b66;
+    --value-5: #8c5a45;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --wash: color-mix(in srgb, var(--accent) 10%, transparent);
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #857e70;
+      --rule: #302e25;
+      --rule-2: #48443a;
+      --accent: #d9763f;
+      --value-0: #d2aa5a;
+      --value-1: #8393c4;
+      --value-2: #8dae78;
+      --value-3: #b48aad;
+      --value-4: #7fa8a1;
+      --value-5: #c4876a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #857e70;
+    --rule: #302e25;
+    --rule-2: #48443a;
+    --accent: #d9763f;
+    --value-0: #d2aa5a;
+    --value-1: #8393c4;
+    --value-2: #8dae78;
+    --value-3: #b48aad;
+    --value-4: #7fa8a1;
+    --value-5: #c4876a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 80px;
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 84rem;
+    margin-inline: auto;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px 40px;
+    align-items: end;
+    padding-block: 56px 28px;
+    border-bottom: 1px solid var(--rule-2);
+    animation: rise 600ms var(--ease) both;
+  }
+  .mast .meta {
+    grid-column: 1 / -1;
+  }
+  h1 {
+    font-size: clamp(56px, 8vw, 92px);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    font-size: clamp(19px, 2.1vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 38ch;
+  }
+  .specnote {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--muted);
+    max-width: 72ch;
+  }
+  .specnote b {
+    font-weight: 400;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .quiet {
+    background: none;
+    border: 0;
+    padding: 2px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 4px;
+    transition: color 160ms var(--ease);
+  }
+  .quiet:hover {
+    color: var(--ink);
+  }
+
+  /* the sheet and the desk */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    margin-top: 28px;
+  }
+  @media (min-width: 1024px) {
+    .stage {
+      grid-template-columns: minmax(0, 1fr) 23rem;
+      gap: 32px;
+    }
+  }
+  .sheet {
+    position: relative;
+    align-self: start;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 12px;
+    animation: rise 600ms var(--ease) 60ms both;
+  }
+  .sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 4px 0;
+  }
+  .sheet-head .t {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    min-width: 0;
+  }
+  .title {
+    font-size: 19px;
+    line-height: 1.2;
+  }
+  .sheet-head .acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .cap {
+    position: absolute;
+    top: 44px;
+    right: 18px;
+    z-index: 4;
+    pointer-events: none;
+    font-size: 16px;
+    color: var(--accent);
+    background: var(--surface);
+    padding: 0 4px;
+    animation: fade 220ms var(--ease) both;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--faint);
+    transition:
+      color 180ms var(--ease),
+      border-color 180ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:hover:not(:disabled) {
+    color: var(--ink);
+  }
+  .chip:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .chip.on {
+    color: var(--ink);
+  }
+  .chip.on.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  /* the line from now to then */
+  .linewrap {
+    overflow-x: auto;
+    margin-top: 2px;
+  }
+  #line {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+  #line text {
+    pointer-events: none;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  #line .lab {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    fill: var(--faint);
+  }
+  #line .ink {
+    fill: var(--pen);
+  }
+  #line .now-dot {
+    fill: var(--ink);
+    fill-opacity: 0.9;
+    stroke: var(--ink);
+    stroke-width: 0.8;
+  }
+  #line .now-word {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 7.5px;
+    letter-spacing: 0.08em;
+    fill: var(--surface);
+  }
+  #line .day {
+    font-size: 11.5px;
+    fill: var(--muted);
+  }
+  #line .then-dot {
+    fill: var(--accent);
+    fill-opacity: 0.15;
+    stroke: var(--accent);
+    stroke-width: 1.4;
+  }
+  #line .then-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 0.9;
+    stroke-opacity: 0.6;
+  }
+  #line .then-day {
+    font-size: 11.5px;
+    fill: var(--accent);
+  }
+  #line .empty {
+    font-size: 14px;
+    fill: var(--faint);
+  }
+  #line .hatch {
+    stroke: var(--ink);
+    stroke-width: 0.8;
+    stroke-opacity: 0.35;
+  }
+  #line .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1000ms var(--ease) 160ms both;
+  }
+  .mk {
+    cursor: pointer;
+  }
+  .mk.enter {
+    animation: settle 460ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    animation-delay: calc(var(--i, 0) * 40ms + 380ms);
+  }
+  .mk .stem {
+    stroke: var(--ink);
+    stroke-width: 0.8;
+    stroke-opacity: 0.6;
+  }
+  .mk .dot {
+    stroke: var(--ink);
+    stroke-width: 0.9;
+    transition:
+      fill 220ms var(--ease),
+      fill-opacity 220ms var(--ease),
+      stroke 220ms var(--ease);
+  }
+  .mk.back .dot {
+    fill: var(--accent);
+    fill-opacity: 0.85;
+  }
+  .mk.fwd .dot {
+    fill: var(--ink);
+    fill-opacity: 0.85;
+  }
+  .mk.hollow .stem {
+    stroke: var(--faint);
+    stroke-dasharray: 2 2;
+  }
+  .mk.hollow .dot {
+    fill: var(--surface);
+    fill-opacity: 1;
+    stroke: var(--faint);
+    stroke-dasharray: 2.5 2;
+  }
+  .mk.on .dot {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+  }
+  .mk:hover .dot {
+    stroke: var(--accent);
+  }
+  .mk .ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.2;
+  }
+  .mk .hit {
+    fill: transparent;
+  }
+  #line .lbl {
+    font-size: 11px;
+    fill: var(--muted);
+    stroke: var(--surface);
+    stroke-width: 3;
+    stroke-opacity: 0.85;
+    paint-order: stroke;
+  }
+  #line .lbl.on {
+    font-size: 12.5px;
+    fill: var(--ink);
+  }
+  #line .ob-box {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 0.9;
+  }
+  #line .ob.hollow .ob-box {
+    stroke: var(--faint);
+    stroke-dasharray: 2.5 2;
+  }
+  #line .ob-fill {
+    fill: url(#w-hatch);
+  }
+  #line .ob-t {
+    font-size: 10.5px;
+    fill: var(--muted);
+  }
+  #line .ob.hollow .ob-t {
+    fill: var(--faint);
+  }
+
+  /* the two papers */
+  .papers {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+    padding: 0 4px 6px;
+  }
+  @media (min-width: 640px) {
+    .papers {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .paper {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 12px;
+    transition: border-color 220ms var(--ease);
+  }
+  .paper.then {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--rule));
+  }
+  .paper .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .paper.then .head > .meta:first-child {
+    color: var(--accent);
+  }
+  .paper.now .head > .meta:first-child {
+    color: var(--muted);
+  }
+  .field {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  .field:focus-visible {
+    outline: 2px solid transparent;
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+  .field::placeholder {
+    color: var(--faint);
+  }
+  .field[readonly] {
+    cursor: default;
+  }
+  .field.bad {
+    border-color: var(--accent);
+  }
+  .paper textarea {
+    margin-top: 8px;
+    padding: 9px 12px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 11.5em;
+  }
+  .daybox {
+    width: 6.5rem;
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+  .words {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 7px;
+    margin-top: 8px;
+  }
+  .words .w {
+    font-style: italic;
+    font-size: 14.5px;
+    color: var(--accent);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    line-height: 1.25;
+  }
+  .ahead {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--faint);
+  }
+
+  /* standing at the then */
+  .memoir {
+    padding: 24px 12px 16px;
+    animation: rise 700ms var(--ease) both;
+  }
+  @media (min-width: 640px) {
+    .memoir {
+      padding-inline: 32px;
+    }
+  }
+  .memoir .meta.lead {
+    color: var(--accent);
+  }
+  .memoir h2 {
+    margin-top: 4px;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .memoir .then-said {
+    margin-top: 20px;
+    max-width: 44rem;
+    font-size: 20.5px;
+    line-height: 1.45;
+  }
+  .memoir .block {
+    margin-top: 26px;
+  }
+  .memoir .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    margin-top: 26px;
+  }
+  @media (min-width: 640px) {
+    .memoir .cols {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .lanechips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .lanechip {
+    padding: 3px 11px;
+    border: 1px solid var(--lane, var(--faint));
+    border-radius: 999px;
+    font-style: italic;
+    font-size: 14.5px;
+  }
+  .hadtobe {
+    display: grid;
+    gap: 9px;
+    margin-top: 10px;
+  }
+  .hadtobe li {
+    display: grid;
+    grid-template-columns: 4.8rem minmax(0, 1fr);
+    gap: 8px;
+    align-items: baseline;
+  }
+  .hadtobe .when {
+    color: var(--accent);
+  }
+  .hadtobe .what,
+  .nearly .what {
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.32;
+  }
+  .nearly {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .nearly .plan {
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.32;
+    color: var(--accent);
+  }
+  .first {
+    margin-top: 16px;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .first span {
+    color: var(--ink);
+  }
+  .none {
+    margin-top: 8px;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--faint);
+  }
+  .stay {
+    margin-top: 26px;
+    font-style: italic;
+    font-size: 14.5px;
+    color: var(--faint);
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+    animation: rise 600ms var(--ease) 140ms both;
+  }
+  .rowhead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 10px;
+  }
+  .rowhead.left {
+    justify-content: flex-start;
+  }
+  .add {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .add:hover {
+    color: var(--ink);
+  }
+  #search {
+    margin-top: 8px;
+    padding: 8px 12px;
+    font-size: 15px;
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    margin-top: 6px;
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    padding: 3px 6px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .row:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .row.cur {
+    background: var(--wash);
+  }
+  .row .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.3;
+  }
+  .row .when {
+    flex-shrink: 0;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 16px;
+  }
+  .panel.step {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+    animation: rise 420ms var(--ease) both;
+  }
+  .reading {
+    display: grid;
+    gap: 3px;
+    margin-top: 8px;
+  }
+  .reading li {
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .ctl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .panel.step textarea {
+    margin-top: 8px;
+    padding: 8px 12px;
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.3;
+    resize: none;
+  }
+  .esc {
+    background: none;
+    border: 0;
+    padding: 0 2px;
+  }
+  .steprow {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .pip {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    transform: translateY(-1px);
+  }
+  .pip.back {
+    border-color: var(--accent);
+  }
+  .pip.kept.fwd {
+    background: var(--ink);
+  }
+  .pip.kept.back {
+    background: var(--accent);
+  }
+  .pip:not(.kept) {
+    border-style: dashed;
+  }
+  .row.hollow .name {
+    color: var(--muted);
+  }
+  .keep {
+    flex-shrink: 0;
+    background: none;
+    border: 0;
+    padding: 0 4px;
+    color: var(--accent);
+  }
+  .sub {
+    margin-top: 14px;
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .item .field {
+    min-width: 0;
+    flex: 1;
+    padding: 4px 8px;
+    font-style: italic;
+    font-size: 15.5px;
+  }
+  .item .field.hollow {
+    border-style: dashed;
+    color: var(--muted);
+  }
+  .plan-in {
+    margin-left: 16px;
+    width: calc(100% - 16px) !important;
+    padding: 4px 8px;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--accent);
+  }
+  .ob-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .x {
+    background: none;
+    border: 0;
+    padding: 0 4px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--ink);
+  }
+  .lanedot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--lane, var(--faint));
+  }
+  .lanedot.kept {
+    background: var(--lane, var(--faint));
+  }
+  .item select.field {
+    max-width: 6.8rem;
+    padding: 4px 4px;
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 10.5px;
+  }
+  .howread {
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.42;
+    color: var(--faint);
+  }
+  .letgo.sure {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes settle {
+    from {
+      transform: translateY(-14px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 40px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+    }
+    #line .draw {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <p class="meta">CAPP · instrument</p>
+    <h1>Way</h1>
+    <p class="deck hand">
+      Say where you are. Say where you mean to be, as it is and not as it will
+      be. Keep the steps you would actually take. Then stand at the then and
+      look back.
+    </p>
+  </header>
+
+  <p class="specnote" id="specNote" hidden>
+    <b>Specimen</b>
+    <span
+      >Specimen A&rsquo;s way: the year away a synthetic life keeps postponing.
+      Fiction, to show the instrument, and read-only. The dashed marks are
+      proposals that life has not kept.</span
+    >
+    <button class="quiet" type="button" data-act="new">
+      start your own · n
+    </button>
+  </p>
+
+  <div class="stage">
+    <!-- the sheet -->
+    <section class="sheet" aria-label="The way">
+      <div class="sheet-head">
+        <div class="t">
+          <span class="title hand" id="title">a way</span>
+          <span class="meta plain" id="count"></span>
+          <span class="meta" id="status" style="color: var(--accent)"></span>
+        </div>
+        <div class="acts">
+          <button
+            class="chip"
+            type="button"
+            id="standBtn"
+            data-act="stand"
+            title="s"
+            aria-pressed="false"
+          >
+            stand at the then
+          </button>
+          <span class="meta" id="kept" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="cap hand" id="cap" hidden aria-live="polite"></div>
+
+      <div id="wayView">
+        <div class="linewrap">
+          <svg
+            id="line"
+            viewBox="0 0 1000 200"
+            role="img"
+            aria-label="The way from now to then"
+          ></svg>
+        </div>
+
+        <div class="papers">
+          <div class="paper now">
+            <div class="head">
+              <label class="meta" for="nowText">now · where you are</label>
+            </div>
+            <textarea
+              id="nowText"
+              class="field"
+              rows="7"
+              maxlength="20000"
+              placeholder="honestly, in your own words. the place, the work, the body, the money, the people, the mind."
+            ></textarea>
+            <div class="words" id="nowWords"></div>
+          </div>
+          <div class="paper then">
+            <div class="head">
+              <label class="meta" for="thenText">then · as it is</label>
+              <label
+                class="meta"
+                style="display: flex; gap: 6px; align-items: baseline"
+                >set in
+                <input
+                  id="thenDay"
+                  class="field daybox"
+                  placeholder="2027-09"
+                  autocomplete="off"
+              /></label>
+            </div>
+            <textarea
+              id="thenText"
+              class="field"
+              rows="7"
+              maxlength="20000"
+              placeholder="present tense. it is so. where you wake, what is on the desk, who is there. not 'I will', 'I do'."
+            ></textarea>
+            <div class="words" id="thenWords"></div>
+            <p class="ahead hand" id="ahead" hidden></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="memoir" id="memoir" hidden></div>
+    </section>
+
+    <!-- the desk -->
+    <aside class="desk">
+      <div>
+        <div class="rowhead">
+          <label class="meta" for="search" id="waysLabel">the ways</label>
+          <button class="add" type="button" data-act="new">new · n</button>
+        </div>
+        <input
+          id="search"
+          class="field"
+          placeholder="a way  /"
+          autocomplete="off"
+        />
+        <ul class="rows" id="waysList"></ul>
+      </div>
+
+      <section class="panel" aria-label="The reading">
+        <div class="meta">the reading</div>
+        <ul class="reading" id="reading"></ul>
+      </section>
+
+      <section
+        class="panel step"
+        id="stepPanel"
+        aria-label="The step"
+        hidden
+      ></section>
+
+      <section aria-label="The way, listed" id="listed">
+        <div class="rowhead left">
+          <span class="meta">the way</span>
+          <button class="add w-only" type="button" data-act="add-fwd">
+            + a first move
+          </button>
+          <button class="add w-only" type="button" data-act="add-back">
+            + what had to be true
+          </button>
+        </div>
+        <ul class="rows" id="stepsList"></ul>
+
+        <div class="sub" id="obWrap">
+          <div class="rowhead left">
+            <span class="meta">in the way · when–then</span>
+            <button class="add w-only" type="button" data-act="add-ob">
+              + name one
+            </button>
+          </div>
+          <ul class="items" id="obList"></ul>
+        </div>
+
+        <div class="sub" id="chWrap">
+          <div class="rowhead left">
+            <span class="meta">what changes</span>
+            <button class="add w-only" type="button" data-act="add-ch">
+              + one
+            </button>
+          </div>
+          <ul class="items" id="chList"></ul>
+        </div>
+      </section>
+
+      <section aria-label="Standing" id="standing"></section>
+
+      <p class="howread">
+        how it is read: the then is written as if it is already so. that is the
+        whole trick; imagining an outcome as having happened makes its causes
+        easier to name, and the desk counts the sentences that still look ahead.
+        the obstacles are the part that turns a picture into effort, each with a
+        when–then. standing at the then is a mode, not a home: stay a minute,
+        then come back to the steps. what you write stays in this browser.
+      </p>
+      <p class="meta plain">/ find · n new · s stand at the then · esc</p>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Way · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ── time, as the chronology counts it ─────────────────────────────────
+  const DAY_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const YEAR_MS = 365.2425 * 86400000;
+  const DAY_MS = 86400000;
+
+  function validDay(s) {
+    if (typeof s !== "string") return false;
+    const m = DAY_RE.exec(s);
+    if (!m) return false;
+    const y = +m[1];
+    if (y < 1000 || y > 2999) return false;
+    if (m[2]) {
+      const mo = +m[2];
+      if (mo < 1 || mo > 12) return false;
+      if (m[3]) {
+        const d = +m[3];
+        if (d < 1 || d > new Date(Date.UTC(y, mo, 0)).getUTCDate())
+          return false;
+      }
+    }
+    return true;
+  }
+
+  function timeOf(day, edge = "mid") {
+    const m = DAY_RE.exec(day);
+    if (!m) return NaN;
+    const y = +m[1];
+    let s, e;
+    if (m[3]) {
+      s = Date.UTC(y, +m[2] - 1, +m[3]);
+      e = s + DAY_MS;
+    } else if (m[2]) {
+      s = Date.UTC(y, +m[2] - 1, 1);
+      e = Date.UTC(y, +m[2], 1);
+    } else {
+      s = Date.UTC(y, 0, 1);
+      e = Date.UTC(y + 1, 0, 1);
+    }
+    return edge === "start" ? s : edge === "end" ? e : (s + e) / 2;
+  }
+
+  function formatDay(day) {
+    const m = DAY_RE.exec(day);
+    if (!m) return day;
+    if (m[3]) return `${+m[3]} ${MON[+m[2] - 1]} ${m[1]}`;
+    if (m[2]) return `${MON[+m[2] - 1]} ${m[1]}`;
+    return `c. ${m[1]}`;
+  }
+
+  function yearsWords(years) {
+    const y = Math.max(0, years);
+    if (y < 0.075) {
+      const d = Math.max(1, Math.round(y * 365.25));
+      return d === 1 ? "a day" : `${d} days`;
+    }
+    if (y < 0.96) {
+      const m = Math.max(1, Math.round(y * 12));
+      return m === 1 ? "a month" : `${m} months`;
+    }
+    const whole = Math.floor(y + 0.04);
+    const months = Math.round((y - whole) * 12);
+    const ys = whole === 1 ? "a year" : `${whole} years`;
+    if (months < 1 || months >= 12) return ys;
+    return `${ys} and ${months === 1 ? "a month" : `${months} months`}`;
+  }
+
+  // ── the way, read as facts (pure) ─────────────────────────────────────
+  const STATUS_LABEL = {
+    open: "on the way",
+    arrived: "arrived",
+    "let-go": "let go",
+  };
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  const emptyWay = (today) => ({
+    slug: "",
+    title: "",
+    then: null,
+    status: "open",
+    steps: [],
+    obstacles: [],
+    changes: [],
+    thenText: "",
+    nowText: "",
+    colour: "",
+    recorded: today,
+    touched: today,
+  });
+
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+
+  const AHEAD =
+    /\b(will|won't|going to|gonna|would|someday|one day|eventually|i want|i hope|i wish|i'd like|i would like|by then|in the future|i plan to)\b/gi;
+
+  /** Which sentences of a then still look ahead instead of standing there. */
+  function lookingAhead(text) {
+    const ss = sentencesOf(text);
+    const words = new Set();
+    let n = 0;
+    for (const s of ss) {
+      const m = s.match(AHEAD);
+      if (m) {
+        n++;
+        for (const w of m) words.add(w.toLowerCase());
+      }
+    }
+    return { n, of: ss.length, words: [...words].slice(0, 5) };
+  }
+
+  const STOP = new Set(
+    "a an the and or but if then than that this these those there here it its it's i i'm i've i'd my me mine we our you your he she they them their his her is are was were be been being am do does did done have has had having will would can could should may might must not no nor so as at by for from in into of on to with without about over under after before again once only own same such very too more most much many some any each few both all just also still yet ever never now when where why how what which who whom whose because while during through between out up down off above below one two three first last new old day days year years month months time thing things way much".split(
+      " ",
+    ),
+  );
+
+  function contentWords(text) {
+    const m = new Map();
+    for (const raw of text.toLowerCase().split(/[^a-z0-9'’-]+/)) {
+      const w = raw.replace(/^['’-]+|['’-]+$/g, "");
+      if (w.length < 4 || STOP.has(w) || /^\d+$/.test(w)) continue;
+      m.set(w, (m.get(w) ?? 0) + 1);
+    }
+    return m;
+  }
+
+  /** What the then speaks of that the now does not, and the reverse — the vocabulary of the change. */
+  function differs(thenText, nowText) {
+    const a = contentWords(thenText);
+    const b = contentWords(nowText);
+    const pick = (x, y) =>
+      [...x.entries()]
+        .filter(([w]) => !y.has(w))
+        .sort(
+          (p, q) =>
+            q[1] - p[1] ||
+            q[0].length - p[0].length ||
+            p[0].localeCompare(q[0]),
+        )
+        .map(([w]) => w)
+        .slice(0, 10);
+    return { only: pick(a, b), gone: pick(b, a) };
+  }
+
+  const list = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+
+  const dayMs = (d) => (d && validDay(d) ? timeOf(d, "mid") : NaN);
+
+  /** The steps in the order they happen: undated first moves, then dated ones by day, then undated back steps. */
+  function ordered(steps) {
+    const dated = steps
+      .filter((s) => s.day && validDay(s.day))
+      .sort((a, b) => dayMs(a.day) - dayMs(b.day));
+    const fwd = steps.filter(
+      (s) => !(s.day && validDay(s.day)) && s.dir === "forward",
+    );
+    const back = steps.filter(
+      (s) => !(s.day && validDay(s.day)) && s.dir === "back",
+    );
+    return [...fwd, ...dated, ...[...back].reverse()];
+  }
+
+  /** Facts about the way. None of them is a verdict. */
+  function readings(w, today) {
+    const out = [];
+    if (!w.thenText.trim() && !w.nowText.trim())
+      return [
+        "say where you are, and say where you mean to be — as it is, not as it will be.",
+      ];
+    const nowMs = timeOf(today, "mid");
+    if (w.then && validDay(w.then)) {
+      const d = (timeOf(w.then, "mid") - nowMs) / YEAR_MS;
+      out.push(
+        d < 0
+          ? `the then was set in ${formatDay(w.then)} — ${yearsWords(-d)} ago.`
+          : `the then is set in ${formatDay(w.then)} — ${yearsWords(d)} from today.`,
+      );
+    } else
+      out.push(
+        "the then has no day yet; give it one and the steps can be dated.",
+      );
+    if (w.status === "arrived") out.push("arrived — the then is now.");
+    if (w.status === "let-go") out.push("let go.");
+    if (w.thenText.trim()) {
+      const a = lookingAhead(w.thenText);
+      if (a.n)
+        out.push(
+          `${a.n} of the then's ${a.of} sentences still look ahead — ${list(a.words)}. it is meant to be written as it is.`,
+        );
+      else out.push("the then stands in the present tense throughout.");
+    }
+    if (w.thenText.trim() && w.nowText.trim()) {
+      const { only, gone } = differs(w.thenText, w.nowText);
+      if (only.length)
+        out.push(
+          `the then speaks of ${list(only.slice(0, 6))}; the now does not.`,
+        );
+      if (gone.length)
+        out.push(
+          `the now speaks of ${list(gone.slice(0, 6))}; the then has let them go.`,
+        );
+    }
+    const kept = w.steps.filter((s) => s.kept);
+    const proposed = w.steps.length - kept.length;
+    if (w.steps.length) {
+      const dated = kept.filter((s) => s.day && validDay(s.day)).length;
+      out.push(
+        `${kept.length} ${kept.length === 1 ? "step" : "steps"} yours${proposed ? `, ${proposed} proposed and not yet yours` : ""}; ${dated} dated.`,
+      );
+      const next = kept
+        .filter(
+          (s) => s.day && validDay(s.day) && timeOf(s.day, "end") >= nowMs,
+        )
+        .sort((a, b) => dayMs(a.day) - dayMs(b.day))[0];
+      if (next)
+        out.push(`the next dated step: ${next.text} — ${formatDay(next.day)}.`);
+      const before = ordered(kept).at(-1);
+      if (before && before.dir === "back")
+        out.push(
+          `looking back from the then, what had to be true right before: ${before.text}`,
+        );
+    }
+    const ob = w.obstacles.filter((o) => o.kept);
+    if (ob.length)
+      out.push(
+        `${ob.length} in the way, named; ${ob.filter((o) => o.plan.trim()).length} with a when–then.`,
+      );
+    const ch = w.changes.filter((c) => c.kept);
+    if (ch.length) {
+      const lanes = [...new Set(ch.map((c) => c.lane).filter((l) => !!l))];
+      out.push(
+        `${ch.length} ${ch.length === 1 ? "thing changes" : "things change"} between the now and the then${lanes.length ? `, across ${list(lanes)}` : ""}.`,
+      );
+    }
+    return out;
+  }
+
+  /** Standing at the then and looking back: the way told as if it has already been walked. */
+  function memoir(w) {
+    const kept = w.steps.filter((s) => s.kept);
+    const inOrder = ordered(kept);
+    return {
+      dateline:
+        w.then && validDay(w.then)
+          ? `It is ${formatDay(w.then)}. It is so.`
+          : "It is so.",
+      hadToBe: [...inOrder].reverse(),
+      nearly: w.obstacles.filter((o) => o.kept),
+      first: inOrder[0] ?? null,
+      changes: w.changes.filter((c) => c.kept),
+    };
+  }
+
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  /** A title from the then's first sentence, when none was given. */
+  function titleOf(w) {
+    if (w.title.trim()) return w.title.trim();
+    const first = sentencesOf(w.thenText)[0] ?? "";
+    return first.replace(/[.!?]$/, "").slice(0, 80) || "a way";
+  }
+
+  const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const dayStr = (v) => {
+    if (typeof v === "number") return String(v);
+    return typeof v === "string" ? v.trim() : "";
+  };
+  const byOf = (v) => (v === "proposed" ? "proposed" : "you");
+  const dirOf = (v) => (v === "back" ? "back" : "forward");
+
+  /** Validation at the boundary: a way arrives from the sheet, or from storage. */
+  function validateWay(input, today) {
+    const w = input;
+    if (!w || typeof w !== "object") throw new Error("way: not an object");
+    const thenText =
+      typeof w.thenText === "string" ? w.thenText.trim().slice(0, 20000) : "";
+    const nowText =
+      typeof w.nowText === "string" ? w.nowText.trim().slice(0, 20000) : "";
+    if (!thenText && !nowText)
+      throw new Error("way: say where you are, or where you mean to be");
+    const then = dayStr(w.then);
+    if (then && !validDay(then))
+      throw new Error("way: the then's day — a year, a month or a day");
+    const title = titleOf({ title: str(w.title, 120), thenText });
+    const recorded = dayStr(w.recorded);
+    const slugIn = str(w.slug, 80);
+    const slug = slugIn || slugOf(title, validDay(recorded) ? recorded : today);
+    if (!SLUG.test(slug)) throw new Error("way: bad slug");
+    const many = (v, f) =>
+      Array.isArray(v)
+        ? v
+            .slice(0, 60)
+            .map((x) => (x && typeof x === "object" ? f(x) : null))
+            .filter((x) => x !== null)
+        : [];
+    return {
+      slug,
+      title,
+      then: then || null,
+      status:
+        w.status === "arrived" || w.status === "let-go" ? w.status : "open",
+      steps: many(w.steps, (x) => {
+        const text = str(x.text, 300);
+        if (!text) return null;
+        const d = dayStr(x.day);
+        return {
+          id: str(x.id, 24) || uid(),
+          text,
+          day: validDay(d) ? d : null,
+          dir: dirOf(x.dir),
+          by: byOf(x.by),
+          kept: x.kept === true,
+          entry: str(x.entry, 120) || null,
+        };
+      }),
+      obstacles: many(w.obstacles, (x) => {
+        const text = str(x.text, 300);
+        return text
+          ? {
+              id: str(x.id, 24) || uid(),
+              text,
+              plan: str(x.plan, 300),
+              by: byOf(x.by),
+              kept: x.kept === true,
+            }
+          : null;
+      }),
+      changes: many(w.changes, (x) => {
+        const text = str(x.text, 300);
+        return text
+          ? {
+              id: str(x.id, 24) || uid(),
+              text,
+              lane: str(x.lane, 40) || null,
+              by: byOf(x.by),
+              kept: x.kept === true,
+            }
+          : null;
+      }),
+      thenText,
+      nowText,
+      colour:
+        typeof w.colour === "string" ? w.colour.trim().slice(0, 4000) : "",
+      recorded: validDay(recorded) && recorded.length === 10 ? recorded : today,
+      touched: today,
+    };
+  }
+  // ── end of the pure part ──────────────────────────────────────────────
+
+  // ── the pen: deterministic hand-drawn strokes ─────────────────────────
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ── Specimen A's way: fiction, to show the instrument ────────────────
+  const SPECIMEN = {
+    slug: "2026-09-19-a-year-away",
+    title: "A year away, somewhere I can't drive",
+    then: "2028-03",
+    status: "open",
+    steps: [
+      {
+        id: "sa1",
+        text: "The sublet on the flat is signed and the piano is in storage",
+        day: "2027-02",
+        dir: "back",
+        by: "you",
+        kept: true,
+        entry: null,
+      },
+      {
+        id: "sa2",
+        text: "The two retainers are told, in writing, that I am away from March",
+        day: "2026-12",
+        dir: "back",
+        by: "you",
+        kept: true,
+        entry: null,
+      },
+      {
+        id: "sa3",
+        text: "Pick the town — the one with the harbour, not the one with the airport",
+        day: "2026-10",
+        dir: "forward",
+        by: "you",
+        kept: true,
+        entry: null,
+      },
+      {
+        id: "sa4",
+        text: "Tell my father the month, on a Sunday, before I tell anyone else",
+        day: "2026-11",
+        dir: "forward",
+        by: "proposed",
+        kept: false,
+        entry: null,
+      },
+    ],
+    obstacles: [
+      {
+        id: "oa1",
+        text: "I keep moving the month",
+        plan: "when I catch myself moving it, I book the ferry for the month it was",
+        by: "you",
+        kept: true,
+      },
+      {
+        id: "oa2",
+        text: "The inbox on holidays",
+        plan: "when I reach for it, I play the C major scale instead, badly",
+        by: "proposed",
+        kept: false,
+      },
+    ],
+    changes: [
+      {
+        id: "ca1",
+        text: "Mornings are for the piano, not the inbox",
+        lane: "taste",
+        by: "you",
+        kept: true,
+      },
+      {
+        id: "ca2",
+        text: "Sundays with my father are a standing thing",
+        lane: "family",
+        by: "proposed",
+        kept: false,
+      },
+    ],
+    thenText:
+      "I live for a year in a town I can't drive around, by a harbour. I play the piano in the mornings, badly, and nobody minds. The work inbox has been closed for eleven months and the two retainers survived it. My father and I talk on Sundays; he asks about the piano.",
+    nowText:
+      "I'm freelance, mostly at the desk in the flat. The flat is quiet. I keep moving the month for the year away. I still check the inbox on holidays. I talk to my father when something is wrong, and not otherwise.",
+    colour: "",
+    recorded: "2026-09-19",
+    touched: "2026-09-19",
+  };
+
+  /** The lanes a change can belong to: the specimen life's six domains. */
+  const LANES = [
+    { id: "belonging", label: "Belonging" },
+    { id: "taste", label: "Taste" },
+    { id: "family", label: "Family" },
+    { id: "body", label: "Body" },
+    { id: "work", label: "Work" },
+    { id: "money", label: "Money" },
+  ];
+
+  // ── the sheet's geometry ─────────────────────────────────────────────
+  const W = 1000;
+  const H = 200;
+  const X0 = 90;
+  const X1 = 910;
+  const LY = 92;
+  // the days under now and then sit below the first moves' second row of labels
+  const DAY_Y = LY + 70;
+
+  const KEY = "pp-way";
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const today = todayStr();
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const esc = (s) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  const $ = (id) => document.getElementById(id);
+
+  const S = {
+    ways: [], // the reader's own, newest touched first
+    draft: null,
+    spec: false,
+    fresh: false,
+    selected: null,
+    stand: false,
+    query: "",
+    sure: false,
+    enter: true,
+  };
+  const writable = () => !S.spec;
+
+  // ── keeping, in this browser ─────────────────────────────────────────
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return { ways: [], open: null };
+      const j = JSON.parse(raw);
+      const ways = [];
+      for (const w of Array.isArray(j?.ways) ? j.ways : []) {
+        try {
+          const v = validateWay(w, today);
+          if (validDay(w.touched)) v.touched = w.touched;
+          if (!ways.some((x) => x.slug === v.slug)) ways.push(v);
+        } catch {
+          /* a way that will not read is left out */
+        }
+      }
+      return { ways, open: typeof j?.open === "string" ? j.open : null };
+    } catch {
+      return { ways: [], open: null };
+    }
+  }
+
+  function writeStore() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          open: S.spec ? SPECIMEN.slug : S.draft?.slug || null,
+          ways: S.ways,
+        }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  let capTimer = 0;
+  function say(msg) {
+    clearTimeout(capTimer);
+    const c = $("cap");
+    c.textContent = `— ${msg}`;
+    c.hidden = false;
+    capTimer = setTimeout(() => (c.hidden = true), 2600);
+  }
+
+  let keptTimer = 0;
+  function settleKept(state) {
+    clearTimeout(keptTimer);
+    setKept(state);
+    keptTimer = setTimeout(() => setKept("idle"), 1600);
+  }
+  function setKept(state) {
+    const k = $("kept");
+    k.style.color = state === "error" ? "var(--accent)" : "var(--faint)";
+    k.textContent =
+      state === "saving"
+        ? "keeping…"
+        : state === "kept"
+          ? "kept"
+          : state === "error"
+            ? "not kept"
+            : S.spec
+              ? "read-only"
+              : "";
+  }
+
+  function put() {
+    const d = S.draft;
+    if (!d || !writable()) return;
+    if (!d.thenText.trim() && !d.nowText.trim()) return;
+    let k;
+    try {
+      k = validateWay(d, today);
+    } catch (e) {
+      settleKept("error");
+      say(String(e.message).replace(/^way: /, ""));
+      return;
+    }
+    if (S.fresh) {
+      const taken = new Set(S.ways.map((x) => x.slug).concat(SPECIMEN.slug));
+      const base = k.slug;
+      let n = 2;
+      while (taken.has(k.slug)) k.slug = `${base}-${n++}`;
+    }
+    S.ways = S.ways.some((x) => x.slug === k.slug)
+      ? S.ways.map((x) => (x.slug === k.slug ? k : x))
+      : [k, ...S.ways];
+    d.slug = k.slug;
+    d.touched = k.touched;
+    d.title = d.title || k.title;
+    S.fresh = false;
+    if (writeStore()) settleKept("kept");
+    else {
+      settleKept("error");
+      say("not kept — this browser will not hold it.");
+    }
+    renderHead();
+    renderWays();
+    renderStanding();
+  }
+
+  let saveTimer = 0;
+  /** The texts keep themselves a moment after the typing stops. */
+  function schedule() {
+    const d = S.draft;
+    if (!d || !writable()) return;
+    if (!d.thenText.trim() && !d.nowText.trim()) return;
+    clearTimeout(saveTimer);
+    setKept("saving");
+    saveTimer = setTimeout(put, 1400);
+  }
+  function keepNow() {
+    clearTimeout(saveTimer);
+    put();
+  }
+
+  function openWay(w) {
+    clearTimeout(saveTimer);
+    if (S.draft && writable() && S.draft !== w) put();
+    S.spec = w.slug === SPECIMEN.slug;
+    S.draft = clone(w);
+    S.fresh = false;
+    S.selected = null;
+    S.stand = false;
+    S.sure = false;
+    S.enter = true;
+    writeStore();
+    renderAll();
+  }
+
+  function begin() {
+    clearTimeout(saveTimer);
+    if (S.draft && writable()) put();
+    S.spec = false;
+    S.draft = emptyWay(today);
+    S.fresh = true;
+    S.selected = null;
+    S.stand = false;
+    S.sure = false;
+    S.enter = true;
+    renderAll();
+    $("nowText").focus();
+  }
+
+  function letGo() {
+    const d = S.draft;
+    if (!d?.slug || !writable()) return;
+    clearTimeout(saveTimer);
+    S.ways = S.ways.filter((w) => w.slug !== d.slug);
+    S.sure = false;
+    S.draft = null;
+    if (!writeStore()) settleKept("error");
+    if (S.ways[0]) openWay(S.ways[0]);
+    else begin();
+    say("let go of the way.");
+  }
+
+  // ── the drawing ──────────────────────────────────────────────────────
+  function marksOf(d) {
+    const thenMs = d.then && validDay(d.then) ? timeOf(d.then, "mid") : null;
+    const nowMs = timeOf(today, "mid");
+    const steps = ordered(d.steps);
+    const xs = new Array(steps.length).fill(null);
+    if (thenMs && thenMs > nowMs)
+      steps.forEach((s, i) => {
+        if (s.day && validDay(s.day))
+          xs[i] =
+            X0 +
+            (X1 - X0) *
+              clamp((timeOf(s.day, "mid") - nowMs) / (thenMs - nowMs), 0, 1);
+      });
+    // undated steps sit evenly between the dated ones around them
+    let i = 0;
+    while (i < steps.length) {
+      if (xs[i] !== null) {
+        i++;
+        continue;
+      }
+      let j = i;
+      while (j < steps.length && xs[j] === null) j++;
+      const left = i === 0 ? X0 : xs[i - 1];
+      const right = j >= steps.length ? X1 : xs[j];
+      const n = j - i;
+      for (let k = 0; k < n; k++)
+        xs[i + k] = left + ((right - left) * (k + 1)) / (n + 1);
+      i = j;
+    }
+    return steps.map((s, k) => ({
+      s,
+      x: xs[k],
+      y: s.dir === "back" ? LY - 26 : LY + 26,
+    }));
+  }
+
+  function labelsOf(marks, selected, reserved = []) {
+    const taken = [...reserved];
+    const hit = (b) =>
+      taken.some(
+        (t) =>
+          b[0] < t[0] + t[2] &&
+          b[0] + b[2] > t[0] &&
+          b[1] < t[1] + t[3] &&
+          b[1] + b[3] > t[1],
+      );
+    const out = [];
+    const order = [...marks].sort(
+      (a, b) =>
+        Number(b.s.id === selected) - Number(a.s.id === selected) ||
+        Number(b.s.kept) - Number(a.s.kept),
+    );
+    for (const m of order) {
+      const must = m.s.id === selected;
+      for (const text of must
+        ? [short(m.s.text, 70)]
+        : [short(m.s.text, 44), short(m.s.text, 22)]) {
+        const w = text.length * 5.6 + 6;
+        const ys =
+          m.s.dir === "back" ? [m.y - 14, m.y - 26] : [m.y + 19, m.y + 31];
+        let placed = false;
+        for (const ly of ys) {
+          const bx = clamp(m.x - w / 2, 8, W - w - 8);
+          const box = [bx, ly - 9, w, 12];
+          if (!must && hit(box)) continue;
+          taken.push(box);
+          out.push({ id: m.s.id, x: bx + w / 2, y: ly, text });
+          placed = true;
+          break;
+        }
+        if (placed) break;
+      }
+    }
+    return out;
+  }
+
+  const LINE = (() => {
+    const d = stroke([X0, LY], [X1, LY], rand(seedOf("way-line")), 1.6, 4);
+    return { d, ink: ribbon(d, 2.2, seedOf("way-ink")) };
+  })();
+
+  /** The parts of the line that never change: drawn once, so the pen draws on once. */
+  function drawFrame() {
+    const lab = (y, t) =>
+      `<text class="lab" x="${X0 - 10}" y="${y}" text-anchor="end">${t}</text>`;
+    $("line").innerHTML = `
+      <defs>
+        <pattern id="w-hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(-45)">
+          <line class="hatch" x1="0" y1="0" x2="0" y2="6"/>
+        </pattern>
+        <mask id="w-line-mask" maskUnits="userSpaceOnUse" x="${X0 - 20}" y="${LY - 12}" width="${X1 - X0 + 40}" height="24">
+          <path class="draw" d="${LINE.d}" pathLength="1" fill="none" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </mask>
+      </defs>
+      ${lab(LY - 30, "looking back")}
+      ${lab(LY + 30, "first moves")}
+      <path class="ink" d="${LINE.ink}" mask="url(#w-line-mask)"/>
+      <path class="now-dot" d="${roughEllipse(14, 14, seedOf("way-now"), { pad: 0, steps: 12 })}" transform="translate(${X0 - 7} ${LY - 7})"/>
+      <text class="now-word" x="${X0}" y="${LY + 4}" text-anchor="middle">now</text>
+      <text class="day" x="${X0}" y="${DAY_Y}" text-anchor="middle">${formatDay(today)}</text>
+      <path class="then-dot" d="${roughEllipse(18, 18, seedOf("way-then"), { pad: 0, steps: 14, wobble: 1.4 })}" transform="translate(${X1 - 9} ${LY - 9})"/>
+      <path class="then-ring" d="${roughEllipse(26, 26, seedOf("way-then-ring"), { pad: 0, steps: 14, wobble: 1.6 })}" transform="translate(${X1 - 13} ${LY - 13})"/>
+      <text class="then-day" id="thenLabel" x="${X1 + 16}" y="${DAY_Y}" text-anchor="end"></text>
+      <g id="gMarks"></g>
+      <g id="gLabels"></g>
+      <g id="gObs"></g>
+      <text class="empty" id="emptyLine" x="${(X0 + X1) / 2}" y="${LY - 44}" text-anchor="middle"></text>`;
+  }
+
+  function renderLine() {
+    const d = S.draft;
+    if (!d) return;
+    const thenMs = d.then && validDay(d.then) ? timeOf(d.then, "mid") : null;
+    const thenIn = thenMs ? (thenMs - timeOf(today, "mid")) / YEAR_MS : null;
+    $("thenLabel").textContent =
+      `then${d.then && validDay(d.then) ? ` · ${formatDay(d.then)}` : ""}` +
+      (thenIn !== null && thenIn > 0 ? ` · ${yearsWords(thenIn)}` : "");
+
+    const marks = marksOf(d);
+    const r = 6;
+    $("gMarks").innerHTML = marks
+      .map((m, i) => {
+        const on = m.s.id === S.selected;
+        const cls = [
+          "mk",
+          m.s.dir === "back" ? "back" : "fwd",
+          m.s.kept ? "" : "hollow",
+          on ? "on" : "",
+          S.enter ? "enter" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        return `<g class="${cls}" data-step="${esc(m.s.id)}" style="--i:${i}" role="button" tabindex="0" aria-label="${esc(m.s.text || "a step")}">
+          <line class="stem" x1="${f1(m.x)}" x2="${f1(m.x)}" y1="${LY}" y2="${m.y}"/>
+          <path class="dot" d="${roughEllipse(r * 2, r * 2, seedOf(m.s.id), { pad: 0, steps: 12, wobble: 0.9 })}" transform="translate(${f1(m.x - r)} ${m.y - r})"/>
+          ${on ? `<path class="ring" d="${roughEllipse(r * 2 + 10, r * 2 + 10, seedOf(`${m.s.id}-ring`), { pad: 0, steps: 14, wobble: 1.2 })}" transform="translate(${f1(m.x - r - 5)} ${m.y - r - 5})"/>` : ""}
+          <rect class="hit" x="${f1(m.x - 12)}" y="${m.y - 12}" width="24" height="24"/>
+        </g>`;
+      })
+      .join("");
+    S.enter = false;
+
+    // the two day lines under now and then are spoken for before any label is placed
+    const thenText = $("thenLabel").textContent;
+    const nowW = formatDay(today).length * 5.6 + 6;
+    const thenW = thenText.length * 5.6 + 6;
+    const reserved = [
+      [X0 - nowW / 2, DAY_Y - 9, nowW, 12],
+      [X1 + 16 - thenW, DAY_Y - 9, thenW, 12],
+    ];
+    $("gLabels").innerHTML = labelsOf(marks, S.selected, reserved)
+      .map(
+        (l) =>
+          `<text class="lbl${l.id === S.selected ? " on" : ""}" x="${f1(l.x)}" y="${l.y}" text-anchor="middle">${esc(l.text)}</text>`,
+      )
+      .join("");
+
+    $("gObs").innerHTML = d.obstacles.length
+      ? `<text class="lab" x="${X0 - 10}" y="${H - 14}" text-anchor="end">in the way</text>` +
+        d.obstacles
+          .slice(0, 8)
+          .map((o, i) => {
+            const x = X0 + 20 + i * 108;
+            return `<g class="ob${o.kept ? "" : " hollow"}">
+              ${o.kept ? `<rect class="ob-fill" x="${x}" y="${H - 26}" width="16" height="12"/>` : ""}
+              <path class="ob-box" d="${roughRect(16, 12, seedOf(o.id), { wobble: 0.8, overshoot: 1.5 })}" transform="translate(${x} ${H - 26})"/>
+              <text class="ob-t" x="${x + 21}" y="${H - 16}">${esc(short(o.text, 16))}</text>
+            </g>`;
+          })
+          .join("")
+      : "";
+
+    $("emptyLine").textContent = d.steps.length
+      ? ""
+      : writable()
+        ? "write the two texts, then put down a first move or what had to be true"
+        : "nothing on the way";
+  }
+
+  // ── the sheet ────────────────────────────────────────────────────────
+  function renderHead() {
+    const d = S.draft;
+    if (!d) return;
+    $("title").textContent = titleOf(d);
+    const nProposed =
+      d.steps.filter((s) => !s.kept).length +
+      d.obstacles.filter((o) => !o.kept).length +
+      d.changes.filter((c) => !c.kept).length;
+    $("count").textContent =
+      `· ${d.steps.filter((s) => s.kept).length} steps yours${nProposed ? ` · ${nProposed} proposed` : ""}${d.then ? ` · then ${validDay(d.then) ? formatDay(d.then) : d.then}` : ""}`;
+    $("status").textContent =
+      d.status !== "open" ? `· ${STATUS_LABEL[d.status]}` : "";
+    const b = $("standBtn");
+    b.textContent = S.stand ? "back to the way" : "stand at the then";
+    b.classList.toggle("on", S.stand);
+    b.classList.toggle("acc", S.stand);
+    b.setAttribute("aria-pressed", String(S.stand));
+    $("specNote").hidden = !S.spec;
+    $("wayView").hidden = S.stand;
+    $("memoir").hidden = !S.stand;
+  }
+
+  function wordsHtml(xs) {
+    if (!xs.length) return "";
+    return (
+      `<span class="meta">speaks of</span>` +
+      xs
+        .slice(0, 8)
+        .map((w) => `<span class="w">${esc(w)}</span>`)
+        .join("")
+    );
+  }
+
+  function renderWords() {
+    const d = S.draft;
+    const diff = differs(d.thenText, d.nowText);
+    $("nowWords").innerHTML = wordsHtml(diff.gone);
+    $("thenWords").innerHTML = wordsHtml(diff.only);
+    const a = lookingAhead(d.thenText);
+    const p = $("ahead");
+    p.hidden = !a.n;
+    p.textContent = a.n
+      ? `${a.n} of ${a.of} sentences still look ahead (${a.words.join(", ")}) — say them as they are.`
+      : "";
+    $("thenDay").classList.toggle("bad", !!d.then && !validDay(d.then));
+  }
+
+  function renderPapers() {
+    const d = S.draft;
+    for (const [id, v] of [
+      ["nowText", d.nowText],
+      ["thenText", d.thenText],
+      ["thenDay", d.then ?? ""],
+    ]) {
+      const el = $(id);
+      el.value = v;
+      el.readOnly = !writable();
+    }
+    renderWords();
+  }
+
+  function renderMemoir() {
+    const d = S.draft;
+    if (!S.stand || !d) return;
+    const tale = memoir(d);
+    const day = (s) => (s.day && validDay(s.day) ? formatDay(s.day) : "—");
+    $("memoir").innerHTML = `
+      <div class="meta lead">looking back</div>
+      <h2>${esc(tale.dateline)}</h2>
+      <p class="then-said hand">${esc(d.thenText.trim() || "…")}</p>
+      ${
+        tale.changes.length
+          ? `<div class="block"><div class="meta">what is different now</div>
+          <ul class="lanechips">${tale.changes
+            .map(
+              (c) =>
+                `<li class="lanechip" style="--lane:${laneColor(c.lane)}">${esc(c.text)}</li>`,
+            )
+            .join("")}</ul></div>`
+          : ""
+      }
+      <div class="cols">
+        <div>
+          <div class="meta">what had to be true, latest first</div>
+          ${
+            tale.hadToBe.length
+              ? `<ol class="hadtobe">${tale.hadToBe
+                  .map(
+                    (s) =>
+                      `<li><span class="meta plain when">${day(s)}</span><span class="what">${esc(s.text)}</span></li>`,
+                  )
+                  .join("")}</ol>`
+              : `<p class="none">nothing kept yet — write a step.</p>`
+          }
+          ${
+            tale.first
+              ? `<p class="first">the first thing I did${tale.first.day && validDay(tale.first.day) ? `, ${formatDay(tale.first.day)}` : ""}: <span>${esc(tale.first.text)}</span></p>`
+              : ""
+          }
+        </div>
+        <div>
+          <div class="meta">what nearly stopped it, and what I did</div>
+          ${
+            tale.nearly.length
+              ? `<ul class="nearly">${tale.nearly
+                  .map(
+                    (o) =>
+                      `<li><div class="what">${esc(o.text)}</div>${o.plan ? `<div class="plan">${esc(o.plan)}</div>` : ""}</li>`,
+                  )
+                  .join("")}</ul>`
+              : `<p class="none">nothing named in the way.</p>`
+          }
+        </div>
+      </div>
+      <p class="stay">stay a minute, then go back to the way — the steps are the point.</p>`;
+  }
+
+  // ── the desk ─────────────────────────────────────────────────────────
+  const laneColor = (id) => {
+    const i = LANES.findIndex((l) => l.id === id);
+    return i >= 0 ? `var(--value-${i % 6})` : "var(--faint)";
+  };
+  const laneLabel = (id) => LANES.find((l) => l.id === id)?.label ?? id ?? "";
+
+  function renderWays() {
+    const all = [...S.ways, SPECIMEN];
+    $("waysLabel").textContent = `the ways · ${all.length}`;
+    const q = S.query.trim().toLowerCase();
+    const results =
+      q.length < 2
+        ? []
+        : all
+            .filter(
+              (w) =>
+                titleOf(w).toLowerCase().includes(q) ||
+                w.thenText.toLowerCase().includes(q) ||
+                w.nowText.toLowerCase().includes(q),
+            )
+            .slice(0, 8);
+    const show = results.length
+      ? results
+      : q.length < 2 && all.length > 1
+        ? all.slice(0, 6)
+        : [];
+    const cur = S.spec ? SPECIMEN.slug : S.draft?.slug;
+    $("waysList").innerHTML = show
+      .map(
+        (w) =>
+          `<li><button type="button" class="row${w.slug === cur ? " cur" : ""}" data-open="${esc(w.slug)}">
+            <span class="name">${esc(titleOf(w))}</span>
+            <span class="meta plain when">${w.slug === SPECIMEN.slug ? "specimen" : w.then ? (validDay(w.then) ? formatDay(w.then) : esc(w.then)) : STATUS_LABEL[w.status]}</span>
+          </button></li>`,
+      )
+      .join("");
+  }
+
+  function renderReading() {
+    $("reading").innerHTML = readings(S.draft, today)
+      .map((w) => `<li>${esc(w)}</li>`)
+      .join("");
+  }
+
+  function renderStepsList() {
+    const d = S.draft;
+    const rw = writable();
+    $("stepsList").innerHTML = ordered(d.steps)
+      .map(
+        (s) =>
+          `<li class="steprow"><button type="button" class="row${s.kept ? "" : " hollow"}${S.selected === s.id ? " cur" : ""}" data-select="${esc(s.id)}">
+            <span class="pip ${s.dir === "back" ? "back" : "fwd"}${s.kept ? " kept" : ""}" aria-hidden="true"></span>
+            <span class="name">${esc(s.text || "…")}</span>
+            <span class="meta plain when">${s.day && validDay(s.day) ? formatDay(s.day) : ""}</span>
+          </button>${!s.kept && rw ? `<button type="button" class="meta keep" data-keep-step="${esc(s.id)}">keep</button>` : ""}</li>`,
+      )
+      .join("");
+  }
+
+  function renderStepPanel() {
+    const d = S.draft;
+    const p = $("stepPanel");
+    const s = d.steps.find((x) => x.id === S.selected);
+    if (!s) {
+      p.hidden = true;
+      p.innerHTML = "";
+      return;
+    }
+    const rw = writable();
+    p.hidden = false;
+    p.innerHTML = `
+      <div class="rowhead">
+        <div class="meta" style="color:${s.dir === "back" ? "var(--accent)" : "var(--ink)"}">
+          ${s.dir === "back" ? "had to be true before" : "a first move"}
+          <span style="color:var(--faint)"> · ${s.kept ? "yours" : "proposed"}</span>
+        </div>
+        <button type="button" class="meta esc" data-act="deselect">esc</button>
+      </div>
+      <textarea id="stepText" class="field" rows="2" maxlength="300" aria-label="The step"
+        placeholder="${s.dir === "back" ? "what had to be true right before?" : "the next concrete move"}" ${rw ? "" : "readonly"}>${esc(s.text)}</textarea>
+      <div class="ctl">
+        <input id="stepDay" class="field daybox${s.day && !validDay(s.day) ? " bad" : ""}" placeholder="2027-03" aria-label="When" autocomplete="off" value="${esc(s.day ?? "")}" ${rw ? "" : "readonly"} />
+        <button type="button" class="chip" data-act="flip" ${rw ? "" : "disabled"}>${s.dir === "back" ? "looking back" : "first move"}</button>
+        ${rw ? `<button type="button" class="chip${s.kept ? "" : " on acc"}" data-act="keep-toggle">${s.kept ? "unkeep" : "keep it"}</button>` : ""}
+        ${rw ? `<button type="button" class="meta esc" data-act="take-back">take it back</button>` : ""}
+      </div>`;
+  }
+
+  function renderObstacles() {
+    const d = S.draft;
+    const rw = writable();
+    $("obWrap").hidden = !d.obstacles.length && !rw;
+    $("obList").innerHTML = d.obstacles
+      .map(
+        (o) =>
+          `<li class="ob-item" data-ob="${esc(o.id)}">
+            <div class="item">
+              <input class="field${o.kept ? "" : " hollow"}" data-f="text" value="${esc(o.text)}" placeholder="what stands in the way" aria-label="What stands in the way" ${rw ? "" : "readonly"} />
+              ${rw ? `<button type="button" class="chip${o.kept ? "" : " on acc"}" data-act="ob-keep">${o.kept ? "yours" : "keep"}</button><button type="button" class="x" data-act="ob-remove" aria-label="Remove">×</button>` : ""}
+            </div>
+            <input class="field plan-in" data-f="plan" value="${esc(o.plan)}" placeholder="when …, I …" aria-label="When–then" ${rw ? "" : "readonly"} />
+          </li>`,
+      )
+      .join("");
+  }
+
+  function renderChanges() {
+    const d = S.draft;
+    const rw = writable();
+    $("chWrap").hidden = !d.changes.length && !rw;
+    $("chList").innerHTML = d.changes
+      .map(
+        (c) =>
+          `<li class="item" data-ch="${esc(c.id)}">
+            <span class="lanedot${c.kept ? " kept" : ""}" style="--lane:${laneColor(c.lane)}" title="${esc(laneLabel(c.lane))}" aria-hidden="true"></span>
+            <input class="field${c.kept ? "" : " hollow"}" data-f="text" value="${esc(c.text)}" placeholder="what is different" aria-label="What is different" ${rw ? "" : "readonly"} />
+            <select class="field" data-f="lane" aria-label="Lane" ${rw ? "" : "disabled"}>
+              <option value="">lane</option>
+              ${LANES.map((l) => `<option value="${l.id}"${c.lane === l.id ? " selected" : ""}>${l.label.toLowerCase()}</option>`).join("")}
+            </select>
+            ${rw ? `${c.kept ? "" : `<button type="button" class="chip on acc" data-act="ch-keep">keep</button>`}<button type="button" class="x" data-act="ch-remove" aria-label="Remove">×</button>` : ""}
+          </li>`,
+      )
+      .join("");
+  }
+
+  function renderStanding() {
+    const d = S.draft;
+    const el = $("standing");
+    if (!writable()) {
+      el.innerHTML = "";
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    el.innerHTML = `
+      <div class="meta">this way</div>
+      <div class="ctl">
+        ${["open", "arrived", "let-go"]
+          .map(
+            (s) =>
+              `<button type="button" class="chip${d.status === s ? ` on${s === "arrived" ? " acc" : ""}` : ""}" data-status="${s}" aria-pressed="${d.status === s}">${STATUS_LABEL[s]}</button>`,
+          )
+          .join("")}
+        ${d.slug ? `<button type="button" class="chip letgo${S.sure ? " sure" : ""}" data-act="remove">${S.sure ? "yes, let go of it" : "let go of this way"}</button>` : ""}
+      </div>
+      ${d.slug ? `<p class="meta plain" style="margin-top:8px">kept in this browser · written ${d.recorded ? formatDay(d.recorded) : "—"}</p>` : ""}`;
+  }
+
+  function renderAll() {
+    if (!S.draft) return;
+    document
+      .querySelectorAll(".w-only")
+      .forEach((b) => (b.hidden = !writable()));
+    renderHead();
+    renderPapers();
+    renderLine();
+    renderMemoir();
+    renderWays();
+    renderReading();
+    renderStepPanel();
+    renderStepsList();
+    renderObstacles();
+    renderChanges();
+    renderStanding();
+    setKept("idle");
+  }
+
+  /** After a keystroke: everything computed from the text, never the field being typed in. */
+  function renderDerived() {
+    renderHead();
+    renderWords();
+    renderLine();
+    renderReading();
+    renderStepsList();
+    renderWays();
+    renderMemoir();
+  }
+
+  // ── changing the way ─────────────────────────────────────────────────
+  function select(id) {
+    S.selected = S.selected === id ? null : id;
+    S.sure = false;
+    renderLine();
+    renderStepPanel();
+    renderStepsList();
+    renderStanding();
+  }
+
+  function addStep(dir) {
+    const id = uid();
+    S.draft.steps.push({
+      id,
+      text: "",
+      day: null,
+      dir,
+      by: "you",
+      kept: true,
+      entry: null,
+    });
+    S.selected = id;
+    renderLine();
+    renderStepPanel();
+    renderStepsList();
+    renderHead();
+    renderReading();
+    $("stepText")?.focus();
+  }
+
+  function structural() {
+    keepNow();
+    renderHead();
+    renderLine();
+    renderReading();
+    renderStepPanel();
+    renderStepsList();
+    renderObstacles();
+    renderChanges();
+    renderStanding();
+    renderMemoir();
+  }
+
+  // the papers
+  $("nowText").addEventListener("input", (e) => {
+    if (!writable()) return;
+    S.draft.nowText = e.target.value;
+    renderDerived();
+    schedule();
+  });
+  $("thenText").addEventListener("input", (e) => {
+    if (!writable()) return;
+    S.draft.thenText = e.target.value;
+    renderDerived();
+    schedule();
+  });
+  $("thenDay").addEventListener("input", (e) => {
+    if (!writable()) return;
+    S.draft.then = e.target.value.trim() || null;
+    renderDerived();
+    schedule();
+  });
+  $("search").addEventListener("input", (e) => {
+    S.query = e.target.value;
+    renderWays();
+  });
+
+  // the step on the desk, the obstacles and the changes
+  document.querySelector(".desk").addEventListener("input", (e) => {
+    const t = e.target;
+    const d = S.draft;
+    if (!d || !writable()) return;
+    if (t.id === "stepText" || t.id === "stepDay") {
+      const s = d.steps.find((x) => x.id === S.selected);
+      if (!s) return;
+      if (t.id === "stepText") {
+        s.text = t.value;
+        s.by = "you";
+      } else {
+        s.day = t.value.trim() || null;
+        t.classList.toggle("bad", !!s.day && !validDay(s.day));
+      }
+      renderDerived();
+      schedule();
+      return;
+    }
+    const ob = t.closest("[data-ob]");
+    if (ob) {
+      const o = d.obstacles.find((x) => x.id === ob.dataset.ob);
+      if (!o) return;
+      if (t.dataset.f === "text") {
+        o.text = t.value;
+        o.by = "you";
+      } else o.plan = t.value;
+      renderDerived();
+      schedule();
+      return;
+    }
+    const ch = t.closest("[data-ch]");
+    if (ch && t.dataset.f === "text") {
+      const c = d.changes.find((x) => x.id === ch.dataset.ch);
+      if (!c) return;
+      c.text = t.value;
+      c.by = "you";
+      renderDerived();
+      schedule();
+    }
+  });
+  document.querySelector(".desk").addEventListener("change", (e) => {
+    const t = e.target;
+    const ch = t.closest("[data-ch]");
+    if (!ch || t.dataset.f !== "lane" || !writable()) return;
+    const c = S.draft.changes.find((x) => x.id === ch.dataset.ch);
+    if (!c) return;
+    c.lane = t.value || null;
+    structural();
+  });
+
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest(
+      "[data-act],[data-open],[data-select],[data-keep-step],[data-status],[data-step]",
+    );
+    if (!t) return;
+    const d = S.draft;
+    if (t.dataset.open) {
+      const w = [...S.ways, SPECIMEN].find((x) => x.slug === t.dataset.open);
+      if (w && !(w.slug === (S.spec ? SPECIMEN.slug : d?.slug))) openWay(w);
+      return;
+    }
+    if (t.dataset.step) return select(t.dataset.step);
+    if (t.dataset.select) return select(t.dataset.select);
+    if (
+      !writable() &&
+      t.dataset.act !== "new" &&
+      t.dataset.act !== "stand" &&
+      t.dataset.act !== "deselect"
+    )
+      return;
+    if (t.dataset.keepStep) {
+      const s = d.steps.find((x) => x.id === t.dataset.keepStep);
+      if (s) s.kept = true;
+      return structural();
+    }
+    if (t.dataset.status) {
+      d.status = t.dataset.status;
+      return structural();
+    }
+    const ob = t.closest("[data-ob]");
+    const ch = t.closest("[data-ch]");
+    switch (t.dataset.act) {
+      case "new":
+        return begin();
+      case "stand":
+        S.stand = !S.stand;
+        renderHead();
+        renderMemoir();
+        return;
+      case "deselect":
+        return select(S.selected);
+      case "add-fwd":
+        return addStep("forward");
+      case "add-back":
+        return addStep("back");
+      case "add-ob":
+        d.obstacles.push({
+          id: uid(),
+          text: "",
+          plan: "",
+          by: "you",
+          kept: true,
+        });
+        renderObstacles();
+        renderLine();
+        $("obList").lastElementChild?.querySelector("input")?.focus();
+        return;
+      case "add-ch":
+        d.changes.push({
+          id: uid(),
+          text: "",
+          lane: null,
+          by: "you",
+          kept: true,
+        });
+        renderChanges();
+        $("chList").lastElementChild?.querySelector("input")?.focus();
+        return;
+      case "flip": {
+        const s = d.steps.find((x) => x.id === S.selected);
+        if (s) s.dir = s.dir === "back" ? "forward" : "back";
+        return structural();
+      }
+      case "keep-toggle": {
+        const s = d.steps.find((x) => x.id === S.selected);
+        if (s) s.kept = !s.kept;
+        return structural();
+      }
+      case "take-back":
+        d.steps = d.steps.filter((x) => x.id !== S.selected);
+        S.selected = null;
+        return structural();
+      case "ob-keep": {
+        const o = d.obstacles.find((x) => x.id === ob?.dataset.ob);
+        if (o) o.kept = !o.kept;
+        return structural();
+      }
+      case "ob-remove":
+        d.obstacles = d.obstacles.filter((x) => x.id !== ob?.dataset.ob);
+        return structural();
+      case "ch-keep": {
+        const c = d.changes.find((x) => x.id === ch?.dataset.ch);
+        if (c) c.kept = true;
+        return structural();
+      }
+      case "ch-remove":
+        d.changes = d.changes.filter((x) => x.id !== ch?.dataset.ch);
+        return structural();
+      case "remove":
+        if (S.sure) return letGo();
+        S.sure = true;
+        return renderStanding();
+    }
+  });
+
+  // a mark on the line is a button too
+  $("line").addEventListener("keydown", (e) => {
+    const g = e.target.closest?.("[data-step]");
+    if (g && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      select(g.dataset.step);
+    }
+  });
+
+  // ── keys ─────────────────────────────────────────────────────────────
+  window.addEventListener("keydown", (e) => {
+    const el = e.target;
+    const typing =
+      el &&
+      (el.tagName === "INPUT" ||
+        el.tagName === "TEXTAREA" ||
+        el.tagName === "SELECT" ||
+        el.isContentEditable);
+    if (typing) {
+      if (e.key === "Escape") el.blur();
+      return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "/") {
+      e.preventDefault();
+      $("search").focus();
+    } else if (e.key === "Escape") {
+      S.sure = false;
+      if (S.selected) select(S.selected);
+      else renderStanding();
+    } else if (e.key === "s") {
+      S.stand = !S.stand;
+      renderHead();
+      renderMemoir();
+    } else if (e.key === "n") begin();
+  });
+
+  // keep what is pending if the page is closed mid-sentence
+  window.addEventListener("pagehide", () => {
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      put();
+    }
+  });
+
+  // ── open ─────────────────────────────────────────────────────────────
+  drawFrame();
+  {
+    const st = readStore();
+    S.ways = st.ways.sort(
+      (a, b) =>
+        b.touched.localeCompare(a.touched) || a.slug.localeCompare(b.slug),
+    );
+    const mine = st.open && S.ways.find((w) => w.slug === st.open);
+    S.spec = !mine;
+    S.draft = clone(mine || SPECIMEN);
+    renderAll();
+  }
+</script>

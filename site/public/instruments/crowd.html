@@ -1,0 +1,1522 @@
+<title>Crowd</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A positive result, set against how rare the thing is. Not in percentages: in a crowd of a thousand, one dot each."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a ward sheet. Ink on bone. Red ochre is only ever a person who has the thing;
+     slate blue is only ever the ring a test puts round someone it flags. Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed;
+    --sheet: #faf9f6;
+    --ink: #23211e;
+    --ink-2: #6b655c;
+    --ink-3: #776f64;
+    --faint: #9a9287;
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --so: #a8452c;
+    --flag: #4f5f8a;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --grain-blend: multiply;
+    --grain: 0.05;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f;
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --ink-2: #a39c8e;
+      --ink-3: #8f887a;
+      --faint: #6f685c;
+      --rule: #302e25;
+      --rule-2: #4a473c;
+      --so: #c4623f;
+      --flag: #8393c4;
+      --grain-blend: screen;
+      --grain: 0.04;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --ink-2: #a39c8e;
+    --ink-3: #8f887a;
+    --faint: #6f685c;
+    --rule: #302e25;
+    --rule-2: #4a473c;
+    --so: #c4623f;
+    --flag: #8393c4;
+    --grain-blend: screen;
+    --grain: 0.04;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: var(--ink);
+  }
+  .wrap {
+    max-width: 1040px;
+    margin-inline: auto;
+  }
+  .small {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: 2px solid var(--flag);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 40px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast > div > .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .question {
+    margin: 0;
+    padding: 24px 24px 20px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .question .label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 14px;
+  }
+  .question .lead {
+    font-size: clamp(22px, 2.6vw, 27px);
+    line-height: 1.26;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+  }
+  .question .then {
+    font-size: 16.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin: 0 0 16px;
+  }
+  .ask {
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--so);
+    margin: 0;
+  }
+
+  /* stations */
+  .lede,
+  .station {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 56px 24px;
+  }
+  .station {
+    padding-top: 64px;
+    border-top: 1px solid var(--rule-2);
+  }
+  .lede .body {
+    max-width: 64ch;
+  }
+  .lede p {
+    font-size: clamp(19px, 2.2vw, 21px);
+    line-height: 1.5;
+  }
+  .rail .n {
+    display: block;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .rail .label {
+    display: block;
+    margin-top: 10px;
+  }
+  .station h2 {
+    font-size: clamp(32px, 4.4vw, 44px);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    margin-bottom: 18px;
+  }
+  .station .body > p {
+    max-width: 64ch;
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* buttons, chips */
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .go {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 11px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  .go:disabled {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--sheet);
+    transition:
+      background-color 160ms var(--ease),
+      color 160ms var(--ease),
+      border-color 160ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:hover:not(:disabled) {
+    border-color: var(--ink-2);
+    color: var(--ink);
+  }
+  .chip:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .chip.accent {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .chip:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .chip .k {
+    color: var(--ink-3);
+    margin-right: 8px;
+  }
+  .chip[aria-pressed="true"] .k {
+    color: var(--paper);
+    opacity: 0.6;
+  }
+
+  /* the dials: a hairline track, ink for the thumb */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 22px;
+    margin: 4px 0 0;
+    background: transparent;
+    cursor: ew-resize;
+  }
+  input[type="range"]:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--rule-2);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background: var(--sheet);
+    border: 1.5px solid var(--ink);
+    transition: transform 160ms var(--ease);
+  }
+  input[type="range"]:hover:not(:disabled)::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  input[type="range"]::-moz-range-track {
+    height: 2px;
+    background: var(--rule-2);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--sheet);
+    border: 1.5px solid var(--ink);
+  }
+
+  /* I: your number */
+  .yours {
+    padding: 20px 22px 22px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .yours .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .yours .before {
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .big {
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+  .big small {
+    font-size: 17px;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .yours .actions {
+    margin-top: 14px;
+  }
+  .after {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    animation: rise 520ms var(--ease) both;
+  }
+  .after .says {
+    font-size: 27px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 10px;
+  }
+  .after .read {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .bars3 {
+    display: grid;
+    gap: 8px;
+    margin: 16px 0 14px;
+  }
+  .bars3 > div {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr) 2.5rem;
+    gap: 12px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .bars3 .who {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-2);
+  }
+  .bars3 .v {
+    text-align: right;
+    color: var(--ink);
+  }
+  .bar {
+    display: block;
+    height: 8px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    animation: grow 700ms var(--ease) both;
+  }
+  .bar .t-you {
+    background: var(--ink);
+  }
+  .bar .t-asked {
+    background: var(--faint);
+  }
+  .bar .t-crowd {
+    background: var(--so);
+  }
+  @keyframes grow {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* the seats: a thousand, forty to a row */
+  .seats {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .seats circle {
+    fill: color-mix(in srgb, var(--faint) 55%, var(--sheet));
+    stroke: transparent;
+    stroke-width: 1.7;
+    transition:
+      fill 450ms var(--ease),
+      stroke 450ms var(--ease),
+      opacity 500ms var(--ease);
+  }
+  .seats[data-stage="1"] circle.so,
+  .seats[data-stage="2"] circle.so,
+  .seats[data-stage="3"] circle.so {
+    fill: var(--so);
+  }
+  .seats[data-stage="2"] circle.flag,
+  .seats[data-stage="3"] circle.flag {
+    stroke: var(--flag);
+  }
+  .seats[data-stage="3"] circle:not(.flag) {
+    opacity: 0.14;
+  }
+  .field {
+    padding: 18px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .key {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--faint) 55%, var(--sheet));
+  }
+  .key.so {
+    background: var(--so);
+  }
+  .key.flag {
+    width: 7px;
+    height: 7px;
+    margin: 0 1.5px;
+    box-shadow: 0 0 0 2px var(--flag);
+  }
+  .walk {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    gap: 32px;
+    margin-top: 22px;
+    align-items: start;
+  }
+  .walk .text {
+    font-size: 18px;
+    line-height: 1.6;
+    min-height: 9.6em;
+    margin: 0 0 18px;
+  }
+  .walk .text.swap {
+    animation: rise 420ms var(--ease) both;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+  }
+
+  /* III: dials */
+  .dials {
+    display: grid;
+    grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+    gap: 44px;
+    margin-top: 28px;
+  }
+  .dial {
+    margin-bottom: 24px;
+  }
+  .dial label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .dial label .said {
+    font-family: var(--mono);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .dial .hint2 {
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .note {
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .readout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
+  }
+  .huge {
+    font-size: clamp(64px, 8vw, 84px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-top: 4px;
+  }
+  .huge small {
+    font-size: 19px;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .meter {
+    display: flex;
+    height: 12px;
+    margin-top: 16px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--sheet);
+  }
+  .meter span {
+    display: block;
+    flex: none;
+    transition: width 400ms var(--ease);
+  }
+  .meter .m-so {
+    background: var(--so);
+  }
+  .meter .m-flag {
+    background: var(--flag);
+  }
+  .meter-read {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .meter-read .so {
+    color: var(--so);
+  }
+  .meter-read .flag {
+    color: var(--flag);
+    text-align: right;
+  }
+  .story {
+    font-size: 16.5px;
+    line-height: 1.6;
+    margin: 6px 0 18px;
+  }
+  .leans {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .leans li {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .leans li b {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .atdials {
+    margin-top: 28px;
+  }
+
+  /* IV: elsewhere */
+  .bites {
+    margin: 22px 0 0;
+    border-top: 1px solid var(--rule);
+    max-width: 46rem;
+  }
+  .bites > div {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 4px 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .bites dt {
+    padding-top: 5px;
+  }
+  .bites dd {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  /* coda */
+  .coda {
+    border-top: 1px solid var(--rule-2);
+    margin-top: 64px;
+    padding-top: 48px;
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+  }
+  .coda .last {
+    font-style: italic;
+    font-size: clamp(22px, 2.8vw, 28px);
+    line-height: 1.38;
+    letter-spacing: -0.01em;
+    max-width: 36ch;
+  }
+  .refs {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 64ch;
+  }
+  .refs li {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .refs a {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* entry */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .after,
+    .bar > span,
+    .walk .text.swap {
+      animation: none;
+    }
+    .seats circle,
+    .meter span {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      padding-top: 44px;
+    }
+    .lede,
+    .station,
+    .coda {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+    .rail {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .rail .n {
+      font-size: 32px;
+    }
+    .rail .label {
+      margin: 0;
+    }
+    .split,
+    .walk,
+    .dials {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+    .walk .text {
+      min-height: 0;
+    }
+  }
+  @media (max-width: 560px) {
+    .readout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .bites > div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .field {
+      padding: 10px;
+    }
+    .bars3 > div {
+      grid-template-columns: 5.6rem minmax(0, 1fr) 2rem;
+      gap: 8px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="rise">
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Crowd</h1>
+      <p class="deck">
+        A positive result, set against how rare the thing is.
+        <em>Not in percentages: in a crowd of a thousand, one dot each.</em>
+      </p>
+    </div>
+    <figure class="question rise" style="--i: 1" aria-label="The question">
+      <p class="label"><span>The question</span><span>since 1978</span></p>
+      <p class="lead" id="lead0"></p>
+      <p class="then" id="lead1"></p>
+      <p class="ask" id="ask"></p>
+    </figure>
+  </header>
+
+  <section class="station rise" style="--i: 2" aria-labelledby="h-yours">
+    <div class="rail">
+      <span class="n">I</span><span class="label">Your number</span>
+    </div>
+    <div class="body">
+      <h2 id="h-yours">Your number</h2>
+      <div class="split">
+        <p>
+          Before any arithmetic, say what the chance is. Move the dial to the
+          number that feels right and say it. It is set beside two others, and
+          nothing grades it.
+        </p>
+        <div class="yours">
+          <p class="label" style="margin: 0">Your number</p>
+          <div class="row">
+            <span class="before" id="before"></span>
+            <span class="big num"
+              ><span id="guessOut">50</span><small> in 100</small></span
+            >
+          </div>
+          <input
+            id="guess"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="50"
+            aria-label="Your number, in 100"
+          />
+          <div class="actions">
+            <button class="go" id="say" type="button">Say it</button>
+          </div>
+          <div class="after" id="after" hidden aria-live="polite">
+            <p class="says" id="says"></p>
+            <p class="read" id="sayRead"></p>
+            <div class="bars3" id="bars3"></div>
+            <p class="hint" style="margin: 0">
+              The next station is why the crowd's count is what it is.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="station rise" style="--i: 3" aria-labelledby="h-crowd">
+    <div class="rail">
+      <span class="n">II</span><span class="label">A step at a time</span>
+    </div>
+    <div class="body">
+      <h2 id="h-crowd">The crowd, a step at a time</h2>
+      <div class="head">
+        <div class="chips" id="steps" role="group" aria-label="Steps"></div>
+        <span class="hint">→ and ← walk it</span>
+      </div>
+      <div class="walk">
+        <div>
+          <div class="field">
+            <svg
+              class="seats"
+              id="seatsA"
+              viewBox="0 0 400 250"
+              role="img"
+              aria-label="A thousand people, forty to a row"
+            ></svg>
+          </div>
+          <div class="legend" id="legendA"></div>
+        </div>
+        <div>
+          <p class="text" id="stepText" aria-live="polite"></p>
+          <div class="chips">
+            <button class="chip" id="back" type="button">back</button>
+            <button class="chip accent" id="next" type="button">next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="station rise" style="--i: 4" aria-labelledby="h-dials">
+    <div class="rail">
+      <span class="n">III</span><span class="label">The dials</span>
+    </div>
+    <div class="body">
+      <h2 id="h-dials">The dials</h2>
+      <p>
+        Three things set what a positive means. One is about the test. The other
+        two are about the crowd.
+      </p>
+      <div class="dials">
+        <div>
+          <div class="dial">
+            <label for="rare"
+              ><span>how rare the thing is</span
+              ><span class="said num" id="rareSaid"></span
+            ></label>
+            <input id="rare" type="range" min="0" max="100" step="1" />
+            <p class="hint2">
+              The base rate: how many in the crowd have it before anyone is
+              tested.
+            </p>
+          </div>
+          <div class="dial">
+            <label for="catches"
+              ><span>how often it catches those who have it</span
+              ><span class="said num" id="catchesSaid"></span
+            ></label>
+            <input id="catches" type="range" min="50" max="100" step="1" />
+            <p class="hint2">
+              Of the people who have it, the share the test flags.
+            </p>
+          </div>
+          <div class="dial">
+            <label for="flags"
+              ><span>how often it flags those who do not</span
+              ><span class="said num" id="flagsSaid"></span
+            ></label>
+            <input id="flags" type="range" min="0" max="200" step="1" />
+            <p class="hint2">
+              Of the people who do not have it, the share the test flags anyway.
+            </p>
+          </div>
+          <p class="label" style="margin: 4px 0 8px">Set it to</p>
+          <div
+            class="chips"
+            id="sits"
+            role="group"
+            aria-label="Situations"
+          ></div>
+          <p class="note" id="sitNote"></p>
+        </div>
+        <div>
+          <div class="readout">
+            <div>
+              <p class="label" style="margin: 0">
+                Of the flagged, how many have it
+              </p>
+              <div class="huge num">
+                <span id="pctOut"></span><small> in 100</small>
+              </div>
+              <div class="meter" aria-hidden="true">
+                <span class="m-so" id="mSo"></span
+                ><span class="m-flag" id="mFlag"></span>
+              </div>
+              <div class="meter-read num">
+                <span class="so" id="mSoRead"></span
+                ><span class="flag" id="mFlagRead"></span>
+              </div>
+            </div>
+            <div>
+              <p class="label" style="margin: 0">In whole people</p>
+              <p class="story" id="story" aria-live="polite"></p>
+              <p class="label" style="margin: 0">From here</p>
+              <ul class="leans" id="leans"></ul>
+            </div>
+          </div>
+          <div class="atdials">
+            <div class="field">
+              <svg
+                class="seats"
+                id="seatsB"
+                data-stage="3"
+                viewBox="0 0 400 250"
+                role="img"
+                aria-label="The crowd at these dials"
+              ></svg>
+            </div>
+            <div class="legend" id="legendB"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="station rise" style="--i: 5" aria-labelledby="h-else">
+    <div class="rail">
+      <span class="n">IV</span><span class="label">Elsewhere</span>
+    </div>
+    <div class="body">
+      <h2 id="h-else">The same shape elsewhere</h2>
+      <dl class="bites" id="bites"></dl>
+    </div>
+  </section>
+
+  <section class="coda" aria-label="What it leaves to you">
+    <div class="rail"><span class="label">What it leaves to you</span></div>
+    <div class="body">
+      <p class="last" id="leaves"></p>
+      <p class="small" id="numbersNote" style="max-width: 64ch"></p>
+      <p class="label" style="margin-top: 40px">Sources</p>
+      <ul class="refs">
+        <li>
+          Casscells, W., Schoenberger, A., &amp; Graboys, T. B. (1978).
+          Interpretation by physicians of clinical laboratory results.
+          <em>New England Journal of Medicine</em>, 299(18), 999–1001.
+          <a href="https://doi.org/10.1056/NEJM197811022991808"
+            >doi:10.1056/NEJM197811022991808</a
+          >
+        </li>
+        <li>
+          Gigerenzer, G., &amp; Hoffrage, U. (1995). How to improve Bayesian
+          reasoning without instruction: Frequency formats.
+          <em>Psychological Review</em>, 102(4), 684–704.
+          <a href="https://doi.org/10.1037/0033-295X.102.4.684"
+            >doi:10.1037/0033-295X.102.4.684</a
+          >
+        </li>
+      </ul>
+      <p class="small" style="margin-top: 18px; max-width: 64ch">
+        Counting in whole people rather than percentages is what Gigerenzer and
+        Hoffrage called natural frequencies: Bayes' rule in the form people read
+        without help.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Crowd · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network, no storage</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ---- the crowd, by hand from niwa lib/crowd.ts: the maths is the same ----
+  const N = 1000;
+
+  function chance(c) {
+    const p = 1 / c.rare;
+    const yes = p * c.catches;
+    const no = (1 - p) * c.flags;
+    return yes + no === 0 ? 0 : yes / (yes + no);
+  }
+
+  function counts(c, n = N) {
+    const so = Math.max(1, Math.min(n, Math.round(n / c.rare)));
+    const not = n - so;
+    const caught = Math.round(so * c.catches);
+    const alarms = Math.round(not * c.flags);
+    return {
+      so,
+      not,
+      caught,
+      missed: so - caught,
+      alarms,
+      flagged: caught + alarms,
+    };
+  }
+
+  const mulberry32 = (a) => () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  function order(seed, n = N) {
+    const r = mulberry32(seed);
+    const a = Array.from({ length: n }, (_, i) => i);
+    for (let j = n - 1; j > 0; j--) {
+      const k = Math.floor(r() * (j + 1));
+      [a[j], a[k]] = [a[k], a[j]];
+    }
+    return a;
+  }
+
+  function rareOfDial(t) {
+    let n = Math.round(2 * Math.pow(500, Math.min(100, Math.max(0, t)) / 100));
+    if (n > 200) n = Math.round(n / 25) * 25;
+    else if (n > 20) n = Math.round(n / 5) * 5;
+    return n;
+  }
+
+  function dialOfRare(rare) {
+    return Math.round((100 * Math.log(rare / 2)) / Math.log(500));
+  }
+
+  function pct(p) {
+    const x = p * 100;
+    if (x >= 99.5) return "99+";
+    if (x >= 10) return String(Math.round(x));
+    if (x >= 1) return String(Math.round(x * 10) / 10);
+    return String(Math.round(x * 100) / 100);
+  }
+
+  const fmt = (n) => n.toLocaleString("en-US");
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const one = (n, w) => (n === 1 ? w.has[0] : w.has[1]);
+
+  function story(c, w) {
+    const k = counts(c);
+    const head = `Of ${fmt(N)} ${w.people}, ${fmt(k.so)} ${one(k.so, w)}.`;
+    if (k.flagged === 0)
+      return `${head} ${cap(w.test)} flags no one, so there is no one to ask about.`;
+    return (
+      `${head} ${cap(w.test)} catches ${fmt(k.caught)}` +
+      (k.missed ? ` and misses ${fmt(k.missed)}` : "") +
+      `. It also flags ${fmt(k.alarms)} of the ${fmt(k.not)} who do not.` +
+      ` So of the ${fmt(k.flagged)} flagged, ${fmt(k.caught)} ${one(k.caught, w)}: ${pct(chance(c))} in 100.`
+    );
+  }
+
+  function leans(c) {
+    return [
+      // Already 1 in 2: there is no rarer-halved crowd to set beside it.
+      ...(c.rare > 2
+        ? [
+            {
+              name: `at 1 in ${fmt(Math.max(2, Math.round(c.rare / 2)))} instead`,
+              chance: chance({ ...c, rare: Math.max(2, c.rare / 2) }),
+            },
+          ]
+        : []),
+      {
+        name: "with half the flags on those who do not have it",
+        chance: chance({ ...c, flags: c.flags / 2 }),
+      },
+      {
+        name: "catching every one who has it",
+        chance: chance({ ...c, catches: 1 }),
+      },
+    ];
+  }
+
+  function guessReading(guess, c, asked) {
+    return `You said ${guess} in 100. The crowd says ${pct(chance(c))} in 100. ${asked}`;
+  }
+
+  function readings(c, w, guess, asked) {
+    const out = [
+      story(c, w),
+      ...leans(c).map((l) => `${l.name}, ${pct(l.chance)} in 100`),
+    ];
+    if (guess !== null) out.unshift(guessReading(guess, c, asked));
+    return out;
+  }
+  // ---- end of the crowd's maths ----
+
+  // ---- every word of the crowd, from niwa content/crowd.ts ----
+  const CLASSIC = { rare: 1000, catches: 0.99, flags: 0.01 };
+  const CLASSIC_WORDS = {
+    people: "people",
+    has: ["has the illness", "have the illness"],
+    test: "the test",
+  };
+  const QUESTION = {
+    lead: [
+      "A screening test for a rare illness is 99% accurate. It catches 99 of every 100 people who have the illness, and it flags only 1 in 100 of the people who do not.",
+      "About 1 person in 1,000 has the illness. You take the test. It comes back positive.",
+    ],
+    ask: "What is the chance you actually have it?",
+    before: "No arithmetic yet. Say what it feels like.",
+  };
+  const ASKED = "Most people asked, doctors among them, say 95 in 100 or more.";
+  const TYPICAL = 95;
+  const STEPS = [
+    {
+      name: "1,000 people",
+      text: "Here are 1,000 people. No one has been tested yet. You are one of these dots.",
+    },
+    {
+      name: "who has it",
+      text: "About 1 in 1,000 has the illness, so in this crowd one person has it. No one knows which dot, including them.",
+    },
+    {
+      name: "test everyone",
+      text: "Now everyone takes the 99% test. It catches the one who has it. It also flags 1 in 100 of the 999 who do not, which is about 10 of them. A ring marks everyone the test flagged.",
+    },
+    {
+      name: "keep only the flagged",
+      text: "Only the flagged matter now, because you are one of them. 11 were flagged; 1 has it. That is 1 in 11, about 9 in 100. The test did what it said. The crowd without the illness was simply enormous, and 1 in 100 of an enormous number is more than 99 in 100 of one.",
+    },
+  ];
+  const SITUATIONS = [
+    {
+      slug: "illness",
+      name: "a rare illness",
+      crowd: CLASSIC,
+      words: CLASSIC_WORDS,
+      note: "The classic. A very good test, a very rare illness: of every eleven flagged, one has it.",
+    },
+    {
+      slug: "breath",
+      name: "a roadside breath test",
+      crowd: { rare: 100, catches: 1, flags: 0.05 },
+      words: {
+        people: "drivers",
+        has: ["is over the limit", "are over the limit"],
+        test: "the device",
+      },
+      note: "Say 1 driver in 100 at a night checkpoint is over the limit, and the device flags 5 in 100 of those who are not. Of every six flagged, one is over.",
+    },
+    {
+      slug: "faces",
+      name: "a camera at a stadium",
+      crowd: { rare: 1000, catches: 0.95, flags: 0.005 },
+      words: {
+        people: "faces",
+        has: ["is on the list", "are on the list"],
+        test: "the match",
+      },
+      note: "Looking for 1 face in 1,000 with a strong match, wrong on only 1 in 200 of the rest. Of every six matches, five are someone else.",
+    },
+    {
+      slug: "season",
+      name: "a common illness, in season",
+      crowd: { rare: 4, catches: 0.9, flags: 0.05 },
+      words: CLASSIC_WORDS,
+      note: "When the thing is common, the same kind of test reads the other way: most of the flagged have it.",
+    },
+    {
+      slug: "spam",
+      name: "a spam filter",
+      crowd: { rare: 2, catches: 0.99, flags: 0.01 },
+      words: {
+        people: "emails",
+        has: ["is spam", "are spam"],
+        test: "the filter",
+      },
+      note: "Half of all email is spam, so a flag is almost always spam. The same 99 and 1 as the rare illness; a different crowd.",
+    },
+  ];
+  const BITES = [
+    {
+      where: "screening",
+      how: "A positive mammogram, PSA or prenatal screen in a low-risk person is, more often than not, a person who does not have it. That is why the next step is a better test rather than a diagnosis.",
+    },
+    {
+      where: "fraud alerts",
+      how: "Fraud is rare, so even a fine detector freezes mostly innocent cards. The bank texts you rather than cancelling the card for the same reason.",
+    },
+    {
+      where: "face matching",
+      how: "Point a camera at a stadium looking for a handful of people, and nearly every match it makes is someone who resembles them.",
+    },
+    {
+      where: "checkpoints",
+      how: "A device that flags a few in a hundred of the sober, used on thousands of sober drivers in a night, flags a good many sober drivers.",
+    },
+    {
+      where: "reading people",
+      how: "Quiet and fond of puzzles, so probably a programmer. Perhaps. There are far more quiet people who are not programmers than quiet people who are.",
+    },
+  ];
+  const LEAVES =
+    "Before you take a positive at its word, ask how rare the thing was to begin with. The rarer it is, the more of the flagged do not have it, however the test is described. Whether this one is the rare case is yours to weigh.";
+  const NUMBERS_NOTE =
+    "The 99% example is the one the psychology literature has asked doctors since 1978. The situations are illustrative numbers, not clinical or legal ones.";
+
+  // ---- the page ----
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const COLS = 40;
+  const SEATS = order(7);
+  const SVGNS = "http://www.w3.org/2000/svg";
+
+  const S = {
+    said: null,
+    stage: 0,
+    rare: dialOfRare(CLASSIC.rare),
+    catches: Math.round(CLASSIC.catches * 100),
+    flags: Math.round(CLASSIC.flags * 1000),
+    situation: SITUATIONS[0].slug,
+  };
+
+  // A thousand seats. The first `so` seats in the shuffled order have the thing; of those the
+  // first `caught` are flagged; the next `alarms` seats are flagged without it.
+  function seatsInit(svg) {
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < N; i++) {
+      const c = document.createElementNS(SVGNS, "circle");
+      c.setAttribute("cx", 5 + (i % COLS) * 10);
+      c.setAttribute("cy", 5 + Math.floor(i / COLS) * 10);
+      c.setAttribute("r", 3.3);
+      frag.appendChild(c);
+    }
+    svg.appendChild(frag);
+  }
+  function seatsSet(svg, c) {
+    const k = counts(c);
+    const cls = new Array(N).fill("");
+    for (let i = 0; i < k.so; i++)
+      cls[SEATS[i]] = i < k.caught ? "so flag" : "so";
+    for (let i = 0; i < k.alarms; i++) cls[SEATS[k.so + i]] = "flag";
+    const dots = svg.children;
+    for (let i = 0; i < N; i++) {
+      if (cls[i]) dots[i].setAttribute("class", cls[i]);
+      else dots[i].removeAttribute("class");
+    }
+  }
+  const legendHTML = (w) =>
+    `<span><i class="key"></i>${esc(w.people)}</span>` +
+    `<span><i class="key so"></i>${esc(w.has[1])}</span>` +
+    `<span><i class="key flag"></i>flagged by ${esc(w.test)}</span>`;
+
+  // I: the question and the reader's number
+  $("lead0").textContent = QUESTION.lead[0];
+  $("lead1").textContent = QUESTION.lead[1];
+  $("ask").textContent = QUESTION.ask;
+  $("before").textContent = QUESTION.before;
+  $("guess").addEventListener("input", (e) => {
+    $("guessOut").textContent = e.target.value;
+  });
+  $("say").addEventListener("click", () => {
+    if (S.said !== null) return;
+    S.said = +$("guess").value;
+    $("guess").disabled = true;
+    const btn = $("say");
+    btn.textContent = "Said";
+    btn.disabled = true;
+    $("says").textContent = `The crowd says ${pct(chance(CLASSIC))} in 100.`;
+    $("sayRead").textContent = guessReading(S.said, CLASSIC, ASKED);
+    $("bars3").innerHTML = [
+      { name: "you", v: S.said, t: "t-you" },
+      { name: "most asked", v: TYPICAL, t: "t-asked" },
+      {
+        name: "the crowd",
+        v: Math.round(chance(CLASSIC) * 100),
+        t: "t-crowd",
+      },
+    ]
+      .map(
+        (b) =>
+          `<div><span class="who">${b.name}</span><span class="bar"><span class="${b.t}" style="width:${b.v}%"></span></span><span class="v num">${b.v}</span></div>`,
+      )
+      .join("");
+    $("after").hidden = false;
+  });
+
+  // II: the crowd, a step at a time
+  $("steps").innerHTML = STEPS.map(
+    (s, i) =>
+      `<button class="chip" type="button" data-i="${i}"><span class="k num">${i + 1}</span>${esc(s.name)}</button>`,
+  ).join("");
+  $("steps").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-i]");
+    if (b) setStage(+b.dataset.i);
+  });
+  function setStage(s) {
+    const changed = s !== S.stage;
+    S.stage = s;
+    $("seatsA").setAttribute("data-stage", s);
+    $("steps")
+      .querySelectorAll("button")
+      .forEach((b) =>
+        b.setAttribute("aria-pressed", String(+b.dataset.i === s)),
+      );
+    const t = $("stepText");
+    t.textContent = STEPS[s].text;
+    if (changed) {
+      t.classList.remove("swap");
+      void t.offsetWidth;
+      t.classList.add("swap");
+    }
+    $("back").disabled = s === 0;
+    $("next").textContent = s < 3 ? "next" : "again";
+  }
+  $("back").addEventListener("click", () => setStage(Math.max(0, S.stage - 1)));
+  $("next").addEventListener("click", () =>
+    setStage(S.stage < 3 ? S.stage + 1 : 0),
+  );
+  window.addEventListener("keydown", (e) => {
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowRight" && S.stage < 3) setStage(S.stage + 1);
+    if (e.key === "ArrowLeft" && S.stage > 0) setStage(S.stage - 1);
+  });
+
+  // III: the dials
+  const sitOf = () => SITUATIONS.find((s) => s.slug === S.situation) || null;
+  $("sits").innerHTML = SITUATIONS.map(
+    (s) =>
+      `<button class="chip" type="button" data-slug="${s.slug}">${esc(s.name)}</button>`,
+  ).join("");
+  $("sits").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-slug]");
+    if (!b) return;
+    const s = SITUATIONS.find((x) => x.slug === b.dataset.slug);
+    S.rare = dialOfRare(s.crowd.rare);
+    S.catches = Math.round(s.crowd.catches * 100);
+    S.flags = Math.round(s.crowd.flags * 1000);
+    S.situation = s.slug;
+    renderDials();
+  });
+  for (const id of ["rare", "catches", "flags"])
+    $(id).addEventListener("input", (e) => {
+      S[id] = +e.target.value;
+      S.situation = null;
+      renderDials();
+    });
+
+  function renderDials() {
+    const c = {
+      rare: rareOfDial(S.rare),
+      catches: S.catches / 100,
+      flags: S.flags / 1000,
+    };
+    const sit = sitOf();
+    const words = sit ? sit.words : CLASSIC_WORDS;
+    const k = counts(c);
+    const p = chance(c);
+    $("rare").value = S.rare;
+    $("catches").value = S.catches;
+    $("flags").value = S.flags;
+    $("rareSaid").textContent = `1 in ${fmt(c.rare)}`;
+    $("catchesSaid").textContent = `${S.catches} in 100`;
+    $("flagsSaid").textContent = `${(S.flags / 10).toFixed(1)} in 100`;
+    $("sits")
+      .querySelectorAll("button")
+      .forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.slug === S.situation)),
+      );
+    $("sitNote").textContent = sit ? sit.note : "Your own numbers.";
+    $("pctOut").textContent = pct(p);
+    $("mSo").style.width = `${k.flagged ? (k.caught / k.flagged) * 100 : 0}%`;
+    $("mFlag").style.width = `${k.flagged ? (k.alarms / k.flagged) * 100 : 0}%`;
+    $("mSoRead").textContent =
+      `${fmt(k.caught)} ${k.caught === 1 ? words.has[0] : words.has[1]}`;
+    $("mFlagRead").textContent = `${fmt(k.alarms)} flagged, do not`;
+    $("story").textContent = story(c, words);
+    $("leans").innerHTML = leans(c)
+      .map(
+        (l) =>
+          `<li><span>${esc(l.name)}</span><b class="num">${pct(l.chance)} in 100</b></li>`,
+      )
+      .join("");
+    seatsSet($("seatsB"), c);
+    $("legendB").innerHTML = legendHTML(words);
+  }
+
+  // IV and the coda
+  $("bites").innerHTML = BITES.map(
+    (b) =>
+      `<div><dt class="label">${esc(b.where)}</dt><dd>${esc(b.how)}</dd></div>`,
+  ).join("");
+  $("leaves").textContent = LEAVES;
+  $("numbersNote").textContent = NUMBERS_NOTE;
+
+  seatsInit($("seatsA"));
+  seatsInit($("seatsB"));
+  seatsSet($("seatsA"), CLASSIC);
+  $("legendA").innerHTML = legendHTML(CLASSIC_WORDS);
+  setStage(0);
+  renderDials();
+</script>

@@ -1,0 +1,2531 @@
+<title>Wish</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Loving-kindness as an instrument. May you be safe, well, at ease, happy: said to yourself, then outward, ring by ring, to everyone. Nothing has to be felt."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Karesansui at noon: ink on bone. One accent, the burnt orange of a lit
+     line, used for what is happening now: the ring picked, the sitting, the
+     breath. Everything else is ink, and ink thinned toward the paper. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed;
+    --sheet: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d71;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--paper));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f;
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #847d70;
+      --rule: #302e25;
+      --accent: #d9763f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #847d70;
+    --rule: #302e25;
+    --accent: #d9763f;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .label.acc {
+    color: var(--accent);
+  }
+  .label.quiet {
+    color: var(--faint);
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .faint {
+    color: var(--faint);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .small {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .label {
+    margin: 0 0 22px;
+  }
+  h1 {
+    font-size: clamp(64px, 10vw, 120px);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .claim {
+    font-size: clamp(19px, 2vw, 22px);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    max-width: 40ch;
+  }
+  .mast .small {
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  /* which practice is on the sheet */
+  .practice {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 18px;
+    padding-block: 18px;
+  }
+  .practice p {
+    margin: 0;
+    flex: 1 1 28rem;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+  .practice p b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .practice .chips {
+    flex: 0 1 auto;
+  }
+
+  /* the rig: the sheet, and the desk beside it */
+  .rig {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19.5rem;
+    gap: 24px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--sheet);
+    border-radius: 3px;
+    animation: rise 600ms var(--ease) both;
+  }
+  .panel > .body {
+    position: relative;
+    z-index: 2;
+  }
+  .sheet {
+    padding: clamp(18px, 3vw, 28px);
+    min-width: 0;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px 18px 18px;
+  }
+  .desk .panel:nth-child(1) {
+    animation-delay: 100ms;
+  }
+  .desk .panel:nth-child(2) {
+    animation-delay: 140ms;
+  }
+  .desk .panel:nth-child(3) {
+    animation-delay: 180ms;
+  }
+  .desk .panel:nth-child(4) {
+    animation-delay: 220ms;
+  }
+  .desk .panel:nth-child(5) {
+    animation-delay: 260ms;
+  }
+  .sheet {
+    animation-delay: 60ms;
+  }
+
+  /* the drawn frame: a pen ribbon, drawn on through a mask of the same line */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .mk {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sketch .mk {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  .ink-pen {
+    fill: var(--pen);
+  }
+  .ink-acc {
+    fill: var(--accent);
+  }
+  .ink-rule {
+    fill: var(--rule);
+  }
+  .ink-sheet {
+    fill: var(--sheet);
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* chips: the only buttons */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    padding: 6px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition:
+      color 200ms var(--ease),
+      border-color 200ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+    border-color: var(--faint);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.acc {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .x {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px 6px;
+    border: 0;
+    background: transparent;
+    color: var(--faint);
+    cursor: pointer;
+    transition: color 160ms var(--ease);
+  }
+  .x:hover {
+    color: var(--accent);
+  }
+
+  /* lines you type on */
+  .case,
+  .add {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16.5px;
+    color: var(--ink);
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .add {
+    border-bottom-style: dotted;
+  }
+  .case::placeholder,
+  .add::placeholder {
+    color: var(--faint);
+  }
+  .case:focus,
+  .add:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .num {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    padding: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    line-height: 1.1;
+    text-align: center;
+    color: var(--ink);
+    transition: border-color 160ms var(--ease);
+  }
+  .num:hover {
+    border-bottom-color: var(--faint);
+    cursor: text;
+  }
+  .num:focus {
+    outline: none;
+    border-bottom: 1px solid var(--accent);
+  }
+
+  /* the sheet: the next sitting beside the rings */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(15rem, 18.5rem) minmax(0, 1fr);
+    gap: 20px 32px;
+  }
+  .grid .ctl {
+    min-width: 0;
+  }
+  .grid .rings {
+    min-width: 0;
+  }
+  .ruled {
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    margin-top: 22px;
+  }
+  .nexthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    margin-top: 6px;
+  }
+  .nexthead .hand {
+    font-size: 19px;
+    color: var(--muted);
+  }
+  .tight {
+    margin: 8px 0 0;
+    font-size: 15.5px;
+    line-height: 1.35;
+  }
+  .beingname {
+    font-size: 23px !important;
+    margin-top: 4px;
+  }
+  .newring {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .newring .add {
+    flex: 1;
+  }
+
+  .w-rings {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .w-ring {
+    transition: opacity 260ms var(--ease);
+  }
+  .w-rings text {
+    font-family: var(--serif);
+    font-style: italic;
+    fill: var(--ink);
+  }
+  .w-rings text.pod {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .w-rings .on text,
+  .w-rings text.on {
+    fill: var(--accent);
+  }
+  .w-rings [data-act] {
+    cursor: pointer;
+  }
+  .w-rings [data-act]:focus {
+    outline: none;
+  }
+  .w-rings [data-act]:focus-visible text,
+  .w-rings text[data-act]:focus-visible {
+    fill: var(--accent);
+    text-decoration: underline;
+  }
+
+  /* the sittings */
+  .sittings {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .sittings li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    padding: 9px 0;
+  }
+  .sittings li + li {
+    border-top: 1px solid var(--rule);
+  }
+  .sittings .on {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .sittings .meta {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+  .sittings .said {
+    flex: 1 1 14rem;
+    min-width: 0;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .sittings .chips {
+    margin-left: auto;
+  }
+  .enter .sittings li {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  .trouble {
+    margin: 12px 0 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* a sitting */
+  .sitting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 32rem;
+    padding-block: 16px;
+    text-align: center;
+  }
+  .sitting .line {
+    max-width: 30ch;
+    margin: 0;
+    font-size: clamp(27px, 3.4vw, 37px);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    animation: rise 700ms var(--ease) both;
+  }
+  .sitting .line.quiet {
+    color: var(--muted);
+  }
+  .breathbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .breathbox .stand {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+  }
+  .w-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw linear both;
+  }
+  .sitting .said-box {
+    width: 100%;
+    max-width: 36rem;
+    text-align: left;
+  }
+  .sitting textarea {
+    resize: none;
+    font-style: normal;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+
+  /* the desk */
+  .desk .hint {
+    margin: 4px 0 0;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--faint);
+  }
+  .list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .list li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .list .wish {
+    flex: 1;
+    font-size: 18px;
+  }
+  .item {
+    flex: 1;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    padding: 1px 0;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--ink);
+    cursor: pointer;
+    transition: color 160ms var(--ease);
+  }
+  .item:hover {
+    color: var(--accent);
+  }
+  .item.off {
+    color: var(--faint);
+    text-decoration: line-through;
+  }
+  .desk .add {
+    margin-top: 8px;
+  }
+  .reading {
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .laws {
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1120px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .grid .rings {
+      order: -1;
+    }
+  }
+  @media (max-width: 960px) {
+    .rig {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 44px;
+    }
+    .sitting {
+      min-height: 28rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .sitting .line,
+    .enter .sittings li {
+      animation: none;
+    }
+    .sketch .mk {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Wish</h1>
+      <p class="deck">
+        <em>May you be safe, well, at ease, happy.</em> Said to yourself, then
+        outward, ring by ring, to everyone.
+      </p>
+    </div>
+    <div>
+      <p class="label">The claim</p>
+      <p class="claim">
+        Loving-kindness is something said, not something you have to feel. The
+        wishes are said, and what they do is theirs.
+      </p>
+      <p class="small">
+        Your people on rings that widen from you to everyone, the one you find
+        difficult only as far as you can hold them today. Truths that hold for
+        every being, said of each one, so saying one of someone is not a claim
+        about them. Facts you keep about yourself. The page counts sittings and
+        who was held; it never says whether you are kind.
+      </p>
+    </div>
+  </header>
+
+  <div class="practice" id="practice"></div>
+
+  <main class="rig">
+    <section class="panel sheet" id="sheet" aria-label="The wish">
+      <div class="body" id="sheet-body"></div>
+    </section>
+    <aside class="desk" aria-label="The desk">
+      <section class="panel" id="p-reading" aria-label="The reading">
+        <div class="body">
+          <div class="label acc">the reading</div>
+          <p class="reading" id="reading"></p>
+        </div>
+      </section>
+      <section class="panel" id="p-wishes" aria-label="The wishes">
+        <div class="body" id="wishes"></div>
+      </section>
+      <section class="panel" id="p-truths" aria-label="The truths">
+        <div class="body" id="truths"></div>
+      </section>
+      <section class="panel" id="p-facts" aria-label="What is true of you">
+        <div class="body" id="facts"></div>
+      </section>
+      <section class="panel" id="p-laws" aria-label="What the wish holds to">
+        <div class="body">
+          <div class="label acc">what the wish holds to</div>
+          <p class="laws">
+            Nothing has to be felt; the wishes are said, and what they do is
+            theirs. The difficult ring is held only as far as you can hold it
+            today, and left out when you cannot. The truths are true of every
+            being, so saying one of someone is not a claim about them. The desk
+            counts sittings and who was held; it never says whether you are
+            kind.
+          </p>
+          <p class="label quiet" id="where" style="margin: 0"></p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    <span class="label">Wish · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── pure:begin ─────────────────────────────────────────────────────────
+     The hand (mulberry32, the pen stroke, the ring, the ribbon) and the wish
+     (the script, the timing, the tally, the readings, the forms), ported by
+     hand from niwa's lib/hand.ts and lib/wish.ts. The maths is unchanged. */
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /* the wish */
+
+  const POD_KINDS = [
+    "self",
+    "benefactor",
+    "friend",
+    "neutral",
+    "difficult",
+    "all",
+    "custom",
+  ];
+
+  const POD_INTRO = {
+    self: "Begin with yourself, as you are today.",
+    benefactor: "Now someone who has been good to you.",
+    friend: "Now a friend.",
+    neutral: "Now someone you pass and never think about.",
+    difficult:
+      "Now someone you find difficult. Take only as much of them as you can hold today.",
+    all: "Now everyone at once: everyone you have held, and everyone you have not.",
+    custom: "",
+  };
+
+  const DEFAULT_POD_NAME = {
+    self: "you",
+    benefactor: "someone who has been good to you",
+    friend: "a friend",
+    neutral: "someone you pass without a thought",
+    difficult: "someone you find difficult",
+    all: "everyone",
+    custom: "a pod",
+  };
+
+  const LINE_KINDS = [
+    "settle",
+    "fact",
+    "pod",
+    "being",
+    "truth",
+    "wish",
+    "close",
+  ];
+
+  const MIN_MINUTES = 3;
+  const MAX_MINUTES = 60;
+  const clampMinutes = (n) =>
+    Math.min(
+      MAX_MINUTES,
+      Math.max(MIN_MINUTES, Math.round(Number.isFinite(n) ? n : 10)),
+    );
+
+  const shuffle = (xs, r) => {
+    const out = xs.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  };
+
+  const clean = (s) => s.replace(/\s+/g, " ").trim();
+  const sentence = (s) => {
+    const t = clean(s).replace(/\.+$/, "");
+    return t ? `${t}.` : "";
+  };
+  const predicate = (w) =>
+    clean(w)
+      .replace(/^may (you|i|all beings|we) be /i, "")
+      .replace(/[.!]+$/, "")
+      .trim();
+
+  /* The script: settle, then each pod in turn (brought to mind, a truth that
+     holds for every being said of this one, the wishes), then let go. Every
+     line is composed from the reader's own lists; nothing here is advice. */
+  function compose(o) {
+    const r = rand(seedOf(o.seed));
+    const truths = shuffle(o.truths.map(sentence).filter(Boolean), r);
+    const facts = shuffle(o.facts.map(sentence).filter(Boolean), r);
+    const wishes = o.wishes.map(predicate).filter(Boolean);
+    let ti = 0;
+    let fi = 0;
+    const truth = () => (truths.length ? truths[ti++ % truths.length] : "");
+    const fact = () => (facts.length && fi < facts.length ? facts[fi++] : "");
+    const L = [];
+    const say = (text, kind, pause) => {
+      if (text) L.push({ text, kind, pause });
+    };
+    const wishAll = (subject, pause) => {
+      for (const w of wishes) say(`May ${subject} be ${w}.`, "wish", pause);
+    };
+
+    say("Sit, and let the breath find its own length.", "settle", 10);
+    say(
+      "Nothing has to be felt. The wishes are said; what they do is theirs.",
+      "settle",
+      6,
+    );
+    const f0 = fact();
+    if (f0) say(`Something true of you, to begin from: ${f0}`, "fact", 8);
+
+    for (const pod of o.pods) {
+      if (pod.kind === "self") {
+        say(POD_INTRO.self, "pod", 6);
+        const t = truth();
+        if (t) say(`${t} You too.`, "truth", 6);
+        wishAll("I", 5);
+        continue;
+      }
+      if (pod.kind === "all") {
+        say(POD_INTRO.all, "pod", 6);
+        const t = truth();
+        if (t) say(t, "truth", 6);
+        wishAll("all beings", 5);
+        continue;
+      }
+      say(
+        pod.kind === "custom" ? `Now ${clean(pod.name)}.` : POD_INTRO[pod.kind],
+        "pod",
+        5,
+      );
+      const bs = pod.beings.filter((b) => clean(b.name));
+      if (!bs.length) {
+        say("Whoever comes to mind.", "being", 5);
+        const t = truth();
+        if (t) say(`${t} This one too.`, "truth", 5);
+        wishAll("you", 5);
+      } else if (bs.length <= 3) {
+        for (const b of bs) {
+          const name = clean(b.name);
+          say(
+            b.note.trim()
+              ? `${name}, ${clean(b.note).replace(/\.+$/, "")}.`
+              : `${name}.`,
+            "being",
+            5,
+          );
+          const t = truth();
+          if (t) say(`${t} ${name} too.`, "truth", 5);
+          wishAll("you", 5);
+        }
+      } else {
+        say(`${bs.map((b) => clean(b.name)).join(", ")}.`, "being", 6);
+        const t = truth();
+        if (t) say(`${t} Every one of them.`, "truth", 5);
+        wishAll("you all", 5);
+      }
+    }
+
+    say("Let the wishes go where they go.", "close", 8);
+    const fz = fact();
+    if (fz) say(`And something true of you, to carry out: ${fz}`, "fact", 6);
+    say("When you are ready, open your eyes.", "close", 3);
+    return timed(L, o.minutes);
+  }
+
+  /* Roughly how long a line takes to say, in seconds. */
+  const spoken = (text) =>
+    Math.max(1.5, text.split(/\s+/).filter(Boolean).length / 2.4);
+
+  /* The pauses stretched or shortened so the whole sitting fills its minutes. */
+  function timed(lines, minutes) {
+    const target = clampMinutes(minutes) * 60;
+    const speak = lines.reduce((a, l) => a + spoken(l.text), 0);
+    const base = lines.reduce((a, l) => a + l.pause, 0) || 1;
+    const scale = Math.max(0, target - speak) / base;
+    return lines.map((l) => ({
+      ...l,
+      pause: Math.min(45, Math.max(2, Math.round(l.pause * scale))),
+    }));
+  }
+
+  const runtime = (lines) =>
+    Math.round(lines.reduce((a, l) => a + spoken(l.text) + l.pause, 0));
+
+  const heldBy = (pods) =>
+    pods.flatMap((p) => p.beings.map((b) => clean(b.name)).filter(Boolean));
+
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+  function plus(day, k) {
+    return new Date(utc(day) + k * 86400000).toISOString().slice(0, 10);
+  }
+
+  function tally(sittings, pods, lists, today) {
+    const days = new Set(sittings.map((s) => s.on));
+    let run = 0;
+    let d = days.has(today) ? today : plus(today, -1);
+    while (days.has(d)) {
+      run++;
+      d = plus(d, -1);
+    }
+    const counts = new Map();
+    for (const s of sittings)
+      for (const name of s.held) counts.set(name, (counts.get(name) ?? 0) + 1);
+    const difficultSlugs = new Set(
+      pods.filter((p) => p.kind === "difficult").map((p) => p.slug),
+    );
+    const last =
+      sittings
+        .map((s) => s.on)
+        .sort()
+        .at(-1) ?? null;
+    return {
+      n: sittings.length,
+      week: sittings.filter((s) => daysBetween(s.on, today) < 7).length,
+      month: sittings.filter((s) => daysBetween(s.on, today) < 30).length,
+      minutes: sittings.reduce((a, s) => a + s.minutes, 0),
+      last,
+      sinceLast: last ? daysBetween(last, today) : null,
+      run,
+      held: [...counts]
+        .map(([name, n]) => ({ name, n }))
+        .sort((a, b) => b.n - a.n || (a.name < b.name ? -1 : 1)),
+      difficult: sittings.filter((s) =>
+        s.pods.some((p) => difficultSlugs.has(p)),
+      ).length,
+      pods: pods.length,
+      beings: heldBy(pods).length,
+      truths: lists.truths.filter((t) => t.trim()).length,
+      facts: lists.facts.filter((t) => t.trim()).length,
+      wishes: lists.wishes.filter((t) => t.trim()).length,
+    };
+  }
+
+  const count = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const ago = (d) =>
+    d === 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
+
+  /* Facts about the practice's record; none a verdict on the reader. */
+  function readings(t) {
+    const out = [];
+    if (!t.n) out.push("no sittings yet");
+    else {
+      out.push(
+        `${count(t.n, "sitting")}, ${count(t.minutes, "minute")} in all · ${t.week} this week, ${t.month} this month · the last ${ago(t.sinceLast ?? 0)}`,
+      );
+      if (t.run > 1) out.push(`${t.run} days running`);
+      if (t.held.length) {
+        const top = t.held
+          .slice(0, 5)
+          .map((h) => `${h.name} ×${h.n}`)
+          .join(", ");
+        out.push(
+          `held: ${top}${t.held.length > 5 ? `, and ${t.held.length - 5} more` : ""}`,
+        );
+        const once = t.held.filter((h) => h.n === 1).length;
+        if (once && t.n > 1) out.push(`${once} held only once`);
+      }
+      out.push(
+        t.difficult
+          ? `the difficult one held in ${t.difficult} of ${t.n}`
+          : "the difficult one not yet held",
+      );
+    }
+    out.push(
+      `${count(t.pods, "pod")} with ${count(t.beings, "being")} · ${count(t.wishes, "wish", "wishes")}, ${count(t.truths, "truth")}, ${count(t.facts, "fact")} in the practice`,
+    );
+    return out;
+  }
+
+  /* the forms: what comes back out of this browser's storage is checked here */
+
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day}-${t || "pod"}`;
+  }
+
+  function validatePod(input) {
+    const r = input ?? {};
+    const kind = POD_KINDS.includes(String(r.kind)) ? r.kind : "custom";
+    const beings =
+      kind === "self" || kind === "all"
+        ? []
+        : (Array.isArray(r.beings) ? r.beings : [])
+            .slice(0, 60)
+            .map((x) => {
+              const o = x ?? {};
+              return { name: str(o.name, 80), note: str(o.note, 200) };
+            })
+            .filter((b) => b.name);
+    const name = str(r.name, 80) || DEFAULT_POD_NAME[kind];
+    const slug = str(r.slug, 120);
+    return {
+      slug: slug || slugOf(name, "pod").replace(/^pod-/, ""),
+      name,
+      kind,
+      order: Number.isFinite(Number(r.order))
+        ? Math.round(Number(r.order))
+        : 99,
+      beings,
+    };
+  }
+
+  function validateSitting(input) {
+    const r = input ?? {};
+    const strs = (v, max, n = 200) =>
+      (Array.isArray(v) ? v : [])
+        .slice(0, n)
+        .map((x) => str(x, max))
+        .filter(Boolean);
+    const on =
+      typeof r.on === "string" && DAY.test(r.on)
+        ? r.on
+        : new Date().toISOString().slice(0, 10);
+    const lines = (Array.isArray(r.lines) ? r.lines : [])
+      .slice(0, 600)
+      .map((x) => {
+        const o = x ?? {};
+        const kind = String(o.kind ?? "settle");
+        return {
+          text: str(o.text, 600),
+          kind: LINE_KINDS.includes(kind) ? kind : "settle",
+          pause: Math.min(120, Math.max(0, Math.round(Number(o.pause) || 0))),
+        };
+      })
+      .filter((l) => l.text);
+    if (!lines.length) throw new Error("a sitting needs its lines");
+    return {
+      slug: str(r.slug, 120),
+      on,
+      minutes: clampMinutes(Number(r.minutes)),
+      pods: strs(r.pods, 120, 30),
+      held: strs(r.held, 80, 300),
+      wishes: strs(r.wishes, 120, 20),
+      truths: strs(r.truths, 300, 60),
+      facts: strs(r.facts, 300, 60),
+      lines,
+      voice: r.voice === true,
+      said: typeof r.said === "string" ? r.said.trim().slice(0, 4000) : "",
+    };
+  }
+
+  const validateList = (v, max = 60) =>
+    (Array.isArray(v) ? v : [])
+      .slice(0, max)
+      .map((x) => str(x, 300))
+      .filter(Boolean);
+
+  /* ── pure:end ─────────────────────────────────────────────────────────── */
+
+  /* The wishes in the plainest words the practice has, each said after
+     "May you be"; and truths that hold for every being, said of each one held.
+     Nothing here is a belief about anyone in particular; that is the point. */
+  const DEFAULT_WISHES = ["safe", "well", "at ease", "happy"];
+  const DEFAULT_TRUTHS = [
+    "Every being wants to be happy and does not want to suffer.",
+    "Every being was once a small child.",
+    "Every being has been afraid.",
+    "Every being has lost someone or something they loved.",
+    "Every being has been wrong, and gone on living.",
+    "Every being is doing what makes sense from where they stand.",
+    "Every being will die, and does not know when.",
+    "Every being has been kind at least once, and been shown kindness at least once.",
+    "Every being carries something no one else can see.",
+    "Every being is more than the worst thing they have done.",
+  ];
+  /* The six pods every practice begins with, you at the centre. */
+  const DEFAULT_PODS = [
+    { slug: "you", name: "you", kind: "self", order: 0, beings: [] },
+    {
+      slug: "good-to-you",
+      name: "someone who has been good to you",
+      kind: "benefactor",
+      order: 1,
+      beings: [],
+    },
+    {
+      slug: "a-friend",
+      name: "a friend",
+      kind: "friend",
+      order: 2,
+      beings: [],
+    },
+    {
+      slug: "passed-by",
+      name: "someone you pass without a thought",
+      kind: "neutral",
+      order: 3,
+      beings: [],
+    },
+    {
+      slug: "difficult",
+      name: "someone you find difficult",
+      kind: "difficult",
+      order: 4,
+      beings: [],
+    },
+    { slug: "everyone", name: "everyone", kind: "all", order: 5, beings: [] },
+  ];
+
+  /* Specimen A: a synthetic life's practice, its rings filled, three facts it
+     kept, two sittings. Fiction. */
+  const SPECIMEN_PODS = [
+    DEFAULT_PODS[0],
+    {
+      ...DEFAULT_PODS[1],
+      beings: [
+        { name: "Nadia", note: "who taught you to ask before you argue" },
+      ],
+    },
+    {
+      ...DEFAULT_PODS[2],
+      beings: [
+        { name: "Tomas", note: "who calls on Sundays" },
+        {
+          name: "the junior",
+          note: "quiet at standup, clean on the first change",
+        },
+      ],
+    },
+    {
+      ...DEFAULT_PODS[3],
+      beings: [{ name: "the man at the kiosk", note: "" }],
+    },
+    {
+      ...DEFAULT_PODS[4],
+      beings: [
+        { name: "the client who shouted", note: "on the call in March" },
+      ],
+    },
+    DEFAULT_PODS[5],
+  ];
+  const SPECIMEN_FACTS = [
+    "You value craft, candour, curiosity, care and quiet, by your own bearing.",
+    "You hold to this, chosen 2026-09-23: I ask before I argue.",
+    "You are hypersensitive to noise, and you are allowed to want quiet.",
+  ];
+  const specimenSitting = (slug, on, minutes, pods) => ({
+    slug,
+    on,
+    minutes,
+    pods: pods.map((p) => p.slug),
+    held: heldBy(pods),
+    wishes: DEFAULT_WISHES,
+    truths: DEFAULT_TRUTHS,
+    facts: SPECIMEN_FACTS,
+    lines: compose({
+      pods,
+      wishes: DEFAULT_WISHES,
+      truths: DEFAULT_TRUTHS,
+      facts: SPECIMEN_FACTS,
+      minutes,
+      seed: slug,
+    }),
+    voice: false,
+    said: "",
+  });
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const freshSpecimen = () => ({
+    pods: clone(SPECIMEN_PODS),
+    sittings: [
+      {
+        ...specimenSitting("2026-09-25-0712", "2026-09-25", 12, SPECIMEN_PODS),
+        said: "The client was harder than I expected and easier than last time.",
+      },
+      specimenSitting(
+        "2026-09-23-0705",
+        "2026-09-23",
+        8,
+        SPECIMEN_PODS.filter((p) => p.kind !== "difficult"),
+      ),
+    ],
+    wishes: [...DEFAULT_WISHES],
+    truths: [...DEFAULT_TRUTHS],
+    facts: [...SPECIMEN_FACTS],
+  });
+  const freshOwn = () => ({
+    pods: clone(DEFAULT_PODS),
+    sittings: [],
+    wishes: [...DEFAULT_WISHES],
+    truths: [...DEFAULT_TRUTHS],
+    facts: [],
+  });
+
+  /* ── keeping: one key, this browser only ───────────────────────────────── */
+
+  const KEY = "pp-wish";
+  const store = { showing: "specimen", own: null };
+  const specimen = freshSpecimen();
+
+  function load() {
+    let raw = null;
+    try {
+      raw = localStorage.getItem(KEY);
+    } catch {
+      return;
+    }
+    if (!raw) return;
+    try {
+      const o = JSON.parse(raw);
+      if (o && o.own && typeof o.own === "object") {
+        const pods = (Array.isArray(o.own.pods) ? o.own.pods : [])
+          .slice(0, 30)
+          .map(validatePod)
+          .sort((a, b) => a.order - b.order || (a.slug < b.slug ? -1 : 1));
+        const sittings = [];
+        for (const s of Array.isArray(o.own.sittings)
+          ? o.own.sittings.slice(0, 2000)
+          : []) {
+          try {
+            sittings.push(validateSitting(s));
+          } catch {
+            /* a sitting with no lines is not a sitting */
+          }
+        }
+        store.own = {
+          pods: pods.length ? pods : clone(DEFAULT_PODS),
+          sittings,
+          wishes: validateList(o.own.wishes, 20),
+          truths: validateList(o.own.truths),
+          facts: validateList(o.own.facts),
+        };
+      }
+      store.showing =
+        o && o.showing === "own" && store.own ? "own" : "specimen";
+    } catch {
+      /* unreadable: open on the specimen */
+    }
+  }
+
+  function save() {
+    try {
+      if (store.own)
+        localStorage.setItem(
+          KEY,
+          JSON.stringify({ v: 1, showing: store.showing, own: store.own }),
+        );
+      else localStorage.removeItem(KEY);
+      return true;
+    } catch {
+      ui.trouble = "not kept: this browser would not keep it";
+      return false;
+    }
+  }
+
+  const P = () => (store.showing === "own" && store.own ? store.own : specimen);
+  const writable = () => store.showing === "own" && Boolean(store.own);
+
+  /* ── the voice: this machine's own voices, never a network one ─────────── */
+
+  const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+  function localVoices() {
+    try {
+      return synth ? synth.getVoices().filter((v) => v.localService) : [];
+    } catch {
+      return [];
+    }
+  }
+  const speech = () => localVoices().length > 0;
+  function pickVoice() {
+    const vs = localVoices();
+    const lang = (navigator.language || "en").toLowerCase();
+    return (
+      vs.find((v) => v.lang.toLowerCase() === lang && v.default) ||
+      vs.find((v) => v.lang.toLowerCase() === lang) ||
+      vs.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2))) ||
+      vs.find((v) => v.lang.toLowerCase().startsWith("en")) ||
+      vs[0] ||
+      null
+    );
+  }
+  function hush() {
+    try {
+      synth?.cancel();
+    } catch {
+      /* nothing to hush */
+    }
+  }
+
+  /* ── the page's state ──────────────────────────────────────────────────── */
+
+  const ui = {
+    sel: null,
+    minutes: 10,
+    on: new Set(),
+    truthsOff: new Set(),
+    factsOff: new Set(),
+    run: null,
+    said: "",
+    trouble: null,
+    sure: null,
+  };
+  const localToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const hhmm = () => {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2, "0")}${String(d.getMinutes()).padStart(2, "0")}`;
+  };
+  const today = localToday();
+  const mins = (secs) => `${Math.round(secs / 60)} min`;
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const $ = (id) => document.getElementById(id);
+
+  function resetUi() {
+    ui.sel = null;
+    ui.on = new Set(P().pods.map((p) => p.slug));
+    ui.truthsOff = new Set();
+    ui.factsOff = new Set();
+    ui.sure = null;
+    ui.trouble = null;
+  }
+
+  const chip = (label, act, { on, acc, disabled, title, data = "" } = {}) =>
+    `<button type="button" class="chip${acc ? " acc" : ""}" data-act="${act}" ${data}${
+      on !== undefined ? ` aria-pressed="${on ? "true" : "false"}"` : ""
+    }${disabled ? " disabled" : ""}${title ? ` title="${esc(title)}"` : ""}>${label}</button>`;
+
+  const podLabel = (p) =>
+    p.kind === "custom"
+      ? p.name
+      : DEFAULT_POD_NAME[p.kind].split(" ")[0] === "someone"
+        ? p.name.replace(/^someone /, "")
+        : p.name;
+
+  /* ── the drawn frames ──────────────────────────────────────────────────── */
+
+  const NS = "http://www.w3.org/2000/svg";
+  let maskN = 0;
+  function sketch(panel, seed, cls = "ink-pen") {
+    let svg = panel.querySelector(":scope > svg.sketch");
+    if (!svg) {
+      svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("class", "sketch");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("preserveAspectRatio", "none");
+      panel.prepend(svg);
+      new ResizeObserver(() => drawFrame(svg, panel, false)).observe(panel);
+    }
+    svg.dataset.seed = seed;
+    svg.dataset.cls = cls;
+    drawFrame(svg, panel, true);
+  }
+  function drawFrame(svg, panel, fresh) {
+    const w = panel.offsetWidth;
+    const h = panel.offsetHeight;
+    if (!w || !h) return;
+    if (!fresh && svg.dataset.size === `${w}x${h}`) return;
+    svg.dataset.size = `${w}x${h}`;
+    const s = seedOf(svg.dataset.seed);
+    const line = roughRect(w, h, s);
+    const pen = 1.7;
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    let mask = svg.querySelector("mask");
+    if (fresh || !mask) {
+      const id = `fr${++maskN}`;
+      svg.innerHTML = `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path class="mk" pathLength="1" stroke-width="${pen * 2 + 4}" d="${line}"/></mask></defs><path class="${svg.dataset.cls}" mask="url(#${id})" d="${ribbon(line, pen, s)}"/>`;
+    } else {
+      mask.setAttribute("width", w + 80);
+      mask.setAttribute("height", h + 80);
+      mask.querySelector("path").setAttribute("d", line);
+      svg
+        .querySelector(":scope > path")
+        .setAttribute("d", ribbon(line, pen, s));
+    }
+  }
+
+  /* ── the rings ─────────────────────────────────────────────────────────── */
+
+  const RW = 760;
+  const RH = 520;
+  const CX = RW / 2;
+  const CY = RH / 2 + 12;
+  const ringCache = new Map();
+
+  /* The pods as rings that widen outward, you at the centre, everyone at the
+     edge; each being's name written on its ring. A pod not in the next sitting
+     is drawn faint. On a narrow sheet the writing is set larger so it can be read. */
+  function ringsSvg(pods) {
+    const box = $("rings");
+    const fs = box && box.clientWidth && box.clientWidth < 560 ? 1.7 : 1;
+    const n = pods.length;
+    const stepX = n > 1 ? Math.min(54, (330 - 46) / (n - 1)) : 54;
+    const stepY = n > 1 ? Math.min(39, (232 - 36) / (n - 1)) : 39;
+    const sel = ui.sel;
+    let out = `<svg viewBox="0 0 ${RW} ${RH}" class="w-rings" role="group" aria-label="The pods as rings, you at the centre">`;
+    pods.forEach((p, k) => {
+      const rx = 46 + k * stepX;
+      const ry = 36 + k * stepY;
+      const key = `${p.slug}|${rx}|${ry}`;
+      let d = ringCache.get(key);
+      if (!d) {
+        const s = seedOf(`ring-${p.slug}`);
+        d = ribbon(
+          roughEllipse(rx * 2, ry * 2, s, {
+            pad: 0,
+            grow: 1,
+            wobble: 1.2,
+            steps: 22,
+          }),
+          1.5,
+          s,
+        );
+        ringCache.set(key, d);
+      }
+      const lit = ui.on.has(p.slug);
+      const picked = sel && sel.kind === "pod" && sel.slug === p.slug;
+      out += `<g class="w-ring" style="opacity:${lit ? 1 : 0.32}">`;
+      out += `<path class="ink-pen" d="${d}" transform="translate(${CX - rx} ${CY - ry})"/>`;
+      const podAttrs = `data-act="pick" data-pod="${esc(p.slug)}" tabindex="0" role="button" aria-label="${esc(`the ring: ${p.name}`)}"`;
+      if (p.kind === "self")
+        out += `<text x="${CX}" y="${CY + 6 * fs}" font-size="${19 * fs}" text-anchor="middle" class="${picked ? "on" : ""}" ${podAttrs}>${esc(p.name)}</text>`;
+      else
+        out += `<text x="${CX}" y="${CY - ry - 7}" font-size="${15 * fs}" text-anchor="middle" class="pod${picked ? " on" : ""}" ${podAttrs}>${esc(p.name)}</text>`;
+      p.beings.forEach((b, i) => {
+        const m = p.beings.length;
+        const a = ((22 + ((i + 0.5) * 136) / m) * Math.PI) / 180;
+        const x = CX + rx * Math.cos(a);
+        const y = CY + ry * Math.sin(a);
+        const w = (b.name.length * 7.6 + 12) * fs;
+        const hh = 20 * fs;
+        const isSel =
+          sel && sel.kind === "being" && sel.slug === p.slug && sel.i === i;
+        out += `<g data-act="pick" data-pod="${esc(p.slug)}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(b.name)}" class="${isSel ? "on" : ""}">`;
+        out += `<rect class="ink-sheet" x="${x - w / 2}" y="${y - hh / 2 - 1}" width="${w}" height="${hh}" opacity="0.92" rx="2"/>`;
+        if (isSel) {
+          const ss = seedOf(`sel-${b.name}`);
+          out += `<path class="ink-acc" d="${ribbon(roughEllipse(w + 6, hh + 4, ss, { pad: 3, grow: 1.1 }), 1.4, ss)}" transform="translate(${x - w / 2 - 3} ${y - hh / 2 - 3})"/>`;
+        }
+        out += `<text x="${x}" y="${y + 5 * fs}" font-size="${16 * fs}" text-anchor="middle">${esc(b.name)}</text></g>`;
+      });
+      out += `</g>`;
+    });
+    return out + `</svg>`;
+  }
+  function renderRings() {
+    const box = $("rings");
+    if (box) box.innerHTML = ringsSvg(P().pods);
+  }
+
+  /* ── the sheet ─────────────────────────────────────────────────────────── */
+
+  function preview() {
+    const pr = P();
+    return compose({
+      pods: pr.pods.filter((p) => ui.on.has(p.slug)),
+      wishes: pr.wishes,
+      truths: pr.truths.filter((t) => !ui.truthsOff.has(t)),
+      facts: pr.facts.filter((f) => !ui.factsOff.has(f)),
+      minutes: ui.minutes,
+      seed: "preview",
+    });
+  }
+
+  function selHtml(pr, w) {
+    const sel = ui.sel;
+    const pod = sel ? pr.pods.find((p) => p.slug === sel.slug) : null;
+    if (!pod)
+      return `<p class="hand faint tight ruled">click a ring's name to hold someone on it, or a name to move or let it go</p>`;
+    const being = sel.kind === "being" ? pod.beings[sel.i] : null;
+    let h = `<div class="ruled"><div class="label acc">${being ? "a being" : "a pod"}</div>`;
+    if (being && !w) {
+      h += `<p class="hand" style="margin:4px 0 0;font-size:23px">${esc(being.name)}</p>`;
+      if (being.note)
+        h += `<p class="hand muted" style="margin:2px 0 0;font-size:16.5px">${esc(being.note)}</p>`;
+      h += `<p class="label quiet" style="margin:8px 0 0">in ${esc(pod.name)}</p>`;
+    } else if (being) {
+      h += `<input class="case beingname" data-k="being-name" data-edit="name" value="${esc(being.name)}" aria-label="The being's name" />`;
+      h += `<input class="case" data-k="being-note" data-edit="note" value="${esc(being.note)}" placeholder="a note, said after the name: who calls on Sundays" aria-label="A note on the being" style="margin-top:6px;color:var(--muted)" />`;
+      {
+        h += `<div class="chips" style="margin-top:10px;align-items:baseline"><span class="label quiet">in ${esc(pod.name)} · move to</span>`;
+        for (const p of pr.pods)
+          if (p.kind !== "self" && p.kind !== "all" && p.slug !== pod.slug)
+            h += chip(
+              esc(
+                p.kind === "custom" ? p.name : p.name.replace(/^someone /, ""),
+              ),
+              "move",
+              { data: `data-to="${esc(p.slug)}"` },
+            );
+        h += chip("let go", "let-go", { acc: true }) + `</div>`;
+      }
+    } else {
+      if (pod.kind === "custom" && w)
+        h += `<input class="case beingname" data-k="pod-name" data-edit="pod" value="${esc(pod.name)}" aria-label="The pod's name" />`;
+      else
+        h += `<p class="hand" style="margin:4px 0 0;font-size:23px">${esc(pod.name)}</p>`;
+      if (pod.kind === "self" || pod.kind === "all")
+        h += `<p class="hand faint tight">${pod.kind === "self" ? "this ring holds you; nothing else goes on it" : "this ring holds everyone, named or not"}</p>`;
+      else {
+        if (w)
+          h += `<input class="add" style="margin-top:8px" data-k="add-being" data-add="being" placeholder="a name to hold here, then return" aria-label="${esc(`A being for ${pod.name}`)}" />`;
+        if (!pod.beings.length)
+          h += `<p class="hand faint tight">empty rings hold whoever comes to mind</p>`;
+      }
+      if (pod.kind === "custom" && w) {
+        const sure = ui.sure === `pod-${pod.slug}`;
+        h += `<div class="chips" style="margin-top:10px">${chip(sure ? "take the ring off — sure?" : "take the ring off", "rm-pod", { acc: sure })}</div>`;
+      }
+    }
+    return h + `</div>`;
+  }
+
+  function sittingsHtml(pr, w) {
+    let h = `<div class="ruled"><div class="label acc">sittings</div>`;
+    if (!pr.sittings.length)
+      return h + `<p class="hand faint tight">none yet</p></div>`;
+    h += `<ol class="sittings">`;
+    pr.sittings.slice(0, 12).forEach((s, i) => {
+      const sure = ui.sure === `sit-${s.slug}`;
+      h += `<li style="--i:${i}"><span class="on">${esc(s.on)}</span><span class="meta">${s.minutes} min · ${s.pods.length} rings · ${s.held.length} held${s.voice ? " · in a voice" : ""}</span>`;
+      if (s.said) h += `<span class="said hand">${esc(s.said)}</span>`;
+      h += `<span class="chips">${chip("sit it again", "again", { data: `data-slug="${esc(s.slug)}"` })}`;
+      if (speech())
+        h += chip("in a voice", "again-voice", {
+          data: `data-slug="${esc(s.slug)}"`,
+        });
+      if (w)
+        h += chip(sure ? "sure?" : "×", "rm-sitting", {
+          acc: sure,
+          data: `data-slug="${esc(s.slug)}"`,
+          title: sure ? undefined : "let this sitting go",
+        });
+      h += `</span></li>`;
+    });
+    return h + `</ol></div>`;
+  }
+
+  function renderSheet() {
+    const body = $("sheet-body");
+    if (ui.run) return renderRun();
+    const pr = P();
+    const w = writable();
+    const pv = preview();
+    const held = pr.pods.filter((p) => ui.on.has(p.slug));
+    const rt = runtime(pv);
+    let h = `<div class="grid"><div class="ctl">`;
+    h += `<div class="label acc">the next sitting</div>`;
+    h += `<div class="nexthead"><input class="num" data-k="minutes" inputmode="numeric" value="${ui.minutes}" aria-label="Minutes" style="width:${Math.max(1.4, String(ui.minutes).length * 0.62 + 0.6)}em" /><span class="hand">minutes · ${pv.length} lines${Math.abs(rt - ui.minutes * 60) > 90 ? ` · about ${mins(rt)}` : ""}</span></div>`;
+    h += `<div class="chips" style="margin-top:12px">`;
+    for (const p of pr.pods)
+      h += chip(esc(podLabel(p)), "toggle-pod", {
+        on: ui.on.has(p.slug),
+        data: `data-pod="${esc(p.slug)}"`,
+        title: ui.on.has(p.slug)
+          ? "held in the next sitting"
+          : "left out of the next sitting",
+      });
+    h += `</div>`;
+    h += `<p class="hand faint tight">${pr.wishes.length} wishes · ${pr.truths.length - ui.truthsOff.size} of ${pr.truths.length} truths · ${pr.facts.length - ui.factsOff.size} of ${pr.facts.length} facts — on the desk</p>`;
+    h += `<div class="chips" style="margin-top:12px">${chip("begin, in silence", "begin", { acc: true, disabled: !held.length })}`;
+    if (speech())
+      h += chip("begin, in a voice", "begin-voice", {
+        disabled: !held.length,
+        title:
+          "said aloud by one of this machine's own voices, with the silences kept as silence",
+      });
+    h += `</div>`;
+    if (!w)
+      h += `<p class="label quiet" style="margin:10px 0 0">the specimen keeps no sittings; this one runs and is let go</p>`;
+    h += selHtml(pr, w);
+    if (w)
+      h += `<div class="newring"><input class="add" data-k="new-pod" data-add="pod" placeholder="a ring of your own: the people at the Küfa" aria-label="A new pod" />${chip("+ ring", "add-pod")}</div>`;
+    h += `</div><div class="rings" id="rings"></div></div>`;
+    h += sittingsHtml(pr, w);
+    if (ui.trouble)
+      h += `<p class="trouble" role="alert">${esc(ui.trouble)}</p>`;
+    body.innerHTML = h;
+    renderRings();
+  }
+
+  /* ── a sitting ─────────────────────────────────────────────────────────── */
+
+  let tick = 0;
+  let timer = 0;
+  const voiced = (r) => r.s.voice && speech();
+
+  function breathSvg(seconds, id, paused) {
+    const s = seedOf(id);
+    const line = roughEllipse(200, 200, s, { pad: 0, grow: 1, steps: 24 });
+    const ink = ribbon(line, 2, s);
+    return `<svg viewBox="-12 -12 224 224" width="150" height="150" aria-hidden="true" class="w-breath"><defs><mask id="m-${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><path d="${line}" pathLength="1" class="mk w-draw" stroke-width="10" style="animation-duration:${Math.max(1, seconds)}s;animation-play-state:${paused ? "paused" : "running"}"/></mask></defs><path class="ink-rule" d="${ink}"/><path class="ink-acc" d="${ink}" mask="url(#m-${id})"/></svg>`;
+  }
+
+  function runMeta(r) {
+    return `a sitting · ${r.s.minutes} minutes · ${r.done ? "done" : `${r.i + 1} of ${r.s.lines.length}`}${voiced(r) ? " · in a voice" : " · in silence"}${!r.kept ? " · not kept" : ""}`;
+  }
+
+  function renderRun() {
+    const r = ui.run;
+    const body = $("sheet-body");
+    const line = r.s.lines[r.i] ?? null;
+    let h = `<div class="sitting"><div class="label acc" id="run-meta">${runMeta(r)}</div>`;
+    if (!r.done && line) {
+      h += `<p class="line${line.kind === "pod" || line.kind === "close" ? " quiet" : ""}">${esc(line.text)}</p>`;
+      h += `<div class="breathbox">`;
+      if (r.phase === "pause")
+        h += breathSvg(line.pause, `b${r.i}-${tick}`, r.since === null);
+      else
+        h += `<div class="stand hand faint">${voiced(r) ? "…" : "read it, slowly"}</div>`;
+      h += `<span class="label quiet">${r.phase === "pause" ? `${line.pause}s of silence` : "&nbsp;"}</span></div>`;
+      h += `<div class="chips" style="justify-content:center">${chip(r.since === null ? "go on" : "hold", "hold", { on: r.since === null })}${chip("next line", "next")}${chip("end the sitting", "end", { acc: true })}</div>`;
+      h += `<p class="hand faint" style="margin:0;font-size:15px">space holds · → next · esc ends</p>`;
+    } else {
+      h += `<p class="line" style="max-width:30ch">That is the sitting.</p>`;
+      h += `<div class="said-box"><div class="label quiet">how was it — in your words, or none</div>`;
+      h += `<textarea class="case" rows="2" data-k="said" aria-label="What you said afterwards" placeholder="${r.kept ? "what came up, who was hard to hold, what you noticed" : "a sitting that is not kept has nowhere to keep this"}"${r.kept ? "" : " readonly"}>${esc(ui.said)}</textarea></div>`;
+      h += `<div class="chips" style="justify-content:center">${chip(r.kept && ui.said.trim() ? "keep it and come back" : "come back", "come-back", { acc: true })}</div>`;
+    }
+    body.innerHTML = h + `</div>`;
+  }
+
+  /* Hold and go on change only the controls, so the breath keeps its place. */
+  function renderHold() {
+    const r = ui.run;
+    const b = document.querySelector('[data-act="hold"]');
+    if (b) {
+      b.textContent = r.since === null ? "go on" : "hold";
+      b.setAttribute("aria-pressed", r.since === null ? "true" : "false");
+    }
+    const d = document.querySelector(".w-draw");
+    if (d) d.style.animationPlayState = r.since === null ? "paused" : "running";
+  }
+
+  function arm() {
+    clearTimeout(timer);
+    const r = ui.run;
+    if (!r || r.done || r.since === null) return;
+    const t = ++tick;
+    if (r.phase === "say" && voiced(r)) {
+      hush();
+      const line = r.s.lines[r.i];
+      try {
+        const u = new SpeechSynthesisUtterance(line.text);
+        const v = pickVoice();
+        if (v) {
+          u.voice = v;
+          u.lang = v.lang;
+        }
+        u.rate = 0.88;
+        u.onend = () => advance(t);
+        u.onerror = () => advance(t);
+        synth.speak(u);
+      } catch {
+        /* the voice failed; the line keeps its time in silence */
+      }
+      // A voice that never says it has finished does not hold the sitting.
+      timer = setTimeout(() => advance(t), spoken(line.text) * 2500 + 4000);
+    } else timer = setTimeout(() => advance(t), r.len);
+  }
+
+  function advance(t) {
+    if (t !== tick) return;
+    const r = ui.run;
+    if (!r || r.done) return;
+    if (r.phase === "say") {
+      r.phase = "pause";
+      r.since = performance.now();
+      r.len = r.s.lines[r.i].pause * 1000;
+      r.left = 0;
+    } else {
+      const i = r.i + 1;
+      if (i >= r.s.lines.length) {
+        r.done = true;
+        r.since = null;
+      } else {
+        r.i = i;
+        r.phase = "say";
+        r.since = performance.now();
+        r.len = spoken(r.s.lines[i].text) * 1000;
+        r.left = 0;
+      }
+    }
+    renderRun();
+    if (!r.done) arm();
+  }
+
+  function start(s, kept) {
+    hush();
+    ui.said = "";
+    ui.sel = null;
+    const first = s.lines[0];
+    ui.run = {
+      s,
+      kept,
+      i: 0,
+      phase: "say",
+      since: performance.now(),
+      len: spoken(first?.text ?? "") * 1000,
+      left: 0,
+      done: false,
+    };
+    renderRun();
+    renderDesk();
+    sketch($("sheet"), `sitting-${s.slug}`, "ink-acc");
+    arm();
+    $("sheet").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function begin(withVoice) {
+    const pr = P();
+    const pods = pr.pods.filter((p) => ui.on.has(p.slug));
+    if (!pods.length) {
+      ui.trouble = "hold at least one pod";
+      return renderSheet();
+    }
+    const day = localToday();
+    let slug = `${day}-${hhmm()}`;
+    for (let k = 2; pr.sittings.some((s) => s.slug === slug); k++)
+      slug = `${day}-${hhmm()}-${k}`;
+    const truths = pr.truths.filter((t) => !ui.truthsOff.has(t));
+    const facts = pr.facts.filter((f) => !ui.factsOff.has(f));
+    const s = {
+      slug,
+      on: day,
+      minutes: ui.minutes,
+      pods: pods.map((p) => p.slug),
+      held: heldBy(pods),
+      wishes: pr.wishes.slice(),
+      truths,
+      facts,
+      lines: compose({
+        pods,
+        wishes: pr.wishes,
+        truths,
+        facts,
+        minutes: ui.minutes,
+        seed: slug,
+      }),
+      voice: Boolean(withVoice),
+      said: "",
+    };
+    if (!writable()) return start(s, false);
+    store.own.sittings.unshift(s);
+    save();
+    start(s, true);
+  }
+
+  function pauseOrGo() {
+    const r = ui.run;
+    if (!r || r.done) return;
+    if (r.since !== null) {
+      if (r.phase === "say" && voiced(r)) {
+        r.left = spoken(r.s.lines[r.i].text) * 1000;
+      } else r.left = Math.max(0, r.len - (performance.now() - r.since));
+      r.since = null;
+      tick++;
+      clearTimeout(timer);
+      hush();
+    } else {
+      r.since = performance.now();
+      r.len = r.left;
+      arm();
+    }
+    renderHold();
+  }
+  function next() {
+    const r = ui.run;
+    if (!r || r.done) return;
+    tick++;
+    clearTimeout(timer);
+    hush();
+    const i = r.i + 1;
+    if (i >= r.s.lines.length) {
+      r.done = true;
+      r.since = null;
+    } else {
+      Object.assign(r, {
+        i,
+        phase: "say",
+        since: performance.now(),
+        len: spoken(r.s.lines[i].text) * 1000,
+        left: 0,
+      });
+    }
+    renderRun();
+    arm();
+  }
+  function end() {
+    const r = ui.run;
+    if (!r) return;
+    tick++;
+    clearTimeout(timer);
+    hush();
+    r.done = true;
+    r.since = null;
+    renderRun();
+  }
+  function closeRun() {
+    const r = ui.run;
+    tick++;
+    clearTimeout(timer);
+    hush();
+    if (r && r.kept && ui.said.trim() && writable()) {
+      const kept = store.own.sittings.find((x) => x.slug === r.s.slug);
+      if (kept) {
+        kept.said = ui.said.trim().slice(0, 4000);
+        save();
+      }
+    }
+    ui.run = null;
+    ui.said = "";
+    render();
+    sketch($("sheet"), "wish-sheet");
+  }
+
+  /* ── the desk ──────────────────────────────────────────────────────────── */
+
+  function renderDesk() {
+    const pr = P();
+    const w = writable();
+    const t = tally(
+      pr.sittings,
+      pr.pods,
+      { wishes: pr.wishes, truths: pr.truths, facts: pr.facts },
+      today,
+    );
+    $("reading").textContent = readings(t).join(" · ");
+
+    let h = `<div class="label acc">the wishes</div><p class="hint hand">each said after “may you be”</p><ul class="list">`;
+    pr.wishes.forEach((x, i) => {
+      h += `<li><span class="wish hand">may you be ${esc(x)}</span>`;
+      if (w && pr.wishes.length > 1)
+        h += `<button type="button" class="x" data-act="rm-wish" data-i="${i}" aria-label="${esc(`Let go of ${x}`)}">×</button>`;
+      h += `</li>`;
+    });
+    h += `</ul>`;
+    if (w)
+      h += `<input class="add" data-k="add-wish" data-add="wishes" placeholder="+ free from fear" aria-label="A wish" />`;
+    $("wishes").innerHTML = h;
+
+    h = `<div class="label acc">truths of every being</div><p class="hint hand">said of each one held · click to leave one out of the next sitting</p><ul class="list">`;
+    pr.truths.forEach((x, i) => {
+      h += `<li><button type="button" class="item${ui.truthsOff.has(x) ? " off" : ""}" data-act="truth" data-i="${i}" aria-pressed="${ui.truthsOff.has(x) ? "false" : "true"}">${esc(x)}</button>`;
+      if (w)
+        h += `<button type="button" class="x" data-act="rm-truth" data-i="${i}" aria-label="Let go of this truth">×</button>`;
+      h += `</li>`;
+    });
+    h += `</ul>`;
+    if (w)
+      h += `<input class="add" data-k="add-truth" data-add="truths" placeholder="+ every being …" aria-label="A truth" />`;
+    $("truths").innerHTML = h;
+
+    h = `<div class="label acc">true of you</div><p class="hint hand">one to begin from, one to carry out · in your own words</p>`;
+    if (!pr.facts.length)
+      h += `<p class="hand muted" style="margin:6px 0 0;font-size:16px">nothing kept yet</p>`;
+    h += `<ul class="list">`;
+    pr.facts.forEach((x, i) => {
+      h += `<li><button type="button" class="item${ui.factsOff.has(x) ? " off" : ""}" data-act="fact" data-i="${i}" aria-pressed="${ui.factsOff.has(x) ? "false" : "true"}">${esc(x)}</button>`;
+      if (w)
+        h += `<button type="button" class="x" data-act="rm-fact" data-i="${i}" aria-label="Let go of this fact">×</button>`;
+      h += `</li>`;
+    });
+    h += `</ul>`;
+    if (w)
+      h += `<input class="add" data-k="add-fact" data-add="facts" placeholder="+ something true of you" aria-label="A fact" />`;
+    $("facts").innerHTML = h;
+
+    $("where").textContent = w
+      ? `kept in this browser only, under ${KEY} · ${speech() ? "sittings run in silence, or in one of this machine's own voices" : "no voice on this machine; sittings run in silence"}`
+      : "Specimen A: fiction, like the rest of the specimen";
+  }
+
+  /* ── which practice ────────────────────────────────────────────────────── */
+
+  function renderPractice() {
+    let h;
+    if (writable()) {
+      const sure = ui.sure === "forget";
+      h = `<p><b>Your practice.</b> Kept in this browser and nowhere else. Clearing the browser's site data lets it go.</p><div class="chips">${chip("show the specimen", "show-specimen")}${chip(sure ? "let it all go — sure?" : "let it all go", "forget", { acc: sure })}</div>`;
+    } else {
+      h = `<p><b>Specimen A, fiction.</b> A made-up life's practice: five people on the rings, three facts it kept about itself, two sittings. Sit with it; nothing done here is kept.</p><div class="chips">${
+        store.own
+          ? chip("back to yours", "show-own", { acc: true })
+          : chip("begin your own practice", "own", { acc: true })
+      }</div>`;
+    }
+    $("practice").innerHTML = h;
+  }
+
+  /* ── render, keeping the caret where it was ───────────────────────────── */
+
+  let first = true;
+  function render() {
+    const a = document.activeElement;
+    const k = a && a.dataset ? a.dataset.k : null;
+    const caret =
+      k && "selectionStart" in a ? [a.selectionStart, a.selectionEnd] : null;
+    $("sheet").classList.toggle("enter", first);
+    renderPractice();
+    renderSheet();
+    renderDesk();
+    first = false;
+    if (k) {
+      const el = document.querySelector(`[data-k="${k}"]`);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (caret && el.value !== undefined) {
+          try {
+            el.setSelectionRange(
+              Math.min(caret[0], el.value.length),
+              Math.min(caret[1], el.value.length),
+            );
+          } catch {
+            /* not a text field */
+          }
+        }
+      }
+    }
+  }
+
+  /* ── what the reader does ──────────────────────────────────────────────── */
+
+  const pod = (slug) => P().pods.find((p) => p.slug === slug);
+  const sameSel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+  function keep() {
+    if (writable()) save();
+  }
+  function addBeing(slug, name) {
+    const p = pod(slug);
+    const nm = name.trim();
+    if (!p || !nm) return;
+    if (p.beings.some((b) => b.name.toLowerCase() === nm.toLowerCase())) return;
+    p.beings.push({ name: nm.slice(0, 80), note: "" });
+    ui.sel = { kind: "being", slug, i: p.beings.length - 1 };
+    keep();
+  }
+  function addPod(name) {
+    const nm = name.trim();
+    if (!nm || !writable()) return;
+    const pr = store.own;
+    const slug = `${
+      nm
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 40) || "pod"
+    }-${hhmm()}`;
+    if (pr.pods.some((p) => p.slug === slug)) return;
+    const everyone = pr.pods.find((p) => p.kind === "all");
+    const others = pr.pods.filter((p) => p.kind !== "all");
+    const order = Math.max(0, ...others.map((p) => p.order)) + 1;
+    const fresh = {
+      slug,
+      name: nm.slice(0, 80),
+      kind: "custom",
+      order,
+      beings: [],
+    };
+    pr.pods = [
+      ...others,
+      fresh,
+      ...(everyone ? [{ ...everyone, order: order + 1 }] : []),
+    ];
+    ui.on.add(slug);
+    ui.sel = { kind: "pod", slug };
+    keep();
+  }
+
+  const acts = {
+    pick(el) {
+      const s =
+        el.dataset.i !== undefined
+          ? { kind: "being", slug: el.dataset.pod, i: Number(el.dataset.i) }
+          : { kind: "pod", slug: el.dataset.pod };
+      ui.sel = sameSel(ui.sel, s) ? null : s;
+      ui.sure = null;
+    },
+    "toggle-pod"(el) {
+      const s = el.dataset.pod;
+      if (ui.on.has(s)) ui.on.delete(s);
+      else ui.on.add(s);
+      ui.trouble = null;
+    },
+    begin: () => begin(false),
+    "begin-voice": () => begin(true),
+    move(el) {
+      const sel = ui.sel;
+      const a = pod(sel.slug);
+      const b = pod(el.dataset.to);
+      if (!a || !b || a === b) return;
+      const [being] = a.beings.splice(sel.i, 1);
+      if (!being) return;
+      b.beings.push(being);
+      ui.sel = { kind: "being", slug: b.slug, i: b.beings.length - 1 };
+      keep();
+    },
+    "let-go"() {
+      const sel = ui.sel;
+      const p = pod(sel.slug);
+      if (!p) return;
+      p.beings.splice(sel.i, 1);
+      ui.sel = { kind: "pod", slug: p.slug };
+      keep();
+    },
+    "rm-pod"() {
+      const slug = ui.sel?.slug;
+      if (ui.sure !== `pod-${slug}`) return void (ui.sure = `pod-${slug}`);
+      store.own.pods = store.own.pods.filter((p) => p.slug !== slug);
+      ui.on.delete(slug);
+      ui.sel = null;
+      ui.sure = null;
+      keep();
+    },
+    "add-pod"() {
+      const el = document.querySelector('[data-k="new-pod"]');
+      if (el) addPod(el.value);
+    },
+    again(el) {
+      const s = P().sittings.find((x) => x.slug === el.dataset.slug);
+      if (s) start({ ...s, voice: false }, writable());
+    },
+    "again-voice"(el) {
+      const s = P().sittings.find((x) => x.slug === el.dataset.slug);
+      if (s) start({ ...s, voice: true }, writable());
+    },
+    "rm-sitting"(el) {
+      const slug = el.dataset.slug;
+      if (ui.sure !== `sit-${slug}`) return void (ui.sure = `sit-${slug}`);
+      store.own.sittings = store.own.sittings.filter((s) => s.slug !== slug);
+      ui.sure = null;
+      keep();
+    },
+    truth(el) {
+      const x = P().truths[Number(el.dataset.i)];
+      if (ui.truthsOff.has(x)) ui.truthsOff.delete(x);
+      else ui.truthsOff.add(x);
+    },
+    fact(el) {
+      const x = P().facts[Number(el.dataset.i)];
+      if (ui.factsOff.has(x)) ui.factsOff.delete(x);
+      else ui.factsOff.add(x);
+    },
+    "rm-wish"(el) {
+      store.own.wishes.splice(Number(el.dataset.i), 1);
+      keep();
+    },
+    "rm-truth"(el) {
+      const [x] = store.own.truths.splice(Number(el.dataset.i), 1);
+      ui.truthsOff.delete(x);
+      keep();
+    },
+    "rm-fact"(el) {
+      const [x] = store.own.facts.splice(Number(el.dataset.i), 1);
+      ui.factsOff.delete(x);
+      keep();
+    },
+    hold: () => pauseOrGo(),
+    next: () => next(),
+    end: () => end(),
+    "come-back": () => closeRun(),
+    own() {
+      store.own = freshOwn();
+      store.showing = "own";
+      save();
+      resetUi();
+    },
+    "show-specimen"() {
+      store.showing = "specimen";
+      save();
+      resetUi();
+    },
+    "show-own"() {
+      store.showing = "own";
+      save();
+      resetUi();
+    },
+    forget() {
+      if (ui.sure !== "forget") return void (ui.sure = "forget");
+      store.own = null;
+      store.showing = "specimen";
+      save();
+      resetUi();
+    },
+  };
+  const RUN_ACTS = new Set([
+    "hold",
+    "next",
+    "end",
+    "come-back",
+    "again",
+    "again-voice",
+    "begin",
+    "begin-voice",
+  ]);
+
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-act]");
+    if (!el || el.disabled) return;
+    const act = el.dataset.act;
+    const fn = acts[act];
+    if (!fn) return;
+    if (act !== "rm-pod" && act !== "rm-sitting" && act !== "forget")
+      ui.sure = null;
+    fn(el);
+    if (!RUN_ACTS.has(act)) render();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const el = e.target;
+    const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+    // The rings' names are not buttons, so return and space pick them.
+    if (
+      !typing &&
+      el &&
+      el.dataset &&
+      el.dataset.act &&
+      el.tagName !== "BUTTON" &&
+      (e.key === "Enter" || e.key === " ")
+    ) {
+      e.preventDefault();
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      return;
+    }
+    if (typing && e.key === "Enter" && el.dataset.add) {
+      e.preventDefault();
+      const v = el.value.trim();
+      if (!v) return;
+      const kind = el.dataset.add;
+      if (kind === "being" && ui.sel) addBeing(ui.sel.slug, v);
+      else if (kind === "pod") addPod(v);
+      else if (writable() && store.own[kind]) {
+        store.own[kind].push(v.slice(0, 300));
+        keep();
+      }
+      el.value = "";
+      render();
+      return;
+    }
+    if (typing && el.dataset.k === "minutes") {
+      if (e.key === "Enter") el.blur();
+      if (e.key === "Escape") {
+        el.value = String(ui.minutes);
+        el.blur();
+      }
+      return;
+    }
+    if (typing && el.dataset.edit && e.key === "Enter") return el.blur();
+    if (!ui.run || typing) return;
+    if (e.key === " " && el.tagName !== "BUTTON") {
+      e.preventDefault();
+      pauseOrGo();
+    } else if (e.key === "ArrowRight") next();
+    else if (e.key === "Escape") end();
+  });
+
+  document.addEventListener("focusin", (e) => {
+    if (e.target.dataset && e.target.dataset.k === "minutes") e.target.select();
+  });
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    if (el.dataset.k === "said") {
+      ui.said = el.value;
+      const b = document.querySelector('[data-act="come-back"]');
+      if (b)
+        b.textContent =
+          ui.run && ui.run.kept && ui.said.trim()
+            ? "keep it and come back"
+            : "come back";
+      return;
+    }
+    if (el.dataset.k === "minutes") {
+      el.style.width = `${Math.max(1.4, el.value.length * 0.62 + 0.6)}em`;
+      return;
+    }
+    const edit = el.dataset.edit;
+    if (!edit || !writable() || !ui.sel) return;
+    const p = pod(ui.sel.slug);
+    if (!p) return;
+    if (edit === "pod") p.name = el.value.slice(0, 80);
+    else {
+      const b = p.beings[ui.sel.i];
+      if (b) b[edit] = el.value.slice(0, edit === "name" ? 80 : 200);
+    }
+    renderRings();
+  });
+
+  document.addEventListener("change", (e) => {
+    const el = e.target;
+    if (el.dataset.k === "minutes") {
+      const v = Number(el.value);
+      if (Number.isFinite(v) && el.value.trim() !== "")
+        ui.minutes = clampMinutes(v);
+      render();
+      return;
+    }
+    const edit = el.dataset.edit;
+    if (!edit || !writable() || !ui.sel) return;
+    const p = pod(ui.sel.slug);
+    if (!p) return;
+    // A name cleared to nothing goes back to what it was: a being needs a name, a pod its own.
+    if (edit === "pod") p.name = str(p.name, 80) || DEFAULT_POD_NAME[p.kind];
+    else if (edit === "name") {
+      const b = p.beings[ui.sel.i];
+      if (b && !str(b.name, 80)) b.name = "someone";
+    }
+    keep();
+    render();
+  });
+
+  /* the rings set their writing to the sheet's width */
+  let narrowRings = null;
+  new ResizeObserver(() => {
+    const box = $("rings");
+    if (!box) return;
+    const narrow = box.clientWidth < 560;
+    if (narrow !== narrowRings) {
+      narrowRings = narrow;
+      renderRings();
+    }
+  }).observe($("sheet"));
+
+  if (synth && "onvoiceschanged" in synth)
+    synth.addEventListener("voiceschanged", () => {
+      if (!ui.run) render();
+    });
+  window.addEventListener("pagehide", hush);
+
+  load();
+  resetUi();
+  render();
+  sketch($("sheet"), "wish-sheet");
+  sketch($("p-reading"), "wish-reading");
+  sketch($("p-wishes"), "wish-wishes");
+  sketch($("p-truths"), "wish-truths");
+  sketch($("p-facts"), "wish-facts");
+  sketch($("p-laws"), "wish-laws");
+</script>

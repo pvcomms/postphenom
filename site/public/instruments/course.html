@@ -1,0 +1,3819 @@
+<title>Course</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="You don't arrive; you stay pointed. A belief, everything that hit it in the order it came, and the course your own after-the-fact marks imply."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Ink on bone. Green-grey is only ever "bent it toward the question", plum only
+     ever "bent it away"; the rust accent is the belief and the question. A stone's
+     kind keeps its own muted hue. Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8c8478;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --toward: #5e7a4e;
+    --away: #7e5a78;
+    --kind-project: #2f3437;
+    --kind-concept: #b5532a;
+    --kind-user: #7b4b3a;
+    --kind-feedback: #5b6b52;
+    --kind-reference: #4a5a6b;
+    --kind-routine: #8a7549;
+    --kind-meta: #1a1815;
+    --kind-note: #6e6257;
+    --kind-notion: #3f6b66;
+    --kind-garden: #8e5b55;
+    --kind-reading: #8a6f84;
+    --kind-agent: #8c6a3f;
+    --kind-repo: #a8a49b;
+    --kind-ghost: #c6c0b4;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --tooth: 0.06;
+    --tooth-blend: multiply;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #7d7669;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --toward: #8dae78;
+      --away: #b48aad;
+      --kind-project: #a9a394;
+      --kind-concept: #d9763f;
+      --kind-user: #bc8064;
+      --kind-feedback: #8aa076;
+      --kind-reference: #7891ac;
+      --kind-routine: #b89751;
+      --kind-meta: #ede9df;
+      --kind-note: #948b7c;
+      --kind-notion: #7fa8a1;
+      --kind-garden: #c08a82;
+      --kind-reading: #b39aae;
+      --kind-agent: #d0a468;
+      --kind-repo: #6a665c;
+      --kind-ghost: #413e35;
+      --tooth: 0.045;
+      --tooth-blend: screen;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #7d7669;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --toward: #8dae78;
+    --away: #b48aad;
+    --kind-project: #a9a394;
+    --kind-concept: #d9763f;
+    --kind-user: #bc8064;
+    --kind-feedback: #8aa076;
+    --kind-reference: #7891ac;
+    --kind-routine: #b89751;
+    --kind-meta: #ede9df;
+    --kind-note: #948b7c;
+    --kind-notion: #7fa8a1;
+    --kind-garden: #c08a82;
+    --kind-reading: #b39aae;
+    --kind-agent: #d0a468;
+    --kind-repo: #6a665c;
+    --kind-ghost: #413e35;
+    --tooth: 0.045;
+    --tooth-blend: screen;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 3.4vw, 40px);
+    padding-block: 0 80px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--tooth);
+    mix-blend-mode: var(--tooth-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .label,
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .label {
+    color: var(--muted);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 25rem);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .label {
+    margin: 0 0 20px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 20px 0 0;
+    font-size: clamp(19px, 2.2vw, 23px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .source {
+    position: relative;
+    padding: 18px 20px 16px;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+  .source p.label {
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+  }
+  .source .label b {
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .source p {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .source p.fine {
+    font-size: 13.5px;
+    color: var(--faint);
+    margin: 10px 0 0;
+  }
+  .src-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+  }
+  .go {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+  #folder:focus-visible + .go {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .quiet {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 2px;
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 4px;
+    transition: color 160ms var(--ease);
+  }
+  .quiet:hover {
+    color: var(--ink);
+  }
+
+  /* the sheet and the desk */
+  .bench {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 28px;
+    margin-top: 28px;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .sheet-panel {
+    padding: 12px;
+  }
+  .readout {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 2px 4px 0;
+  }
+  .readout .left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    min-width: 0;
+  }
+  .readout .meta {
+    color: var(--muted);
+  }
+  .readout .status {
+    color: var(--faint);
+  }
+  .readout .status.err {
+    color: var(--accent);
+  }
+  .walk {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+  }
+  .walk .meta {
+    color: var(--faint);
+  }
+  .walk-step {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .walk-step:not(:disabled):hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+  }
+  .walk-step:disabled {
+    color: var(--ink);
+  }
+  .sheet-scroll {
+    position: relative;
+    z-index: 2;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .sheet {
+    position: relative;
+  }
+  .sheet svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 900 / 484;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .empty {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 900 / 484;
+  }
+  .b-mono {
+    font-family: var(--mono);
+  }
+  .b-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .b-label {
+    font-family: var(--serif);
+  }
+  .course-sheet text {
+    pointer-events: none;
+  }
+  .course-sheet .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 900ms var(--ease) 220ms both;
+  }
+  @keyframes brick {
+    from {
+      transform: translateY(-38px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .course-sheet.enter .c-brick {
+    animation: brick 520ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  .course-sheet .c-brick path,
+  .course-sheet .c-brick text {
+    transition:
+      fill 220ms var(--ease),
+      opacity 220ms var(--ease);
+  }
+  .brick {
+    cursor: pointer;
+  }
+  .steer {
+    cursor: help;
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.35);
+    }
+  }
+  .breathe {
+    animation: breathe 3.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .fade {
+    animation: fade 220ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  .float {
+    position: absolute;
+    z-index: 4;
+    transform: translate(-50%, 0);
+    display: flex;
+    gap: 6px;
+  }
+  .card {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+    max-width: 18rem;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border-radius: 3px;
+    box-shadow: 0 2px 10px color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .card .big {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .card .small {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.25;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* chips: the two marks, and the desk's small actions */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: var(--surface);
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    color: var(--ink);
+    border-color: var(--faint);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .marks {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+  .marks.sm .chip {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+  .c-mark {
+    color: var(--faint);
+  }
+  .c-mark.on.toward {
+    color: var(--toward);
+    border-color: var(--toward);
+    background: color-mix(in srgb, var(--toward) 10%, var(--surface));
+  }
+  .c-mark.on.away {
+    color: var(--away);
+    border-color: var(--away);
+    background: color-mix(in srgb, var(--away) 10%, var(--surface));
+  }
+
+  /* caption under the sheet */
+  .caption {
+    position: relative;
+    z-index: 2;
+    margin-top: 8px;
+    min-height: 3.6rem;
+    padding-left: 12px;
+    border-left: 2px solid var(--rule);
+  }
+  .caption .said {
+    color: var(--accent);
+  }
+  .caption p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.3;
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+  .caption p.cap {
+    color: var(--ink);
+  }
+  .chosen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+  .chosen .name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+  .chosen .acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .chosen .acts .hand {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .legend {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+  }
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend .sw {
+    width: 14px;
+    height: 2px;
+    border-radius: 1px;
+  }
+  .legend .dash {
+    width: 14px;
+    border-top: 1.5px dashed var(--faint);
+  }
+  .legend .it {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--faint);
+  }
+  .legend .pip {
+    width: 4px;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--ink);
+    opacity: 0.55;
+  }
+  kbd {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--faint);
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+  }
+  .search {
+    width: 100%;
+    margin-top: 8px;
+    padding: 9px 12px;
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  .search:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .search::placeholder {
+    color: var(--faint);
+    font-style: italic;
+  }
+  textarea.search {
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.3;
+    resize: none;
+  }
+  .found {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 6px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .stone {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    padding: 2px 0;
+    text-align: left;
+    min-width: 0;
+  }
+  .dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    transform: translateY(-1px);
+  }
+  .dot.ghost {
+    outline: 1px dashed var(--faint);
+  }
+  .stone .nm {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14.5px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .stone:hover .nm {
+    color: var(--ink);
+  }
+  .reading {
+    padding: 18px;
+  }
+  .reading > div {
+    position: relative;
+    z-index: 2;
+  }
+  .reading h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 25px;
+    line-height: 1.15;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+  .words {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+  }
+  .words li {
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 2px 0;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .note-text {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    max-height: 18rem;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+    border-left: 2px solid var(--rule);
+  }
+  .aside-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+  .block {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .row-acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .row-acts .meta {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .meta-btn {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .meta-btn:hover {
+    color: var(--ink);
+  }
+  .put {
+    color: var(--accent);
+  }
+  .trail {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .trail li {
+    padding: 3px 0;
+  }
+  .trail .q {
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.25;
+    color: var(--muted);
+  }
+  .hits {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    max-height: 26rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .c-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 4px;
+    border-radius: 3px;
+    transition: background-color 160ms var(--ease);
+  }
+  .c-row.on {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .c-row .stone .nm.toward {
+    color: var(--toward);
+  }
+  .c-row .stone .nm.away {
+    color: var(--away);
+  }
+  .c-row .stone.on .nm {
+    color: var(--ink);
+  }
+  .c-row .nm.fallow {
+    font-style: italic;
+  }
+  .when {
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+  }
+  .when.late {
+    color: var(--accent);
+  }
+  .kin {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .kin li {
+    padding: 2px 0;
+  }
+  .kin .why {
+    margin-left: 14px;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--faint);
+  }
+  .kept {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .kept li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .kept .tally {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--faint);
+  }
+  .t-toward {
+    color: var(--toward);
+  }
+  .t-away {
+    color: var(--away);
+  }
+  .how {
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--faint);
+    margin: 0;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1080px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 40px;
+    }
+    .sheet-panel {
+      padding: 8px;
+    }
+    .sheet {
+      min-width: 620px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sketch .draw,
+    .course-sheet .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .course-sheet.enter .c-brick,
+    .breathe,
+    .fade,
+    .rise {
+      animation: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Course</h1>
+      <p class="deck">
+        <em>You don’t arrive; you stay pointed.</em> Pick a belief, see what hit
+        it in the order it came, and say — after the fact — which way each one
+        bent you. The course is drawn from your marks.
+      </p>
+    </div>
+    <div class="source rise" id="source" data-seed="course-source">
+      <div style="position: relative; z-index: 2">
+        <p class="label">
+          <span>On the sheet</span><b id="src-tag">specimen</b>
+        </p>
+        <p id="src-line"></p>
+        <div class="src-actions">
+          <input
+            type="file"
+            id="folder"
+            class="sr"
+            webkitdirectory
+            multiple
+            accept=".md,text/markdown"
+          />
+          <label class="go" for="folder">open your own notes</label>
+          <button type="button" class="quiet" id="to-specimen" hidden>
+            back to the specimen
+          </button>
+          <button type="button" class="quiet" id="reset-specimen" hidden>
+            put the specimen back as it came
+          </button>
+        </div>
+        <p class="fine" id="src-fine"></p>
+      </div>
+    </div>
+  </header>
+
+  <div class="bench">
+    <section
+      class="panel sheet-panel rise"
+      id="sheet-panel"
+      data-seed="course-sheet"
+      style="animation-delay: 60ms"
+      aria-label="The course"
+    >
+      <div class="readout">
+        <div class="left">
+          <span class="meta" id="tally-line"></span>
+          <span class="walk" id="walk"></span>
+        </div>
+        <span class="meta status" id="status" aria-live="polite"></span>
+      </div>
+      <div class="sheet-scroll">
+        <div class="sheet" id="sheet"></div>
+      </div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+      <ul class="legend" aria-label="Key">
+        <li>
+          <span class="sw" style="background: var(--toward)"></span
+          ><span class="meta">bent it toward the question</span>
+        </li>
+        <li>
+          <span class="sw" style="background: var(--away)"></span
+          ><span class="meta">bent it away</span>
+        </li>
+        <li>
+          <span class="sw" style="background: var(--faint)"></span
+          ><span class="meta">unweighed</span>
+        </li>
+        <li>
+          <span class="dash"></span><span class="meta">never written</span>
+        </li>
+        <li>
+          <span class="it">italic</span><span class="meta">gone fallow</span>
+        </li>
+        <li>
+          <span class="pip"></span
+          ><span class="meta">dated by its arrival</span>
+        </li>
+      </ul>
+    </section>
+
+    <aside
+      class="desk rise"
+      style="animation-delay: 140ms"
+      aria-label="The desk"
+    >
+      <div>
+        <label class="meta" for="q-search" style="display: block"
+          >put a belief on the sheet</label
+        >
+        <input
+          id="q-search"
+          class="search"
+          placeholder="any stone  /"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <ul class="found" id="found" hidden></ul>
+      </div>
+      <section
+        class="panel reading"
+        id="reading"
+        data-pen="var(--accent)"
+        aria-label="The reading"
+        hidden
+      >
+        <div id="reading-body"></div>
+      </section>
+      <section id="kept" aria-label="Courses kept" hidden></section>
+      <p class="how" id="how"></p>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="label">Course · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ── the hand: deterministic pen strokes (lib/hand.ts) ─────────────────────
+  // Every path is fixed for its seed, so a re-draw never moves a border.
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b, the pen starting and stopping just past the ends. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+  /** The circling: once round a w×h box and a little past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  /** The pen's pressure: a centreline turned into a ribbon, thin where it lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ── the garden: notes into stones and threads (lib/garden.ts) ─────────────
+
+  const MEMORY_PREFIXES = [
+    "project_",
+    "feedback_",
+    "user_",
+    "reference_",
+    "routine_",
+  ];
+  const unq = (s) => s.replace(/^["']|["']$/g, "");
+
+  /** A lenient frontmatter reader: hand-written YAML is not always valid YAML. */
+  function matterOf(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    let parent = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s*-\s+(.*)$/);
+      if (item && parent) {
+        if (!Array.isArray(data[parent])) data[parent] = [];
+        data[parent].push(unq(item[1].trim()));
+        continue;
+      }
+      const field = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, indent, key, rawValue] = field;
+      const value = unq(rawValue.trim());
+      if (indent.length > 0 && parent) {
+        if (
+          typeof data[parent] !== "object" ||
+          data[parent] === null ||
+          Array.isArray(data[parent])
+        )
+          data[parent] = {};
+        data[parent][key] = value;
+        continue;
+      }
+      if (!value) {
+        parent = key;
+        data[key] = {};
+        continue;
+      }
+      parent = null;
+      data[key] =
+        value.startsWith("[") && value.endsWith("]")
+          ? value
+              .slice(1, -1)
+              .split(",")
+              .map((s) => unq(s.trim()))
+              .filter(Boolean)
+          : value;
+    }
+    return { data, content: m[2] };
+  }
+
+  /** Wikilinks get written four ways: project_suji, project-suji, suji, suji.md. */
+  const norm = (s) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\.md$/, "")
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+  const stripPrefix = (key) => {
+    for (const p of MEMORY_PREFIXES)
+      if (key.startsWith(p)) return key.slice(p.length);
+    return key;
+  };
+  /** The body with its code blanked, character for character: a [[ref]] in code names nothing. */
+  const proseOf = (body) => {
+    const blank = (code) => code.replace(/[^\n]/g, " ");
+    return body.replace(/```[\s\S]*?```/g, blank).replace(/`[^`\n]*`/g, blank);
+  };
+  function stageOf(modified) {
+    if (!modified) return "unknown";
+    const days = (Date.now() - modified.getTime()) / 86400000;
+    if (days <= 7) return "fresh";
+    if (days <= 30) return "tended";
+    if (days <= 90) return "settled";
+    return "fallow";
+  }
+  function frontmatterType(data) {
+    const t = data?.type ?? data?.metadata?.type;
+    return typeof t === "string" ? t.toLowerCase() : null;
+  }
+  function frontmatterModified(data, fallback) {
+    const raw =
+      data?.tended ??
+      data?.metadata?.modified ??
+      data?.modified ??
+      data?.updated;
+    if (raw) {
+      const d = new Date(raw);
+      if (!Number.isNaN(d.getTime())) return d;
+    }
+    return fallback;
+  }
+  /** Single-word glossary terms only match capitalised, or common words poison everything. */
+  function conceptMatchers(title, aliases) {
+    return [title, ...aliases]
+      .filter((t) => t && t.length >= 4)
+      .map((t) => {
+        const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        return new RegExp(
+          `(?<![\\w-])${escaped}(?![\\w-])`,
+          /\s/.test(t) ? "i" : "",
+        );
+      });
+  }
+  const slugLike = (s) => /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(s);
+
+  /**
+   * One folder of markdown notes into a garden. A file under a Glossary folder is a
+   * term; `source: notion` and `source: readwise-reader` say where a page came from;
+   * a `type:` or a memory prefix says what kind of note it is; everything else is a
+   * fieldnote. Threads: [[links]] and `related:`, terms practised in a note, the same
+   * title in two sources, and one note named in another's prose. Unresolved links
+   * become stones that were never written.
+   */
+  function buildGarden(files) {
+    const nodes = new Map();
+    const links = [];
+    const byKey = new Map();
+    const byBare = new Map();
+    const bodies = new Map();
+    const concepts = [];
+    const related = new Map();
+    const register = (node, extra = []) => {
+      nodes.set(node.id, node);
+      for (const k of [norm(node.id), ...extra.map(norm)]) {
+        if (k && !byKey.has(k)) byKey.set(k, node.id);
+        const bare = stripPrefix(k);
+        if (bare && !byBare.has(bare)) byBare.set(bare, node.id);
+      }
+    };
+    const entries = [];
+    for (const f of files) {
+      const parts = f.path.split("/").filter(Boolean);
+      if (parts.length > 4) continue;
+      if (parts.some((p) => p.startsWith(".") || p.startsWith("_attachments")))
+        continue;
+      const base = parts[parts.length - 1].replace(/\.md$/i, "");
+      if (base.startsWith("_")) continue;
+      const dirs = parts.slice(0, -1);
+      const { data, content } = matterOf(f.text);
+      entries.push({
+        f,
+        base,
+        dirs,
+        data,
+        content,
+        glossary: dirs.some((d) => d.toLowerCase() === "glossary"),
+      });
+    }
+    entries.sort((a, b) =>
+      a.f.path < b.f.path ? -1 : a.f.path > b.f.path ? 1 : 0,
+    );
+
+    for (const e of entries.filter((x) => x.glossary)) {
+      const modified = frontmatterModified(e.data, new Date(e.f.mtime));
+      const id = `concept:${e.base}`;
+      const aliases = Array.isArray(e.data.aliases)
+        ? e.data.aliases.filter((a) => typeof a === "string")
+        : [];
+      register(
+        {
+          id,
+          label: e.base,
+          kind: "concept",
+          description: typeof e.data.meaning === "string" ? e.data.meaning : "",
+          body: e.content.trim(),
+          modified: modified.toISOString(),
+          stage: stageOf(modified),
+          degree: 0,
+          tags: [],
+        },
+        [e.base, ...aliases],
+      );
+      bodies.set(id, e.content);
+      concepts.push({ id, matchers: conceptMatchers(e.base, aliases) });
+    }
+
+    const KNOWN = [
+      "project",
+      "feedback",
+      "user",
+      "reference",
+      "routine",
+      "reading",
+      "notion",
+      "note",
+    ];
+    for (const e of entries.filter((x) => !x.glossary)) {
+      const { data, base } = e;
+      const src = String(data.source ?? "").toLowerCase();
+      const fmType = frontmatterType(data);
+      let kind =
+        src === "notion"
+          ? "notion"
+          : src === "readwise-reader"
+            ? "reading"
+            : null;
+      if (!kind && fmType && KNOWN.includes(fmType)) kind = fmType;
+      if (!kind)
+        for (const p of MEMORY_PREFIXES)
+          if (base.startsWith(p)) kind = p.slice(0, -1);
+      kind = kind ?? "note";
+      const modified = frontmatterModified(data, new Date(e.f.mtime));
+      const name = typeof data.name === "string" ? data.name.trim() : "";
+      const title = typeof data.title === "string" ? data.title.trim() : "";
+      const label =
+        title ||
+        (name && !slugLike(name) ? name : "") ||
+        base
+          .replace(/^(project|feedback|user|reference|routine)_/, "")
+          .replace(/_/g, " ");
+      const summary = typeof data.summary === "string" ? data.summary : "";
+      const id = `note:${e.f.path.replace(/\.md$/i, "")}`;
+      register(
+        {
+          id,
+          label,
+          kind,
+          description:
+            typeof data.description === "string"
+              ? data.description
+              : summary && summary !== label
+                ? summary
+                : e.dirs.join("/"),
+          body: e.content.trim(),
+          modified: modified.toISOString(),
+          stage: stageOf(modified),
+          degree: 0,
+          tags: Array.isArray(data.topics) ? data.topics.map(String) : [],
+        },
+        [base, stripPrefix(norm(base)), name, label],
+      );
+      bodies.set(id, e.content);
+      if (Array.isArray(data.related)) related.set(id, data.related);
+    }
+
+    const seen = new Set();
+    const addLink = (source, target, kind) => {
+      if (source === target) return;
+      const key = `${source}→${target}:${kind}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      links.push({ source, target, kind });
+    };
+    const resolve = (ref) => {
+      const k = norm(ref);
+      if (!k) return null;
+      if (byKey.has(k)) return byKey.get(k);
+      const bare = stripPrefix(k);
+      if (byBare.has(bare)) return byBare.get(bare);
+      for (const p of MEMORY_PREFIXES)
+        if (byKey.has(p + k)) return byKey.get(p + k);
+      return null;
+    };
+
+    for (const [id, refs] of related)
+      for (const ref of refs) {
+        const target = resolve(ref);
+        if (target) addLink(id, target, "link");
+      }
+
+    for (const [id, body] of bodies) {
+      const prose = proseOf(body);
+      for (const m of body.matchAll(
+        /\[\[([^\]\[\n`|#]{2,80})(?:[|#][^\]\n]*)?\]\]/g,
+      )) {
+        const ref = m[1].replace(/\\$/, "").trim();
+        if (!ref || /^[^A-Za-z0-9]/.test(ref)) continue;
+        const target = resolve(ref);
+        if (target) addLink(id, target, "link");
+        else if (prose[m.index] === "[") {
+          const ghostId = `ghost:${norm(ref)}`;
+          if (!nodes.has(ghostId))
+            nodes.set(ghostId, {
+              id: ghostId,
+              label: ref,
+              kind: "ghost",
+              description: "Linked to, never written.",
+              body: "",
+              modified: null,
+              stage: "unknown",
+              degree: 0,
+              tags: [],
+            });
+          addLink(id, ghostId, "seed");
+        }
+      }
+      for (const { id: conceptId, matchers } of concepts) {
+        if (conceptId === id) continue;
+        if (matchers.some((re) => re.test(body)))
+          addLink(conceptId, id, "concept");
+      }
+    }
+
+    // Relations nobody wrote down: the same document filed twice, and one note
+    // named in another's prose. Derived here; never written back.
+    const pair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const joined = new Set(links.map((l) => pair(l.source, l.target)));
+    const PAGES = ["note", "notion", "garden", "reading"];
+    const titleKey = (s) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const pages = [...nodes.values()]
+      .filter((n) => PAGES.includes(n.kind))
+      .map((n) => ({ id: n.id, kind: n.kind, key: titleKey(n.label) }))
+      .filter((p) => p.key.length >= 10);
+    for (let i = 0; i < pages.length; i++)
+      for (let j = i + 1; j < pages.length; j++) {
+        const [a, b] = [pages[i], pages[j]];
+        const [short, long] =
+          a.key.length <= b.key.length ? [a.key, b.key] : [b.key, a.key];
+        const same =
+          a.kind !== b.kind &&
+          (short === long || (short.length >= 24 && long.startsWith(short)));
+        if (same && !joined.has(pair(a.id, b.id))) {
+          addLink(a.id, b.id, "twin");
+          joined.add(pair(a.id, b.id));
+        }
+      }
+    const named = [...nodes.values()]
+      .filter(
+        (n) =>
+          !["concept", "repo", "ghost"].includes(n.kind) &&
+          /\s/.test(n.label.trim()) &&
+          n.label.trim().length >= 10 &&
+          /^[A-Za-z]/.test(n.label) &&
+          !/_/.test(n.label),
+      )
+      .map((n) => ({
+        id: n.id,
+        label: n.label.trim(),
+        lower: n.label.trim().toLowerCase(),
+        exact: n.label.trim().split(/\s+/).length <= 2,
+        re: null,
+      }));
+    for (const [id, body] of bodies) {
+      const prose = body
+        .replace(/\[\[[^\]\n]*\]\]/g, " ")
+        .replace(/\]\([^)\n]*\)/g, "]");
+      const lower = prose.toLowerCase();
+      for (const t of named) {
+        if (t.id === id || !lower.includes(t.lower)) continue;
+        if (joined.has(pair(id, t.id))) continue;
+        t.re ??= new RegExp(
+          `(?<![\\w-])${t.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`,
+          t.exact ? "" : "i",
+        );
+        if (t.re.test(prose)) {
+          addLink(id, t.id, "mention");
+          joined.add(pair(id, t.id));
+        }
+      }
+    }
+    for (const l of links) {
+      const s = nodes.get(l.source);
+      const t = nodes.get(l.target);
+      if (s) s.degree++;
+      if (t) t.degree++;
+    }
+    return { nodes: [...nodes.values()], links };
+  }
+
+  // ── the flow: which way a thread carries influence (lib/flow.ts) ──────────
+
+  /** A note that links to, names or seeds a thing was fed by it; a term practised in a note fed the note; twins feed each other. */
+  function orient(l) {
+    switch (l.kind) {
+      case "link":
+      case "mention":
+      case "seed":
+        return [{ from: l.target, to: l.source, kind: l.kind }];
+      case "concept":
+      case "build":
+        return [{ from: l.source, to: l.target, kind: l.kind }];
+      case "twin":
+        return [
+          { from: l.source, to: l.target, kind: l.kind },
+          { from: l.target, to: l.source, kind: l.kind },
+        ];
+    }
+    return [];
+  }
+  function buildFlow(links) {
+    const into = new Map();
+    for (const l of links)
+      for (const a of orient(l)) {
+        const arr = into.get(a.to);
+        if (arr) arr.push(a);
+        else into.set(a.to, [a]);
+      }
+    return { into };
+  }
+
+  // ── the course: pure (lib/course.ts) ──────────────────────────────────────
+
+  function slugOf(title) {
+    const s = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60);
+    return s || "decision";
+  }
+  const emptyCourse = (belief) => ({
+    belief,
+    slug: slugOf(belief),
+    question: "",
+    asked: "",
+    trail: [],
+    marks: {},
+    note: "",
+  });
+  const dayKey = (iso) => iso.slice(0, 10);
+  const sortInputs = (inputs, nodes) => {
+    const label = (id) => nodes.get(id)?.label ?? id;
+    return [...inputs].sort((x, y) => {
+      if (x.date === null && y.date === null)
+        return label(x.id).localeCompare(label(y.id));
+      if (x.date === null) return -1;
+      if (y.date === null) return 1;
+      return x.date < y.date
+        ? -1
+        : x.date > y.date
+          ? 1
+          : label(x.id).localeCompare(label(y.id));
+    });
+  };
+  /** What hit the belief, in the order it came: everything that flows straight into it, undated first. */
+  function inputsOf(flow, nodes, belief) {
+    const by = new Map();
+    for (const a of flow.into.get(belief) ?? []) {
+      if (a.from === belief) continue;
+      const cur = by.get(a.from);
+      if (cur) {
+        if (!cur.threads.includes(a.kind)) cur.threads.push(a.kind);
+      } else {
+        const date = nodes.get(a.from)?.modified ?? null;
+        by.set(a.from, {
+          id: a.from,
+          threads: [a.kind],
+          date,
+          dated: date ? "changed" : null,
+        });
+      }
+    }
+    return sortInputs([...by.values()], nodes);
+  }
+  function dateInputs(inputs, arrivals, nodes) {
+    return sortInputs(
+      inputs.map((i) =>
+        arrivals[i.id] ? { ...i, date: arrivals[i.id], dated: "arrived" } : i,
+      ),
+      nodes,
+    );
+  }
+  function tally(inputs, marks, nodes, belief, rewrites = []) {
+    const lastSteered = rewrites.length
+      ? rewrites[rewrites.length - 1]
+      : belief?.modified
+        ? dayKey(belief.modified)
+        : null;
+    const t = {
+      n: inputs.length,
+      weighed: 0,
+      toward: 0,
+      away: 0,
+      unweighed: 0,
+      undated: 0,
+      first: null,
+      last: null,
+      recordSince: rewrites[0] ?? null,
+      steered: Math.max(0, rewrites.length - 1),
+      lastSteered,
+      since: 0,
+      sinceUnweighed: 0,
+      run: [],
+      byKind: { toward: {}, away: {} },
+      own: 0,
+      read: 0,
+      code: 0,
+      unwritten: 0,
+      fallow: 0,
+      lastMarked: null,
+    };
+    for (const i of inputs) {
+      const n = nodes.get(i.id);
+      const m = marks[i.id];
+      if (m) {
+        t.weighed++;
+        t[m.mark]++;
+        t.run.push(m.mark);
+        const kind = n?.kind ?? "note";
+        t.byKind[m.mark][kind] = (t.byKind[m.mark][kind] ?? 0) + 1;
+        if (!t.lastMarked || m.day > t.lastMarked) t.lastMarked = m.day;
+      } else t.unweighed++;
+      if (i.date === null) t.undated++;
+      else {
+        if (!t.first || i.date < t.first) t.first = i.date;
+        if (!t.last || i.date > t.last) t.last = i.date;
+        if (lastSteered && dayKey(i.date) > lastSteered) {
+          t.since++;
+          if (!m) t.sinceUnweighed++;
+        }
+      }
+      const k = n?.kind;
+      if (k === "ghost") t.unwritten++;
+      else if (k === "reading") t.read++;
+      else if (k === "repo") t.code++;
+      else if (k) t.own++;
+      if (n?.stage === "fallow") t.fallow++;
+    }
+    return t;
+  }
+  const MON = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  /** "3 Aug", with the year when it is not this one. */
+  function dayOf(iso, now = new Date()) {
+    if (!iso) return "undated";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    const year =
+      d.getFullYear() === now.getFullYear() ? "" : ` ${d.getFullYear()}`;
+    return `${d.getDate()} ${MON[d.getMonth()]}${year}`;
+  }
+  const DAY_MS = 86400000;
+  const daysBetween = (from, to) =>
+    Math.max(0, Math.floor((to.getTime() - new Date(from).getTime()) / DAY_MS));
+  const QUIET_DAYS = 45;
+  const NOUN = {
+    project: ["build", "builds"],
+    concept: ["concept", "concepts"],
+    user: ["self note", "self notes"],
+    feedback: ["rule", "rules"],
+    reference: ["reference", "references"],
+    routine: ["routine", "routines"],
+    note: ["fieldnote", "fieldnotes"],
+    notion: ["Notion note", "Notion notes"],
+    garden: ["garden note", "garden notes"],
+    reading: ["reading", "readings"],
+    meta: ["root", "roots"],
+    agent: ["agent", "agents"],
+    repo: ["repo", "repos"],
+    ghost: ["unwritten thing", "unwritten things"],
+  };
+  const count = (n, kind) => {
+    const [one, many] = NOUN[kind] ?? [kind, `${kind}s`];
+    return n === 1 ? `${/^[aeiou]/.test(one) ? "an" : "a"} ${one}` : `${n} ${many}`;
+  };
+  const list = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+  const kinds = (by) =>
+    list(
+      Object.entries(by)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .map(([k, n]) => count(n, k)),
+    );
+
+  /** The reading, sentence by sentence: what the marks and the dates say. The judgment stays the reader's. */
+  function readings(t, course, belief, now = new Date()) {
+    const out = [];
+    const day = (iso) => dayOf(iso, now);
+    const s = (n) => (n === 1 ? "" : "s");
+    const have = (n) => (n === 1 ? "has" : "have");
+    if (t.n === 0) {
+      out.push("nothing has hit this yet — it rests on nothing written here.");
+    } else {
+      const span =
+        t.first && t.last
+          ? dayKey(t.first) === dayKey(t.last)
+            ? `, all on ${day(t.first)}`
+            : `, ${day(t.first)} to ${day(t.last)}`
+          : "";
+      const undated = t.undated ? `; ${t.undated} undated` : "";
+      out.push(`hit by ${t.n} input${s(t.n)}${span}${undated}.`);
+      if (t.weighed === 0)
+        out.push(
+          "none weighed yet — say, after the fact, which way each one bent you.",
+        );
+      else
+        out.push(
+          `${t.weighed} weighed: ${t.toward} bent it toward the question, ${t.away} away${
+            t.unweighed ? `; ${t.unweighed} unweighed` : ""
+          }.`,
+        );
+    }
+    if (t.recordSince && t.lastSteered) {
+      const times = (n) =>
+        n === 1 ? "once" : n === 2 ? "twice" : `${n} times`;
+      const after =
+        t.since > 0
+          ? `${t.since} input${s(t.since)} ${have(t.since)} hit it since${
+              t.sinceUnweighed ? `, ${t.sinceUnweighed} of them unweighed` : ""
+            }`
+          : t.n > 0
+            ? "nothing has hit it since"
+            : "";
+      out.push(
+        `on record since ${day(t.recordSince)}; ${
+          t.steered > 0
+            ? `steered ${times(t.steered)}, last on ${day(t.lastSteered)}`
+            : "not steered since"
+        }${after ? `; ${after}` : ""}.`,
+      );
+    } else if (t.since > 0 && belief?.modified)
+      out.push(
+        `${t.since} input${s(t.since)} ${have(t.since)} hit it since it was last rewritten (${day(belief.modified)})${
+          t.sinceUnweighed ? `, ${t.sinceUnweighed} of them unweighed` : ""
+        }.`,
+      );
+    if (t.last) {
+      const ago = daysBetween(t.last, now);
+      if (ago > QUIET_DAYS)
+        out.push(
+          `nothing has hit it in ${ago} days — the field has gone quiet.`,
+        );
+      else if (ago <= 14)
+        out.push(
+          `the last input landed ${ago === 0 ? "today" : ago === 1 ? "yesterday" : `${ago} days ago`}.`,
+        );
+    }
+    if (t.run.length >= 3) {
+      const k = Math.min(t.run.length, 5);
+      const last = t.run.slice(-k);
+      const toward = last.filter((m) => m === "toward").length;
+      const away = k - toward;
+      if (toward === k || away === k)
+        out.push(
+          `the last ${k} weighed all bent it ${toward === k ? "toward" : "away"}.`,
+        );
+      else if (k >= 4 && Math.max(toward, away) / k >= 0.75)
+        out.push(
+          `of the last ${k} weighed, ${Math.max(toward, away)} bent it ${toward > away ? "toward" : "away"}.`,
+        );
+    }
+    if (t.toward > 0 || t.away > 0) {
+      const parts = [];
+      if (t.toward > 0) parts.push(`toward: ${kinds(t.byKind.toward)}`);
+      if (t.away > 0) parts.push(`away: ${kinds(t.byKind.away)}`);
+      out.push(`what bent it ${parts.join(" · ")}.`);
+    }
+    const total = t.own + t.read + t.code;
+    if (total > 0 && t.n > 0) {
+      if (t.read === 0) out.push("its inputs are all your own writing.");
+      else if (t.own / total >= 0.75)
+        out.push(
+          `its inputs are mostly your own writing — ${t.read} of ${total} ${t.read === 1 ? "is something" : "are things"} you read.`,
+        );
+      else if (t.own / total <= 0.25)
+        out.push(
+          `its inputs are mostly things you read — ${t.own} of ${total} your own.`,
+        );
+      else
+        out.push(
+          `its inputs are ${t.own} of your own and ${t.read} things you read.`,
+        );
+    }
+    if (t.unwritten > 0)
+      out.push(
+        `${t.unwritten} of the inputs ${t.unwritten === 1 ? "was" : "were"} never written down.`,
+      );
+    if (t.fallow > 0)
+      out.push(
+        `${t.fallow} of the inputs ${have(t.fallow)} gone fallow since.`,
+      );
+    if (!course.question) out.push("the question has not been put in words.");
+    else if (course.trail.length === 0)
+      out.push(`the question was put ${day(course.asked)}.`);
+    else
+      out.push(
+        `the question as now put dates from ${day(course.asked)}; it was re-put ${course.trail.length} time${s(course.trail.length)} — it drifts because you moved it.`,
+      );
+    return out;
+  }
+  /** Where a day falls along a field whose inputs sit at known places. */
+  function timeX(anchors, day, x0, x1, now) {
+    if (!anchors.length) return (x0 + x1) / 2;
+    const at = (d) => new Date(dayKey(d)).getTime();
+    const a = [...anchors].sort((p, q) => at(p.date) - at(q.date));
+    const d = at(day);
+    if (d <= at(a[0].date)) return Math.max(x0, a[0].x - 14);
+    const last = a[a.length - 1];
+    if (d >= at(last.date)) {
+      const span = at(now) - at(last.date);
+      const f = span <= 0 ? 1 : Math.min(1, (d - at(last.date)) / span);
+      return last.x + (x1 - last.x) * f;
+    }
+    for (let i = 0; i < a.length - 1; i++) {
+      const p = a[i];
+      const q = a[i + 1];
+      if (d >= at(p.date) && d <= at(q.date)) {
+        const span = at(q.date) - at(p.date);
+        return span <= 0
+          ? (p.x + q.x) / 2
+          : p.x + ((q.x - p.x) * (d - at(p.date))) / span;
+      }
+    }
+    return last.x;
+  }
+  const TRAIL_MAX = 40;
+  /** Put the question in words. The old phrasing is kept, with its day. */
+  function putQuestion(c, question, today) {
+    const q = question.trim().slice(0, 500);
+    if (q === c.question) return c;
+    const trail = c.question
+      ? [...c.trail, { question: c.question, asked: c.asked }].slice(-TRAIL_MAX)
+      : c.trail;
+    return { ...c, question: q, asked: q ? today : "", trail };
+  }
+  /** Say which way an input bent the belief; null takes the mark back. */
+  function setMark(c, id, mark, today) {
+    const marks = { ...c.marks };
+    if (mark === null) delete marks[id];
+    else marks[id] = { mark, day: today };
+    return { ...c, marks };
+  }
+  const isBlank = (c) =>
+    !c.question && !c.trail.length && !Object.keys(c.marks).length && !c.note;
+  const DAYRE = /^\d{4}-\d{2}-\d{2}$/;
+  /** Validation at the boundary: a course read back from this browser's storage. */
+  function validateCourse(input, today) {
+    const c = input;
+    if (!c || typeof c !== "object") throw new Error("course: not an object");
+    if (
+      typeof c.belief !== "string" ||
+      !c.belief.trim() ||
+      c.belief.length > 400
+    )
+      throw new Error("course: which belief?");
+    const belief = c.belief.trim();
+    const question =
+      typeof c.question === "string" ? c.question.trim().slice(0, 500) : "";
+    const asked =
+      question && typeof c.asked === "string" && DAYRE.test(c.asked)
+        ? c.asked
+        : question
+          ? today
+          : "";
+    const trail = Array.isArray(c.trail)
+      ? c.trail
+          .flatMap((t) =>
+            t &&
+            typeof t === "object" &&
+            typeof t.question === "string" &&
+            t.question.trim()
+              ? [
+                  {
+                    question: t.question.trim().slice(0, 500),
+                    asked:
+                      typeof t.asked === "string" && DAYRE.test(t.asked)
+                        ? t.asked
+                        : "",
+                  },
+                ]
+              : [],
+          )
+          .slice(-TRAIL_MAX)
+      : [];
+    const marks = {};
+    if (c.marks && typeof c.marks === "object") {
+      let n = 0;
+      for (const [id, v] of Object.entries(c.marks)) {
+        if (!id || id.length > 400) continue;
+        if (!v || (v.mark !== "toward" && v.mark !== "away")) continue;
+        marks[id] = {
+          mark: v.mark,
+          day: typeof v.day === "string" && DAYRE.test(v.day) ? v.day : today,
+        };
+        if (++n >= 500) break;
+      }
+    }
+    return {
+      belief,
+      slug:
+        typeof c.slug === "string" && /^[a-z0-9][a-z0-9-]{0,80}$/.test(c.slug)
+          ? c.slug
+          : slugOf(belief),
+      question,
+      asked,
+      trail,
+      marks,
+      note: typeof c.note === "string" ? c.note.slice(0, 20000) : "",
+    };
+  }
+
+  // ── arriving: the distribution's word model (lib/taste.ts, the words measure) ──
+
+  const CORPUS_KINDS = new Set([
+    "concept",
+    "note",
+    "notion",
+    "garden",
+    "reading",
+    "project",
+    "user",
+    "feedback",
+    "reference",
+  ]);
+  const K = 8;
+  const MIN_WINDOW = 24;
+  const STOP = new Set(
+    `a about above after again against all also am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just let me more most my myself no nor not now of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves ll re ve don didn doesn isn aren wasn weren won wouldn couldn shouldn one two three like get got make made much many may might must ones thing things way well even still already always never ever every something anything nothing everything someone anyone everyone said says say see seen going went come came take took give gave use used using new old first last next back per via etc http https www com html`
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+  function stem(w) {
+    if (w.length <= 3) return w;
+    if (w.endsWith("ies") && w.length > 4) return `${w.slice(0, -3)}y`;
+    if (w.endsWith("ness") && w.length > 6) return w.slice(0, -4);
+    if (w.endsWith("ing") && w.length > 5) return w.slice(0, -3);
+    if (w.endsWith("ed") && w.length > 5) return w.slice(0, -2);
+    if (w.endsWith("ly") && w.length > 5) return w.slice(0, -2);
+    if (/(?:[sxz]|[cs]h)es$/.test(w) && w.length > 4) return w.slice(0, -2);
+    if (w.endsWith("s") && !w.endsWith("ss") && w.length > 4)
+      return w.slice(0, -1);
+    return w;
+  }
+  function tokens(text) {
+    return text
+      .toLowerCase()
+      .replace(/https?:\/\/\S+/g, " ")
+      .replace(/['’]s\b/g, "")
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !STOP.has(w) && !/^\d+$/.test(w))
+      .map((w) => {
+        const st = stem(w);
+        return st.length >= 3 && !STOP.has(st) ? st : w;
+      });
+  }
+  function docText(n) {
+    const body = (n.body ?? "").slice(0, 4000).replace(/[[\]#*_`>|]/g, " ");
+    return {
+      title: n.label,
+      text: `${n.description ?? ""}\n${(n.tags ?? []).join(" ")}\n${body}`,
+    };
+  }
+  function counts(title, text) {
+    const c = new Map();
+    const add = (ts, w) => {
+      for (let i = 0; i < ts.length; i++) {
+        c.set(ts[i], (c.get(ts[i]) ?? 0) + w);
+        if (i + 1 < ts.length) {
+          const pair = `${ts[i]}_${ts[i + 1]}`;
+          c.set(pair, (c.get(pair) ?? 0) + w);
+        }
+      }
+    };
+    add(tokens(title), 2);
+    add(tokens(text), 1);
+    return c;
+  }
+  function normalise(v) {
+    let s = 0;
+    for (const w of v.values()) s += w * w;
+    const n = Math.sqrt(s) || 1;
+    for (const [k, w] of v) v.set(k, w / n);
+    return v;
+  }
+  function weigh(c, idf) {
+    const v = new Map();
+    for (const [t, n] of c) v.set(t, (1 + Math.log(n)) * (idf.get(t) ?? 1));
+    return v;
+  }
+  function buildIndex(nodes) {
+    const raw = nodes
+      .filter((n) => CORPUS_KINDS.has(n.kind))
+      .map((n) => {
+        const { title, text } = docText(n);
+        return { n, c: counts(title, text) };
+      })
+      .filter((d) => d.c.size >= 4);
+    const N = raw.length;
+    const df = new Map();
+    for (const d of raw)
+      for (const t of d.c.keys()) df.set(t, (df.get(t) ?? 0) + 1);
+    const idf = new Map();
+    for (const [t, f] of df) idf.set(t, Math.log((N + 1) / (f + 1)) + 1);
+    const docs = raw.map((d) => ({
+      id: d.n.id,
+      label: d.n.label,
+      kind: d.n.kind,
+      modified: d.n.modified,
+      vec: normalise(weigh(d.c, idf)),
+    }));
+    return { docs, idf, N };
+  }
+  const vectorise = (index, title, text) =>
+    normalise(weigh(counts(title, text), index.idf));
+  function dot(a, b) {
+    if (a.size > b.size) [a, b] = [b, a];
+    let s = 0;
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) s += w * x;
+    }
+    return s;
+  }
+  function windowMembers(docs, days, now = Date.now()) {
+    if (days === null) return docs.map((_, i) => i);
+    const cut = now - days * 86400000;
+    const out = [];
+    docs.forEach((d, i) => {
+      if (d.modified && new Date(d.modified).getTime() >= cut) out.push(i);
+    });
+    return out;
+  }
+  function shared(a, b, n = 6) {
+    const out = [];
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) out.push([t, w * x]);
+    }
+    return out
+      .sort((p, q) => q[1] - p[1])
+      .slice(0, n)
+      .map((p) => p[0].replace(/_/g, " "));
+  }
+  /** The nearest stones on words, in the latest window that holds enough of the garden to have a curve. */
+  function kinOf(index, title, text) {
+    if (tokens(`${title} ${text}`).length < 4) return null;
+    const cvec = vectorise(index, title, text);
+    for (const days of [30, 90, null]) {
+      const members = windowMembers(index.docs, days);
+      if (members.length < MIN_WINDOW) continue;
+      return members
+        .map((i) => ({ i, sim: dot(index.docs[i].vec, cvec) }))
+        .sort((a, b) => b.sim - a.sim)
+        .slice(0, K)
+        .filter((s) => s.sim > 0)
+        .map((s) => ({
+          id: index.docs[s.i].id,
+          label: index.docs[s.i].label,
+          kind: index.docs[s.i].kind,
+          sim: s.sim,
+          shared: shared(cvec, index.docs[s.i].vec),
+        }));
+    }
+    return null;
+  }
+
+  // ── the specimen: a made-up garden, dated relative to today ───────────────
+
+  const NOW = Date.now();
+  const ago = (d) => new Date(NOW - d * DAY_MS).toISOString().slice(0, 10);
+  const RD = "source: readwise-reader";
+  const NO = "source: notion";
+  // [folder, title, days since it last changed, frontmatter, body]
+  const SPECIMEN = [
+    [
+      "Fieldnotes",
+      "Attention is composed, not captured",
+      9,
+      "",
+      "What I attend to is not simply taken from me. It can be arranged, the way a page is arranged: what goes in, what is left out, what comes first. A feed captures; a person can compose.\n\nIt started with [[Boredom is a doorway]] and the [[Commonplace book]], long before I had words for it. Then [[Phone in the drawer, week one]], and [[Unfollowing as editing]], which is where the word composing came from.\n\nSalience is the trouble. Whatever is loudest goes to the front, and [[The feed decides what is urgent]]. [[An economy of interruptions]] makes the case that the loudness is sold. I keep an attention budget now, and count what I spend.\n\nAgainst it: [[Attention as a kind of generosity]] says real attention is receiving, not arranging. [[A morning with no inputs]] went badly. And [[the default feed]] is still there whenever I stop choosing.\n\nLately: [[Against the dashboard]], [[Slow looking at the gallery]], and the Notification audit from this week.",
+    ],
+    [
+      "Fieldnotes",
+      "Phone in the drawer, week one",
+      182,
+      "",
+      "Seven days with the phone in the kitchen drawer. The first two days I reached for it every few minutes. By the fifth I noticed what I reached for: not news, not people, only the next thing. [[Boredom is a doorway]] came back to mind.",
+    ],
+    [
+      "Fieldnotes",
+      "Unfollowing as editing",
+      152,
+      "",
+      "Unfollowed a hundred and forty accounts in an afternoon. It felt less like quitting and more like editing a draft: cutting what crowds the page so the rest can be read. Composing, not abstaining. See [[Commonplace book]].",
+    ],
+    [
+      "Fieldnotes",
+      "The feed decides what is urgent",
+      68,
+      "",
+      "Nothing in the feed is urgent, and all of it is presented as if it were. The red dot is a decision someone made about my afternoon. Read alongside [[An economy of interruptions]] and [[Against the dashboard]]; kept the [[Notification audit]] as evidence.",
+    ],
+    [
+      "Fieldnotes",
+      "A morning with no inputs",
+      42,
+      "",
+      "A whole morning with no inputs: no podcast, no messages, no reading. Expected clarity; got restlessness and a long list of things I should be checking. Composing needs material. An empty page is not a composed one.",
+    ],
+    [
+      "Fieldnotes",
+      "Commonplace book",
+      130,
+      "",
+      "Copying passages out by hand into one notebook. What I copy is what I keep; the slowness is the filter. Started in a bad winter and never stopped.",
+    ],
+    [
+      "Fieldnotes",
+      "Boredom is a doorway",
+      240,
+      "",
+      "Bored on the train as a teenager, before phones, and the long thoughts that came out of it. The default mode, they call it. Boredom was where attention went when nothing was pulling it.",
+    ],
+    [
+      "Fieldnotes",
+      "Slow looking at the gallery",
+      6,
+      "",
+      "Ten minutes in front of one painting. The first three were impatience. After that the painting kept giving. Attention arranged on purpose, and held there.",
+    ],
+    [
+      "Fieldnotes",
+      "Notification audit",
+      3,
+      "",
+      "Counted every notification for a week: four hundred and twelve. Turned off all but people. The feed still decides plenty, but no longer when.",
+    ],
+    [
+      "Fieldnotes",
+      "Walking without headphones",
+      18,
+      "",
+      "Walked to work without headphones for a fortnight. The street is loud, but nothing in it is trying to capture me: whatever is loudest does not go to the front unless I let it. I chose what to look at, what goes in and what is left out. Attention, composed.",
+    ],
+    [
+      "Fieldnotes",
+      "Reading on paper again",
+      11,
+      "",
+      "Back to paper books in the evening. No feed at the bottom of the page, no next thing. A page arranged by someone who meant it, and my attention arranged around it: what comes first, what is left out.",
+    ],
+    [
+      "Fieldnotes",
+      "Sunday with the router off",
+      27,
+      "",
+      "Router off from Saturday night to Monday. With no feed to capture it, attention went where I arranged it, the way a page is arranged. The loudest thing in the house was the kettle. A day composed, not captured; it held until about four, then I stopped choosing.",
+    ],
+    [
+      "Fieldnotes",
+      "Group chats as weather",
+      35,
+      "",
+      "Three group chats, each with its own climate. I don't read them so much as check the weather, and half the time the forecast decides my mood.",
+    ],
+    [
+      "Fieldnotes",
+      "What I mean by a quiet week",
+      80,
+      "",
+      "A quiet week is not an empty one. It means fewer people deciding what I look at, and more of the looking chosen. See [[Commonplace book]].",
+    ],
+    [
+      "Fieldnotes",
+      "Letters to a younger self, draft",
+      300,
+      "",
+      "Draft of a letter I will not send. You will spend years worrying about the wrong exams, and almost no time on who you sit next to.",
+    ],
+    [
+      "Fieldnotes",
+      "Kitchen notes on bread",
+      45,
+      "",
+      "Seventy percent hydration, overnight in the fridge. Fold four times in the first two hours. The crust wants a hotter oven than the recipe says.",
+    ],
+    [
+      "Fieldnotes",
+      "The garden in October",
+      20,
+      "",
+      "Pulled the last tomatoes. The beans can stay until the first frost; the mint has taken the whole corner again.",
+    ],
+    [
+      "Glossary",
+      "Attention Budget",
+      60,
+      "meaning: The hours of attention in a day, treated as finite and spent on purpose.",
+      "A term for counting what attention gets spent on, the way one counts money. Not a scarcity mindset; a ledger.",
+    ],
+    [
+      "Glossary",
+      "Salience",
+      100,
+      "meaning: What stands out, whether or not it matters.",
+      "The property that makes something grab attention before it is chosen. Loud is not the same as important.",
+    ],
+    [
+      "Glossary",
+      "Default Mode",
+      150,
+      "meaning: What the mind does when nothing is asked of it.",
+      "Mind-wandering, rehearsal, the long thought on the train. Not idle.",
+    ],
+    [
+      "Reading",
+      "An economy of interruptions",
+      125,
+      RD,
+      "Highlights. The argument: attention is the scarce good of an information-rich world, and the platforms are in the business of selling it on. Every interruption is inventory. Better on the market than on what a person can do about it.",
+    ],
+    [
+      "Reading",
+      "Attention as a kind of generosity",
+      58,
+      RD,
+      "Highlights. Attention here is not a tool for arranging the world but a way of letting it in: the patience to receive what is there without deciding in advance what it is for. Composing what you see is a kind of control, and control is not attention.",
+    ],
+    [
+      "Reading",
+      "Against the dashboard",
+      16,
+      RD,
+      "Highlights. A review of productivity dashboards: counting attention changes what it is. The moment you budget it you are managing it, and managing is another feed.",
+    ],
+    [
+      "Reading",
+      "The interrupted mind, a review",
+      200,
+      RD,
+      "Highlights. An older survey of the research on task-switching. Each switch has a cost the switcher does not feel.",
+    ],
+    [
+      "Reading",
+      "Notes on monastic hours",
+      90,
+      RD,
+      "Highlights. The day divided by bells. Attention given a shape from outside, chosen once and then kept.",
+    ],
+    [
+      "Notion",
+      "Attention is composed, not captured",
+      215,
+      NO,
+      "Imported from an old workspace. The first version of the note: attention can be arranged rather than taken. Needs examples.",
+    ],
+    [
+      "Notion",
+      "Books to get to",
+      110,
+      NO,
+      "[[Notes on monastic hours]], [[The interrupted mind, a review]], and whatever the gallery shop has.",
+    ],
+    [
+      "Notion",
+      "Plans for the year",
+      50,
+      NO,
+      "The bread, the garden, a quieter phone, one long walk a week.",
+    ],
+  ];
+  const SPEC_FILES = SPECIMEN.map(([dir, title, days, front, body]) => ({
+    path: `${dir}/${title}.md`,
+    text: front ? `---\n${front}\n---\n${body}` : body,
+    mtime: NOW - days * DAY_MS,
+  }));
+  const SB = "note:Fieldnotes/Attention is composed, not captured";
+  const SF = "note:Fieldnotes/The feed decides what is urgent";
+  const sp = (title) => `note:Fieldnotes/${title}`;
+  const rd = (title) => `note:Reading/${title}`;
+  /** The specimen belief's record, as if it had been kept here for seven months. */
+  const SEED_HISTORY = {
+    [SB]: {
+      since: ago(210),
+      rewrites: [210, 160, 96, 41, 9].map(ago),
+      arrivals: {
+        [sp("Phone in the drawer, week one")]: ago(180),
+        [sp("Unfollowing as editing")]: ago(150),
+        [rd("An economy of interruptions")]: ago(120),
+        "concept:Salience": ago(96),
+        [SF]: ago(66),
+        [rd("Attention as a kind of generosity")]: ago(55),
+        [sp("A morning with no inputs")]: ago(41),
+        "ghost:the_default_feed": ago(25),
+        [rd("Against the dashboard")]: ago(14),
+        [sp("Slow looking at the gallery")]: ago(6),
+        [sp("Notification audit")]: ago(3),
+      },
+    },
+  };
+  const mk = (mark, d) => ({ mark, day: ago(d) });
+  const SEED_COURSES = () => [
+    {
+      belief: SB,
+      slug: "attention-is-composed-not-captured",
+      question:
+        "Is attention something I can compose, or only something I can protect?",
+      asked: ago(41),
+      trail: [
+        {
+          question: "How do I stop the feed deciding for me?",
+          asked: ago(160),
+        },
+        { question: "Can I choose what I attend to?", asked: ago(96) },
+      ],
+      marks: {
+        [sp("Boredom is a doorway")]: mk("toward", 200),
+        [sp("Phone in the drawer, week one")]: mk("toward", 175),
+        [sp("Unfollowing as editing")]: mk("toward", 148),
+        [sp("Commonplace book")]: mk("toward", 140),
+        [rd("An economy of interruptions")]: mk("away", 110),
+        "concept:Salience": mk("away", 95),
+        [SF]: mk("away", 64),
+        "concept:Attention Budget": mk("toward", 60),
+        [rd("Attention as a kind of generosity")]: mk("away", 50),
+        [sp("A morning with no inputs")]: mk("away", 40),
+        "ghost:the_default_feed": mk("away", 22),
+      },
+      note: "",
+    },
+    {
+      belief: SF,
+      slug: "the-feed-decides-what-is-urgent",
+      question: "What makes something feel urgent when it is not?",
+      asked: ago(66),
+      trail: [],
+      marks: { [rd("An economy of interruptions")]: mk("toward", 66) },
+      note: "",
+    },
+  ];
+
+  // ── keeping: one key in this browser ──────────────────────────────────────
+
+  const KEY = "pp-course";
+  let storeOk = true;
+  function loadStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      const v = raw ? JSON.parse(raw) : null;
+      return v &&
+        typeof v === "object" &&
+        v.gardens &&
+        typeof v.gardens === "object"
+        ? v
+        : { v: 1, gardens: {} };
+    } catch {
+      storeOk = false;
+      return { v: 1, gardens: {} };
+    }
+  }
+  const store = loadStore();
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(store));
+      storeOk = true;
+    } catch {
+      storeOk = false;
+    }
+    return storeOk;
+  }
+  const today = () => new Date().toISOString().slice(0, 10);
+  const gardenStore = (gk) => (store.gardens[gk] ??= {});
+
+  function coursesOf(gk) {
+    const g = store.gardens[gk];
+    const raw =
+      g && Array.isArray(g.courses)
+        ? g.courses
+        : gk === "specimen"
+          ? SEED_COURSES()
+          : [];
+    const t = today();
+    const out = [];
+    for (const c of raw) {
+      try {
+        out.push(validateCourse(c, t));
+      } catch {
+        /* a course this page cannot read is left out, not guessed at */
+      }
+    }
+    return out;
+  }
+
+  /**
+   * What the belief's own record remembers. niwa read it from git; here the record
+   * is kept in this browser: the first day the belief was put on the sheet begins
+   * it, a day its note had changed when read again is a day it was steered, and the
+   * first day an input was found threaded to it is the day that input arrived. An
+   * input already there when the record begins has no arrival; the record cannot
+   * say when it came. Twins are the same document and are not dated by arrival.
+   */
+  function historyFor(gk, beliefId, inputs) {
+    if (gk === "specimen" && SEED_HISTORY[beliefId])
+      return SEED_HISTORY[beliefId];
+    const node = S.nodes.get(beliefId);
+    if (!node) return { rewrites: [], arrivals: {}, since: null };
+    const g = gardenStore(gk);
+    g.record ??= {};
+    const t = today();
+    const h = seedOf(`${node.description}\u0000${node.body}`);
+    let rec = g.record[beliefId];
+    if (!rec || typeof rec !== "object" || !DAYRE.test(rec.since ?? "")) {
+      rec = { since: t, rewrites: [t], hash: h, seen: {} };
+      g.record[beliefId] = rec;
+    } else if (rec.hash !== h) {
+      rec.hash = h;
+      if (!rec.rewrites.includes(t)) rec.rewrites.push(t);
+    }
+    for (const i of inputs) {
+      if (i.threads.length === 1 && i.threads[0] === "twin") continue;
+      if (!(i.id in rec.seen)) rec.seen[i.id] = t;
+    }
+    persist();
+    const arrivals = {};
+    for (const [id, d] of Object.entries(rec.seen))
+      if (d > rec.since) arrivals[id] = d;
+    return {
+      rewrites: [...new Set(rec.rewrites)].sort(),
+      arrivals,
+      since: rec.since,
+    };
+  }
+
+  // ── the page ──────────────────────────────────────────────────────────────
+
+  const W = 900;
+  const H = 484;
+  const QY = 74;
+  const FX0 = 170;
+  const FX1 = 780;
+  const END_X = 802;
+  const LAUNCH = [110, 392];
+  const Y0 = 250;
+  const Y_MIN = 100;
+  const Y_MAX = 386;
+  const BH = 22;
+  const TICK_Y = 428;
+  const STEER_Y = 462;
+  const LABELS_UP_TO = 22;
+  const REST =
+    "click an input and say, after the fact, which way it bent you. the course is your marks, drawn; nothing here is a grade.";
+  const OWN = new Set([
+    "note",
+    "project",
+    "user",
+    "feedback",
+    "concept",
+    "reference",
+  ]);
+  const KIND_LABEL = {
+    project: "Builds",
+    concept: "Concepts",
+    user: "Self",
+    feedback: "Rules",
+    reference: "Reference",
+    routine: "Routines",
+    note: "Fieldnotes",
+    notion: "Notion",
+    garden: "Garden notes",
+    reading: "Reading",
+    meta: "Root",
+    agent: "Agents",
+    repo: "Repos",
+    ghost: "Unwritten",
+  };
+  const LINK_LABEL = {
+    link: "Written link",
+    concept: "Shared vocabulary",
+    build: "Points at code",
+    seed: "Unplanted",
+    mention: "Named in prose",
+    twin: "Same document",
+  };
+  const STAGE_LABEL = {
+    fresh: "Fresh",
+    tended: "Tended",
+    settled: "Settled",
+    fallow: "Fallow",
+    unknown: "Undated",
+  };
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const $ = (id) => document.getElementById(id);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const lastSaid = (c) =>
+    Object.values(c.marks).reduce((m, x) => (x.day > m ? x.day : m), c.asked);
+  const colourOf = (m) =>
+    m === "toward"
+      ? "var(--toward)"
+      : m === "away"
+        ? "var(--away)"
+        : "var(--faint)";
+  const kindVar = (k) => `var(--kind-${KIND_LABEL[k] ? k : "note"})`;
+
+  const S = {
+    gk: "specimen",
+    ownName: null,
+    nodes: new Map(),
+    flow: { into: new Map() },
+    garden: null,
+    index: null,
+    courses: [],
+    belief: null,
+    walk: [],
+    history: null,
+    inputs: [],
+    arriving: null,
+    selected: null,
+    hover: null,
+    cap: null,
+    kept: "idle",
+    qDraft: "",
+    trailOpen: false,
+    steerOpen: false,
+    readOpen: false,
+    query: "",
+    lastBelief: null,
+    lastMarks: null,
+  };
+  let capTimer = null;
+  let keptTimer = null;
+
+  const course = () =>
+    S.belief
+      ? (S.courses.find((c) => c.belief === S.belief) ?? emptyCourse(S.belief))
+      : null;
+
+  function openGarden(gk, files, name) {
+    S.gk = gk;
+    S.ownName = name;
+    S.garden = buildGarden(files);
+    S.nodes = new Map(S.garden.nodes.map((n) => [n.id, n]));
+    S.flow = buildFlow(S.garden.links);
+    S.index = null;
+    S.courses = coursesOf(gk);
+    S.walk = [];
+    S.belief = null;
+    S.query = "";
+    S.cap = null;
+    $("q-search").value = "";
+    // Every belief already on record is read again: has its note changed, has anything new hit it?
+    const rec = store.gardens[gk]?.record;
+    if (rec)
+      for (const id of Object.keys(rec))
+        if (S.nodes.has(id)) historyFor(gk, id, inputsOf(S.flow, S.nodes, id));
+    // The first belief: the one last steered here, else your own stone the most has flowed into.
+    const steered = [...S.courses]
+      .filter((c) => S.nodes.has(c.belief) && !isBlank(c))
+      .sort((a, b) =>
+        lastSaid(a) < lastSaid(b) ? 1 : lastSaid(a) > lastSaid(b) ? -1 : 0,
+      )[0];
+    let first = steered?.belief ?? null;
+    if (!first) {
+      let most = 0;
+      for (const n of S.garden.nodes) {
+        if (!OWN.has(n.kind)) continue;
+        const k = new Set((S.flow.into.get(n.id) ?? []).map((a) => a.from))
+          .size;
+        if (k > most) {
+          most = k;
+          first = n.id;
+        }
+      }
+    }
+    if (first) go(first);
+    else render();
+  }
+
+  /** Put a belief on the sheet, and remember the way here. */
+  function go(id) {
+    const i = S.walk.indexOf(id);
+    S.walk = i >= 0 ? S.walk.slice(0, i + 1) : [...S.walk, id];
+    setBelief(id);
+  }
+  function back() {
+    if (S.walk.length < 2) return;
+    S.walk = S.walk.slice(0, -1);
+    setBelief(S.walk[S.walk.length - 1]);
+  }
+  function setBelief(id) {
+    S.belief = id;
+    S.selected = null;
+    S.hover = null;
+    S.trailOpen = false;
+    S.steerOpen = false;
+    S.readOpen = false;
+    const raw = inputsOf(S.flow, S.nodes, id);
+    S.history = historyFor(S.gk, id, raw);
+    S.inputs = dateInputs(raw, S.history.arrivals, S.nodes);
+    S.qDraft = course().question;
+    S.arriving = arrivingFor(id);
+    render();
+  }
+
+  /** What came lately that speaks the belief's words and is not threaded to it. */
+  function arrivingFor(id) {
+    const n = S.nodes.get(id);
+    if (!n) return null;
+    const text = `${n.description ?? ""}\n${n.body ?? ""}`.trim();
+    if (text.split(/\s+/).length < 8) return null;
+    S.index ??= buildIndex(S.garden.nodes);
+    const have = new Set((S.flow.into.get(id) ?? []).map((a) => a.from));
+    const kin = kinOf(S.index, n.label, text.slice(0, 20000));
+    return kin
+      ? kin.filter((k) => k.id !== id && !have.has(k.id)).slice(0, 6)
+      : null;
+  }
+
+  function say(msg) {
+    if (capTimer) clearTimeout(capTimer);
+    S.cap = msg;
+    capTimer = setTimeout(() => {
+      S.cap = null;
+      renderCaption();
+    }, 2400);
+  }
+
+  function save(next) {
+    let c;
+    try {
+      c = validateCourse(next, today());
+    } catch {
+      return;
+    }
+    const i = S.courses.findIndex((x) => x.belief === c.belief);
+    if (isBlank(c)) {
+      if (i >= 0) S.courses.splice(i, 1);
+    } else if (i < 0) S.courses.push(c);
+    else S.courses[i] = c;
+    gardenStore(S.gk).courses = S.courses;
+    S.kept = persist() ? "kept" : "error";
+    if (S.kept === "error")
+      say("could not keep it — this browser will not hold it.");
+    if (keptTimer) clearTimeout(keptTimer);
+    keptTimer = setTimeout(() => {
+      if (S.kept === "kept") S.kept = "idle";
+      renderStatus();
+    }, 1600);
+  }
+
+  function mark(id, m) {
+    const c = course();
+    if (!c) return;
+    const cur = c.marks[id]?.mark ?? null;
+    const next = cur === m ? null : m;
+    save(setMark(c, id, next, today()));
+    const label = short(S.nodes.get(id)?.label ?? id, 40).toLowerCase();
+    if (S.kept !== "error")
+      say(
+        next === "toward"
+          ? `${label} — course corrected.`
+          : next === "away"
+            ? `${label} — drift.`
+            : `${label} — unweighed again.`,
+      );
+    render();
+  }
+
+  function put() {
+    const c = course();
+    if (!c) return;
+    const next = putQuestion(c, S.qDraft, today());
+    if (next === c) return;
+    save(next);
+    if (S.kept !== "error")
+      say(
+        next.question
+          ? "the question, as now put."
+          : "the question, taken back.",
+      );
+    render();
+  }
+
+  // ── drawn ─────────────────────────────────────────────────────────────────
+
+  function sceneOf(c) {
+    const inputs = S.inputs;
+    const n = inputs.length;
+    const step = clamp(210 / Math.max(n, 1), 8, 32);
+    const slot = (FX1 - FX0) / Math.max(n, 1);
+    const bw = clamp(slot - 8, 22, 96);
+    let y = Y0;
+    const pts = [LAUNCH];
+    const bricks = inputs.map((inp, i) => {
+      const x = FX0 + (i + 0.5) * slot;
+      const m = c.marks[inp.id]?.mark ?? null;
+      const b = { ...inp, i, x, y, mark: m };
+      pts.push([x, y]);
+      if (m === "toward") y = Math.max(Y_MIN, y - step);
+      else if (m === "away") y = Math.min(Y_MAX, y + step);
+      return b;
+    });
+    pts.push([END_X, y]);
+    const seed = seedOf(`course:${c.belief}`);
+    const r = rand(seed);
+    let line = "";
+    for (let i = 0; i < pts.length - 1; i++)
+      line += stroke(pts[i], pts[i + 1], r, 1.0, 0);
+    const ink = ribbon(line, 1.7, seed);
+    const a = pts[pts.length - 2];
+    const b = pts[pts.length - 1];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const ux = (b[0] - a[0]) / len;
+    const uy = (b[1] - a[1]) / len;
+    const tip = [b[0] + ux * 34, b[1] + uy * 34];
+    const head = (ang) => {
+      const s = [
+        tip[0] - (ux * Math.cos(ang) - uy * Math.sin(ang)) * 9,
+        tip[1] - (ux * Math.sin(ang) + uy * Math.cos(ang)) * 9,
+      ];
+      return ribbon(stroke(s, tip, r, 0.5, 0), 1.3, seed + 3);
+    };
+    const heading =
+      ribbon(
+        stroke([b[0] + ux * 11, b[1] + uy * 11], tip, r, 0.6, 0),
+        1.4,
+        seed + 2,
+      ) +
+      head(0.5) +
+      head(-0.5);
+    const ticks = [];
+    let last = "";
+    for (const brick of bricks) {
+      const d = brick.date ? new Date(brick.date) : null;
+      const key = d ? `${d.getFullYear()}-${d.getMonth()}` : "undated";
+      if (key === last) continue;
+      last = key;
+      ticks.push({
+        x: brick.x,
+        label: d
+          ? `${MON[d.getMonth()]}${d.getFullYear() === new Date().getFullYear() ? "" : ` ${d.getFullYear()}`}`
+          : "undated",
+      });
+    }
+    const anchors = bricks
+      .filter((k) => k.date)
+      .map((k) => ({ date: dayKey(k.date), x: k.x }));
+    const steers = (S.history?.rewrites ?? []).map((day) => ({
+      day,
+      x: timeX(anchors, day, FX0, END_X, today()),
+    }));
+    // Labels take the first free place among near and far, above and below.
+    const cw = 6.1;
+    const maxChars = clamp(
+      Math.floor((4 * (FX1 - FX0)) / Math.max(n, 1) / cw),
+      8,
+      26,
+    );
+    const taken = bricks.map((k) => [
+      k.x - bw / 2 - 2,
+      k.y - BH / 2 - 2,
+      k.x + bw / 2 + 2,
+      k.y + BH / 2 + 2,
+    ]);
+    const labels = new Map();
+    const slots = [-7, BH + 15, -21, BH + 29, -35, BH + 43];
+    for (const brick of bricks) {
+      const text = short(S.nodes.get(brick.id)?.label ?? brick.id, maxChars);
+      const w = text.length * cw;
+      for (const dy of slots) {
+        const ly = brick.y - BH / 2 + dy;
+        const box = [brick.x - w / 2 - 3, ly - 11, brick.x + w / 2 + 3, ly + 3];
+        const clear = !taken.some(
+          (k) =>
+            box[0] < k[2] && box[2] > k[0] && box[1] < k[3] && box[3] > k[1],
+        );
+        if (clear) {
+          taken.push(box);
+          labels.set(brick.id, { x: brick.x, y: ly, text });
+          break;
+        }
+      }
+    }
+    return {
+      bricks,
+      line,
+      ink,
+      end: b,
+      heading,
+      ticks,
+      steers,
+      bw,
+      seed,
+      labels,
+    };
+  }
+
+  const mono = (x, y, text, { anchor = "start", size = 9, ls = 1.2 } = {}) =>
+    `<text class="b-mono" x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" letter-spacing="${ls}" style="fill:var(--faint);text-transform:uppercase">${esc(text)}</text>`;
+
+  function renderSheet() {
+    const box = $("sheet");
+    const c = course();
+    const b = S.belief ? S.nodes.get(S.belief) : null;
+    if (!c || !b) {
+      S.lastBelief = null;
+      box.innerHTML = `<div class="empty"><span class="meta">${
+        S.garden ? "nothing has flowed into anything yet" : "laying the field"
+      }</span></div>`;
+      return;
+    }
+    const t = tally(S.inputs, c.marks, S.nodes, b, S.history?.rewrites ?? []);
+    const sc = sceneOf(c);
+    const marksKey = `${c.belief}|${JSON.stringify(c.marks)}`;
+    const enter = S.lastBelief !== c.belief;
+    const drawCourse = S.lastMarks !== marksKey;
+    S.lastBelief = c.belief;
+    S.lastMarks = marksKey;
+    const motion = !reduce.matches;
+    const o = [];
+    o.push(
+      `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="course-sheet${enter ? " enter" : ""}" role="img" aria-label="${esc(`${b.label}: hit by ${t.n} inputs, ${t.weighed} weighed`)}">`,
+    );
+    if (motion)
+      o.push(
+        `<defs><mask id="cm" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><path d="${sc.line}" pathLength="1" fill="none" stroke="white" stroke-width="26" stroke-linecap="round"${drawCourse ? ' class="draw"' : ""}/></mask></defs>`,
+      );
+    // the belief, named where the readout sits
+    o.push(mono(18, 24, "the belief", { size: 9.5, ls: 1.6 }));
+    o.push(`<circle cx="22" cy="40" r="4.5" style="fill:var(--accent)"/>`);
+    o.push(
+      `<text class="b-hand" x="32" y="45" font-size="16" style="fill:var(--ink)">${esc(short(b.label, 44))}</text>`,
+    );
+    // the question, as a horizon, with its earlier phrasings settled under it
+    o.push(
+      mono(850, QY - 16, "the question · approx.", {
+        anchor: "end",
+        size: 9.5,
+        ls: 1.6,
+      }),
+    );
+    o.push(
+      `<path d="${stroke([FX0 - 10, QY], [850, QY], rand(sc.seed + 7), 1.2, 0)}" fill="none" stroke-width="1" stroke-dasharray="3 5" opacity="0.8" style="stroke:var(--muted)"/>`,
+    );
+    const star = [
+      [
+        [0, -8],
+        [0, 8],
+      ],
+      [
+        [-8, 0],
+        [8, 0],
+      ],
+      [
+        [-4.5, -4.5],
+        [4.5, 4.5],
+      ],
+      [
+        [-4.5, 4.5],
+        [4.5, -4.5],
+      ],
+    ];
+    o.push(
+      `<g transform="translate(866 ${QY})" style="fill:var(--ink)">${star
+        .map(
+          ([p, q], i) =>
+            `<path d="${ribbon(stroke(p, q, rand(sc.seed + 11 + i), 0.5, 0), 1.4, sc.seed + i)}"/>`,
+        )
+        .join("")}</g>`,
+    );
+    o.push(
+      `<text class="b-hand" x="${FX0 - 6}" y="${QY - 9}" font-size="15" style="fill:${c.question ? "var(--ink)" : "var(--faint)"}">${esc(
+        c.question
+          ? short(c.question, 76)
+          : "not yet put in words — put it on the desk",
+      )}</text>`,
+    );
+    const rev = [...c.trail].reverse();
+    rev.slice(0, 3).forEach((tr, k) => {
+      const until = tr.asked
+        ? ` · until ${dayOf(tr.asked === c.asked ? tr.asked : k === 0 ? c.asked : rev[k - 1].asked)}`
+        : "";
+      o.push(
+        `<text class="b-hand" x="${FX0 - 6}" y="${QY + 15 + k * 13}" font-size="12.5" opacity="${0.55 - k * 0.14}" style="fill:var(--muted)">${esc(short(tr.question, 70) + until)}</text>`,
+      );
+    });
+    // the months under the field
+    for (const tk of sc.ticks)
+      o.push(
+        `<line x1="${tk.x}" y1="${TICK_Y}" x2="${tk.x}" y2="${TICK_Y + 6}" stroke-width="1" style="stroke:var(--rule)"/>${mono(tk.x, TICK_Y + 18, tk.label, { anchor: "middle" })}`,
+      );
+    if (t.n > 0) o.push(mono(END_X, TICK_Y + 18, "now", { anchor: "middle" }));
+    // the days it was steered: the paddle's touches, on record
+    if (sc.steers.length) {
+      o.push(
+        mono(
+          FX0 - 12,
+          STEER_Y + 4,
+          `steered · ${Math.max(0, sc.steers.length - 1)}`,
+          { anchor: "end" },
+        ),
+      );
+      o.push(
+        `<line x1="${FX0 - 4}" y1="${STEER_Y}" x2="${END_X}" y2="${STEER_Y}" stroke-width="1" style="stroke:var(--rule)"/>`,
+      );
+      sc.steers.forEach((s, i) => {
+        const lastOne = i === sc.steers.length - 1 && sc.steers.length > 1;
+        const firstOne = i === 0;
+        o.push(
+          `<g class="steer" data-steer="${s.day}"><path d="${ribbon(
+            stroke(
+              [s.x, STEER_Y - 7],
+              [s.x, STEER_Y + 7],
+              rand(sc.seed + 40 + i),
+              0.5,
+              1,
+            ),
+            lastOne ? 2.6 : 1.8,
+            sc.seed + 40 + i,
+          )}" opacity="${lastOne ? 0.95 : firstOne ? 0.6 : 0.7}" style="fill:${lastOne ? "var(--accent)" : firstOne ? "var(--faint)" : "var(--ink)"}"/>${
+            lastOne
+              ? `<line x1="${s.x}" y1="${STEER_Y - 12}" x2="${s.x}" y2="${Y_MAX + 8}" stroke-width="1" stroke-dasharray="2 6" opacity="0.4" style="stroke:var(--accent)"/>`
+              : ""
+          }<rect x="${s.x - 10}" y="${STEER_Y - 16}" width="20" height="32" fill="transparent"/></g>`,
+        );
+      });
+    }
+    // the paddle: judgment, where the belief is launched from
+    o.push(
+      `<path d="${ribbon(stroke([70, 404], [150, 404], rand(sc.seed + 5), 0.8, 1), 3.4, sc.seed + 5)}" style="fill:var(--ink)"/>`,
+    );
+    o.push(mono(110, 422, "judgment", { anchor: "middle", ls: 1.6 }));
+    // the guide: from the belief straight up to the question
+    o.push(
+      `<line x1="${sc.end[0]}" y1="${sc.end[1] - 12}" x2="${sc.end[0]}" y2="${QY + 6}" stroke-width="1" stroke-dasharray="2 6" opacity="0.45" style="stroke:var(--accent)"/>`,
+    );
+    // the course
+    o.push(
+      `<g${motion ? ' mask="url(#cm)"' : ""}><path d="${sc.ink}" opacity="0.92" style="fill:var(--ink)"/></g>`,
+    );
+    // the bricks: what hit it, in the order it came
+    for (const br of sc.bricks) {
+      const n = S.nodes.get(br.id);
+      const kind = n?.kind ?? "note";
+      const ghost = kind === "ghost";
+      const fallow = n?.stage === "fallow";
+      const on = S.selected === br.id;
+      const lit = S.hover?.kind === "brick" && S.hover.id === br.id;
+      const col = colourOf(br.mark);
+      const seed = seedOf(`brick:${br.id}`);
+      const shape = roughRect(sc.bw, BH, seed, { wobble: 0.9, overshoot: 2 });
+      const placed = sc.labels.get(br.id);
+      const label = placed ?? {
+        x: br.x,
+        y: br.y - BH / 2 - 7,
+        text: short(n?.label ?? br.id, 26),
+      };
+      const showLabel =
+        on || lit || (placed && (S.inputs.length <= LABELS_UP_TO || br.mark));
+      o.push(
+        `<g class="brick" data-id="${esc(br.id)}" transform="translate(${fx(br.x - sc.bw / 2)} ${fx(br.y - BH / 2)})"><g class="c-brick" style="--i:${br.i}">`,
+      );
+      if (on)
+        o.push(
+          `<path transform="translate(-8 -8)" d="${ribbon(roughEllipse(sc.bw + 16, BH + 16, seed + 1, { wobble: 1.1, pad: 0, steps: 16 }), 1.5, seed + 1)}" style="fill:var(--accent)"/>`,
+        );
+      o.push(
+        `<rect x="1" y="1" width="${fx(sc.bw - 2)}" height="${BH - 2}" opacity="0.6" style="fill:var(--bg)"/>`,
+      );
+      o.push(
+        ghost
+          ? `<path d="${shape}" fill="none" stroke-width="1.2" stroke-dasharray="3 3" style="stroke:${col}"/>`
+          : `<path d="${ribbon(shape, 1.5, seed)}" opacity="${br.mark || lit || on ? 1 : 0.75}" style="fill:${col}"/>`,
+      );
+      if (br.dated === "arrived")
+        o.push(
+          `<circle cx="${fx(sc.bw - 3)}" cy="3" r="1.6" opacity="0.55" style="fill:var(--ink)"/>`,
+        );
+      if (showLabel)
+        o.push(
+          `<text class="b-label" x="${fx(sc.bw / 2)}" y="${fx(label.y - (br.y - BH / 2))}" text-anchor="middle" font-size="12"${fallow ? ' font-style="italic"' : ""} style="fill:${br.mark ? col : on || lit ? "var(--ink)" : "var(--muted)"}">${esc(label.text)}</text>`,
+        );
+      o.push(
+        `<rect x="-5" y="-5" width="${fx(sc.bw + 10)}" height="${BH + 10}" fill="transparent"/></g></g>`,
+      );
+    }
+    // the belief, where the marks have left it, and where it is pointed
+    o.push(
+      `<g transform="translate(${fx(sc.end[0])} ${fx(sc.end[1])})"><path transform="translate(-14 -14)" d="${ribbon(
+        roughEllipse(28, 28, sc.seed, { wobble: 1.2, pad: 0, steps: 14 }),
+        1.4,
+        sc.seed,
+      )}" opacity="0.9" style="fill:var(--accent)"/><circle r="6.5" class="${motion ? "breathe" : ""}" style="fill:var(--accent)"/></g>`,
+    );
+    if (t.n > 0) o.push(`<path d="${sc.heading}" style="fill:var(--accent)"/>`);
+    o.push(`</svg>`);
+    // the marks, over the chosen brick
+    const sb = S.selected ? sc.bricks.find((x) => x.id === S.selected) : null;
+    if (sb)
+      o.push(
+        `<div class="float fade" style="left:${clamp((sb.x / W) * 100, 16, 84)}%;top:${(Math.max(sb.y - BH / 2 - 62, 8) / H) * 100}%">${marksHTML(sb.id, "lg")}</div>`,
+      );
+    o.push(`<div class="card fade" id="card" hidden></div>`);
+    box.innerHTML = o.join("");
+    renderCard();
+  }
+
+  function marksHTML(id, size) {
+    const c = course();
+    const cur = c?.marks[id]?.mark ?? null;
+    return `<span class="marks ${size}">${["toward", "away"]
+      .map(
+        (m) =>
+          `<button type="button" class="chip c-mark${cur === m ? ` on ${m}` : ""}" data-mark="${m}" data-id="${esc(id)}" data-fk="${esc(`m-${size}-${m}-${id}`)}" aria-pressed="${cur === m}" title="${
+            m === "toward"
+              ? "it bent the belief toward the question"
+              : "it bent the belief away from it"
+          }">${m}</button>`,
+      )
+      .join("")}</span>`;
+  }
+
+  const when = (i) =>
+    !i || !i.date
+      ? "undated"
+      : `${i.dated === "arrived" ? "arrived" : "changed"} ${dayOf(i.date)}`;
+
+  function renderCard() {
+    const card = $("card");
+    if (!card) return;
+    const h = S.hover;
+    const c = course();
+    if (!h || !c) {
+      card.hidden = true;
+      return;
+    }
+    if (h.kind === "steer") {
+      const first = S.history?.since === h.day;
+      card.innerHTML = `<div class="meta">${first ? "the record begins" : "steered"}</div><div class="big">${esc(dayOf(h.day))}</div><div class="small">${
+        first
+          ? "the belief was already written when its record starts"
+          : "the belief’s note had changed by this day"
+      }</div>`;
+    } else {
+      const n = S.nodes.get(h.id);
+      const inp = S.inputs.find((i) => i.id === h.id);
+      if (!n) {
+        card.hidden = true;
+        return;
+      }
+      const m = c.marks[h.id];
+      card.innerHTML = `<div class="meta" style="color:${kindVar(n.kind)}">${esc(KIND_LABEL[n.kind] ?? n.kind)}<span style="color:var(--faint)"> · ${esc(
+        STAGE_LABEL[n.stage] ?? n.stage,
+      )} · ${esc(when(inp))}</span></div><div class="big">${esc(n.label)}</div><div class="small">${esc(
+        (inp?.threads ?? []).map((k) => LINK_LABEL[k] ?? k).join(" · "),
+      )} · ${m ? `<span style="color:${colourOf(m.mark)}">bent it ${m.mark} · said ${esc(dayOf(m.day))}</span>` : "unweighed"}</div>`;
+    }
+    card.hidden = false;
+    const sheet = $("sheet");
+    const sw = sheet.offsetWidth;
+    const shh = sheet.offsetHeight;
+    const cw = card.offsetWidth;
+    const chh = card.offsetHeight;
+    card.style.left = `${Math.max(4, Math.min(h.x + 14, sw - cw - 4))}px`;
+    card.style.top = `${Math.max(4, Math.min(h.y - 10, shh - chh - 4))}px`;
+  }
+
+  function renderCaption() {
+    const box = $("caption");
+    const c = course();
+    const inp = S.selected ? S.inputs.find((i) => i.id === S.selected) : null;
+    const n = S.selected ? S.nodes.get(S.selected) : null;
+    if (c && inp && n) {
+      box.innerHTML = `<div class="chosen"><div style="min-width:0"><div class="meta" style="color:${kindVar(n.kind)}">${esc(
+        KIND_LABEL[n.kind] ?? n.kind,
+      )}<span style="color:var(--faint)"> · ${esc(when(inp))} · ${esc(
+        inp.threads.map((k) => (LINK_LABEL[k] ?? k).toLowerCase()).join(" · "),
+      )}</span></div><div class="name">${esc(n.label)}</div></div><div class="acts"><span class="hand">it bent the belief</span>${marksHTML(inp.id, "lg")}${
+        n.kind !== "ghost"
+          ? `<button type="button" class="chip" data-go="${esc(inp.id)}" data-fk="its-course" title="Put this input on the sheet as the belief">its course</button>`
+          : ""
+      }<kbd>← → · t a u · esc</kbd></div></div>`;
+    } else {
+      box.innerHTML = `<div class="meta${S.cap ? " said" : ""}">${S.cap ? "said" : "the rule"}</div><p class="fade${S.cap ? " cap" : ""}">${esc(S.cap ?? REST)}</p>`;
+    }
+  }
+
+  function renderStatus() {
+    const el = $("status");
+    el.className = `meta status${S.kept === "error" || !storeOk ? " err" : ""}`;
+    el.textContent =
+      S.kept === "kept"
+        ? "kept"
+        : S.kept === "error" || !storeOk
+          ? "not kept — this browser will not hold it"
+          : S.gk === "specimen"
+            ? "specimen · kept in this browser"
+            : `${S.ownName} · kept in this browser`;
+  }
+
+  function renderReadout() {
+    const c = course();
+    const b = S.belief ? S.nodes.get(S.belief) : null;
+    const t = c
+      ? tally(S.inputs, c.marks, S.nodes, b, S.history?.rewrites ?? [])
+      : null;
+    $("tally-line").textContent = !t
+      ? ""
+      : t.n === 0
+        ? "nothing has hit this"
+        : `weighed ${t.weighed} of ${t.n} · toward ${t.toward} · away ${t.away}`;
+    $("walk").innerHTML =
+      S.walk.length > 1
+        ? `<span class="meta">· walked</span>${S.walk
+            .map(
+              (id, i) =>
+                `${i > 0 ? '<span class="meta">›</span>' : ""}<button type="button" class="walk-step" data-go="${esc(id)}" data-fk="walk-${i}"${
+                  i === S.walk.length - 1 ? " disabled" : ""
+                }>${esc(short(S.nodes.get(id)?.label ?? id, 24))}</button>`,
+            )
+            .join("")}<kbd>[ back</kbd>`
+        : "";
+    renderStatus();
+  }
+
+  const stoneHTML = (id, attrs) => {
+    const n = S.nodes.get(id);
+    return `<button type="button" class="stone" ${attrs}><span class="dot${n?.kind === "ghost" ? " ghost" : ""}" style="background:${kindVar(n?.kind ?? "note")}" aria-hidden="true"></span><span class="nm">${esc(n?.label ?? id)}</span></button>`;
+  };
+
+  function renderResults() {
+    const q = S.query.trim().toLowerCase();
+    const found = $("found");
+    const hits = !q
+      ? []
+      : (S.garden?.nodes ?? [])
+          .filter(
+            (n) =>
+              n.kind !== "ghost" &&
+              n.id !== S.belief &&
+              n.label.toLowerCase().includes(q),
+          )
+          .sort((a, b) => b.degree - a.degree)
+          .slice(0, 8);
+    found.hidden = !hits.length;
+    found.innerHTML = hits
+      .map((n) => `<li>${stoneHTML(n.id, `data-pick="${esc(n.id)}"`)}</li>`)
+      .join("");
+  }
+
+  function renderDesk() {
+    const panel = $("reading");
+    const c = course();
+    const b = S.belief ? S.nodes.get(S.belief) : null;
+    if (!c || !b) {
+      panel.hidden = true;
+    } else {
+      panel.hidden = false;
+      const t = tally(S.inputs, c.marks, S.nodes, b, S.history?.rewrites ?? []);
+      const words = readings(t, c, b);
+      const h = S.history;
+      const o = [];
+      o.push(
+        `<div class="meta" style="color:${kindVar(b.kind)}">${esc(KIND_LABEL[b.kind] ?? b.kind)}<span style="color:var(--faint)"> · ${esc(
+          STAGE_LABEL[b.stage] ?? b.stage,
+        )} · ${esc(dayOf(b.modified))}</span></div>`,
+      );
+      o.push(`<h2>${esc(b.label)}</h2>`);
+      o.push(
+        `<ul class="words">${words.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>`,
+      );
+      o.push(`<div class="chips">`);
+      if (b.body)
+        o.push(
+          `<button type="button" class="chip" data-act="read" data-fk="read" aria-expanded="${S.readOpen}">${S.readOpen ? "put it away" : "read it"}</button>`,
+        );
+      if (h && h.rewrites.length > 0)
+        o.push(
+          `<button type="button" class="chip" data-act="steer" data-fk="steer" aria-expanded="${S.steerOpen}">steered · ${Math.max(0, h.rewrites.length - 1)}</button>`,
+        );
+      o.push(`</div>`);
+      if (S.readOpen && b.body)
+        o.push(`<div class="note-text">${esc(b.body)}</div>`);
+      if (S.steerOpen && h)
+        o.push(
+          `<p class="aside-text">on record since ${esc(dayOf(h.since))}${
+            h.rewrites.length > 1
+              ? `; steered ${esc(
+                  h.rewrites
+                    .slice(1)
+                    .map((d) => dayOf(d))
+                    .join(" · "),
+                )}`
+              : "; not steered since"
+          }</p>`,
+        );
+      // the question
+      const changed = S.qDraft.trim() !== (c.question ?? "");
+      o.push(
+        `<div class="block"><label class="meta" for="q-question" style="display:block">the question · approx.</label>`,
+      );
+      o.push(
+        `<textarea id="q-question" class="search" rows="2" maxlength="500" placeholder="what is this belief trying to get right?">${esc(S.qDraft)}</textarea>`,
+      );
+      o.push(`<div class="row-acts" id="q-acts">${qActs(c, changed)}</div>`);
+      if (S.trailOpen)
+        o.push(
+          `<ul class="trail">${[...c.trail]
+            .reverse()
+            .map(
+              (tr) =>
+                `<li><div class="q">${esc(tr.question)}</div><div class="meta" style="text-transform:none;letter-spacing:.04em">put ${esc(dayOf(tr.asked))}</div></li>`,
+            )
+            .join("")}</ul>`,
+        );
+      o.push(`</div>`);
+      // what hit it
+      o.push(
+        `<div class="block"><div class="meta">what hit it · ${t.n}${t.n > 0 ? " · in the order it came" : ""}</div>`,
+      );
+      if (t.n === 0)
+        o.push(
+          `<p class="aside-text">nothing flows into this yet. write toward it, and it will.</p>`,
+        );
+      else {
+        o.push(`<ul class="hits">`);
+        for (const inp of S.inputs) {
+          const n = S.nodes.get(inp.id);
+          const m = c.marks[inp.id]?.mark ?? null;
+          const on = S.selected === inp.id;
+          const late =
+            inp.date && t.lastSteered
+              ? dayKey(inp.date) > t.lastSteered
+              : false;
+          const title =
+            inp.dated === "arrived"
+              ? "the day it was first found threaded to the belief"
+              : inp.dated === "changed"
+                ? "the day the input itself last changed"
+                : "undated";
+          o.push(
+            `<li class="c-row${on ? " on" : ""}"><button type="button" class="stone${on ? " on" : ""}" data-select="${esc(inp.id)}" data-fk="${esc(`row-${inp.id}`)}" aria-pressed="${on}"><span class="dot${
+              n?.kind === "ghost" ? " ghost" : ""
+            }" style="background:${m ? colourOf(m) : kindVar(n?.kind ?? "note")}" aria-hidden="true"></span><span class="nm${m ? ` ${m}` : ""}${
+              n?.stage === "fallow" ? " fallow" : ""
+            }">${esc(n?.label ?? inp.id)}</span><span class="when${late ? " late" : ""}" title="${title}">${inp.date ? esc(dayOf(inp.date)) : "—"}${
+              inp.dated === "arrived" ? "·" : ""
+            }</span></button>${marksHTML(inp.id, "sm")}</li>`,
+          );
+        }
+        o.push(`</ul>`);
+      }
+      if (t.since > 0)
+        o.push(
+          `<p class="aside-text" style="font-size:14px;color:var(--faint)">dates in the accent came after it was last steered.</p>`,
+        );
+      o.push(`</div>`);
+      // the field repopulates
+      if (S.arriving && S.arriving.length) {
+        o.push(
+          `<div class="block"><div class="meta">arriving · ${S.arriving.length}</div><p class="aside-text" style="font-size:14px;color:var(--faint);margin-top:2px">speaks its words, came lately, not threaded to it yet.</p><ul class="kin">`,
+        );
+        for (const k of S.arriving)
+          o.push(
+            `<li>${stoneHTML(k.id, `data-pick="${esc(k.id)}" title="put it on the sheet"`)}<div class="why">${esc(
+              k.shared.slice(0, 4).join(" · ") || "almost nothing in common",
+            )}</div></li>`,
+          );
+        o.push(`</ul></div>`);
+      }
+      $("reading-body").innerHTML = o.join("");
+      $("q-question").value = S.qDraft;
+    }
+    renderKept();
+  }
+
+  function qActs(c, changed) {
+    const o = [];
+    if (changed)
+      o.push(
+        `<button type="button" class="chip put" data-act="put" data-fk="put">${
+          S.qDraft.trim()
+            ? c.question
+              ? "re-put it"
+              : "put it"
+            : "take it back"
+        }</button>`,
+      );
+    if (c.asked) o.push(`<span class="meta">put ${esc(dayOf(c.asked))}</span>`);
+    if (c.trail.length)
+      o.push(
+        `<button type="button" class="meta-btn" data-act="trail" data-fk="trail" aria-expanded="${S.trailOpen}">as put before · ${c.trail.length} ${S.trailOpen ? "▴" : "▾"}</button>`,
+      );
+    return o.join("");
+  }
+
+  function renderKept() {
+    const box = $("kept");
+    const kept = S.courses
+      .filter((c) => !isBlank(c) && S.nodes.has(c.belief))
+      .sort((a, b) =>
+        lastSaid(a) < lastSaid(b) ? 1 : lastSaid(a) > lastSaid(b) ? -1 : 0,
+      );
+    box.hidden = !kept.length;
+    box.innerHTML = kept.length
+      ? `<div class="meta">courses kept · ${kept.length}</div><ul class="kept">${kept
+          .map((c) => {
+            const tw = Object.values(c.marks).filter(
+              (m) => m.mark === "toward",
+            ).length;
+            const aw = Object.values(c.marks).length - tw;
+            return `<li><div style="flex:1;min-width:0">${stoneHTML(c.belief, `data-go="${esc(c.belief)}" data-fk="${esc(`kept-${c.belief}`)}"`)}</div><span class="tally">${
+              tw + aw
+                ? `<span class="t-toward">${tw}</span> · <span class="t-away">${aw}</span>`
+                : "asked"
+            }</span></li>`;
+          })
+          .join("")}</ul>`
+      : "";
+  }
+
+  function renderSource() {
+    const own = S.gk !== "specimen";
+    $("src-tag").textContent = own ? "your notes" : "specimen";
+    const nNotes = (S.garden?.nodes ?? []).filter(
+      (n) => n.kind !== "ghost",
+    ).length;
+    $("src-line").textContent = own
+      ? `${S.ownName}: ${nNotes} notes, read in this page from your disk. Nothing was uploaded; the notes are gone from the page when it closes.`
+      : `A made-up garden of ${nNotes} fieldnotes, readings and glossary terms. One belief has been steered for seven months; its dates are set relative to today. Mark it, re-put its question, walk its inputs.`;
+    const last = store.lastOwn;
+    $("src-fine").textContent = own
+      ? "Kept in this browser, under this folder’s name: your marks, your questions, and the record of when each input was first found threaded to a belief. Open the folder again later and the record dates what has arrived since."
+      : last && typeof last.name === "string"
+        ? `Your notes${last.name === "your notes" ? "" : ` (${last.name})`} were last read ${dayOf(last.read)}. Their courses are kept here; open the folder again to see them.`
+        : "Open a folder of markdown notes: [[wikilinks]], related: frontmatter, a Glossary folder’s terms and titles named in prose become the threads. Read in the page, never uploaded.";
+    $("to-specimen").hidden = !own;
+    $("reset-specimen").hidden = own || !store.gardens.specimen;
+  }
+
+  function renderHow() {
+    $("how").textContent =
+      "how it is read: what flowed straight into the belief, by the flow’s direction — a note that links to, names or seeds a thing was fed by it; a term practised in a note fed the note; twins feed each other. each input is dated by the day it was first found threaded to the belief, from a record kept in this browser; where the record cannot say — the input was already there the first time the belief was put on the sheet — by the day the input itself last changed, and the card says which. the days the belief was steered are the days its note had changed when the page read it again. the bricks are grey until you say what each was worth, after it has already bent you; toward bends the course up to the question, away bends it down; the desk counts, and says what kind of thing did the bending. nothing here is a grade.";
+  }
+
+  function render() {
+    const a = document.activeElement;
+    const fk = a?.dataset?.fk ?? null;
+    const aid = a?.id ?? null;
+    const sel =
+      a && "selectionStart" in a ? [a.selectionStart, a.selectionEnd] : null;
+    renderSource();
+    renderReadout();
+    renderSheet();
+    renderCaption();
+    renderDesk();
+    renderResults();
+    sketch($("reading"), `course-${S.belief ?? ""}`);
+    let el = null;
+    if (fk) el = document.querySelector(`[data-fk="${CSS.escape(fk)}"]`);
+    else if (aid) el = document.getElementById(aid);
+    if (el && el !== document.activeElement) {
+      el.focus({ preventScroll: true });
+      if (sel && "setSelectionRange" in el)
+        el.setSelectionRange(sel[0], sel[1]);
+    }
+  }
+
+  // ── sketched borders: a pen line laid over the element it sits in ─────────
+
+  const NS = "http://www.w3.org/2000/svg";
+  function sketch(el, seed) {
+    if (!el) return;
+    let svg = el.querySelector(":scope > svg.sketch");
+    if (!svg) {
+      svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("class", "sketch");
+      svg.setAttribute("aria-hidden", "true");
+      el.prepend(svg);
+      new ResizeObserver(() => paint(el, false)).observe(el);
+    }
+    if (el.dataset.drawn !== seed) {
+      el.dataset.drawn = seed;
+      el.dataset.size = "";
+      paint(el, true);
+    }
+  }
+  function paint(el, animate) {
+    const svg = el.querySelector(":scope > svg.sketch");
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!svg || !w || !h) return;
+    const size = `${w}x${h}`;
+    if (!animate && el.dataset.size === size) return;
+    el.dataset.size = size;
+    const s = seedOf(el.dataset.drawn || el.dataset.seed || "sketch");
+    const line = roughRect(w, h, s);
+    const ink = ribbon(line, 1.7, s);
+    const id = `sk-${el.id}`;
+    const pen = el.dataset.pen || "var(--pen)";
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    const draw = animate && !reduce.matches;
+    svg.innerHTML = `${
+      draw
+        ? `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path d="${line}" pathLength="1" fill="none" stroke="white" stroke-width="7.4" stroke-linecap="round" stroke-linejoin="round" class="draw"/></mask></defs>`
+        : ""
+    }<path d="${ink}"${draw ? ` mask="url(#${id})"` : ""} style="fill:${pen}"/>`;
+  }
+
+  // ── hands on it ───────────────────────────────────────────────────────────
+
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest(
+      "[data-mark],[data-go],[data-pick],[data-select],[data-act],.brick",
+    );
+    if (!t) return;
+    if (t.dataset.mark) {
+      mark(t.dataset.id, t.dataset.mark);
+    } else if (t.dataset.go) {
+      go(t.dataset.go);
+    } else if (t.dataset.pick) {
+      S.query = "";
+      $("q-search").value = "";
+      go(t.dataset.pick);
+    } else if (t.dataset.select) {
+      S.selected = S.selected === t.dataset.select ? null : t.dataset.select;
+      render();
+    } else if (t.dataset.act) {
+      const a = t.dataset.act;
+      if (a === "put") put();
+      else {
+        if (a === "read") S.readOpen = !S.readOpen;
+        if (a === "steer") S.steerOpen = !S.steerOpen;
+        if (a === "trail") S.trailOpen = !S.trailOpen;
+        render();
+      }
+    } else if (t.classList.contains("brick")) {
+      const id = t.dataset.id;
+      S.selected = S.selected === id ? null : id;
+      render();
+    }
+  });
+
+  const sheetBox = $("sheet");
+  sheetBox.addEventListener("pointermove", (e) => {
+    const t = e.target.closest?.(".brick,.steer");
+    const box = sheetBox.getBoundingClientRect();
+    const x = e.clientX - box.left;
+    const y = e.clientY - box.top;
+    if (!t) {
+      if (S.hover) {
+        S.hover = null;
+        renderSheet();
+      }
+      return;
+    }
+    const next = t.classList.contains("brick")
+      ? { kind: "brick", id: t.dataset.id, x, y }
+      : { kind: "steer", day: t.dataset.steer, x, y };
+    const same =
+      S.hover &&
+      S.hover.kind === next.kind &&
+      (next.kind === "brick"
+        ? S.hover.id === next.id
+        : S.hover.day === next.day);
+    S.hover = next;
+    if (same) renderCard();
+    else renderSheet();
+  });
+  sheetBox.addEventListener("pointerleave", () => {
+    if (!S.hover) return;
+    S.hover = null;
+    renderSheet();
+  });
+
+  $("q-search").addEventListener("input", (e) => {
+    S.query = e.target.value;
+    renderResults();
+  });
+  $("q-search").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const first = $("found").querySelector("[data-pick]");
+      if (first) {
+        e.preventDefault();
+        first.click();
+      }
+    }
+  });
+  $("reading").addEventListener("input", (e) => {
+    if (e.target.id !== "q-question") return;
+    S.qDraft = e.target.value;
+    const c = course();
+    if (c)
+      $("q-acts").innerHTML = qActs(c, S.qDraft.trim() !== (c.question ?? ""));
+  });
+  $("reading").addEventListener("keydown", (e) => {
+    if (e.target.id === "q-question" && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      put();
+    }
+  });
+
+  window.addEventListener("keydown", (e) => {
+    const el = e.target;
+    const typing =
+      el &&
+      (el.tagName === "INPUT" ||
+        el.tagName === "TEXTAREA" ||
+        el.isContentEditable);
+    if (typing) {
+      if (e.key === "Escape") el.blur();
+      return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "/") {
+      e.preventDefault();
+      $("q-search").focus();
+      return;
+    }
+    if (e.key === "[") {
+      e.preventDefault();
+      back();
+      return;
+    }
+    if (e.key === "Escape") {
+      if (S.selected) {
+        S.selected = null;
+        render();
+      }
+      return;
+    }
+    const inputs = S.inputs;
+    if (!inputs.length || !S.belief) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const i = S.selected ? inputs.findIndex((x) => x.id === S.selected) : -1;
+      const n = inputs.length;
+      const j =
+        e.key === "ArrowRight"
+          ? i < 0
+            ? 0
+            : (i + 1) % n
+          : i < 0
+            ? n - 1
+            : (i - 1 + n) % n;
+      S.selected = inputs[j].id;
+      render();
+      return;
+    }
+    if (S.selected && (e.key === "t" || e.key === "a" || e.key === "u")) {
+      e.preventDefault();
+      mark(
+        S.selected,
+        e.key === "t" ? "toward" : e.key === "a" ? "away" : null,
+      );
+    }
+  });
+
+  $("folder").addEventListener("change", async (e) => {
+    const input = e.target;
+    const all = [...(input.files ?? [])];
+    const md = all.filter((f) => /\.md$/i.test(f.name) && f.size < 2_000_000);
+    input.value = "";
+    if (!md.length) {
+      say("no markdown notes in that folder.");
+      renderCaption();
+      return;
+    }
+    const rel = (f) => f.webkitRelativePath || f.name;
+    const root = rel(md[0]).includes("/")
+      ? rel(md[0]).split("/")[0]
+      : "your notes";
+    const files = await Promise.all(
+      md.map(async (f) => ({
+        path: rel(f).includes("/")
+          ? rel(f).split("/").slice(1).join("/")
+          : rel(f),
+        text: await f.text(),
+        mtime: f.lastModified,
+      })),
+    );
+    store.lastOwn = { name: root, read: today(), n: files.length };
+    persist();
+    openGarden(`own:${root}`, files, root);
+    window.scrollTo({
+      top: $("sheet-panel").offsetTop - 16,
+      behavior: reduce.matches ? "auto" : "smooth",
+    });
+  });
+  $("to-specimen").addEventListener("click", () =>
+    openGarden("specimen", SPEC_FILES, null),
+  );
+  $("reset-specimen").addEventListener("click", () => {
+    delete store.gardens.specimen;
+    persist();
+    openGarden("specimen", SPEC_FILES, null);
+    say("the specimen, as it came.");
+    renderCaption();
+  });
+
+  sketch($("sheet-panel"), "course-sheet");
+  sketch($("source"), "course-source");
+  renderHow();
+  openGarden("specimen", SPEC_FILES, null);
+</script>

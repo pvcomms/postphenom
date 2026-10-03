@@ -1,0 +1,3321 @@
+<title>Tack</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="You cannot sail straight at what is so. A claim sorted by the flinch: a belief into the sails, moved a tack at a time; a commitment into the hull, held until a day you name."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a sheet on the chart table. Ink on bone; the one accent is the waterline, the hull,
+     a step that crossed the middle, and a window that has opened. Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8a8276;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: #383633;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #857e71;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --pen: #d7d4ca;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #857e71;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --pen: #d7d4ca;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 80px;
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+
+  /* type roles: the display serif, the mono for marks and counts, the italic where niwa wrote by hand */
+  .display {
+    font-family: var(--serif);
+    letter-spacing: -0.02em;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.32;
+    color: var(--faint);
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .ink {
+    color: var(--ink);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .faint {
+    color: var(--faint);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 48px 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .meta {
+    margin-bottom: 18px;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin-top: 18px;
+    font-style: italic;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .aside-note {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  .aside-note + .aside-note {
+    margin-top: 10px;
+  }
+  .aside-note b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* the sheet and the desk */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+    }
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 20px;
+    min-width: 0;
+  }
+  .panel.small {
+    padding: 16px;
+  }
+  @media (min-width: 640px) {
+    .panel.big {
+      padding: 28px 32px;
+    }
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+  .row-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .row-wrap.base {
+    align-items: baseline;
+  }
+  .mt1 {
+    margin-top: 4px;
+  }
+  .mt2 {
+    margin-top: 8px;
+  }
+  .mt3 {
+    margin-top: 12px;
+  }
+  .mt4 {
+    margin-top: 16px;
+  }
+  .mt5 {
+    margin-top: 20px;
+  }
+  .mt8 {
+    margin-top: 32px;
+  }
+  .body-s {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  /* the pen over the paper */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .sketch path {
+    fill: none;
+    stroke: var(--pen);
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.8;
+  }
+  .sketch path.acc {
+    stroke: var(--accent);
+    opacity: 1;
+  }
+  .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1100ms var(--ease) both;
+    animation-delay: 160ms;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  .arrive {
+    animation: rise 420ms var(--ease) both;
+  }
+  .tk-tack.new {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+
+  /* chips: the only buttons */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 5px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    text-align: left;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 160ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.acc {
+    color: var(--accent);
+  }
+  .chip.acc:not(.on) {
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+  }
+  .bare {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 2px 2px;
+    transition: color 160ms var(--ease);
+  }
+  .bare:hover {
+    color: var(--accent);
+  }
+
+  /* the fields: a hairline under each, the ink when you are in it */
+  .case {
+    display: block;
+    width: 100%;
+    resize: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    color: var(--ink);
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+    opacity: 1;
+  }
+  .case[readonly] {
+    color: var(--muted);
+  }
+  textarea.case {
+    line-height: 1.55;
+    font-size: 15px;
+  }
+  textarea.case.claim {
+    font-size: clamp(24px, 3vw, 30px);
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    padding-block: 8px;
+  }
+  textarea.case.why {
+    font-size: 16.5px;
+    line-height: 1.6;
+  }
+  input.case {
+    font-size: 14.5px;
+  }
+  input.case.date {
+    width: auto;
+    font-family: var(--mono);
+    font-size: 13.5px;
+  }
+  .case.strike {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--accent);
+  }
+  select.chip {
+    max-width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background: var(--surface);
+  }
+  .grow {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
+  /* where you lean: a hairline track, the accent for the thumb */
+  .dialrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .dialrow .hand {
+    flex: none;
+  }
+  .dialrow .num {
+    flex: none;
+    width: 7.5ch;
+    text-align: right;
+    color: var(--ink);
+    text-transform: none;
+  }
+  .dial {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 18px;
+    background: transparent;
+    cursor: ew-resize;
+    margin: 0;
+  }
+  .dial:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius: 999px;
+  }
+  .dial::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--rule);
+  }
+  .dial::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+  .dial::-moz-range-track {
+    height: 2px;
+    background: var(--rule);
+  }
+  .dial::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+
+  /* the claims, as rows */
+  .rows {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+  }
+  .tk-row {
+    border-radius: 3px;
+    transition: background-color 160ms var(--ease);
+  }
+  .tk-row:hover {
+    background: color-mix(in srgb, var(--ink) 3%, transparent);
+  }
+  .tk-row + .tk-row {
+    border-top: 1px solid var(--rule);
+  }
+  .tk-row > button {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 16px;
+    width: 100%;
+    padding: 8px;
+    text-align: left;
+  }
+  .tk-row .title {
+    flex: 1 1 14rem;
+    min-width: 0;
+    font-size: 19.5px;
+    line-height: 1.22;
+    color: var(--ink);
+  }
+  .tk-row .title.gone {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--accent);
+  }
+  .tk-row .meta {
+    width: 100%;
+  }
+  .tag {
+    color: var(--accent);
+  }
+
+  .waterline {
+    position: relative;
+    height: 16px;
+    margin: 28px 0 20px;
+  }
+  .waterline span {
+    position: absolute;
+    left: 50%;
+    top: -12px;
+    transform: translateX(-50%);
+    padding-inline: 8px;
+    background: var(--surface);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .how {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    list-style: decimal;
+    padding-left: 20px;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .how li::marker {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+  }
+
+  /* the drawings */
+  svg.path {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  svg text {
+    font-family: var(--mono);
+  }
+  .s-rule {
+    stroke: var(--rule);
+  }
+  .s-ink {
+    stroke: var(--ink);
+  }
+  .s-faint {
+    stroke: var(--faint);
+  }
+  .s-acc {
+    stroke: var(--accent);
+  }
+  .f-ink {
+    fill: var(--ink);
+  }
+  .f-faint {
+    fill: var(--faint);
+  }
+  .f-surface {
+    fill: var(--surface);
+  }
+  .f-none {
+    fill: none;
+  }
+  .line-svg {
+    flex: none;
+    display: block;
+  }
+  .wide-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* the record: tacks, looks, reopenings */
+  .log {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .log li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 12px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .log .meta {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .log .said {
+    flex: 1 1 12rem;
+    min-width: 0;
+    color: var(--ink);
+  }
+  .log .end {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .looks li {
+    gap: 4px 8px;
+  }
+  .dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    transform: translateY(-1px);
+  }
+  .dot.hollow {
+    border-style: dashed;
+  }
+  .dot.looked {
+    background: var(--ink);
+  }
+  .look-text {
+    flex: 1 1 16rem;
+    min-width: 0;
+    color: var(--ink);
+  }
+  .look-text.hollow {
+    color: var(--muted);
+    border-bottom: 1px dashed var(--rule);
+  }
+  .rule-top {
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    margin-top: 16px;
+  }
+  .two {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 8px;
+  }
+  @media (min-width: 640px) {
+    .two {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .measure {
+    max-width: 40rem;
+  }
+
+  /* values */
+  .vals {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .val {
+    display: grid;
+    grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .val input.case {
+    font-size: 14px;
+  }
+  .val input.name {
+    font-style: italic;
+  }
+  .leaned {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    align-items: baseline;
+    font-size: 13.5px;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .rise,
+    .arrive,
+    .tk-tack.new {
+      animation: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      padding-top: 36px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Tack</h1>
+      <p class="deck">
+        You cannot sail straight at what is so. Hold a heading, see what the
+        water does, correct — a tack at a time. Beliefs in the sails, loose.
+        Commitments in the hull, fixed.
+      </p>
+    </div>
+    <div>
+      <p class="aside-note">
+        <b>It opens on a specimen.</b> Specimen A is a made-up person with one
+        belief in the sails and one commitment in the hull. Open them, move
+        them, or clear them and set down your own.
+      </p>
+      <p class="aside-note">
+        It never says whether a claim is so, how likely, or what to hold.
+      </p>
+    </div>
+  </header>
+
+  <main id="sheet" aria-live="off"></main>
+
+  <footer>
+    <span class="meta">Tack · CAPP · prototype, 3 October 2026</span>
+    <span class="meta" id="kept-where">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the specimen ─────────────────────────────────────────────────────────
+     Specimen A's tack — the synthetic life with one belief in the sails and one
+     commitment in the hull. The belief came out of its mask (the office-days
+     rule): a claim it did not hold, put down low and tacked twice after asking.
+     The commitment is what the mask taught it, chosen for three months, no
+     evidence owed. Fiction. */
+  const SPECIMEN_CLAIMS = [
+    {
+      slug: "2026-09-21-juniors-learn-more-in-the-office-than-at-home",
+      title: "Juniors learn more in the office than at home",
+      text: "Juniors learn more in the office than at home.",
+      layer: "sail",
+      flinch:
+        "yes — I want to be moved on this; it came out of the mask and I had never asked",
+      ifSo: "Ask three juniors what they learned last month and where. If it is so, most of it happened in the room: overheard, asked in passing, shown by someone who happened to be there.",
+      ifNot:
+        "The same three name things they learned from documents, calls and their own mistakes, and cannot place any of it in the office.",
+      tacks: [
+        {
+          on: "2026-09-21",
+          at: 35,
+          saw: "First put. I argued against the office rule last week and did not believe this.",
+          rent: "",
+        },
+        {
+          on: "2026-09-23",
+          at: 55,
+          saw: "Asked two juniors. One named a corridor argument she learned from; the other said the office is where he gets interrupted.",
+          rent: "neither",
+        },
+        {
+          on: "2026-09-24",
+          at: 60,
+          saw: "The second one wrote later: the thing he learned most from this year was watching a senior handle a client in the room.",
+          rent: "so",
+        },
+      ],
+      looks: [
+        {
+          id: "sl1",
+          text: "Ask the third junior — the one who started remote and has never had an office week.",
+          moves: "either",
+          by: "you",
+          kept: true,
+          looked: "",
+          stone: null,
+        },
+        {
+          id: "sl2",
+          text: "Read last year's exit interviews: does anyone say they never learned how things are done here?",
+          moves: "so",
+          by: "proposed",
+          kept: false,
+          looked: "",
+          stone: null,
+        },
+      ],
+      why: "",
+      chosen: "",
+      until: "",
+      letGo: "",
+      reopened: [],
+      stone: null,
+      opened: "2026-09-21",
+      touched: "2026-09-24",
+      note: "",
+    },
+    {
+      slug: "2026-09-23-i-ask-before-i-argue",
+      title: "I ask before I argue",
+      text: "I ask before I argue.",
+      layer: "hull",
+      flinch:
+        "no — asking whether evidence could change this felt like a small betrayal",
+      ifSo: "",
+      ifNot: "",
+      tacks: [],
+      looks: [],
+      why: "Not because it works. Because the person I argued with last week was a junior I had not asked, and I do not want to be that again whatever the numbers say.",
+      chosen: "2026-09-23",
+      until: "2026-12-23",
+      letGo: "",
+      reopened: [],
+      stone: null,
+      opened: "2026-09-23",
+      touched: "2026-09-23",
+      note: "",
+    },
+  ];
+  const SPECIMEN_SLUGS = new Set(SPECIMEN_CLAIMS.map((c) => c.slug));
+
+  /* The specimen's values, by name and the words that say them. A claim leans on
+     a value when one of the value's terms appears in it. */
+  const SPECIMEN_VALUES = [
+    { name: "craft", terms: ["craft", "quality", "made", "design"] },
+    { name: "candour", terms: ["candour", "honest", "plain", "truth"] },
+    { name: "curiosity", terms: ["curiosity", "question", "wonder", "learn"] },
+    { name: "care", terms: ["care", "kind", "people", "family"] },
+    { name: "quiet", terms: ["quiet", "private", "local", "small"] },
+  ];
+
+  /* logic:start ──────────────────────────────────────────────────────────────
+     The tack: directional accuracy as an instrument. You cannot sail straight
+     at what is so; you hold a heading, see what the water does, and correct —
+     a tack at a time, never a flip. A claim is set down and sorted by one
+     question, the flinch: do you want evidence to be able to change this? If
+     yes it is a belief and goes in the sails — held as a lean on a line from
+     "not so" to "so" that never reaches either end, with what it would expect
+     to see written down (the rent a belief pays), and every move dated with
+     what was seen. If asking felt like a small betrayal it is a commitment
+     and goes in the hull — chosen, not derived; held until a day the reader
+     names, no evidence owed; reopened only on the record. The desk reads back
+     the tacks, the steps, the crossings, the rent, the window. It never says
+     whether a claim is so, how likely, or what to hold. */
+
+  const LAYER_LABEL = { sail: "in the sails", hull: "in the hull" };
+  const LAYER_KIND = { sail: "a belief", hull: "a commitment" };
+
+  /** What a sighting matched: the rent the belief said it would pay. */
+  const RENTS = ["so", "not", "neither"];
+  const RENT_LABEL = {
+    "": "unsaid",
+    so: "as expected if so",
+    not: "as expected if not",
+    neither: "said nothing either way",
+  };
+
+  /** Which way seeing a thing would move the reader. */
+  const MOVES = ["so", "not", "either"];
+  const MOVES_LABEL = {
+    so: "seeing it would move you toward so",
+    not: "seeing it would move you toward not",
+    either: "it could go either way",
+  };
+  const MOVES_SHORT = {
+    so: "toward so",
+    not: "toward not",
+    either: "either way",
+  };
+
+  const uid = () =>
+    Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+
+  /** 0 and 1 are not probabilities: a lean lives strictly between the ends. */
+  const clampLean = (n) =>
+    Math.min(99, Math.max(1, Math.round(Number.isFinite(n) ? n : 50)));
+
+  const emptyClaim = (today) => ({
+    slug: "",
+    title: "",
+    text: "",
+    layer: "sail",
+    flinch: "",
+    ifSo: "",
+    ifNot: "",
+    tacks: [],
+    looks: [],
+    why: "",
+    chosen: "",
+    until: "",
+    letGo: "",
+    reopened: [],
+    stone: null,
+    opened: today,
+    touched: today,
+    note: "",
+  });
+
+  const leanNow = (c) =>
+    c.tacks.length ? c.tacks[c.tacks.length - 1].at : null;
+
+  /* days */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+
+  /** Whole days from a to b; negative when b is before a. */
+  function daysBetween(a, b) {
+    if (!DAY.test(a) || !DAY.test(b)) return 0;
+    return Math.round((utc(b) - utc(a)) / 86400000);
+  }
+
+  /* the tally and the readings */
+  function tally(c, today) {
+    const tacks = c.tacks;
+    let towardSo = 0;
+    let towardNot = 0;
+    let still = 0;
+    let largest = 0;
+    let crossed = 0;
+    for (let i = 1; i < tacks.length; i++) {
+      const d = tacks[i].at - tacks[i - 1].at;
+      if (d > 0) towardSo++;
+      else if (d < 0) towardNot++;
+      else still++;
+      largest = Math.max(largest, Math.abs(d));
+      if (
+        (tacks[i - 1].at < 50 && tacks[i].at > 50) ||
+        (tacks[i - 1].at > 50 && tacks[i].at < 50)
+      )
+        crossed++;
+    }
+    const rent = { "": 0, so: 0, not: 0, neither: 0 };
+    for (const t of tacks.slice(1)) rent[t.rent]++;
+    const last = tacks.length ? tacks[tacks.length - 1] : null;
+    const so = Boolean(c.ifSo.trim());
+    const not = Boolean(c.ifNot.trim());
+    const chosen = c.chosen || c.opened;
+    const letGo = Boolean(c.letGo);
+    return {
+      layer: c.layer,
+      n: tacks.length,
+      first: tacks[0] || null,
+      last,
+      now: last ? last.at : null,
+      towardSo,
+      towardNot,
+      still,
+      largest,
+      crossed,
+      sinceLast: last ? daysBetween(last.on, today) : null,
+      rent,
+      expects: so && not ? "both" : so ? "so" : not ? "not" : "none",
+      looksKept: c.looks.filter((l) => l.kept).length,
+      looksHollow: c.looks.filter((l) => !l.kept).length,
+      looked: c.looks.filter((l) => l.kept && l.looked).length,
+      held:
+        c.layer === "hull"
+          ? daysBetween(chosen, letGo ? c.letGo : today)
+          : null,
+      toGo:
+        c.layer === "hull" && c.until && !letGo
+          ? daysBetween(today, c.until)
+          : null,
+      open:
+        c.layer === "hull" &&
+        !letGo &&
+        Boolean(c.until) &&
+        daysBetween(c.until, today) >= 0,
+      letGo,
+      reopens: c.reopened.length,
+      early: c.reopened.filter((r) => r.early).length,
+      heldAgain: c.reopened.filter((r) => r.went === "held").length,
+    };
+  }
+
+  const n = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const list = (xs) => xs.map((w) => `'${w}'`).join(", ");
+  const ago = (d) =>
+    d === 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
+
+  /** Facts about one claim's record; none a verdict on the claim or on the reader. */
+  function readings(c, t, values) {
+    const out = [];
+    if (c.layer === "sail") {
+      if (!t.first) out.push("not yet put down on the line");
+      else if (t.n === 1)
+        out.push(
+          `first put ${t.first.on} at ${t.first.at}, and not tacked since`,
+        );
+      else
+        out.push(
+          `first put ${t.first.on} at ${t.first.at} · now at ${t.now} after ${n(t.n - 1, "tack")} · moved toward so ×${t.towardSo}, toward not ×${t.towardNot}${t.still ? `, held still ×${t.still}` : ""} · largest step ${t.largest}` +
+            (t.crossed
+              ? ` · crossed the middle ${n(t.crossed, "time")} in one step`
+              : " · never crossed the middle in one step"),
+        );
+      if (t.last && t.n > 1) out.push(`last tack ${ago(t.sinceLast ?? 0)}`);
+      out.push(
+        t.expects === "both"
+          ? "what it expects to see is named both ways"
+          : t.expects === "so"
+            ? "what it expects to see is named only if so — nothing yet for if not"
+            : t.expects === "not"
+              ? "what it expects to see is named only if not — nothing yet for if so"
+              : "nothing it expects to see is named — the belief has not said what would pay its rent",
+      );
+      if (t.n > 1) {
+        const seen = t.rent.so + t.rent.not + t.rent.neither + t.rent[""];
+        out.push(
+          `${n(seen, "sighting")}: ×${t.rent.so} as expected if so, ×${t.rent.not} as expected if not, ×${t.rent.neither} that said nothing either way${t.rent[""] ? `, ×${t.rent[""]} unsaid` : ""}`,
+        );
+      }
+      if (t.looksKept || t.looksHollow)
+        out.push(
+          `what would move it: ${n(t.looksKept, "look")} kept${t.looked ? `, ${t.looked} looked at` : ""}${t.looksHollow ? `, ${t.looksHollow} proposed and hollow` : ""}`,
+        );
+      else out.push("nothing named yet that would move it");
+    } else {
+      const chosen = c.chosen || c.opened;
+      out.push(
+        t.letGo
+          ? `chosen ${chosen}, held ${n(t.held ?? 0, "day")}, let go ${c.letGo}`
+          : `chosen ${chosen}, held ${n(t.held ?? 0, "day")} so far`,
+      );
+      if (!t.letGo)
+        out.push(
+          !c.until
+            ? "no window set — you have not said when you will look at this again"
+            : t.open
+              ? `the window opened ${c.until}${(t.toGo ?? 0) < 0 ? `, ${ago(-(t.toGo ?? 0))}` : ", today"} — you said you would look again, and it is on the record whether you do`
+              : `you said not before ${c.until} — ${n(t.toGo ?? 0, "day")} to go`,
+        );
+      if (t.reopens)
+        out.push(
+          `reopened ${n(t.reopens, "time")}${t.early ? `, ${t.early} of them early` : ""}: held again ×${t.heldAgain}, let go ×${t.reopens - t.heldAgain}`,
+        );
+      else out.push("never reopened");
+      out.push(
+        c.why.trim()
+          ? "why you hold it is written"
+          : "why you hold it is not written — none is owed, but it is yours to have",
+      );
+    }
+    if (values.length)
+      out.push(`leans on ${list(values.map((v) => v.name))}, by their terms`);
+    return out;
+  }
+
+  /** Facts about the whole sheet: how much is in the sails, how much in the hull. */
+  function wholeReadings(claims, today) {
+    const sails = claims.filter((c) => c.layer === "sail");
+    const hull = claims.filter((c) => c.layer === "hull" && !c.letGo);
+    const gone = claims.filter((c) => c.layer === "hull" && c.letGo);
+    if (!claims.length) return ["nothing set down yet"];
+    const out = [
+      `${n(sails.length, "belief")} in the sails · ${n(hull.length, "commitment")} in the hull${gone.length ? ` · ${gone.length} let go` : ""}`,
+    ];
+    if (sails.length) {
+      const unpaid = sails.filter(
+        (c) => !c.ifSo.trim() && !c.ifNot.trim(),
+      ).length;
+      const once = sails.filter((c) => c.tacks.length <= 1).length;
+      const quiet = sails.filter(
+        (c) =>
+          c.tacks.length &&
+          daysBetween(c.tacks[c.tacks.length - 1].on, today) > 30,
+      ).length;
+      if (unpaid)
+        out.push(
+          `${unpaid} of the sails ${unpaid === 1 ? "has" : "have"} named nothing ${unpaid === 1 ? "it" : "they"} would expect to see`,
+        );
+      if (once) out.push(`${once} put down once and never tacked`);
+      if (quiet) out.push(`${quiet} not tacked in over a month`);
+    }
+    if (!hull.length && sails.length) out.push("the hull is empty");
+    if (hull.length) {
+      const open = hull.filter(
+        (c) => c.until && daysBetween(c.until, today) >= 0,
+      ).length;
+      const noWindow = hull.filter((c) => !c.until).length;
+      if (open) out.push(`${n(open, "window")} open in the hull`);
+      if (noWindow) out.push(`${noWindow} in the hull with no window set`);
+    }
+    return out;
+  }
+
+  /** Which of the reader's values a text leans on, by the value's own terms. */
+  function leans(text, values) {
+    const hay = ` ${text.toLowerCase()} `;
+    return values
+      .map((v) => ({
+        name: v.name,
+        hits: v.terms
+          .map((t) => t.toLowerCase().trim())
+          .filter((t) => t && hay.includes(t)),
+      }))
+      .filter((l) => l.hits.length);
+  }
+  const leansOnValues = (c, values) =>
+    leans(`${c.text} ${c.why} ${c.ifSo} ${c.ifNot}`, values);
+
+  const proposedCount = (c) => c.looks.filter((l) => !l.kept).length;
+
+  function keepAll(c, yes) {
+    return {
+      ...c,
+      looks: yes
+        ? c.looks.map((l) => ({ ...l, kept: true }))
+        : c.looks.filter((l) => l.kept),
+    };
+  }
+
+  /* the claim's name */
+  function sentencesOf(text) {
+    return text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+  }
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  function titleOf(c) {
+    if (c.title.trim()) return c.title.trim();
+    const first = (sentencesOf(c.text)[0] ?? c.text.trim())
+      .replace(/[.!…]+$/, "")
+      .trim();
+    if (first)
+      return first.length > 72 ? `${first.slice(0, 69).trim()}…` : first;
+    return "a claim";
+  }
+
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+
+  /** Validation at the boundary: a claim arrives from the sheet, or from this browser's storage. */
+  function validateClaim(input, today) {
+    const r = input ?? {};
+    const text = typeof r.text === "string" ? r.text.trim().slice(0, 2000) : "";
+    if (!text) throw new Error("a claim needs its words");
+    const day = (v, fallback = today) =>
+      typeof v === "string" && DAY.test(v) ? v : fallback;
+    const long = (v, max) =>
+      typeof v === "string" ? v.trim().slice(0, max) : "";
+    const layer = r.layer === "hull" ? "hull" : "sail";
+    const tacks = (Array.isArray(r.tacks) ? r.tacks : [])
+      .slice(0, 500)
+      .map((x) => {
+        const o = x ?? {};
+        const rent = str(o.rent, 10);
+        return {
+          on: day(o.on),
+          at: clampLean(Number(o.at)),
+          saw: long(o.saw, 2000),
+          rent: RENTS.includes(rent) ? rent : "",
+        };
+      });
+    const looks = (Array.isArray(r.looks) ? r.looks : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        const moves = str(o.moves, 10);
+        return {
+          id: str(o.id, 24) || uid(),
+          text: str(o.text, 300),
+          moves: MOVES.includes(moves) ? moves : "either",
+          by:
+            o.by === "proposed"
+              ? "proposed"
+              : o.by === "garden"
+                ? "garden"
+                : "you",
+          kept: o.kept !== false,
+          looked: day(o.looked, ""),
+          stone: str(o.stone, 200) || null,
+        };
+      })
+      .filter((l) => l.text);
+    const reopened = (Array.isArray(r.reopened) ? r.reopened : [])
+      .slice(0, 100)
+      .map((x) => {
+        const o = x ?? {};
+        return {
+          on: day(o.on),
+          said: long(o.said, 2000),
+          went: o.went === "let-go" ? "let-go" : "held",
+          until: day(o.until, ""),
+          early: o.early === true,
+        };
+      });
+    const c = {
+      slug: str(r.slug, 120),
+      title: str(r.title, 120),
+      text,
+      layer,
+      flinch: long(r.flinch, 400),
+      ifSo: long(r.ifSo, 2000),
+      ifNot: long(r.ifNot, 2000),
+      tacks,
+      looks,
+      why: long(r.why, 4000),
+      chosen: day(r.chosen, ""),
+      until: day(r.until, ""),
+      letGo: day(r.letGo, ""),
+      reopened,
+      stone: str(r.stone, 200) || null,
+      opened: day(r.opened),
+      touched: day(r.touched),
+      note: long(r.note, 4000),
+    };
+    c.title = titleOf(c);
+    if (!c.slug) c.slug = slugOf(c.title, c.opened);
+    return c;
+  }
+
+  /* The pen. Every stroke is deterministic for its seed, so a re-draw never
+     moves a line. mulberry32, an FNV seed, and a cubic set a little off the
+     straight line, the way a quick sketch goes. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (k) => String(Math.round(k * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  /* logic:end */
+
+  /* ── keeping: one key in this browser, and nothing anywhere else ────────── */
+
+  const KEY = "pp-tack";
+  const localToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const plusDays = (day, k) => {
+    const d = new Date(`${day}T12:00:00`);
+    d.setDate(d.getDate() + k);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const today = localToday();
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const byTouched = (a, b) =>
+    a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0;
+
+  function validValues(raw) {
+    if (!Array.isArray(raw)) return null;
+    return raw
+      .slice(0, 24)
+      .map((v) => ({
+        name: str(v && v.name, 40),
+        terms: (Array.isArray(v && v.terms) ? v.terms : [])
+          .map((t) => str(t, 40))
+          .filter(Boolean)
+          .slice(0, 24),
+      }))
+      .filter((v) => v.name);
+  }
+
+  let claims = [];
+  let values = [];
+  let storable = true;
+
+  function load() {
+    let raw = null;
+    try {
+      raw = localStorage.getItem(KEY);
+    } catch {
+      storable = false;
+    }
+    let data = null;
+    if (raw)
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        data = null;
+      }
+    if (data && Array.isArray(data.claims)) {
+      claims = data.claims
+        .map((c) => {
+          try {
+            return validateClaim(c, today);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean)
+        .sort(byTouched);
+      values = validValues(data.values) ?? clone(SPECIMEN_VALUES);
+    } else {
+      claims = clone(SPECIMEN_CLAIMS);
+      values = clone(SPECIMEN_VALUES);
+    }
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          claims,
+          values: values.filter((v) => v.name.trim()),
+        }),
+      );
+      storable = true;
+    } catch {
+      storable = false;
+    }
+    keptWhere();
+    return storable;
+  }
+
+  const NOT_KEPT =
+    "this browser will not keep it — the sheet lasts until the page closes";
+
+  /* ── what the sheet holds while you work ──────────────────────────────── */
+
+  let open = null; // the claim on the sheet: a working copy
+  let slugRef = ""; // the slug it is kept under, or "" before it is kept
+  const ui = {
+    text: "",
+    layer0: null,
+    flinch0: "",
+    at0: 50,
+    until0: "",
+    saw: "",
+    atNew: null,
+    rentNew: "",
+    newLook: "",
+    newMoves: "either",
+    reopening: false,
+    saidNew: "",
+    untilNew: "",
+    trouble: null,
+    sure: null,
+  };
+  let viewKey = null;
+  let arrivedLayer = null;
+  const seen = new Set();
+
+  function save(c) {
+    const fresh = !slugRef;
+    let out;
+    try {
+      out = validateClaim({ ...c, slug: slugRef || c.slug }, today);
+    } catch (e) {
+      ui.trouble = e.message;
+      return null;
+    }
+    out.touched = today;
+    if (fresh) {
+      const taken = new Set(claims.map((x) => x.slug));
+      const base = out.slug;
+      let k = 2;
+      while (taken.has(out.slug)) out.slug = `${base}-${k++}`;
+    }
+    slugRef = out.slug;
+    if (open)
+      open = {
+        ...open,
+        slug: out.slug,
+        title: out.title,
+        touched: out.touched,
+      };
+    const i = claims.findIndex((x) => x.slug === out.slug);
+    if (i >= 0) claims[i] = out;
+    else claims.unshift(out);
+    if (!persist()) ui.trouble = NOT_KEPT;
+    return out;
+  }
+
+  function keepNow(next) {
+    ui.trouble = null;
+    open = next;
+    save(next);
+    render();
+  }
+
+  /** A field left: keep what it says, and say so if it could not be kept. */
+  function commit() {
+    if (!open) return;
+    ui.trouble = null;
+    save(open);
+    refreshDesk();
+    showTrouble();
+  }
+
+  /* ── small builders ───────────────────────────────────────────────────── */
+
+  const $ = (id) => document.getElementById(id);
+  function add(el, kids) {
+    for (const k of kids.flat(Infinity)) {
+      if (k == null || k === false || k === "") continue;
+      el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+    }
+  }
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    add(el, kids);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else if (k === "value") el.value = v;
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    return el;
+  }
+  const SVG = "http://www.w3.org/2000/svg";
+  function s(tag, attrs, ...kids) {
+    const el = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs || {}))
+      if (v != null && v !== false) el.setAttribute(k, String(v));
+    add(el, kids);
+    return el;
+  }
+
+  /** A chip. `pressed` only for the ones that toggle; `on` is the ink, `acc` the accent. */
+  function chip(label, onclick, o = {}) {
+    const cls = ["chip", o.on ? "on" : "", o.acc ? "acc" : ""]
+      .filter(Boolean)
+      .join(" ");
+    return h(
+      "button",
+      {
+        type: "button",
+        class: cls,
+        disabled: o.disabled,
+        title: o.title,
+        "aria-pressed":
+          o.pressed === undefined ? null : String(Boolean(o.pressed)),
+        "data-f": o.f,
+        onclick,
+      },
+      label,
+    );
+  }
+  const meta = (cls, ...kids) =>
+    h("div", { class: `meta ${cls || ""}` }, ...kids);
+  const hand = (cls, ...kids) =>
+    h("p", { class: `hand ${cls || ""}` }, ...kids);
+
+  /** A panel of the sheet. It rises once, when the view is new, and the pen goes round it. */
+  let fresh = false;
+  let delay = 0;
+  function panel(o, ...kids) {
+    const el = h(
+      o.tag || "div",
+      {
+        class: `panel sketched ${o.cls || ""} ${fresh ? "rise" : ""}`,
+        style: fresh ? `animation-delay:${o.delay ?? (delay += 50)}ms` : null,
+        "aria-label": o.label,
+        "data-seed": o.seed,
+        "data-pen": o.pen ? "acc" : null,
+      },
+      ...kids,
+    );
+    return el;
+  }
+
+  /** Where you lean, between the ends. */
+  function dial(value, label, f, oninput) {
+    const num = h(
+      "span",
+      { class: "meta num" },
+      String(value),
+      " ",
+      h("span", { class: "faint" }, "/100"),
+    );
+    const input = h("input", {
+      type: "range",
+      min: 1,
+      max: 99,
+      value: String(value),
+      "aria-label": label,
+      class: "dial",
+      "data-f": f,
+    });
+    input.addEventListener("input", () => {
+      const v = Number(input.value);
+      num.firstChild.nodeValue = String(v);
+      oninput(v);
+    });
+    return h(
+      "div",
+      { class: "dialrow" },
+      h("span", { class: "hand" }, "not so"),
+      input,
+      h("span", { class: "hand" }, "so"),
+      num,
+    );
+  }
+
+  /* ── the drawings ─────────────────────────────────────────────────────── */
+
+  /** The lean over its tacks: a pen line between the marks, so at top, not so at bottom, the middle dashed. */
+  function leanPath(tacks, seed, draw) {
+    const w = 320;
+    const ht = 132;
+    const pad = 26;
+    const top = 16;
+    const bottom = 30;
+    const k = tacks.length;
+    const yOf = (at) => top + ((99 - at) / 98) * (ht - top - bottom);
+    const xOf = (i) => (k <= 1 ? pad : pad + (i * (w - 2 * pad)) / (k - 1));
+    const r = rand(seedOf(seed));
+    let d = "";
+    let cross = "";
+    for (let i = 1; i < k; i++) {
+      const sg = stroke(
+        [xOf(i - 1), yOf(tacks[i - 1].at)],
+        [xOf(i), yOf(tacks[i].at)],
+        r,
+        0.9,
+      );
+      d += sg;
+      if (
+        (tacks[i - 1].at < 50 && tacks[i].at > 50) ||
+        (tacks[i - 1].at > 50 && tacks[i].at < 50)
+      )
+        cross += sg;
+    }
+    const mid = yOf(50);
+    const svg = s(
+      "svg",
+      {
+        viewBox: `0 0 ${w} ${ht}`,
+        class: "path",
+        role: "img",
+        "aria-label": "Where the lean has been, tack by tack",
+      },
+      s("text", { x: 4, y: top + 3, "font-size": 7.5, class: "f-faint" }, "so"),
+      s(
+        "text",
+        { x: 4, y: ht - bottom + 3, "font-size": 7.5, class: "f-faint" },
+        "not",
+      ),
+      s("line", {
+        x1: pad - 8,
+        x2: w - pad + 8,
+        y1: mid,
+        y2: mid,
+        class: "s-rule",
+        "stroke-dasharray": "3 4",
+      }),
+      s("line", {
+        x1: pad - 8,
+        x2: pad - 8,
+        y1: top,
+        y2: ht - bottom,
+        class: "s-rule",
+      }),
+      d &&
+        s("path", {
+          d,
+          class: `f-none s-ink ${draw ? "draw" : ""}`,
+          "stroke-width": 1.3,
+          "stroke-linecap": "round",
+          pathLength: 1,
+        }),
+      cross &&
+        s("path", {
+          d: cross,
+          class: `f-none s-acc ${draw ? "draw" : ""}`,
+          "stroke-width": 1.3,
+          "stroke-linecap": "round",
+          pathLength: 1,
+        }),
+    );
+    tacks.forEach((t, i) => {
+      const last = i === k - 1;
+      svg.append(
+        s("circle", {
+          cx: xOf(i),
+          cy: yOf(t.at),
+          r: last ? 3.6 : 2.6,
+          class: `${last ? "f-ink" : "f-surface"} s-ink`,
+          "stroke-width": 1.2,
+        }),
+        s(
+          "text",
+          {
+            x: xOf(i),
+            y: yOf(t.at) - 7,
+            "font-size": 7.5,
+            "text-anchor": "middle",
+            class: last ? "f-ink" : "f-faint",
+          },
+          String(t.at),
+        ),
+      );
+      if (i === 0 || last || k <= 6)
+        svg.append(
+          s(
+            "text",
+            {
+              x: xOf(i),
+              y: ht - 8,
+              "font-size": 7,
+              "text-anchor":
+                i === 0 && k > 1 ? "start" : last && k > 1 ? "end" : "middle",
+              class: "f-faint",
+            },
+            t.on.slice(5),
+          ),
+        );
+    });
+    return svg;
+  }
+
+  /** One row's lean along a short line: the marks it has held hollow, the current one filled. */
+  function leanLine(tacks) {
+    const w = 150;
+    const ht = 16;
+    const pad = 5;
+    const xOf = (at) => pad + (at / 100) * (w - 2 * pad);
+    const svg = s(
+      "svg",
+      {
+        viewBox: `0 0 ${w} ${ht}`,
+        width: w,
+        height: ht,
+        "aria-hidden": "true",
+        class: "line-svg",
+      },
+      s("line", {
+        x1: pad,
+        x2: w - pad,
+        y1: ht / 2,
+        y2: ht / 2,
+        class: "s-rule",
+      }),
+      s("line", {
+        x1: xOf(50),
+        x2: xOf(50),
+        y1: ht / 2 - 4,
+        y2: ht / 2 + 4,
+        class: "s-rule",
+      }),
+    );
+    tacks
+      .slice(0, -1)
+      .forEach((t) =>
+        svg.append(
+          s("circle", {
+            cx: xOf(t.at),
+            cy: ht / 2,
+            r: 2.2,
+            class: "f-surface s-faint",
+            "stroke-width": 1,
+          }),
+        ),
+      );
+    if (tacks.length)
+      svg.append(
+        s("circle", {
+          cx: xOf(tacks[tacks.length - 1].at),
+          cy: ht / 2,
+          r: 3.2,
+          class: "f-ink",
+        }),
+      );
+    return svg;
+  }
+
+  /** A commitment's window: from the day it was chosen to the day it may be looked at again; the accent once open. */
+  function windowBar(chosen, until, letGo, wide) {
+    const w = wide ? 600 : 150;
+    const ht = wide ? 22 : 16;
+    const pad = 5;
+    const attrs = wide
+      ? { viewBox: `0 0 ${w} ${ht}`, "aria-hidden": "true", class: "wide-svg" }
+      : {
+          viewBox: `0 0 ${w} ${ht}`,
+          width: w,
+          height: ht,
+          "aria-hidden": "true",
+          class: "line-svg",
+        };
+    const end = letGo || today;
+    if (!until)
+      return s(
+        "svg",
+        attrs,
+        s("line", {
+          x1: pad,
+          x2: w - pad,
+          y1: ht / 2,
+          y2: ht / 2,
+          class: "s-rule",
+          "stroke-dasharray": "2 4",
+        }),
+        s("circle", { cx: pad, cy: ht / 2, r: 3, class: "f-ink" }),
+      );
+    const span = Math.max(1, daysBetween(chosen, until));
+    const t = Math.min(1, Math.max(0, daysBetween(chosen, end) / span));
+    const isOpen = !letGo && daysBetween(until, today) >= 0;
+    const x = pad + t * (w - 2 * pad);
+    return s(
+      "svg",
+      attrs,
+      s("line", {
+        x1: pad,
+        x2: w - pad,
+        y1: ht / 2,
+        y2: ht / 2,
+        class: "s-rule",
+      }),
+      s("line", {
+        x1: pad,
+        x2: x,
+        y1: ht / 2,
+        y2: ht / 2,
+        class: isOpen ? "s-acc" : letGo ? "s-faint" : "s-ink",
+        "stroke-width": 2,
+        "stroke-linecap": "round",
+      }),
+      s("line", {
+        x1: w - pad,
+        x2: w - pad,
+        y1: ht / 2 - 5,
+        y2: ht / 2 + 5,
+        class: isOpen ? "s-acc" : "s-ink",
+      }),
+      s("circle", {
+        cx: x,
+        cy: ht / 2,
+        r: 3,
+        class: `${letGo ? "f-surface" : "f-ink"} s-ink`,
+        "stroke-width": 1,
+      }),
+    );
+  }
+
+  /** The pen round every panel, and under the waterline. */
+  let observers = [];
+  function sketchAll(draw) {
+    for (const ro of observers) ro.disconnect();
+    observers = [];
+    document
+      .querySelectorAll("#sheet .sketched, #sheet .waterline")
+      .forEach((el) => {
+        const under = el.classList.contains("waterline");
+        const seed = seedOf(el.dataset.seed || "tack");
+        const path = s("path", {
+          pathLength: 1,
+          class: `${under || el.dataset.pen ? "acc" : ""} ${draw ? "draw" : ""}`,
+        });
+        const svg = s("svg", { class: "sketch", "aria-hidden": "true" }, path);
+        el.prepend(svg);
+        const redraw = () => {
+          const w = el.offsetWidth;
+          const ht = el.offsetHeight;
+          if (!w || !ht) return;
+          svg.setAttribute("viewBox", `0 0 ${w} ${ht}`);
+          path.setAttribute(
+            "d",
+            under
+              ? roughUnderline(w, seed, { y: ht - 0.5 })
+              : roughRect(w, ht, seed),
+          );
+        };
+        redraw();
+        const ro = new ResizeObserver(redraw);
+        ro.observe(el);
+        observers.push(ro);
+      });
+  }
+
+  /* ── the sheet, before a claim is open ────────────────────────────────── */
+
+  function claimRow(c) {
+    const tt = tally(c, today);
+    const spec = SPECIMEN_SLUGS.has(c.slug) ? " · specimen" : "";
+    if (c.layer === "sail")
+      return h(
+        "li",
+        { class: "tk-row" },
+        h(
+          "button",
+          { type: "button", onclick: () => openOne(c) },
+          h("span", { class: "title display" }, c.title),
+          leanLine(c.tacks),
+          h(
+            "span",
+            { class: "meta plain" },
+            `at ${tt.now ?? "—"} · ${tt.n > 1 ? `${tt.n - 1} ${tt.n === 2 ? "tack" : "tacks"}` : "not tacked"}${tt.last && tt.n > 1 ? ` · last ${tt.last.on}` : ""}${tt.expects === "none" ? " · expects nothing yet" : ""}`,
+            spec && h("span", { class: "tag" }, spec),
+          ),
+        ),
+      );
+    return h(
+      "li",
+      { class: "tk-row" },
+      h(
+        "button",
+        { type: "button", onclick: () => openOne(c) },
+        h("span", { class: `title display ${c.letGo ? "gone" : ""}` }, c.title),
+        windowBar(c.chosen || c.opened, c.until, c.letGo, false),
+        h(
+          "span",
+          { class: `meta plain ${tt.open ? "accent" : ""}` },
+          c.letGo
+            ? `let go ${c.letGo} · held ${tt.held} days`
+            : !c.until
+              ? `held ${tt.held} days · no window set`
+              : tt.open
+                ? `held ${tt.held} days · the window is open`
+                : `held ${tt.held} days · opens ${c.until}`,
+          spec && h("span", { class: "tag" }, spec),
+        ),
+      ),
+    );
+  }
+
+  function viewIndex() {
+    const sails = claims.filter((c) => c.layer === "sail");
+    const hull = claims.filter((c) => c.layer === "hull");
+    const can = Boolean(ui.text.trim() && ui.layer0);
+    const arrive = ui.layer0 !== arrivedLayer;
+    arrivedLayer = ui.layer0;
+
+    const beginBtn = chip(
+      ui.layer0 === "hull"
+        ? "put it in the hull"
+        : ui.layer0 === "sail"
+          ? "put it in the sails"
+          : "put it down",
+      begin,
+      { disabled: !can, on: can, f: "begin" },
+    );
+    const syncBegin = () => {
+      const ok = Boolean(ui.text.trim() && ui.layer0);
+      beginBtn.disabled = !ok;
+      beginBtn.classList.toggle("on", ok);
+    };
+
+    const sheet = panel(
+      {
+        tag: "section",
+        cls: "big",
+        label: "Set a claim down",
+        seed: "tack-begin",
+        delay: 60,
+      },
+      meta("accent", "the claim"),
+      h("textarea", {
+        class: "case claim display mt3",
+        rows: 2,
+        value: ui.text,
+        placeholder: "what you think is so — or what you will stay loyal to",
+        "aria-label": "The claim",
+        "data-f": "text",
+        oninput: (e) => {
+          ui.text = e.target.value;
+          syncBegin();
+        },
+      }),
+      meta("accent mt5", "the flinch"),
+      h(
+        "p",
+        { class: "display mt1", style: "font-size:19px;line-height:1.3" },
+        "Do you want evidence to be able to change this?",
+      ),
+      h(
+        "div",
+        { class: "row-wrap mt3" },
+        chip("yes — a belief, into the sails", () => setLayer0("sail"), {
+          on: ui.layer0 === "sail",
+          pressed: ui.layer0 === "sail",
+          f: "l0-sail",
+        }),
+        chip("no — a commitment, into the hull", () => setLayer0("hull"), {
+          on: ui.layer0 === "hull",
+          acc: ui.layer0 === "hull",
+          pressed: ui.layer0 === "hull",
+          f: "l0-hull",
+        }),
+      ),
+      hand(
+        "mt2",
+        "if even asking felt like a small betrayal, that flinch is the answer: it is a commitment, not a belief",
+      ),
+      h("input", {
+        class: "case mt3",
+        value: ui.flinch0,
+        placeholder: "what the flinch said, in your words — optional",
+        "aria-label": "What the flinch said",
+        "data-f": "flinch0",
+        oninput: (e) => (ui.flinch0 = e.target.value),
+      }),
+      ui.layer0 === "sail" &&
+        h(
+          "div",
+          { class: `mt5 ${arrive ? "arrive" : ""}` },
+          meta("", "where you lean now"),
+          dial(ui.at0, "Where you lean now", "at0", (v) => (ui.at0 = v)),
+          hand(
+            "mt1",
+            "never 0, never 100 — the ends are not places you can stand",
+          ),
+        ),
+      ui.layer0 === "hull" &&
+        h(
+          "div",
+          { class: `mt5 ${arrive ? "arrive" : ""}` },
+          meta("", "the window"),
+          h(
+            "div",
+            { class: "row-wrap base mt2" },
+            h(
+              "span",
+              { class: "hand muted", style: "font-size:16px" },
+              "you will not look at this again before",
+            ),
+            h("input", {
+              type: "date",
+              class: "case date",
+              value: ui.until0,
+              min: today,
+              "aria-label": "Until",
+              "data-f": "until0",
+              onchange: (e) => {
+                ui.until0 = e.target.value;
+                render();
+              },
+            }),
+            h(
+              "span",
+              { class: "row-wrap", style: "gap:4px" },
+              [30, 90, 365].map((k) =>
+                chip(
+                  k === 365 ? "a year" : `${k} days`,
+                  () => {
+                    ui.until0 = plusDays(today, k);
+                    render();
+                  },
+                  {
+                    on: ui.until0 === plusDays(today, k),
+                    pressed: ui.until0 === plusDays(today, k),
+                    f: `u0-${k}`,
+                  },
+                ),
+              ),
+            ),
+          ),
+          hand(
+            "mt1",
+            "a day you name — no evidence is owed, and none will be asked for",
+          ),
+        ),
+      h(
+        "div",
+        { class: "row-wrap mt5" },
+        beginBtn,
+        h("span", { class: "hand" }, "sorted by your flinch, not by the tool"),
+      ),
+      claims.length > 0 && [
+        h(
+          "div",
+          { class: "head mt8" },
+          meta("accent", "the sails"),
+          h(
+            "span",
+            { class: "hand" },
+            "beliefs — held loosely, moved a tack at a time",
+          ),
+        ),
+        sails.length
+          ? h("ol", { class: "rows" }, sails.map(claimRow))
+          : meta("plain mt2", "nothing in the sails"),
+        h(
+          "div",
+          {
+            class: "waterline",
+            "aria-hidden": "true",
+            "data-seed": "the-waterline",
+          },
+          h("span", { class: "hand" }, "the waterline"),
+        ),
+        h(
+          "div",
+          { class: "head" },
+          meta("accent", "the hull"),
+          h(
+            "span",
+            { class: "hand" },
+            "commitments — chosen, held until a day you named",
+          ),
+        ),
+        hull.length
+          ? h("ol", { class: "rows" }, hull.map(claimRow))
+          : meta("plain mt2", "nothing in the hull"),
+      ],
+      !claims.length &&
+        hand("mt8", "nothing set down yet — the first claim begins above"),
+    );
+
+    const how = panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "How to sail it",
+        seed: "tack-how",
+        delay: 120,
+      },
+      meta("accent", "how to sail it"),
+      h(
+        "ol",
+        { class: "how ink" },
+        h(
+          "li",
+          {},
+          "Write the claim. Then ask the flinch: do you want evidence to be able to change this? If yes, it is a belief. If even asking felt like a small betrayal, that flinch is the instrument — it is a commitment.",
+        ),
+        h(
+          "li",
+          {},
+          "A belief goes in the sails. Say where you lean, between the ends. Write what you would expect to see if it is so, and if it is not: a belief that expects nothing is not paying rent.",
+        ),
+        h(
+          "li",
+          {},
+          "Tack, do not flip. Each time you see something, write what you saw, say what it matched, and move the lean in proportion. The sheet draws the path and marks any step that crossed the middle.",
+        ),
+        h(
+          "li",
+          {},
+          "A commitment goes in the hull. Write why you hold it — no evidence is owed. Name the day before which you will not look at it again, and hold it through the stretch where the water looks bad.",
+        ),
+        h(
+          "li",
+          {},
+          "When the window opens, reopen the question on the record: hold it again, or let it go. Reopening early is allowed and is written down as early.",
+        ),
+      ),
+      hand(
+        "mt4",
+        "all sail and no hull is a shipwreck with a good weather report; all hull and no sail does not move",
+      ),
+    );
+
+    const specimenHere = claims.some((c) => SPECIMEN_SLUGS.has(c.slug));
+    const whole = panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "The whole sheet",
+        seed: "tack-whole",
+        delay: 180,
+      },
+      meta("accent", "the whole sheet"),
+      h("p", { class: "body-s mt2" }, wholeReadings(claims, today).join(" · ")),
+      h(
+        "div",
+        { class: "mt4" },
+        specimenHere
+          ? [
+              meta(
+                "plain",
+                "the two marked specimen are Specimen A's — fiction, a made-up life",
+              ),
+              h(
+                "div",
+                { class: "row-wrap mt2" },
+                chip("clear the specimen", clearSpecimen, {
+                  f: "clear-specimen",
+                }),
+              ),
+            ]
+          : h(
+              "div",
+              { class: "row-wrap" },
+              chip("put the specimen back", restoreSpecimen, {
+                f: "restore-specimen",
+              }),
+            ),
+        meta(
+          "plain mt3",
+          storable
+            ? "kept in this browser only — nothing leaves the page"
+            : NOT_KEPT,
+        ),
+      ),
+      h(
+        "p",
+        {
+          class: "meta accent mt3",
+          role: "alert",
+          id: "trouble",
+          hidden: !ui.trouble,
+        },
+        ui.trouble || "",
+      ),
+    );
+
+    return h(
+      "div",
+      { class: "grid" },
+      sheet,
+      h("aside", { class: "col" }, how, whole, valuesPanel(false)),
+    );
+  }
+
+  function setLayer0(l) {
+    ui.layer0 = l;
+    render();
+  }
+
+  function begin() {
+    if (!ui.text.trim() || !ui.layer0) return;
+    slugRef = "";
+    const layer0 = ui.layer0;
+    const next = {
+      ...emptyClaim(today),
+      text: ui.text.trim(),
+      layer: layer0,
+      flinch: ui.flinch0.trim(),
+      tacks:
+        layer0 === "sail"
+          ? [{ on: today, at: clampLean(ui.at0), saw: "First put.", rent: "" }]
+          : [],
+      chosen: layer0 === "hull" ? today : "",
+      until: layer0 === "hull" ? ui.until0 : "",
+    };
+    Object.assign(ui, {
+      text: "",
+      layer0: null,
+      flinch0: "",
+      at0: 50,
+      until0: "",
+    });
+    resetClaimUi();
+    keepNow(next);
+    hashTo(slugRef);
+  }
+
+  function clearSpecimen() {
+    claims = claims.filter((c) => !SPECIMEN_SLUGS.has(c.slug));
+    if (!persist()) ui.trouble = NOT_KEPT;
+    render();
+  }
+  function restoreSpecimen() {
+    claims = [
+      ...claims.filter((c) => !SPECIMEN_SLUGS.has(c.slug)),
+      ...clone(SPECIMEN_CLAIMS),
+    ].sort(byTouched);
+    if (!persist()) ui.trouble = NOT_KEPT;
+    render();
+  }
+
+  /* ── your values: names and the words that say them ───────────────────── */
+
+  const sameAsSpecimen = () =>
+    JSON.stringify(values.filter((v) => v.name.trim())) ===
+    JSON.stringify(SPECIMEN_VALUES);
+
+  function valuesPanel(inDesk) {
+    const rows = h("div", { class: "vals" });
+    values.forEach((v, i) => {
+      rows.append(
+        h(
+          "div",
+          { class: "val" },
+          h("input", {
+            class: "case name",
+            value: v.name,
+            placeholder: "a value",
+            "aria-label": `Value ${i + 1}, its name`,
+            "data-f": `vn-${i}`,
+            oninput: (e) => {
+              values[i].name = e.target.value.slice(0, 40);
+              refreshDesk();
+            },
+            onchange: () => persist(),
+          }),
+          h("input", {
+            class: "case",
+            value: v.terms.join(", "),
+            placeholder: "its words, with commas",
+            "aria-label": `Value ${i + 1}, its terms`,
+            "data-f": `vt-${i}`,
+            oninput: (e) => {
+              values[i].terms = e.target.value
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean)
+                .slice(0, 24);
+              refreshDesk();
+            },
+            onchange: () => persist(),
+          }),
+          h(
+            "button",
+            {
+              type: "button",
+              class: "bare",
+              "aria-label": `Take ${v.name || "this value"} off`,
+              "data-f": `vx-${i}`,
+              onclick: () => {
+                values.splice(i, 1);
+                persist();
+                render();
+              },
+            },
+            "×",
+          ),
+        ),
+      );
+    });
+    return panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "Your values",
+        seed: inDesk ? "tack-values-desk" : "tack-values",
+        delay: inDesk ? 200 : 240,
+      },
+      h(
+        "div",
+        { class: "head" },
+        meta("accent", "your values"),
+        sameAsSpecimen() && meta("plain", "the specimen's"),
+      ),
+      hand(
+        "mt2",
+        "a claim leans on a value when one of the value's words appears in it — what you say, why, and what you expect",
+      ),
+      values.length ? rows : meta("plain mt3", "no values named"),
+      h(
+        "div",
+        { class: "row-wrap mt4" },
+        chip(
+          "name a value",
+          () => {
+            values.push({ name: "", terms: [] });
+            render();
+            const el = document.querySelector(
+              `[data-f="vn-${values.length - 1}"]`,
+            );
+            if (el) el.focus();
+          },
+          { disabled: values.length >= 24, f: "v-add" },
+        ),
+        !sameAsSpecimen() &&
+          chip(
+            "put the specimen's back",
+            () => {
+              values = clone(SPECIMEN_VALUES);
+              persist();
+              render();
+            },
+            { f: "v-restore" },
+          ),
+      ),
+    );
+  }
+
+  /* ── the sheet, with a claim open ─────────────────────────────────────── */
+
+  function resetClaimUi() {
+    Object.assign(ui, {
+      sure: null,
+      reopening: false,
+      atNew: null,
+      saw: "",
+      rentNew: "",
+      newLook: "",
+      saidNew: "",
+      untilNew: "",
+      trouble: null,
+    });
+  }
+  function openOne(c) {
+    slugRef = c.slug;
+    open = clone(c);
+    resetClaimUi();
+    render();
+    hashTo(c.slug);
+  }
+  function close() {
+    slugRef = "";
+    open = null;
+    resetClaimUi();
+    render();
+    hashTo("");
+  }
+
+  /** A row of the record arrives once; on a re-draw it is already there. */
+  function arrivals(key, i) {
+    const isNew = fresh || !seen.has(key);
+    seen.add(key);
+    return isNew
+      ? { class: "tk-tack new", style: `--i:${Math.min(i, 8)}` }
+      : { class: "tk-tack" };
+  }
+
+  const fieldAttrs = (key, label, placeholder) => ({
+    value: open[key],
+    "aria-label": label,
+    placeholder,
+    "data-f": key,
+    oninput: (e) => {
+      open[key] = e.target.value;
+      if (e.target.tagName === "TEXTAREA" && (key === "text" || key === "why"))
+        e.target.rows = rowsFor(key);
+      refreshDesk();
+    },
+    onchange: commit,
+  });
+  const rowsFor = (key) =>
+    key === "text"
+      ? Math.max(2, Math.min(6, Math.ceil(open.text.length / 40)))
+      : Math.max(4, Math.min(12, Math.ceil(open.why.length / 100) + 2));
+
+  function viewOpen() {
+    const c = open;
+    const t = tally(c, today);
+    const specimen = SPECIMEN_SLUGS.has(slugRef);
+    const now = leanNow(c);
+
+    const claimPanel = panel(
+      {
+        cls: "big",
+        seed: `claim-${c.slug || "fresh"}`,
+        pen: c.layer === "hull",
+        delay: 40,
+      },
+      h(
+        "div",
+        { class: "head" },
+        meta(
+          "accent",
+          `${LAYER_LABEL[c.layer]} · ${LAYER_KIND[c.layer]} · ${c.opened}`,
+          specimen && " · specimen",
+        ),
+        h(
+          "div",
+          { class: "row-wrap", style: "gap:6px" },
+          chip("all claims", close, { f: "close" }),
+        ),
+      ),
+      h("textarea", {
+        ...fieldAttrs("text", "The claim"),
+        class: `case claim display mt3 ${c.letGo ? "strike" : ""}`,
+        rows: rowsFor("text"),
+      }),
+      h(
+        "div",
+        { class: "row-wrap base mt3", style: "gap:4px 12px" },
+        meta("", "the flinch ·"),
+        h("input", {
+          ...fieldAttrs(
+            "flinch",
+            "The flinch",
+            "what you said when asked whether evidence may change this",
+          ),
+          class: "case grow",
+          style: "flex-basis:10rem",
+        }),
+        chip(
+          ui.sure === "layer"
+            ? c.layer === "sail"
+              ? "into the hull — sure?"
+              : "up into the sails — sure?"
+            : c.layer === "sail"
+              ? "ask the flinch again: into the hull"
+              : "ask the flinch again: into the sails",
+          () => {
+            if (ui.sure === "layer") moveLayer();
+            else {
+              ui.sure = "layer";
+              render();
+            }
+          },
+          { acc: ui.sure === "layer", f: "layer" },
+        ),
+      ),
+    );
+
+    const parts = [claimPanel];
+
+    if (c.layer === "sail") {
+      parts.push(
+        panel(
+          { cls: "big", seed: `rent-${c.slug || "fresh"}`, delay: 90 },
+          h(
+            "div",
+            { class: "head" },
+            meta("accent", "what it expects to see"),
+            h(
+              "span",
+              { class: "hand" },
+              "a belief pays rent in what it expects; one that expects nothing is freeloading",
+            ),
+          ),
+          h(
+            "div",
+            { class: "two" },
+            h(
+              "div",
+              {},
+              meta("", "if so"),
+              h("textarea", {
+                ...fieldAttrs(
+                  "ifSo",
+                  "If so",
+                  "if this is so, you would expect to see…",
+                ),
+                class: "case mt1",
+                rows: 4,
+              }),
+            ),
+            h(
+              "div",
+              {},
+              meta("", "if not"),
+              h("textarea", {
+                ...fieldAttrs(
+                  "ifNot",
+                  "If not",
+                  "and if it is not, you would expect to see…",
+                ),
+                class: "case mt1",
+                rows: 4,
+              }),
+            ),
+          ),
+        ),
+      );
+
+      const atShown = () => ui.atNew ?? now ?? 50;
+      const tackBtn = chip("tack", addTack, { f: "tack" });
+      const stepHint = h("span", { class: "hand" });
+      const syncTack = () => {
+        const a = atShown();
+        const can = Boolean(ui.saw.trim()) || a !== now;
+        tackBtn.disabled = !ui.saw.trim() && a === now;
+        tackBtn.classList.toggle("on", can);
+        stepHint.textContent =
+          now !== null && a !== now
+            ? `a step of ${Math.abs(a - now)}${(now < 50 && a > 50) || (now > 50 && a < 50) ? " — across the middle" : ""}`
+            : "move it in proportion to what you saw, or not at all";
+      };
+      syncTack();
+
+      const tacksLog = c.tacks.length
+        ? h(
+            "ol",
+            { class: "log" },
+            [...c.tacks].reverse().map((tk, i) => {
+              const idx = c.tacks.length - 1 - i;
+              const prev = idx > 0 ? c.tacks[idx - 1] : null;
+              return h(
+                "li",
+                arrivals(`t:${slugRef}:${idx}:${tk.on}:${tk.at}`, i),
+                h(
+                  "span",
+                  { class: "meta plain" },
+                  `${tk.on} · at ${tk.at}${prev ? ` (${tk.at > prev.at ? "+" : ""}${tk.at - prev.at})` : " · first put"}${tk.rent ? ` · ${RENT_LABEL[tk.rent]}` : ""}`,
+                ),
+                h(
+                  "span",
+                  { class: "said" },
+                  tk.saw ||
+                    h(
+                      "span",
+                      { class: "faint" },
+                      "nothing written of what was seen",
+                    ),
+                ),
+                idx === c.tacks.length - 1 &&
+                  idx > 0 &&
+                  h(
+                    "button",
+                    {
+                      type: "button",
+                      class: "bare end",
+                      onclick: takeBackTack,
+                      "aria-label": "Take back the last tack",
+                      "data-f": "takeback",
+                    },
+                    "take back",
+                  ),
+              );
+            }),
+          )
+        : null;
+
+      parts.push(
+        panel(
+          { cls: "big", seed: `lean-${c.slug || "fresh"}`, delay: 140 },
+          h(
+            "div",
+            { class: "head" },
+            meta("accent", `where you lean · now at ${now ?? "—"}`),
+            h(
+              "span",
+              { class: "hand" },
+              "the path your tacks drew; a step that crossed the middle is in the accent",
+            ),
+          ),
+          h(
+            "div",
+            { class: "mt3 measure" },
+            leanPath(c.tacks, c.slug || "fresh", fresh),
+          ),
+          h(
+            "div",
+            { class: "rule-top" },
+            meta("", "tack"),
+            h("textarea", {
+              class: "case mt1",
+              rows: 2,
+              value: ui.saw,
+              placeholder: "what did you see?",
+              "aria-label": "What you saw",
+              "data-f": "saw",
+              oninput: (e) => {
+                ui.saw = e.target.value;
+                syncTack();
+              },
+            }),
+            h(
+              "div",
+              { class: "row-wrap mt2", style: "gap:6px" },
+              meta("", "it was"),
+              RENTS.map((r) =>
+                chip(
+                  RENT_LABEL[r],
+                  () => {
+                    ui.rentNew = ui.rentNew === r ? "" : r;
+                    render();
+                  },
+                  {
+                    on: ui.rentNew === r,
+                    pressed: ui.rentNew === r,
+                    f: `rent-${r}`,
+                  },
+                ),
+              ),
+            ),
+            meta("mt3", "and now you lean"),
+            dial(atShown(), "Where you lean now", "atNew", (v) => {
+              ui.atNew = v;
+              syncTack();
+            }),
+            h("div", { class: "row-wrap mt3" }, tackBtn, stepHint),
+          ),
+          tacksLog,
+        ),
+      );
+
+      const nProposed = proposedCount(c);
+      const addLookBtn = chip("name it", addLook, {
+        disabled: !ui.newLook.trim(),
+        on: Boolean(ui.newLook.trim()),
+        f: "look-add",
+      });
+      parts.push(
+        panel(
+          { cls: "big", seed: `looks-${c.slug || "fresh"}`, delay: 190 },
+          h(
+            "div",
+            { class: "head" },
+            meta("accent", "what would move it"),
+            h(
+              "span",
+              { class: "hand" },
+              "places to go and look; a proposed one is hollow until you keep it",
+            ),
+          ),
+          !c.looks.length &&
+            hand(
+              "mt1",
+              "nothing yet — name something you could go and see, or ask",
+            ),
+          c.looks.length > 0 &&
+            h(
+              "ul",
+              { class: "log looks", style: "margin-top:8px" },
+              c.looks.map((l, i) =>
+                h(
+                  "li",
+                  arrivals(`l:${l.id}`, i),
+                  h("span", {
+                    class: `dot ${l.looked ? "looked" : ""} ${l.kept ? "" : "hollow"}`,
+                    "aria-hidden": "true",
+                    title: l.looked
+                      ? `looked at ${l.looked}`
+                      : l.kept
+                        ? "kept, not yet looked at"
+                        : "proposed, hollow",
+                  }),
+                  h(
+                    "span",
+                    { class: `look-text ${l.kept ? "" : "hollow"}` },
+                    l.text,
+                  ),
+                  h(
+                    "span",
+                    { class: "meta plain" },
+                    `${MOVES_SHORT[l.moves]} · ${l.by === "you" ? "yours" : l.by === "garden" ? "the garden" : "proposed"}${l.looked ? ` · looked ${l.looked}` : ""}`,
+                  ),
+                  l.kept
+                    ? h(
+                        "span",
+                        { class: "end" },
+                        chip(
+                          l.looked ? "looked" : "I looked",
+                          () =>
+                            lookPatch(l.id, { looked: l.looked ? "" : today }),
+                          {
+                            on: Boolean(l.looked),
+                            pressed: Boolean(l.looked),
+                            title: l.looked
+                              ? "not looked at after all"
+                              : "I went and looked",
+                            f: `looked-${l.id}`,
+                          },
+                        ),
+                        h(
+                          "button",
+                          {
+                            type: "button",
+                            class: "bare",
+                            onclick: () => dropLook(l.id),
+                            "aria-label": "Drop the look",
+                            "data-f": `drop-${l.id}`,
+                          },
+                          "×",
+                        ),
+                      )
+                    : h(
+                        "span",
+                        { class: "end" },
+                        chip("keep", () => lookPatch(l.id, { kept: true }), {
+                          on: true,
+                          f: `keep-${l.id}`,
+                        }),
+                        chip("drop", () => dropLook(l.id), {
+                          f: `dropc-${l.id}`,
+                        }),
+                      ),
+                ),
+              ),
+            ),
+          h(
+            "div",
+            { class: "row-wrap mt4", style: "align-items:flex-end" },
+            h("input", {
+              class: "case grow",
+              value: ui.newLook,
+              placeholder: "something you could go and see, ask, count or read",
+              "aria-label": "A look",
+              "data-f": "newlook",
+              oninput: (e) => {
+                ui.newLook = e.target.value;
+                const ok = Boolean(ui.newLook.trim());
+                addLookBtn.disabled = !ok;
+                addLookBtn.classList.toggle("on", ok);
+              },
+              onkeydown: (e) => {
+                if (e.key === "Enter") addLook();
+              },
+            }),
+            h(
+              "select",
+              {
+                class: "chip",
+                "aria-label": "Which way it would move you",
+                "data-f": "newmoves",
+                value: ui.newMoves,
+                onchange: (e) => (ui.newMoves = e.target.value),
+              },
+              MOVES.map((m) => h("option", { value: m }, MOVES_LABEL[m])),
+            ),
+            addLookBtn,
+          ),
+          nProposed > 0 &&
+            h(
+              "div",
+              { class: "row-wrap mt4" },
+              chip(
+                `keep all ${nProposed}`,
+                () => keepNow(keepAll(open, true)),
+                { f: "keepall" },
+              ),
+              chip("drop all", () => keepNow(keepAll(open, false)), {
+                f: "dropall",
+              }),
+            ),
+          troubleLine(),
+        ),
+      );
+    } else {
+      parts.push(
+        panel(
+          { cls: "big", seed: `why-${c.slug || "fresh"}`, delay: 90 },
+          h(
+            "div",
+            { class: "head" },
+            meta("accent", "why you hold it"),
+            h(
+              "span",
+              { class: "hand" },
+              "an axiom, not a theorem — no evidence is owed, and none is asked for here",
+            ),
+          ),
+          h("textarea", {
+            ...fieldAttrs(
+              "why",
+              "Why you hold it",
+              "in your own words — what you are loyal to, and what you would be if you were not",
+            ),
+            class: "case why mt2",
+            rows: rowsFor("why"),
+          }),
+        ),
+      );
+
+      const dateField = (key, label, word) =>
+        h(
+          "label",
+          { class: "row-wrap base", style: "gap:8px" },
+          meta("", word),
+          h("input", {
+            type: "date",
+            class: "case date",
+            value: key === "chosen" ? c.chosen || c.opened : c.until,
+            "aria-label": label,
+            "data-f": key,
+            onchange: (e) => {
+              open[key] = e.target.value;
+              commit();
+              render();
+            },
+          }),
+        );
+
+      parts.push(
+        panel(
+          {
+            cls: "big",
+            seed: `window-${c.slug || "fresh"}`,
+            pen: t.open,
+            delay: 140,
+          },
+          h(
+            "div",
+            { class: "head" },
+            meta("accent", "the window"),
+            h(
+              "span",
+              { class: "hand" },
+              "how long you stay committed before you are allowed to reopen the question",
+            ),
+          ),
+          h(
+            "div",
+            { class: "row-wrap base mt3", style: "gap:8px 24px" },
+            dateField("chosen", "Chosen on", "chosen"),
+            dateField("until", "Not before", "not before"),
+          ),
+          h(
+            "div",
+            { class: "mt4 measure" },
+            windowBar(c.chosen || c.opened, c.until, c.letGo, true),
+          ),
+          meta(
+            `plain mt1 ${t.open ? "accent" : ""}`,
+            t.letGo
+              ? `let go ${c.letGo} after ${t.held} days`
+              : !c.until
+                ? `held ${t.held ?? 0} days · no window set`
+                : t.open
+                  ? `held ${t.held} days · the window opened ${c.until}`
+                  : `held ${t.held ?? 0} days · ${t.toGo ?? 0} to go`,
+          ),
+          !c.letGo &&
+            !ui.reopening &&
+            h(
+              "div",
+              { class: "row-wrap mt4" },
+              chip(
+                "reopen the question",
+                () => {
+                  ui.reopening = true;
+                  ui.untilNew = plusDays(today, 90);
+                  render();
+                  const el = document.querySelector('[data-f="saidnew"]');
+                  if (el) el.focus();
+                },
+                { acc: t.open, f: "reopen" },
+              ),
+              h(
+                "span",
+                { class: "hand" },
+                t.open
+                  ? "the window is open; what you say now goes on the record"
+                  : "before the window it is allowed, and is written down as early",
+              ),
+            ),
+          ui.reopening &&
+            h(
+              "div",
+              { class: "rule-top arrive" },
+              meta(
+                t.open ? "" : "accent",
+                t.open
+                  ? "the question, reopened"
+                  : "the question, reopened early",
+              ),
+              h("textarea", {
+                class: "case mt1",
+                rows: 3,
+                value: ui.saidNew,
+                placeholder:
+                  "what would you say now, having held it this long?",
+                "aria-label": "What you would say now",
+                "data-f": "saidnew",
+                oninput: (e) => (ui.saidNew = e.target.value),
+              }),
+              h(
+                "div",
+                { class: "row-wrap mt3" },
+                chip("hold it again, not before", () => reopen("held"), {
+                  on: true,
+                  disabled: !ui.untilNew,
+                  f: "hold",
+                }),
+                h("input", {
+                  type: "date",
+                  class: "case date",
+                  value: ui.untilNew,
+                  min: today,
+                  "aria-label": "Hold it again until",
+                  "data-f": "untilnew",
+                  onchange: (e) => {
+                    ui.untilNew = e.target.value;
+                    render();
+                  },
+                }),
+                chip("let it go", () => reopen("let-go"), {
+                  acc: true,
+                  f: "letgo",
+                }),
+                chip(
+                  "not now",
+                  () => {
+                    ui.reopening = false;
+                    render();
+                  },
+                  { f: "notnow" },
+                ),
+              ),
+            ),
+          c.reopened.length > 0 &&
+            h(
+              "ol",
+              { class: "log" },
+              [...c.reopened]
+                .reverse()
+                .map((r, i) =>
+                  h(
+                    "li",
+                    arrivals(
+                      `r:${slugRef}:${c.reopened.length - 1 - i}:${r.on}`,
+                      i,
+                    ),
+                    h(
+                      "span",
+                      {
+                        class: `meta plain ${r.went === "let-go" ? "accent" : ""}`,
+                      },
+                      `${r.on} · ${r.went === "held" ? `held again${r.until ? ` until ${r.until}` : ""}` : "let go"}${r.early ? " · early" : ""}`,
+                    ),
+                    h(
+                      "span",
+                      { class: "said" },
+                      r.said || h("span", { class: "faint" }, "nothing said"),
+                    ),
+                  ),
+                ),
+            ),
+          troubleLine(),
+        ),
+      );
+    }
+
+    /* the desk */
+    const reading = panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "The reading",
+        seed: "tack-reading",
+        delay: 80,
+      },
+      meta("accent", "the reading"),
+      h("div", { id: "reading" }),
+    );
+    const layers = panel(
+      {
+        tag: "section",
+        cls: "small",
+        label: "The two layers",
+        seed: "tack-layers",
+        delay: 140,
+      },
+      meta("accent", "the two layers"),
+      h(
+        "p",
+        { class: "body-s mt2" },
+        c.layer === "sail"
+          ? "A belief is a claim about how the world is. Hold it in proportion to what you have seen, and move it a tack at a time. What you expect to see is its rent; what you saw is on the record; the ends are not places you can stand."
+          : "A commitment is a claim about what you will stay loyal to however the world turns out. It is chosen, not derived, so no evidence is owed. What you owe it is the window: the stretch you said you would hold it through before the question is yours to reopen.",
+      ),
+      hand(
+        "mt3",
+        c.layer === "sail"
+          ? "loyal to the territory, not to the map of it"
+          : "the scout was never meant to scout forever",
+      ),
+      h(
+        "div",
+        { class: "row-wrap mt4" },
+        chip(
+          ui.sure === "claim"
+            ? "take it off the sheet — sure?"
+            : "take it off the sheet",
+          () => {
+            if (ui.sure === "claim") remove();
+            else {
+              ui.sure = "claim";
+              render();
+            }
+          },
+          { acc: ui.sure === "claim", f: "remove" },
+        ),
+      ),
+      meta(
+        "plain mt4",
+        specimen
+          ? "fiction, like the rest of the specimen"
+          : storable
+            ? "kept in this browser only — nothing leaves the page"
+            : NOT_KEPT,
+      ),
+    );
+
+    return h(
+      "div",
+      { class: "grid" },
+      h("section", { class: "col", "aria-label": "The claim" }, parts),
+      h("aside", { class: "col" }, reading, layers, valuesPanel(true)),
+    );
+  }
+
+  function troubleLine() {
+    return h(
+      "p",
+      {
+        class: "meta accent mt3",
+        role: "alert",
+        id: "trouble",
+        hidden: !ui.trouble,
+      },
+      ui.trouble || "",
+    );
+  }
+  function showTrouble() {
+    const el = $("trouble");
+    if (!el) return;
+    el.textContent = ui.trouble || "";
+    el.hidden = !ui.trouble;
+  }
+
+  /** The reading, re-read as you write: facts about the record, and which values it leans on. */
+  function refreshDesk() {
+    const box = $("reading");
+    if (!box || !open) return;
+    const named = values.filter((v) => v.name.trim());
+    const vals = leansOnValues(open, named);
+    const words = readings(open, tally(open, today), vals);
+    box.replaceChildren();
+    add(box, [
+      h("p", { class: "body-s mt2" }, words.join(" · ")),
+      named.length > 0 && [
+        meta("mt4", "values leaned on, by their terms"),
+        vals.length
+          ? h(
+              "div",
+              {
+                class: "mt1",
+                style: "display:flex;flex-direction:column;gap:4px",
+              },
+              vals.map((v) =>
+                h(
+                  "div",
+                  { class: "leaned" },
+                  h("span", { class: "hand ink" }, v.name),
+                  h("span", { class: "meta plain" }, `(${v.hits.join(", ")})`),
+                ),
+              ),
+            )
+          : meta("plain mt1", "none of your values' terms appear in it yet"),
+      ],
+    ]);
+  }
+
+  /* ── what the sheet does ──────────────────────────────────────────────── */
+
+  function addTack() {
+    const c = open;
+    if (!c) return;
+    const at = clampLean(ui.atNew ?? leanNow(c) ?? 50);
+    if (!ui.saw.trim() && at === leanNow(c)) return;
+    const next = {
+      ...c,
+      tacks: [
+        ...c.tacks,
+        { on: today, at, saw: ui.saw.trim(), rent: ui.rentNew },
+      ],
+    };
+    Object.assign(ui, { saw: "", rentNew: "", atNew: null });
+    keepNow(next);
+  }
+  function takeBackTack() {
+    const c = open;
+    if (!c || c.tacks.length < 2) return;
+    keepNow({ ...c, tacks: c.tacks.slice(0, -1) });
+  }
+  function addLook() {
+    const c = open;
+    const t = ui.newLook.trim();
+    if (!c || !t) return;
+    ui.newLook = "";
+    keepNow({
+      ...c,
+      looks: [
+        ...c.looks,
+        {
+          id: uid(),
+          text: t,
+          moves: ui.newMoves,
+          by: "you",
+          kept: true,
+          looked: "",
+          stone: null,
+        },
+      ],
+    });
+  }
+  function lookPatch(id, p) {
+    if (!open) return;
+    keepNow({
+      ...open,
+      looks: open.looks.map((l) => (l.id === id ? { ...l, ...p } : l)),
+    });
+  }
+  function dropLook(id) {
+    if (!open) return;
+    keepNow({ ...open, looks: open.looks.filter((l) => l.id !== id) });
+  }
+  function reopen(went) {
+    const c = open;
+    if (!c) return;
+    const early = Boolean(c.until) && daysBetween(today, c.until) > 0;
+    const until = went === "held" ? ui.untilNew : "";
+    const said = ui.saidNew.trim();
+    Object.assign(ui, { reopening: false, saidNew: "", untilNew: "" });
+    keepNow({
+      ...c,
+      reopened: [...c.reopened, { on: today, said, went, until, early }],
+      until: went === "held" ? until : c.until,
+      letGo: went === "let-go" ? today : c.letGo,
+    });
+  }
+  function moveLayer() {
+    const c = open;
+    if (!c) return;
+    ui.sure = null;
+    if (c.layer === "sail")
+      keepNow({ ...c, layer: "hull", chosen: today, until: "", letGo: "" });
+    else
+      keepNow({
+        ...c,
+        layer: "sail",
+        letGo: "",
+        tacks: [
+          ...c.tacks,
+          {
+            on: today,
+            at: leanNow(c) ?? 50,
+            saw: "Came up out of the hull: the flinch said evidence may move it after all.",
+            rent: "",
+          },
+        ],
+      });
+  }
+  function remove() {
+    if (!open) return;
+    claims = claims.filter((x) => x.slug !== slugRef);
+    if (!persist()) ui.trouble = NOT_KEPT;
+    close();
+  }
+
+  /* ── drawing the page ─────────────────────────────────────────────────── */
+
+  function keptWhere() {
+    const el = $("kept-where");
+    if (el)
+      el.textContent = storable
+        ? "No network · kept in this browser"
+        : "No network · not kept";
+  }
+
+  function render() {
+    const key = open ? `open:${slugRef || "fresh"}` : "index";
+    fresh = key !== viewKey;
+    viewKey = key;
+    delay = 0;
+    const focused =
+      document.activeElement && document.activeElement.getAttribute("data-f");
+    const sheet = $("sheet");
+    sheet.replaceChildren(open ? viewOpen() : viewIndex());
+    sketchAll(fresh);
+    if (open) refreshDesk();
+    if (focused) {
+      const el = sheet.querySelector(`[data-f="${focused}"]`);
+      if (el && !el.disabled) el.focus({ preventScroll: true });
+    }
+    if (fresh && sheet.getBoundingClientRect().top < 0)
+      sheet.scrollIntoView({ block: "start" });
+  }
+
+  /* The open claim lives in the address after the #, so a reload or the back button finds it. */
+  function hashTo(slug) {
+    const want = slug ? `#${encodeURIComponent(slug)}` : "";
+    if (location.hash === want || (!slug && !location.hash)) return;
+    try {
+      history.replaceState(
+        null,
+        "",
+        want || location.pathname + location.search,
+      );
+    } catch {
+      location.replace(want || "#");
+    }
+  }
+  function fromHash() {
+    const slug = decodeURIComponent(location.hash.slice(1));
+    if (slug === (open ? slugRef : "")) return;
+    const c = slug && claims.find((x) => x.slug === slug);
+    if (c) openOne(c);
+    else if (open) close();
+  }
+  window.addEventListener("hashchange", fromHash);
+
+  load();
+  keptWhere();
+  render();
+  fromHash();
+</script>

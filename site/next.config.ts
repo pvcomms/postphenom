@@ -27,8 +27,8 @@ const altchaStyleHash = (() => {
 //    flight-data scripts that differ per page; hashes or nonces would mean rendering every
 //    request dynamically, and there is no user input anywhere for an injected script to arrive by.
 //  - worker-src allows blob:, because altcha builds its proof-of-work Web Worker from one.
-// The figures are standalone documents with inline <style> and style attributes, so they alone
-// also get style-src 'unsafe-inline'.
+// The figures and the instruments are standalone documents with inline <style> and style
+// attributes, so they alone also get style-src 'unsafe-inline'.
 const policy = (style: string) =>
   [
     "default-src 'self'",
@@ -46,6 +46,7 @@ const policy = (style: string) =>
   ].join("; ");
 
 const standalone = [
+  "/instruments/:path+",
   "/figures",
   "/figures.html",
   "/figures/:path*",
@@ -97,7 +98,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: everywhere },
       {
-        source: "/((?!figures|position).*)",
+        source: "/((?!figures|position|instruments/).*)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -119,12 +120,16 @@ const nextConfig: NextConfig = {
     ];
   },
   // The figures, their legend and the position page are standalone HTML in public/, moved over
-  // from paramv.com as they were. These give them clean URLs.
+  // from paramv.com as they were. These give them, and the instruments, clean URLs.
   async rewrites() {
     return [
       { source: "/figures", destination: "/figures.html" },
       { source: "/figures/legend", destination: "/figures/legend.html" },
       { source: "/position", destination: "/position.html" },
+      // The instruments are standalone HTML too, copied in by scripts/sync-instruments.py. Their
+      // fonts are the same files as public/fonts/, so their relative fonts/ path lands there.
+      { source: "/instruments/fonts/:file", destination: "/fonts/:file" },
+      { source: "/instruments/:slug", destination: "/instruments/:slug.html" },
     ];
   },
 };

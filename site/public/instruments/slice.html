@@ -1,0 +1,1910 @@
+<title>Slice</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Meet sixteen people a little at a time. See what the first second did to your calls, and what more of the same did to how sure you were."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a personnel file. Ink on bone. Amber is only ever the first second; teal is only
+     ever the moments that follow it; rust is only ever a sure call the year went against. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed;
+    --sheet: #faf9f6;
+    --ink: #23211e;
+    --ink-2: #6b655c;
+    --ink-3: #776f64;
+    --faint: #9a9287;
+    --rule: #e2ded5;
+    --rule-2: #c9c3b6;
+    --door: #9a6b2f;
+    --moments: #3f6b73;
+    --against: #b5532a;
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --grain-blend: multiply;
+    --grain: 0.05;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f;
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --ink-2: #a39c8e;
+      --ink-3: #8f887a;
+      --faint: #6f685c;
+      --rule: #302e25;
+      --rule-2: #4a473c;
+      --door: #d2a45e;
+      --moments: #7fb0b8;
+      --against: #d9763f;
+      --grain-blend: screen;
+      --grain: 0.04;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --ink-2: #a39c8e;
+    --ink-3: #8f887a;
+    --faint: #6f685c;
+    --rule: #302e25;
+    --rule-2: #4a473c;
+    --door: #d2a45e;
+    --moments: #7fb0b8;
+    --against: #d9763f;
+    --grain-blend: screen;
+    --grain: 0.04;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration-color: var(--rule-2);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: var(--ink);
+  }
+  .wrap {
+    max-width: 1000px;
+    margin-inline: auto;
+  }
+  .small {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  :focus-visible {
+    outline: 2px solid var(--moments);
+    outline-offset: 3px;
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 40px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast > div > .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .specimen {
+    margin: 0;
+    padding: 20px 20px 16px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .specimen > .label {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 4px;
+  }
+  .specimen .bars {
+    margin-top: 10px;
+  }
+  .specimen figcaption {
+    margin-top: 12px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* lede and stations */
+  .lede,
+  .station {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 56px 24px;
+  }
+  .station {
+    padding-top: 64px;
+    border-top: 1px solid var(--rule-2);
+  }
+  .station:first-child,
+  #play {
+    border-top: 0;
+  }
+  .lede .body,
+  .station .body > p {
+    max-width: 64ch;
+  }
+  .claim {
+    font-size: clamp(22px, 2.7vw, 27px);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.1em;
+  }
+  .title {
+    font-size: 21px;
+    line-height: 1.4;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+  }
+  .muted {
+    color: var(--ink-2);
+  }
+  .rail .n {
+    display: block;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .rail .label {
+    display: block;
+    margin-top: 10px;
+  }
+  .station h2 {
+    font-size: clamp(32px, 4.4vw, 44px);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    margin-bottom: 18px;
+  }
+  .station h3 {
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 32px 0 10px;
+  }
+  .plan {
+    list-style: none;
+    margin: 28px 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .plan li {
+    display: grid;
+    grid-template-columns: 40px 230px minmax(0, 1fr);
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 16.5px;
+    line-height: 1.45;
+  }
+  .plan .k {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    padding-top: 3px;
+  }
+  .plan b {
+    font-weight: 500;
+  }
+  .plan span:last-child {
+    color: var(--ink-2);
+  }
+
+  /* buttons */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .go {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 12px 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    transition:
+      transform 160ms var(--ease),
+      opacity 160ms var(--ease);
+  }
+  .go:hover {
+    transform: translateY(-1px);
+  }
+  .go:active {
+    transform: scale(0.98);
+  }
+
+  /* the person */
+  .card-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .pips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .pips i {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    border: 1px solid var(--faint);
+  }
+  .pips i.on {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .pips i.now {
+    border-color: var(--ink);
+  }
+  /* Seven cells: the first second, then the six moments as they are met. */
+  .strip {
+    display: flex;
+    gap: 3px;
+    margin-top: 18px;
+    max-width: 34rem;
+  }
+  .cell {
+    flex: 1;
+    height: 7px;
+    border-radius: 1px;
+    transition:
+      background-color 350ms var(--ease),
+      border-color 350ms var(--ease);
+  }
+  .cell.door {
+    flex: 1.6;
+    background: var(--door);
+  }
+  .cell.on {
+    background: var(--moments);
+  }
+  .cell.off {
+    border: 1px dashed var(--faint);
+  }
+  .lines {
+    display: grid;
+    gap: 2px;
+    margin: 22px 0 0;
+    max-width: 44rem;
+  }
+  .line {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 14px;
+    align-items: baseline;
+    padding: 9px 0 9px 14px;
+    border-left: 3px solid var(--moments);
+  }
+  .line dt {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .line dd {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .line.door {
+    border-left-color: var(--door);
+    padding-bottom: 14px;
+  }
+  .line.door dd {
+    font-style: italic;
+  }
+  .line.hidden {
+    border-left: 3px dashed var(--rule-2);
+  }
+  .line.hidden dt,
+  .line.hidden dd {
+    color: var(--ink-3);
+  }
+  .line.hidden dd {
+    font-size: 15px;
+    font-style: italic;
+  }
+  .in {
+    animation: rise 450ms var(--ease) both;
+  }
+  .ask {
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--rule-2);
+    max-width: 44rem;
+  }
+  .ask .q {
+    font-size: 19px;
+    margin: 0;
+  }
+  .was {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .was b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .bubbles {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .bub {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 6px;
+    width: 84px;
+    padding: 4px 0;
+    background: none;
+    border: 0;
+    color: var(--ink);
+  }
+  .bub:nth-child(3) {
+    margin-left: 22px;
+  }
+  .bub i {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1.5px solid var(--rule-2);
+    background: var(--sheet);
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 15px;
+    transition:
+      background-color 180ms var(--ease),
+      border-color 180ms var(--ease),
+      color 180ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .bub small {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .bub:hover i {
+    border-color: var(--ink);
+    transform: scale(1.05);
+  }
+  .bub:active i {
+    transform: scale(0.93);
+  }
+  .bub[aria-pressed="true"] i {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .bub:focus-visible {
+    outline: 0;
+  }
+  .bub:focus-visible i {
+    outline: 2px solid var(--moments);
+    outline-offset: 3px;
+  }
+  .year {
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .recall {
+    display: grid;
+    gap: 6px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+  }
+  .recall li {
+    display: grid;
+    grid-template-columns: 7.5rem 7rem minmax(0, 1fr);
+    gap: 10px;
+    align-items: baseline;
+  }
+  .recall b {
+    font-weight: 500;
+  }
+  .recall .off {
+    color: var(--ink-2);
+  }
+
+  /* the debrief's bars: one scale, a band behind for what a coin does */
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 28px;
+  }
+  .bars {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .brow {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) 4.4rem;
+    gap: 12px;
+    align-items: center;
+  }
+  .brow .rl {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .brow .rv {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .brow .rv small {
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+  .track {
+    position: relative;
+    display: block;
+    height: 18px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .band,
+  .key.k-band {
+    background: color-mix(in srgb, var(--faint) 30%, transparent);
+    border-left: 1px dashed var(--faint);
+    border-right: 1px dashed var(--faint);
+  }
+  .band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+  .fill,
+  .agst {
+    position: absolute;
+    top: 3px;
+    bottom: 0;
+    transform-origin: left;
+    animation: grow 600ms var(--ease) both;
+  }
+  .fill,
+  .key.k-fill {
+    background: color-mix(in srgb, var(--ink) 86%, transparent);
+  }
+  .fill {
+    left: 0;
+  }
+  .agst,
+  .key.k-agst {
+    background: repeating-linear-gradient(
+      120deg,
+      var(--against) 0 2px,
+      color-mix(in srgb, var(--against) 25%, transparent) 2px 5px
+    );
+  }
+  .mark {
+    position: absolute;
+    z-index: 1;
+  }
+  .mark.moments {
+    top: -4px;
+    bottom: -1px;
+    width: 3px;
+    margin-left: -1.5px;
+    background: var(--moments);
+    box-shadow: 0 0 0 1px var(--sheet);
+  }
+  .mark.door {
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    margin: -4px 0 0 -4.5px;
+    background: var(--door);
+    box-shadow: 0 0 0 1px var(--sheet);
+    transform: rotate(45deg);
+  }
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .key {
+    display: inline-block;
+    flex: none;
+    width: 14px;
+    height: 8px;
+  }
+  .key.k-band {
+    height: 10px;
+  }
+  .key.moments {
+    width: 3px;
+    height: 12px;
+    background: var(--moments);
+  }
+  .key.door {
+    width: 8px;
+    height: 8px;
+    background: var(--door);
+    transform: rotate(45deg);
+  }
+  .read {
+    max-width: 40rem;
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* each person whose first second pointed away from their moments: three calls */
+  .conflict {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 52rem;
+  }
+  .crow {
+    display: grid;
+    grid-template-columns: 7.5rem auto minmax(0, 1fr);
+    gap: 4px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px dashed var(--rule-2);
+  }
+  .crow .cn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .crow .cy {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .crow .ct {
+    grid-column: 1 / -1;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--ink-3);
+  }
+  .dot {
+    display: inline-block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--faint);
+  }
+  .dot.door {
+    border-color: var(--door);
+    background: color-mix(in srgb, var(--door) 22%, transparent);
+  }
+  .dot.moments {
+    border-color: var(--moments);
+    background: color-mix(in srgb, var(--moments) 22%, transparent);
+  }
+  .dot.door.sure {
+    background: var(--door);
+  }
+  .dot.moments.sure {
+    background: var(--moments);
+  }
+
+  /* the two teams */
+  .tablewrap {
+    overflow-x: auto;
+    margin-top: 20px;
+  }
+  table {
+    width: 100%;
+    min-width: 32rem;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  th,
+  td {
+    padding: 9px 12px 9px 0;
+    border-top: 1px dashed var(--rule-2);
+    text-align: left;
+    vertical-align: baseline;
+  }
+  thead th {
+    border-top: 0;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  tbody th {
+    max-width: 22rem;
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+  td {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td small {
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+
+  /* studies and sources */
+  .studies {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 40px;
+  }
+  .studies p {
+    font-size: 16.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .cite {
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .cite a {
+    color: var(--against);
+    text-decoration: none;
+  }
+  .cite a:hover {
+    text-decoration: underline;
+  }
+  .sources {
+    max-width: 46rem;
+    margin: 12px 0 0;
+    padding-left: 1.4em;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .sources li + li {
+    margin-top: 8px;
+  }
+  .sources li:target {
+    color: var(--ink);
+  }
+  .sources a {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .in,
+    .fill,
+    .agst {
+      animation: none;
+    }
+    .cell {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      padding-top: 44px;
+    }
+    .lede,
+    .station {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+    .rail {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .rail .n {
+      font-size: 32px;
+    }
+    .rail .label {
+      margin: 0;
+    }
+    .cols,
+    .studies {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .plan li {
+      grid-template-columns: 32px minmax(0, 1fr);
+    }
+    .plan li span:last-child {
+      grid-column: 2;
+    }
+  }
+  @media (max-width: 560px) {
+    .bubbles {
+      gap: 2px;
+    }
+    .bub {
+      width: 70px;
+    }
+    .bub:nth-child(3) {
+      margin-left: 12px;
+    }
+    .line {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+    .recall li {
+      grid-template-columns: 5.5rem 6rem minmax(0, 1fr);
+      gap: 6px;
+    }
+    .crow {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .crow .cy {
+      grid-column: 1 / -1;
+    }
+    .brow {
+      grid-template-columns: 5rem minmax(0, 1fr) 4rem;
+      gap: 8px;
+    }
+  }
+</style>
+
+<div class="wrap" id="top">
+  <header class="mast">
+    <div class="rise">
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Slice</h1>
+      <p class="deck">
+        Meet sixteen people a little at a time.
+        <em
+          >See what the first second did to your calls, and what more of the
+          same did to how sure you were.</em
+        >
+      </p>
+    </div>
+    <figure
+      class="specimen rise"
+      style="--i: 1"
+      aria-label="A synthetic example of the first chart the debrief draws"
+    >
+      <p class="label"><span>Specimen sitting</span><span>synthetic</span></p>
+      <p class="hint" style="margin: 0">calls that matched the year, of 16</p>
+      <div class="bars" id="specimen"></div>
+      <figcaption id="specimenCap"></figcaption>
+    </figure>
+  </header>
+
+  <section class="lede rise" style="--i: 2" id="frame" aria-label="The sitting">
+    <div class="rail"><span class="label">The claim</span></div>
+    <div class="body">
+      <p class="claim">
+        A first second is enough to form a view of someone, and it stays on the
+        page at every call after. More of the same can make you surer without
+        making you right more often. Whether a first impression is worth
+        trusting depends on the room it was formed in, and how sure it feels is
+        no reading of that.
+      </p>
+      <p class="title" id="fTitle"></p>
+      <div id="fLede"></div>
+      <ol class="plan" id="fSlices"></ol>
+      <div class="actions">
+        <button class="go" id="begin" type="button"></button>
+        <span class="hint">keys 1 · 2 · 3 · 4 call, enter goes on</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" id="play" hidden aria-labelledby="who">
+    <div class="rail">
+      <span class="n" id="pN"></span><span class="label" id="pOf"></span>
+    </div>
+    <div class="body" id="card"></div>
+  </section>
+
+  <div id="debrief" hidden></div>
+
+  <footer>
+    <span class="label">Slice · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network, no storage</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ---- the slice, by hand from niwa lib/slice.ts (and rand from lib/hand.ts): the maths is the same ----
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const flip = (d) => (d === 1 ? -1 : 1);
+  const TEAMS = ["Ash", "Birch"];
+  const PER_TEAM = 8;
+  const N = PER_TEAM * TEAMS.length;
+  const MOMENTS = 6;
+  const SHOWN = [1, 3, 6];
+  const SLICE_IDS = [0, 1, 2];
+  const DOOR_KINDS = ["entrance", "voice", "likeness", "record", "part"];
+  const DESIGN = {
+    Ash: { conflict: 2, agree: 4 },
+    Birch: { conflict: 3, agree: 3 },
+  };
+  const TURNS = 2;
+  const WOBBLES = 5;
+  const dirOf = (c) => (c <= 2 ? 1 : -1);
+  const isSure = (c) => c === 1 || c === 4;
+  const rng = (seed) => rand(seed);
+
+  function shuffle(a, rnd) {
+    const out = [...a];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  function slotsOf(team, rnd) {
+    const out = [];
+    for (const conflict of [true, false]) {
+      const k = conflict ? DESIGN[team].conflict : DESIGN[team].agree;
+      const leans = shuffle([1, 1, -1, -1], rnd);
+      const follows = shuffle(
+        [0, 1, 2, 3].map((i) => i < k),
+        rnd,
+      );
+      for (let i = 0; i < 4; i++) {
+        const lean = leans[i];
+        out.push({
+          team,
+          lean,
+          door: conflict ? flip(lean) : lean,
+          year: follows[i] ? lean : flip(lean),
+        });
+      }
+    }
+    return out;
+  }
+
+  function deal(pools, rnd = Math.random) {
+    let slots = [];
+    for (let tries = 0; ; tries++) {
+      slots = shuffle(
+        TEAMS.flatMap((t) => slotsOf(t, rnd)),
+        rnd,
+      );
+      if (slots.filter((s) => s.year === 1).length === N / 2) break;
+      if (tries > 1000) throw new Error("no balanced deal");
+    }
+
+    const kinds = shuffle(
+      Array.from({ length: N }, (_, i) => DOOR_KINDS[i % DOOR_KINDS.length]),
+      rnd,
+    );
+    // A thin slice can mislead: two people begin against how they go on, and the
+    // year goes with how they go on. Five more have one moment that does not fit.
+    const turned = new Set(
+      shuffle(
+        slots.flatMap((s, i) => (s.year === s.lean ? [i] : [])),
+        rnd,
+      ).slice(0, TURNS),
+    );
+    const wobbled = new Map(
+      shuffle(
+        slots.flatMap((_, i) => (turned.has(i) ? [] : [i])),
+        rnd,
+      )
+        .slice(0, WOBBLES)
+        .map((i) => [i, 1 + Math.floor(rnd() * (MOMENTS - 1))]),
+    );
+
+    return slots.map((s, i) => {
+      const dirs = Array.from({ length: MOMENTS }, () => s.lean);
+      const wobble = wobbled.has(i) ? wobbled.get(i) : null;
+      if (turned.has(i)) dirs[0] = flip(s.lean);
+      else if (wobble !== null) dirs[wobble] = flip(s.lean);
+      const bag = {
+        1: shuffle(pools.moment.in, rnd),
+        [-1]: shuffle(pools.moment.out, rnd),
+      };
+      const doorPool = pools.door[kinds[i]][s.door === 1 ? "in" : "out"];
+      return {
+        n: i + 1,
+        team: s.team,
+        kind: kinds[i],
+        door: {
+          dir: s.door,
+          text: doorPool[Math.floor(rnd() * doorPool.length)],
+        },
+        moments: dirs.map((dir) => ({ dir, text: bag[dir].shift() })),
+        lean: s.lean,
+        year: s.year,
+        turn: turned.has(i),
+        wobble: turned.has(i) ? null : wobble,
+      };
+    });
+  }
+
+  function momentsLean(p, seen) {
+    const sum = p.moments.slice(0, seen).reduce((a, m) => a + m.dir, 0);
+    return sum >= 0 ? 1 : -1;
+  }
+
+  function pmf(n, p) {
+    const out = [Math.pow(1 - p, n)];
+    for (let k = 0; k < n; k++)
+      out.push((out[k] * (n - k) * p) / ((k + 1) * (1 - p)));
+    return out;
+  }
+
+  function luckBand(n, p = 0.5, tail = 0.05) {
+    const f = pmf(n, p);
+    let lo = 0;
+    let below = 0;
+    while (lo < n && below + f[lo] <= tail) below += f[lo++];
+    let hi = n;
+    let above = 0;
+    while (hi > 0 && above + f[hi] <= tail) above += f[hi--];
+    let cover = 0;
+    for (let k = lo; k <= hi; k++) cover += f[k];
+    return { lo, hi, cover };
+  }
+
+  const zero = () => [0, 0, 0];
+
+  function facts(d) {
+    const out = {};
+    for (const team of TEAMS) {
+      const people = d.filter((p) => p.team === team);
+      const conflict = people.filter((p) => p.door.dir !== p.lean);
+      out[team] = {
+        n: people.length,
+        doorMatched: people.filter((p) => p.door.dir === p.year).length,
+        momentsMatched: people.filter((p) => p.lean === p.year).length,
+        conflictN: conflict.length,
+        conflictYearWithDoor: conflict.filter((p) => p.door.dir === p.year)
+          .length,
+        conflictYearWithMoments: conflict.filter((p) => p.lean === p.year)
+          .length,
+      };
+    }
+    return out;
+  }
+
+  function tally(d, calls) {
+    const f = facts(d);
+    const matched = zero();
+    const sure = zero();
+    const sureAgainst = zero();
+    const momentsMatched = zero();
+    const conflictWithDoor = zero();
+    const teams = {};
+    for (const team of TEAMS)
+      teams[team] = {
+        ...f[team],
+        matched: zero(),
+        sure: zero(),
+        conflictWithDoor: zero(),
+      };
+
+    d.forEach((p, i) => {
+      const t = teams[p.team];
+      const conflict = p.door.dir !== p.lean;
+      for (const s of SLICE_IDS) {
+        const c = calls[i][s];
+        const hit = dirOf(c) === p.year;
+        if (hit) {
+          matched[s]++;
+          t.matched[s]++;
+        }
+        if (isSure(c)) {
+          sure[s]++;
+          t.sure[s]++;
+          if (!hit) sureAgainst[s]++;
+        }
+        if (momentsLean(p, SHOWN[s]) === p.year) momentsMatched[s]++;
+        if (conflict && dirOf(c) === p.door.dir) {
+          conflictWithDoor[s]++;
+          t.conflictWithDoor[s]++;
+        }
+      }
+    });
+
+    const conflictN = TEAMS.reduce((a, t) => a + f[t].conflictN, 0);
+    return {
+      n: d.length,
+      matched,
+      sure,
+      sureAgainst,
+      doorMatched: d.filter((p) => p.door.dir === p.year).length,
+      momentsMatched,
+      conflict: {
+        n: conflictN,
+        withDoor: conflictWithDoor,
+        yearWithDoor: TEAMS.reduce((a, t) => a + f[t].conflictYearWithDoor, 0),
+        yearWithMoments: TEAMS.reduce(
+          (a, t) => a + f[t].conflictYearWithMoments,
+          0,
+        ),
+      },
+      teams,
+      band: luckBand(d.length),
+      teamBand: luckBand(PER_TEAM),
+    };
+  }
+
+  function three(a) {
+    return `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`;
+  }
+
+  function moved(a, b) {
+    return a === b ? `stayed at ${a}` : `went from ${a} to ${b}`;
+  }
+
+  const per100 = (x) => Math.round(x * 100);
+
+  function readings(t) {
+    const { n, band } = t;
+    const out = [];
+    out.push(
+      `Your calls matched the year for ${three(t.matched)} of ${n}, at one moment, three and six. A coin lands between ${band.lo} and ${band.hi} in ${per100(band.cover)} sittings of a hundred.`,
+    );
+    out.push(
+      `You were sure, on a one or a four, on ${three(t.sure)}. Of those, ${three(t.sureAgainst)} went against the year.`,
+    );
+    out.push(
+      `From the first call to the last, your sure calls ${moved(t.sure[0], t.sure[2])} of ${n} and the calls that matched the year ${moved(t.matched[0], t.matched[2])}.`,
+    );
+    out.push(
+      `A reader going only by the moments met so far would have matched ${three(t.momentsMatched)}. A reader going only by the first second would have matched ${t.doorMatched}, at every call.`,
+    );
+    const c = t.conflict;
+    out.push(
+      `Of the ${c.n} people whose first second pointed away from where the six moments came to, your calls went with the first second for ${three(c.withDoor)}. The year went with the first second for ${c.yearWithDoor} of them and with the moments for ${c.yearWithMoments}.`,
+    );
+    const [a, b] = [t.teams.Ash, t.teams.Birch];
+    out.push(
+      `On Ash the first second matched the year for ${a.doorMatched} of ${a.n} and the moments for ${a.momentsMatched}. On Birch the first second matched for ${b.doorMatched} of ${b.n} and the moments for ${b.momentsMatched}.`,
+    );
+    out.push(
+      `At one moment you were sure on ${a.sure[0]} of ${a.n} on Ash and ${b.sure[0]} of ${b.n} on Birch, and your calls went with the first second for ${a.conflictWithDoor[0]} of the ${a.conflictN} whose first second pointed away on Ash and ${b.conflictWithDoor[0]} of the ${b.conflictN} on Birch.`,
+    );
+    return out;
+  }
+  // ---- end of the slice's maths ----
+
+  // ---- every word of the slice, from niwa content/slice.ts. The people are invented. ----
+  const DOOR_NAME = {
+    entrance: "how they came in",
+    voice: "how sure they sounded",
+    likeness: "how much they were like you",
+    record: "where they had come from",
+    part: "whether they looked the part",
+  };
+
+  const POOLS = {
+    door: {
+      entrance: {
+        in: [
+          "Walked in early, shook every hand and remembered two names.",
+          "Arrived first, held the door and introduced themselves to the whole row.",
+          "Came in early and had everyone’s name by the time the coffee was made.",
+        ],
+        out: [
+          "Came in last and sat nearest the door.",
+          "Arrived after the introductions had started and said little.",
+          "Slipped in at the back and stayed by the wall.",
+        ],
+      },
+      voice: {
+        in: [
+          "Spoke first, at length, and was sure of every number.",
+          "Answered before the question had ended, in a steady voice.",
+          "Talked easily, without a pause, and never said “I think”.",
+        ],
+        out: [
+          "Spoke last, briefly, and hedged every number.",
+          "Answered slowly and began most sentences with “I think”.",
+          "Said very little and asked whether that was what was wanted.",
+        ],
+      },
+      likeness: {
+        in: [
+          "Turned out to share your school and your taste in music.",
+          "Turned out to come from your home town and follow your team.",
+          "Turned out to have read the book you were halfway through.",
+        ],
+        out: [
+          "Turned out to share nothing with you but the building.",
+          "Turned out to have no interest in anything you brought up.",
+          "Turned out to be from somewhere you had never been, into things you had never tried.",
+        ],
+      },
+      record: {
+        in: [
+          "Came from the firm everyone wants on a CV.",
+          "Had a famous company’s name at the top of their history.",
+          "Arrived with a recommendation from someone you had heard of.",
+        ],
+        out: [
+          "Came from a firm nobody in the room had heard of.",
+          "Had no famous names in their history.",
+          "Arrived with no one to speak for them.",
+        ],
+      },
+      part: {
+        in: [
+          "Looked just like the person you would have pictured for the job.",
+          "Looked, to the room, like someone who belonged.",
+          "Looked the part from the first glance.",
+        ],
+        out: [
+          "Looked nothing like the person you would have pictured for the job.",
+          "Looked, to the room, like someone who had come to the wrong floor.",
+          "Did not look the part at first glance.",
+        ],
+      },
+    },
+    moment: {
+      in: [
+        "Asked what the last person had run into before starting.",
+        "Read the note back before sending it.",
+        "Said they did not know yet, and came back the next day with an answer.",
+        "Thanked the person whose idea it had been.",
+        "Fixed a small thing nobody had asked about.",
+        "Checked the number a second time.",
+        "Asked for a look at the first draft rather than the last.",
+        "Sent round what had been agreed.",
+        "Said on Tuesday that Monday’s estimate had been too low.",
+        "Asked the quietest person in the room what they thought.",
+        "Left the shared folder tidier than they found it.",
+        "Stayed until the handover was finished.",
+      ],
+      out: [
+        "Started before the question was finished.",
+        "Sent the number as it came.",
+        "Said the report was late because of the tool.",
+        "Called it “basically done” on the second day.",
+        "Mentioned the idea as though it had been theirs.",
+        "Replied after the second reminder.",
+        "Answered the feedback point by point.",
+        "Said they had already known that.",
+        "Changed the plan and mentioned it afterwards.",
+        "Went quiet when a mistake was found.",
+        "Left as soon as their part was done.",
+        "Took the interesting task and left the rest.",
+      ],
+    },
+  };
+
+  const CALL_NAMES = [
+    { key: 1, name: "surely in", short: "sure in" },
+    { key: 2, name: "lean in", short: "lean in" },
+    { key: 3, name: "lean out", short: "lean out" },
+    { key: 4, name: "surely out", short: "sure out" },
+  ];
+
+  const YEAR_WORDS = {
+    in: "A year on, doing well.",
+    out: "A year on, not doing well.",
+  };
+
+  const FRAME = {
+    tagline:
+      "Meet sixteen people a little at a time. See what the first second did to your calls, and what more of the same did to how sure you were.",
+    title:
+      "Sixteen invented people start a job, on one of two teams. Call each three times.",
+    lede: [
+      "The call is whether they will be doing well a year on: surely in, lean in, lean out, surely out. Keys 1 to 4 make it. After the third call the year passes and you are told.",
+      "Nothing is kept. What you call is gone when you leave the page.",
+    ],
+    slices: [
+      {
+        name: "The first second, and one moment",
+        does: "How they came in or what they were like, then the first thing they did.",
+      },
+      { name: "Three moments", does: "Two more of the first weeks." },
+      {
+        name: "All six",
+        does: "The rest of what they did in their first weeks. Then the year.",
+      },
+    ],
+    door: "Each person arrives with a first second: how they came in, how sure they sounded, whether they were like you, where they had come from, or whether they looked the part. It stays on the page at every call. The moments are what they did in their first weeks.",
+    begin: "Meet the first",
+    ask: "A year on, will they be doing well?",
+    hidden: "not met yet",
+    first: "the first second",
+    moments: "the moments",
+    next: "Meet the next",
+    finish: "See what the calls did",
+  };
+
+  const DEBRIEF = {
+    called: {
+      title: "What you called",
+      lede: "One bar for each call. The band is what a coin would do over sixteen people. The two marks are what two plain rules would have done on the same sixteen.",
+    },
+    conflict: {
+      title: "When the first second and the moments pulled apart",
+      lede: "Half of each team was dealt so that the first second pointed away from where the six moments came to. Each row is one of them; each circle is your call at one moment, three and six.",
+    },
+    teams: {
+      title: "Ash and Birch",
+      lede: "You were never told the two teams differed. On Ash the first second was dealt to go with the year for six of eight, on Birch for four of eight.",
+    },
+    deal: { title: "How the deal was made" },
+    studies: {
+      title: "What the studies say",
+      lede: "Five findings this sheet leans on, each as far as its authors took it.",
+    },
+    limits: {
+      title: "What this cannot tell you",
+      body: [
+        "Sixteen people is few. Counts that differ by a person or two are inside what a coin does, which is why the band is drawn.",
+        "The people are invented and the deal is fixed. It says nothing about how well thin slices work in the world; the studies do that. It shows what your calls did here, with these people, when the first second was sometimes a guide and sometimes not.",
+      ],
+    },
+    again: "Deal sixteen new people",
+  };
+
+  const STUDIES = [
+    {
+      id: "clips",
+      head: "A thin slice can carry a lot",
+      body: "Ambady and Rosenthal showed people silent clips of college teachers, under thirty seconds each. Strangers’ ratings of the teachers’ nonverbal behavior predicted the students’ end-of-semester ratings of them, and clips of six and fifteen seconds were still strongly related. Their ratings of the teachers’ physical attractiveness were not as strongly related. That is the finding behind the phrase ‘thin slice’. It is a finding about one kind of behavior and one kind of outcome.",
+      sources: ["ar1993", "ar1992"],
+    },
+    {
+      id: "hundred",
+      head: "A first second can be enough to form a view, and more time adds confidence",
+      body: "Willis and Todorov showed strangers’ faces for 100 milliseconds. Judgments of attractiveness, likeability, trustworthiness, competence and aggressiveness after that correlated highly with judgments made with no time limit, and longer exposure did not significantly raise the correlations. Confidence in the judgments did rise with more time. The authors suggest that additional time may simply boost confidence.",
+      sources: ["wt2006"],
+    },
+    {
+      id: "more",
+      head: "More information can raise confidence without raising accuracy",
+      body: "Oskamp gave thirty-two judges, eight of them clinical psychologists, a case history in four stages, and after each stage twenty-five questions about the man, each with five answers to choose from and how confident they were. Their confidence rose from 33% at the first stage to 53% at the fourth. The share of answers that matched the record was 26, 23, 28 and 28 percent, where guessing gives 20. The sure calls on your bar chart are the same kind of measure, taken on you.",
+      sources: ["o1965"],
+    },
+    {
+      id: "environment",
+      head: "Whether a snap judgment is worth trusting depends on the room, not the feeling",
+      body: "Kahneman and Klein set out two conditions for trusting an intuitive judgment: the environment has regularities that can be learned, and the judge has had the chance to learn them. Their summary is that how a judgment feels is not a reliable indicator of whether it is accurate. Nothing on the page said which team was which. On Ash the first second went with the year for six of eight, on Birch for four.",
+      sources: ["kk2009"],
+    },
+    {
+      id: "halo",
+      head: "What sits in the first second tends to color the rest",
+      body: "Thorndike found that superiors’ ratings of the same person on separate qualities, intelligence and reliability among them, ran very high and very even, as if a general impression colored each one; he described it as a halo. Dion, Berscheid and Walster found that people rated better-looking strangers as having more desirable personalities. Nisbett and Wilson showed students the same instructor once warm and once cold: their views of his appearance, mannerisms and accent followed how warm he had been, and they did not know it. Todorov and colleagues found that judgments of competence from faces alone predicted 68.8% of the 2004 US Senate races, and that they were formed within a second of seeing the face.",
+      sources: ["t1920", "dbw1972", "nw1977", "t2005"],
+    },
+  ];
+
+  const SOURCES = [
+    {
+      id: "ar1993",
+      cite: "Ambady, N., & Rosenthal, R. (1993). Half a minute: Predicting teacher evaluations from thin slices of nonverbal behavior and physical attractiveness. Journal of Personality and Social Psychology, 64(3), 431–441.",
+      doi: "10.1037/0022-3514.64.3.431",
+    },
+    {
+      id: "ar1992",
+      cite: "Ambady, N., & Rosenthal, R. (1992). Thin slices of expressive behavior as predictors of interpersonal consequences: A meta-analysis. Psychological Bulletin, 111(2), 256–274.",
+      doi: "10.1037/0033-2909.111.2.256",
+    },
+    {
+      id: "wt2006",
+      cite: "Willis, J., & Todorov, A. (2006). First impressions: Making up your mind after a 100-ms exposure to a face. Psychological Science, 17(7), 592–598.",
+      doi: "10.1111/j.1467-9280.2006.01750.x",
+    },
+    {
+      id: "o1965",
+      cite: "Oskamp, S. (1965). Overconfidence in case-study judgments. Journal of Consulting Psychology, 29(3), 261–265.",
+      doi: "10.1037/h0022125",
+    },
+    {
+      id: "kk2009",
+      cite: "Kahneman, D., & Klein, G. (2009). Conditions for intuitive expertise: A failure to disagree. American Psychologist, 64(6), 515–526.",
+      doi: "10.1037/a0016755",
+    },
+    {
+      id: "t1920",
+      cite: "Thorndike, E. L. (1920). A constant error in psychological ratings. Journal of Applied Psychology, 4(1), 25–29.",
+      doi: "10.1037/h0071663",
+    },
+    {
+      id: "dbw1972",
+      cite: "Dion, K., Berscheid, E., & Walster, E. (1972). What is beautiful is good. Journal of Personality and Social Psychology, 24(3), 285–290.",
+      doi: "10.1037/h0033731",
+    },
+    {
+      id: "nw1977",
+      cite: "Nisbett, R. E., & Wilson, T. D. (1977). The halo effect: Evidence for unconscious alteration of judgments. Journal of Personality and Social Psychology, 35(4), 250–256.",
+      doi: "10.1037/0022-3514.35.4.250",
+    },
+    {
+      id: "t2005",
+      cite: "Todorov, A., Mandisodza, A. N., Goren, A., & Hall, C. C. (2005). Inferences of competence from faces predict election outcomes. Science, 308(5728), 1623–1626.",
+      doi: "10.1126/science.1110589",
+    },
+  ];
+
+  // ---- the page ----
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const pad = (n) => String(n).padStart(2, "0");
+  const sliceName = (k) => (k === 1 ? "1 moment" : `${k} moments`);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const scrollTo = (el) =>
+    el.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "start",
+    });
+
+  const S = { phase: "frame", people: [], i: 0, calls: [], busy: false };
+
+  // Counts as bars on one scale, with what a coin does behind them.
+  function barsHTML(rows, max, band, unit) {
+    const at = (v) => `${(v / max) * 100}%`;
+    return rows
+      .map((r) => {
+        const held = r.value - (r.against || 0);
+        const text =
+          `${r.label}: ${r.value} of ${max}` +
+          (r.against ? `, ${r.against} of them against the year` : "") +
+          (r.marks || []).map((m) => `; ${m.label} ${m.at}`).join("");
+        let h = `<div class="brow"><span class="rl">${esc(r.label)}</span><span class="track" role="img" aria-label="${esc(text)}">`;
+        if (band)
+          h += `<i class="band" style="left:${at(band.lo)};width:${((band.hi - band.lo) / max) * 100}%"></i>`;
+        h += `<i class="fill" style="width:${at(held)}"></i>`;
+        if (r.against)
+          h += `<i class="agst" style="left:${at(held)};width:${at(r.against)}"></i>`;
+        for (const m of r.marks || [])
+          h += `<i class="mark ${m.kind}" style="left:${at(m.at)}"></i>`;
+        return (
+          h +
+          `</span><span class="rv">${r.value}<small> ${unit}</small></span></div>`
+        );
+      })
+      .join("");
+  }
+  const calledRows = (t) =>
+    SLICE_IDS.map((s) => ({
+      label: sliceName(SHOWN[s]),
+      value: t.matched[s],
+      marks: [
+        { at: t.momentsMatched[s], kind: "moments", label: "the moments only" },
+        { at: t.doorMatched, kind: "door", label: "the first second only" },
+      ],
+    }));
+
+  // ---- the masthead specimen: one made-up reader on a fixed deal ----
+  function specimen() {
+    const d = deal(POOLS, rng(20261003));
+    const calls = d.map((p) => [
+      p.door.dir === 1 ? 1 : 4,
+      momentsLean(p, 3) === 1 ? 2 : 3,
+      momentsLean(p, 6) === 1 ? 1 : 4,
+    ]);
+    const t = tally(d, calls);
+    $("specimen").innerHTML = barsHTML(calledRows(t), t.n, t.band, "of 16");
+    $("specimenCap").textContent =
+      `One made-up reader on one fixed deal: sure with the first second at one moment, leaning with the moments at three, sure with them at six. They were sure on ${three(t.sure)}, and ${three(t.sureAgainst)} of those went against the year. The shaded band is a coin; the line and the diamond are two plain rules, the moments alone and the first second alone.`;
+  }
+
+  // ---- the frame ----
+  $("fTitle").textContent = FRAME.title;
+  $("fLede").innerHTML = [...FRAME.lede, FRAME.door]
+    .map((l) => `<p class="muted">${esc(l)}</p>`)
+    .join("");
+  $("fSlices").innerHTML = FRAME.slices
+    .map(
+      (s, k) =>
+        `<li><span class="k">${k + 1}</span><b>${esc(s.name)}</b><span>${esc(s.does)}</span></li>`,
+    )
+    .join("");
+  $("begin").textContent = FRAME.begin;
+
+  const fresh = () => deal(POOLS, rng((Math.random() * 2 ** 32) >>> 0));
+
+  function start() {
+    S.people = fresh();
+    S.i = 0;
+    S.calls = [];
+    S.phase = "play";
+    $("frame").hidden = true;
+    $("debrief").hidden = true;
+    $("debrief").innerHTML = "";
+    $("play").hidden = false;
+    renderCard(true);
+    scrollTo($("top"));
+  }
+
+  // ---- one person, met a slice at a time ----
+  function renderCard(fresh, pressed) {
+    const p = S.people[S.i];
+    const calls = S.calls[S.i] || [];
+    const asked = calls.length;
+    const revealed = asked === 3;
+    const shown = SHOWN[Math.min(asked, 2)];
+    const prev = fresh ? 0 : asked > 0 ? SHOWN[Math.min(asked, 2) - 1] : 0;
+    $("pN").textContent = pad(p.n);
+    $("pOf").textContent = `of ${N}`;
+
+    let h = `<div class="card-head"><span class="pips" aria-hidden="true">`;
+    for (let k = 0; k < N; k++)
+      h += `<i class="${k < S.i ? "on" : k === S.i ? "now" : ""}"></i>`;
+    h += `</span></div><h2 id="who">Starts on ${p.team}</h2>`;
+    h += `<div class="strip" aria-hidden="true"><i class="cell door"></i>`;
+    for (let k = 0; k < MOMENTS; k++)
+      h += `<i class="cell ${k < shown ? "on" : "off"}"></i>`;
+    h += `</div><dl class="lines"><div class="line door${fresh ? " in" : ""}"><dt>${FRAME.first}</dt><dd>${esc(p.door.text)}</dd></div>`;
+    p.moments.forEach((m, k) => {
+      if (k < shown) {
+        const isNew = k >= prev;
+        h += `<div class="line${isNew ? " in" : ""}" style="animation-delay:${isNew ? (k - prev) * 90 : 0}ms"><dt>moment ${k + 1}</dt><dd>${esc(m.text)}</dd></div>`;
+      } else
+        h += `<div class="line hidden" aria-hidden="true"><dt>moment ${k + 1}</dt><dd>${FRAME.hidden}</dd></div>`;
+    });
+    h += `</dl>`;
+
+    if (!revealed) {
+      h += `<div class="ask">`;
+      if (asked > 0)
+        h +=
+          `<ul class="was">` +
+          calls
+            .map(
+              (c, k) =>
+                `<li>at ${sliceName(SHOWN[k])}: <b>${CALL_NAMES[c - 1].name}</b></li>`,
+            )
+            .join("") +
+          `</ul>`;
+      h += `<p class="q">${FRAME.ask}</p><div class="bubbles" role="group" aria-label="${FRAME.ask}">`;
+      for (const c of CALL_NAMES)
+        h += `<button type="button" class="bub" data-call="${c.key}" aria-pressed="${pressed === c.key}" aria-label="${c.key}, ${c.name}"><i>${c.key}</i><small>${c.name}</small></button>`;
+      h += `</div><p class="hint" style="margin: 12px 0 0">call ${asked + 1} of 3 · ${sliceName(SHOWN[asked])} met</p></div>`;
+    } else {
+      h += `<div class="ask in" aria-live="polite"><p class="year">${YEAR_WORDS[p.year === 1 ? "in" : "out"]}</p><ul class="recall">`;
+      calls.forEach((c, k) => {
+        const hit = dirOf(c) === p.year;
+        h += `<li><span class="hint">at ${sliceName(SHOWN[k])}</span><b>${CALL_NAMES[c - 1].name}</b><span class="${hit ? "" : "off"}">${hit ? "matched the year" : "went against the year"}</span></li>`;
+      });
+      h += `</ul><div class="actions"><button class="go" type="button" id="nextBtn">${S.i + 1 < N ? FRAME.next : FRAME.finish}</button><span class="hint">enter</span></div></div>`;
+    }
+    $("card").innerHTML = h;
+  }
+
+  function pick(c) {
+    if (S.phase !== "play" || S.busy) return;
+    const asked = (S.calls[S.i] || []).length;
+    if (asked >= 3) return;
+    S.busy = true;
+    const b = $("card").querySelector(`.bub[data-call="${c}"]`);
+    if (b) b.setAttribute("aria-pressed", "true");
+    setTimeout(
+      () => {
+        S.busy = false;
+        S.calls[S.i] = [...(S.calls[S.i] || []), c];
+        renderCard(false);
+      },
+      reduced ? 60 : 200,
+    );
+  }
+
+  function next() {
+    if (S.phase !== "play" || (S.calls[S.i] || []).length !== 3) return;
+    if (S.i + 1 < N) {
+      S.i++;
+      renderCard(true);
+      requestAnimationFrame(() => scrollTo($("play")));
+    } else {
+      S.phase = "debrief";
+      $("play").hidden = true;
+      renderDebrief();
+      $("debrief").hidden = false;
+      scrollTo($("top"));
+    }
+  }
+
+  $("begin").addEventListener("click", start);
+  $("card").addEventListener("click", (e) => {
+    const b = e.target.closest(".bub");
+    if (b) return pick(+b.dataset.call);
+    if (e.target.closest("#nextBtn")) next();
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    const v = Number(e.key);
+    if (v >= 1 && v <= 4) pick(v);
+    else if (e.key === "Enter" && (!t || t.tagName !== "BUTTON")) next();
+  });
+
+  // ---- the debrief ----
+  function station(num, label, id, inner, i) {
+    return `<section class="station rise" style="--i:${i}" aria-labelledby="${id}"><div class="rail"><span class="n">${num}</span><span class="label">${label}</span></div><div class="body">${inner}</div></section>`;
+  }
+
+  function renderDebrief() {
+    const people = S.people;
+    const calls = S.calls;
+    const t = tally(people, calls);
+    const r = readings(t);
+    const f = facts(people);
+    const conflict = people.filter((p) => p.door.dir !== p.lean);
+    const cite = (ids) =>
+      ids.map((id) => SOURCES.findIndex((s) => s.id === id) + 1);
+    const turned = people
+      .filter((p) => p.turn)
+      .map((p) => `№ ${pad(p.n)}`)
+      .join(" and ");
+    const sure = SLICE_IDS.map((s) => ({
+      label: sliceName(SHOWN[s]),
+      value: t.sure[s],
+      against: t.sureAgainst[s],
+    }));
+
+    let out = "";
+
+    out += station(
+      "I",
+      "Called",
+      "d-called",
+      `<p class="label" style="margin:0 0 14px">The debrief</p>
+      <h2 id="d-called">${DEBRIEF.called.title}</h2>
+      <p class="muted">${DEBRIEF.called.lede}</p>
+      <div class="cols">
+        <div>
+          <p class="label" style="margin:0">calls that matched the year</p>
+          <div class="bars">${barsHTML(calledRows(t), t.n, t.band, "of 16")}</div>
+          <div class="legend">
+            <span><i class="key k-fill"></i>your calls</span>
+            <span><i class="key k-band"></i>a coin: ${t.band.lo} to ${t.band.hi}</span>
+            <span><i class="key moments"></i>only the moments so far</span>
+            <span><i class="key door"></i>only the first second</span>
+          </div>
+          <p class="read">${r[0]}</p>
+          <p class="read">${r[3]}</p>
+        </div>
+        <div>
+          <p class="label" style="margin:0">calls you were sure of</p>
+          <div class="bars">${barsHTML(sure, t.n, null, "of 16")}</div>
+          <div class="legend">
+            <span><i class="key k-fill"></i>sure, and it matched</span>
+            <span><i class="key k-agst"></i>sure, and it went against the year</span>
+          </div>
+          <p class="read">${r[1]}</p>
+          <p class="read">${r[2]}</p>
+        </div>
+      </div>`,
+      0,
+    );
+
+    const rows = conflict
+      .map((p) => {
+        const withDoor = p.year === p.door.dir;
+        const dots = calls[p.n - 1]
+          .map((c) => {
+            const w =
+              dirOf(c) === p.door.dir
+                ? "door"
+                : dirOf(c) === p.lean
+                  ? "moments"
+                  : "";
+            return `<i class="dot ${w}${isSure(c) ? " sure" : ""}" title="${CALL_NAMES[c - 1].name}"><span class="sr">${CALL_NAMES[c - 1].name}</span></i>`;
+          })
+          .join("");
+        return `<li class="crow"><span class="cn">№ ${pad(p.n)} · ${p.team}</span><span class="dots">${dots}</span><span class="cy">the year went with the ${withDoor ? "first second" : "moments"}</span><span class="ct">${esc(p.door.text)}</span></li>`;
+      })
+      .join("");
+    out += station(
+      "II",
+      "Pulled apart",
+      "d-conflict",
+      `<h2 id="d-conflict">${DEBRIEF.conflict.title}</h2>
+      <p class="muted">${DEBRIEF.conflict.lede}</p>
+      <div class="legend">
+        <span><i class="dot door sure"></i>with the first second</span>
+        <span><i class="dot moments sure"></i>with the moments</span>
+        <span>solid is sure, pale is lean</span>
+      </div>
+      <ul class="conflict">${rows}</ul>
+      <p class="read">${r[4]}</p>`,
+      1,
+    );
+
+    const teamRow = (label, cells, note) =>
+      `<tr><th scope="row">${label}</th>${cells.map((c) => `<td>${c}${note ? `<small> ${note}</small>` : ""}</td>`).join("")}</tr>`;
+    out += station(
+      "III",
+      "The teams",
+      "d-teams",
+      `<h2 id="d-teams">${DEBRIEF.teams.title}</h2>
+      <p class="muted">${DEBRIEF.teams.lede}</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th scope="col"></th>${TEAMS.map((tm) => `<th scope="col">${tm}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${teamRow(
+            "the first second matched the year",
+            TEAMS.map((tm) => `${f[tm].doorMatched} of ${f[tm].n}`),
+            `a coin: ${t.teamBand.lo} to ${t.teamBand.hi}`,
+          )}
+          ${teamRow(
+            "the six moments matched the year",
+            TEAMS.map((tm) => `${f[tm].momentsMatched} of ${f[tm].n}`),
+          )}
+          ${teamRow(
+            "your calls matched, at 1 · 3 · 6 moments",
+            TEAMS.map((tm) => t.teams[tm].matched.join(" · ")),
+            `of ${PER_TEAM}`,
+          )}
+          ${teamRow(
+            "you were sure, at 1 · 3 · 6",
+            TEAMS.map((tm) => t.teams[tm].sure.join(" · ")),
+            `of ${PER_TEAM}`,
+          )}
+          ${teamRow(
+            "your calls went with the first second where it pointed away, at 1 · 3 · 6",
+            TEAMS.map((tm) => t.teams[tm].conflictWithDoor.join(" · ")),
+            `of ${f.Ash.conflictN}`,
+          )}
+        </tbody>
+      </table></div>
+      <p class="read">${r[5]}</p>
+      <p class="read">${r[6]}</p>`,
+      2,
+    );
+
+    const kinds = DOOR_KINDS.map(
+      (k, n) =>
+        (n > 0 ? (n === DOOR_KINDS.length - 1 ? ", and " : ", ") : "") +
+        DOOR_NAME[k],
+    ).join("");
+    out += station(
+      "IV",
+      "The deal",
+      "d-deal",
+      `<h2 id="d-deal">${DEBRIEF.deal.title}</h2>
+      <p class="muted">Each team was dealt ${PER_TEAM} people, and ${t.n / 2} of the ${t.n} were doing well a year on. On every team ${f.Ash.conflictN} came in with a first second that pointed away from where their six moments came to. The six moments matched the year for ${f.Ash.momentsMatched} of ${f.Ash.n} on Ash and ${f.Birch.momentsMatched} of ${f.Birch.n} on Birch. The first second matched it for ${f.Ash.doorMatched} on Ash and ${f.Birch.doorMatched} on Birch. Over ${PER_TEAM} people a coin lands between ${t.teamBand.lo} and ${t.teamBand.hi} in ${per100(t.teamBand.cover)} sittings of a hundred, so both are inside what a coin does: the teams were dealt differently, and eight outcomes on one team are too few to show it.</p>
+      <p class="muted">${TURNS} of the sixteen (${turned}) began against how they went on: their first moment pointed one way and their six moments and their year the other. ${WOBBLES} more had one moment against the rest. Who was on which team, the words each was given and the order you met them in were drawn fresh for this sitting.</p>
+      <p class="muted">The first second came in five kinds: ${kinds}. Each is something a room can be swayed by without anyone deciding to be. ${POOLS.moment.in.length + POOLS.moment.out.length} moments were in the pool, each pointing one way from the wording alone.</p>`,
+      3,
+    );
+
+    out += station(
+      "V",
+      "The studies",
+      "d-studies",
+      `<h2 id="d-studies">${DEBRIEF.studies.title}</h2>
+      <p class="muted">${DEBRIEF.studies.lede}</p>
+      <div class="studies">${STUDIES.map(
+        (s) =>
+          `<div><h3>${esc(s.head)}</h3><p>${esc(s.body)} <sup class="cite">${cite(
+            s.sources,
+          )
+            .map((n) => `<a href="#src-${n}">${n}</a>`)
+            .join(", ")}</sup></p></div>`,
+      ).join("")}</div>
+      <h3>${DEBRIEF.limits.title}</h3>
+      ${DEBRIEF.limits.body.map((b) => `<p class="muted">${b}</p>`).join("")}
+      <h3>Sources</h3>
+      <ol class="sources">${SOURCES.map(
+        (s, n) =>
+          `<li id="src-${n + 1}">${esc(s.cite)} <a href="https://doi.org/${s.doi}">doi:${s.doi}</a></li>`,
+      ).join("")}</ol>
+      <p class="small" style="margin-top:18px">Every citation was checked against Crossref. Each finding is taken from the paper or its abstract, and the figures quoted were read there.</p>
+      <div class="actions"><button class="go" type="button" id="again">${DEBRIEF.again}</button></div>`,
+      4,
+    );
+
+    $("debrief").innerHTML = out;
+    $("again").addEventListener("click", start);
+  }
+
+  specimen();
+</script>

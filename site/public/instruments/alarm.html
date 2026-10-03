@@ -1,0 +1,3575 @@
+<title>Alarm</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Will this set off your fight or flight? Name what trips your alarm, what fires when it does, and what brings it down. Mark a pathway against them, then poke a toy body and watch which road it takes."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a sheet of drawing paper with a desk beside it. Ink on bone. The alarm's five colours are
+     only ever the circuit: rust is the amygdala and the low road, slate the prefrontal brake, moss the
+     vagal brake and calm, ochre the sympathetic surge, plum the defences that fire on their own. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #9a9287;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --alarm-amyg: #a8452c;
+    --alarm-pfc: #4f5f8a;
+    --alarm-vagal: #5e7a4e;
+    --alarm-symp: #b08a3e;
+    --alarm-freeze: #7e5a78;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #6f685c;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --alarm-amyg: #c4623f;
+      --alarm-pfc: #8393c4;
+      --alarm-vagal: #8dae78;
+      --alarm-symp: #d2aa5a;
+      --alarm-freeze: #b48aad;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #6f685c;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --alarm-amyg: #c4623f;
+    --alarm-pfc: #8393c4;
+    --alarm-vagal: #8dae78;
+    --alarm-symp: #d2aa5a;
+    --alarm-freeze: #b48aad;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.06;
+    mix-blend-mode: multiply;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body::after {
+      mix-blend-mode: screen;
+      opacity: 0.045;
+    }
+  }
+  :root[data-theme="dark"] body::after {
+    mix-blend-mode: screen;
+    opacity: 0.045;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .meta.plain {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .faint {
+    color: var(--faint);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* masthead and claim */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--muted);
+    max-width: 26ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .intro {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  .lede {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 44px 8px;
+  }
+  .claim {
+    font-size: clamp(21px, 2.5vw, 26px);
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  /* whose circuit is on the sheet */
+  .whose {
+    margin: 40px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    color: var(--accent);
+  }
+  .whose .link {
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .whose .link:hover {
+    color: var(--ink);
+  }
+
+  /* the sheet and the desk */
+  .inst {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 16px;
+  }
+  @media (min-width: 1024px) {
+    .inst {
+      grid-template-columns: minmax(0, 1fr) 23rem;
+    }
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+  .panel > *:not(.sketch) {
+    position: relative;
+    z-index: 2;
+  }
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  .fade {
+    animation: fade 220ms var(--ease) both;
+  }
+
+  .sheet {
+    align-self: start;
+    padding: 10px 12px 12px;
+  }
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 4px 0;
+  }
+  .state {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    min-width: 0;
+  }
+  .state .hand {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .pokes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .cap {
+    position: absolute;
+    top: 40px;
+    right: 18px;
+    z-index: 4;
+    font-size: 16px;
+    color: var(--accent);
+    pointer-events: none;
+    max-width: 60%;
+    text-align: right;
+  }
+  .svgbox {
+    position: relative;
+    margin-top: 4px;
+  }
+  .svgin {
+    position: relative;
+  }
+  #sheet {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  #sheet text {
+    pointer-events: none;
+  }
+  #sheet .h {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  #sheet .m {
+    font-family: var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  #sheet .m.g {
+    letter-spacing: 0.1em;
+  }
+  /* The wires draw on; the pathway's line last, from the body outward. */
+  #sheet .draw {
+    animation-duration: 900ms;
+  }
+  #sheet .draw.late {
+    animation-delay: 700ms;
+  }
+  #sheet .appear {
+    animation: fade 900ms var(--ease) 200ms both;
+  }
+  #sheet .a-node path,
+  #sheet .a-node ellipse,
+  #sheet .a-node circle {
+    transition:
+      fill-opacity 180ms var(--ease),
+      opacity 220ms var(--ease);
+  }
+  #sheet .a-node,
+  #sheet [data-bend] {
+    cursor: help;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    padding: 6px 4px 0;
+  }
+  .sidehint {
+    display: none;
+    margin: 6px 4px 0;
+  }
+  .summary {
+    margin: 4px 4px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  /* the card that follows the pointer */
+  .card {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+    max-width: 18rem;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-radius: 3px;
+    box-shadow: 0 2px 10px color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .card .hand {
+    line-height: 1.25;
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--faint);
+    line-height: 1.4;
+    transition:
+      color 180ms var(--ease),
+      border-color 220ms var(--ease),
+      opacity 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink) !important;
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.75;
+  }
+  .chip.dot {
+    padding: 2px 6px;
+    min-width: 28px;
+    letter-spacing: 0.04em;
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .search {
+    font: inherit;
+    width: 100%;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  /* The outline is replaced, not removed: a ring in the accent. */
+  .search:focus,
+  .search:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .search::placeholder {
+    color: var(--faint);
+  }
+  .search[readonly] {
+    cursor: default;
+  }
+  .search.mono {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .search.hand {
+    font-size: 15.5px;
+    line-height: 1.3;
+  }
+  .search.title {
+    font-size: 19px;
+    line-height: 1.2;
+  }
+  .search.small {
+    padding: 2px 8px;
+    font-size: 14px;
+  }
+  textarea.search {
+    resize: vertical;
+    display: block;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    gap: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .row:hover {
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+  }
+  .row.on {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  .row .hand {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .row .meta {
+    flex-shrink: 0;
+  }
+  .found {
+    margin-top: 8px;
+    padding: 6px !important;
+  }
+  .pw-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mt {
+    margin-top: 14px;
+  }
+  .mt1 {
+    margin-top: 6px;
+  }
+  .doses {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .doses li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .doses .hand {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15.5px;
+  }
+  .doses .set {
+    display: flex;
+    gap: 4px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .note {
+    font-size: 14.5px;
+    line-height: 1.4;
+    margin: 4px 0 0;
+  }
+  .reading li {
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 3px 0;
+  }
+  .reading li + li {
+    border-top: 1px solid var(--rule);
+  }
+  .dials li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dials .hand {
+    width: 8.6rem;
+    flex-shrink: 0;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .dials .hint {
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+  .dials .v {
+    width: 2rem;
+    text-align: right;
+    color: var(--muted);
+  }
+  .between {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  /* The dials: a hairline track, the accent for the thumb. */
+  .dial {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 0;
+    height: 22px;
+    background: transparent;
+    cursor: ew-resize;
+  }
+  .dial:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  .dial:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+    border-radius: 999px;
+  }
+  .dial::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--rule);
+  }
+  .dial::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+  .dial::-moz-range-track {
+    height: 2px;
+    background: var(--rule);
+  }
+  .dial::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+  }
+  .opener {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--faint);
+    text-align: left;
+    transition: color 160ms var(--ease);
+  }
+  .opener:hover {
+    color: var(--muted);
+  }
+  .opener .tick {
+    display: inline-block;
+    transition: transform 180ms var(--ease);
+  }
+  .opener[aria-expanded="true"] .tick {
+    transform: rotate(90deg);
+  }
+  .named li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .named .top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .named .top input {
+    flex: 1;
+    min-width: 0;
+  }
+  .named .x {
+    color: var(--faint);
+    padding: 0 6px;
+    font-family: var(--mono);
+    font-size: 14px;
+    transition: color 160ms var(--ease);
+  }
+  .named .x:hover {
+    color: var(--ink);
+  }
+  .named .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .named .line input {
+    flex: 1;
+    min-width: 8rem;
+  }
+  .how {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--faint);
+    margin: 0;
+  }
+  .how em {
+    font-style: italic;
+  }
+
+  /* coda */
+  .coda {
+    border-top: 1px solid var(--rule);
+    margin-top: 72px;
+    padding-top: 44px;
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 32px;
+  }
+  .coda p {
+    max-width: 62ch;
+  }
+  .limits {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    list-style: disc;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+  .limits li {
+    margin-bottom: 8px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw,
+    #sheet .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .rise,
+    .fade,
+    #sheet .appear {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      padding-top: 44px;
+    }
+    .lede,
+    .coda {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    /* the sheet keeps its drawing legible and scrolls inside its own frame */
+    .svgbox {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+    }
+    .svgin {
+      min-width: 720px;
+    }
+    .cap {
+      top: 64px;
+    }
+    .sidehint {
+      display: block;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast rise">
+    <div>
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Alarm</h1>
+      <p class="deck"><em>Will this set off your fight or flight?</em></p>
+    </div>
+    <p class="intro">
+      Name what trips your alarm, what fires when it does, and what brings it
+      down. Mark a pathway against them, then poke a toy body and watch which
+      road it takes.
+    </p>
+  </header>
+
+  <section class="lede rise" style="animation-delay: 60ms">
+    <span class="label">The claim</span>
+    <p class="claim">
+      You flinch before you decide. The low road reaches the alarm before the
+      slow one reaches the part of you that appraises, and how loaded you are
+      today sets how much room the brake has. So whether a decision will set you
+      off is not a forecast anyone can make for you. You already half know it:
+      the triggers it touches, the defences that fire, the brakes within reach.
+      Named in your own words and added up, those marks draw a line toward
+      hypervigilance or toward calm, and nothing more than that.
+    </p>
+  </section>
+
+  <p class="whose meta plain" id="whose"></p>
+
+  <div class="inst">
+    <!-- the sheet -->
+    <section
+      class="sheet panel rise"
+      id="sheetPanel"
+      style="animation-delay: 120ms"
+      aria-label="The alarm"
+    >
+      <div class="topbar">
+        <div class="state">
+          <span class="meta" id="stName"></span>
+          <span class="hand" id="stWords"></span>
+        </div>
+        <div class="pokes" id="pokes"></div>
+      </div>
+      <div class="cap hand fade" id="cap" hidden></div>
+      <div class="svgbox">
+        <div class="svgin" id="svgin">
+          <svg
+            id="sheet"
+            viewBox="0 0 1000 620"
+            role="img"
+            aria-label="The threat circuit, the pathway's line, the body's gauges and the run"
+          ></svg>
+          <div class="card fade" id="hover" hidden></div>
+        </div>
+      </div>
+      <p class="meta plain faint sidehint">
+        the sheet is wider than this screen · swipe it sideways for the
+        pathway&rsquo;s line
+      </p>
+      <div class="legend">
+        <span class="meta faint">a hand-drawn toy of a body, not yours</span>
+        <span class="meta" style="color: var(--alarm-amyg)"
+          >· low road, fast</span
+        >
+        <span class="meta" style="color: var(--alarm-pfc)"
+          >· high road, slow</span
+        >
+        <span class="meta" style="color: var(--alarm-vagal)">· the brakes</span>
+        <span class="meta" style="color: var(--alarm-symp)">· the surge</span>
+        <span class="meta faint"
+          >· space pokes · b presses the first brake · r resets</span
+        >
+      </div>
+      <p class="summary hand" id="summary" hidden></p>
+    </section>
+
+    <!-- the desk -->
+    <aside class="desk rise" style="animation-delay: 180ms">
+      <div>
+        <label class="meta faint" for="q" id="qLabel"></label>
+        <input
+          id="q"
+          class="search mono mt1"
+          placeholder="a title, a word  /"
+          autocomplete="off"
+        />
+        <div class="panel found" id="found" hidden><ul id="foundIn"></ul></div>
+      </div>
+
+      <section class="panel" id="pw" aria-label="The pathway" hidden>
+        <div id="pwIn"></div>
+      </section>
+
+      <section class="panel" id="reading" aria-label="The reading">
+        <div class="meta faint">the reading</div>
+        <div id="readingIn"></div>
+      </section>
+
+      <section aria-label="As you are today" id="load"></section>
+
+      <section aria-label="Your circuit">
+        <button
+          type="button"
+          class="opener meta"
+          id="opener"
+          data-act="circuit"
+          data-k="opener"
+          aria-expanded="false"
+          aria-controls="circ"
+        ></button>
+        <div class="panel mt1" id="circ" hidden>
+          <div id="circIn"></div>
+        </div>
+      </section>
+
+      <section aria-label="Pathways asked" id="asked"></section>
+
+      <p class="how hand">
+        how it is read: name what sets your alarm off, what fires when it does,
+        and what brings it down. then mark a pathway against them and poke it.
+        the body here is a toy; the names are yours. a touched trigger bends the
+        pathway&rsquo;s line up by how hard it hits times how much of it is on
+        the path; a brake within reach bends it down by how fast it works, with
+        less room the more loaded you are today. the line is your marks added up
+        and nothing else. the run is the sandbox&rsquo;s physics, unchanged: the
+        low road wins the race, sleep debt and stress lower the brake&rsquo;s
+        ceiling, hold the alarm too high and it flips to freeze. nothing here
+        scores a person.
+        <span id="whereKept"></span>
+      </p>
+      <p class="meta plain faint">
+        / find · n ask · space poke · b brake · r reset · esc
+      </p>
+    </aside>
+  </div>
+
+  <section class="coda">
+    <span class="label">Honest limits</span>
+    <div>
+      <ul class="limits">
+        <li>
+          The body is a toy: a handful of equations for an amygdala, a
+          prefrontal brake, a vagal brake and a sympathetic surge. Its gauges
+          are illustrative, and its heart rate is nobody&rsquo;s.
+        </li>
+        <li>
+          The line is your marks added up. If you leave a trigger unnamed, the
+          line does not know about it, and it will not guess.
+        </li>
+        <li>
+          A brake that works over hours or days barely reaches a run this short.
+          The page says so when you press one, rather than pretending.
+        </li>
+        <li>
+          It never predicts you. After the fact you can say how a pathway went,
+          and the reading counts what you said beside what you marked. It does
+          not grade the difference.
+        </li>
+      </ul>
+      <p class="label" style="margin-top: 36px">What stays here</p>
+      <p style="font-size: 16px; color: var(--muted)">
+        Your circuit and your pathways are kept in this browser&rsquo;s storage
+        and nowhere else. There is no server, no account and no analytics. The
+        specimen is fiction, written to show every mechanic; it is
+        nobody&rsquo;s nervous system.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Alarm · CAPP · prototype, October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ---- pure: begin ----------------------------------------------------------------------------
+  // The alarm's model, ported by hand from niwa's lib/alarm.ts with the maths unchanged: the toy
+  // body, the marks' bends, the tally and readings, and validation at the boundary.
+
+  const REFLEXES = ["fight", "flight", "freeze", "fawn"];
+  const REACHES = ["seconds", "hours", "days"];
+  const WENTS = ["calm", "vigilant", "mixed"];
+  const DEFAULT_LOAD = { sleep: 25, stress: 25, caffeine: 20, tone: 55 };
+  const EMPTY_CIRCUIT = {
+    triggers: [],
+    defences: [],
+    brakes: [],
+    load: DEFAULT_LOAD,
+    loadDay: null,
+  };
+
+  const REST_HR = 58;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  function rest(k) {
+    return {
+      amyg: 0,
+      pfc: 18,
+      vagal: k.tone * 0.45,
+      cort: 0,
+      hr: REST_HR,
+      hrv: k.tone,
+      symp: 0,
+      breatheT: 0,
+      coldT: 0,
+      freeze: 0,
+      freezeChg: 0,
+    };
+  }
+
+  const knobsOf = (l) => ({
+    tone: l.tone,
+    sleep: l.sleep,
+    stress: l.stress,
+    caffeine: l.caffeine,
+  });
+
+  /** A cue hits: the low road reaches the amygdala. `hit` is 0 to 10. */
+  function cue(b, k, hit) {
+    const react = 1 + k.sleep / 110 + k.stress / 100;
+    return {
+      ...b,
+      amyg: clamp(b.amyg + (8 + clamp(hit, 0, 10) * 9) * react, 0, 100),
+      pfc: clamp(b.pfc + 10, 0, 100),
+    };
+  }
+
+  /** A brake applied. Seconds-fast brakes are a slow breath; the slower ones reach less far. */
+  function apply(b, reach) {
+    if (reach === "seconds")
+      return { ...b, breatheT: Math.max(b.breatheT, 4.6) };
+    if (reach === "hours") return { ...b, coldT: Math.max(b.coldT, 3.6) };
+    return { ...b, breatheT: Math.max(b.breatheT, 2.2) };
+  }
+
+  /** The body's ceiling for the brake: sleep debt and chronic stress lower it. */
+  const ceilingOf = (k) =>
+    clamp(100 - k.sleep * 0.45 - k.stress * 0.4, 20, 100);
+
+  /** One tick of the toy, `dt` seconds. */
+  function step(b0, k, dt) {
+    const b = { ...b0 };
+    const pfcCeil = ceilingOf(k);
+    const amygBase = k.stress * 0.14;
+    const breBoost = b.breatheT > 0 ? 40 : 0;
+    const coldBoost = b.coldT > 0 ? 40 : 0;
+    const pfcT = clamp(
+      18 +
+        (b.amyg > 14 ? 16 : 0) -
+        (b.amyg > 62 ? (b.amyg - 62) * 1.2 : 0) +
+        breBoost * 0.4,
+      2,
+      pfcCeil,
+    );
+    b.pfc += (pfcT - b.pfc) * Math.min(1, 3 * dt);
+    const vagT = clamp(
+      k.tone * 0.45 + breBoost + coldBoost - b.amyg * 0.55,
+      0,
+      100,
+    );
+    b.vagal += (vagT - b.vagal) * Math.min(1, 2.4 * dt);
+    b.amyg += (amygBase - b.amyg) * 0.05 * dt;
+    b.amyg -= b.amyg * 0.25 * dt;
+    b.amyg -= (b.pfc / 100) * b.amyg * 0.55 * dt;
+    b.amyg -= (b.vagal / 100) * b.amyg * 0.45 * dt;
+    b.amyg = clamp(b.amyg, 0, 100);
+    b.symp = clamp(b.amyg * 0.9 + k.caffeine * 0.45, 0, 130);
+    if (b.amyg > 80) b.freezeChg += dt;
+    else b.freezeChg = Math.max(0, b.freezeChg - dt * 0.7);
+    if (b.freezeChg > 2.6 && b.freeze <= 0) {
+      b.freeze = 3.4;
+      b.freezeChg = 0;
+    }
+    if (b.freeze > 0) b.freeze -= dt;
+    if (b.freeze > 0) b.symp *= 0.35;
+    const dive = b.coldT > 0 ? 14 : 0;
+    const hrT = clamp(
+      REST_HR + b.symp * 0.95 - b.vagal * 0.28 - dive - (b.freeze > 0 ? 16 : 0),
+      42,
+      192,
+    );
+    b.hr += (hrT - b.hr) * Math.min(1, 3.0 * dt);
+    const hrvT = clamp(
+      18 + b.vagal * 1.5 + (k.tone - 50) * 0.5 - b.symp * 0.7,
+      8,
+      180,
+    );
+    b.hrv += (hrvT - b.hrv) * Math.min(1, 1.2 * dt);
+    const cortT = b.amyg * 0.9;
+    const cl = k.stress > 40 ? 0.09 : 0.14;
+    const kk = cortT > b.cort ? 0.4 : cl;
+    b.cort += (cortT - b.cort) * Math.min(1, kk * dt * 2);
+    if (b.breatheT > 0) b.breatheT -= dt;
+    if (b.coldT > 0) b.coldT -= dt;
+    return b;
+  }
+
+  const STATE_LABEL = {
+    calm: "Calm",
+    rest: "Rest & digest",
+    alert: "Alert",
+    surge: "Fight or flight",
+    hijack: "Amygdala hijack",
+    freeze: "Freeze / shutdown",
+  };
+  const STATE_WORDS = {
+    calm: "baseline — the prefrontal cortex in quiet control, the vagus holding the floor.",
+    rest: "ventral-vagal — high HRV, slow heart, the body doing its housekeeping.",
+    alert:
+      "the amygdala watching, the PFC appraising. arousal up, the brake still engaged.",
+    surge:
+      "full sympathetic surge — heart and muscles mobilised, digestion parked, ready to move.",
+    hijack:
+      "the alarm has the wheel. the prefrontal cortex is offline — no appraisal, pure reaction.",
+    freeze:
+      "dorsal-vagal collapse — the brake slammed past the floor. the heart drops, everything goes still.",
+  };
+  /** The states past which the nervous system is on the vigilant path rather than the calm one. */
+  const VIGILANT = ["surge", "hijack", "freeze"];
+
+  function stateOf(b) {
+    if (b.freeze > 0) return "freeze";
+    if (b.amyg > 62 && b.pfc < b.amyg * 0.5) return "hijack";
+    if (b.amyg >= 42) return "surge";
+    if (b.amyg >= 14) return "alert";
+    if (b.vagal > 45 && b.amyg < 8) return "rest";
+    return "calm";
+  }
+
+  function gaugesOf(b) {
+    let breath = clamp(12 + b.symp * 0.14 - b.vagal * 0.05, 4, 40);
+    if (b.breatheT > 0) breath = 5.5;
+    return {
+      hr: b.hr,
+      hrv: b.hrv,
+      breath,
+      sweat: clamp(2 + b.symp * 0.14, 1, 22),
+      pupil: clamp(3.2 + b.symp * 0.03 - b.vagal * 0.008, 2.5, 8),
+      bp: Math.round(108 + b.symp * 0.5),
+      muscle: clamp(b.symp * 0.9, 0, 100),
+      digestion: clamp(100 - b.symp * 0.85 + b.vagal * 0.25, 0, 100),
+      balance: clamp(b.symp - b.vagal, -100, 100),
+    };
+  }
+
+  const rankOf = (s) =>
+    s === "freeze"
+      ? 5
+      : s === "hijack"
+        ? 4
+        : s === "surge"
+          ? 3
+          : s === "alert"
+            ? 2
+            : 0;
+
+  /** A whole run, without the screen: the cues in order, a brake pressed at `brake.at` seconds. */
+  function simulate(k, hits, opts = {}) {
+    const gap = opts.gap ?? 1.4;
+    const dt = opts.dt ?? 0.05;
+    const seconds = opts.seconds ?? 40;
+    let b = rest(k);
+    let peak = "calm";
+    let peakAt = 0;
+    let peakHr = b.hr;
+    let calmAt = null;
+    let wasUp = false;
+    const states = [];
+    let next = 0;
+    let braked = false;
+    for (let t = 0; t <= seconds; t += dt) {
+      while (next < hits.length && t >= 0.6 + next * gap) {
+        b = cue(b, k, hits[next]);
+        next++;
+      }
+      if (opts.brake && !braked && t >= opts.brake.at) {
+        b = apply(b, opts.brake.reach);
+        braked = true;
+      }
+      b = step(b, k, dt);
+      const s = stateOf(b);
+      states.push(s);
+      if (rankOf(s) > rankOf(peak)) {
+        peak = s;
+        peakAt = t;
+      }
+      if (b.hr > peakHr) peakHr = b.hr;
+      if (rankOf(s) >= 2) wasUp = true;
+      if (wasUp && rankOf(s) < 2 && calmAt === null && next >= hits.length)
+        calmAt = t;
+    }
+    return { peak, peakAt, peakHr, calmAt, states };
+  }
+
+  const REACH_WEIGHT = { seconds: 3, hours: 2, days: 1 };
+
+  /**
+   * What the marks imply, before any run: each touched trigger bends the line up by its charge
+   * times the dose; each brake within reach bends it down by its reach, scaled by how much room
+   * the brake has today. It is the reader's marks, added up, and nothing else.
+   */
+  function bendsOf(p, c) {
+    const bends = [];
+    let up = 0;
+    let down = 0;
+    const room = ceilingOf(knobsOf(c.load)) / 100;
+    for (const t of c.triggers) {
+      const dose = p.touches[t.id];
+      if (!dose) continue;
+      const amount = t.charge * dose;
+      up += amount;
+      bends.push({ kind: "trigger", id: t.id, label: t.label, amount });
+    }
+    for (const b of c.brakes) {
+      if (!p.brakes.includes(b.id)) continue;
+      const amount = REACH_WEIGHT[b.reach] * room;
+      down += amount;
+      bends.push({ kind: "brake", id: b.id, label: b.label, amount });
+    }
+    const lean =
+      up + down === 0 ? 0 : clamp((up - down) / Math.max(4, up + down), -1, 1);
+    return { bends, up, down, lean };
+  }
+
+  const leanOf = (lean) =>
+    lean > 0.25 ? "vigilant" : lean < -0.25 ? "calm" : "between";
+
+  function tally(p, c, all) {
+    const byId = new Map(c.defences.map((d) => [d.id, d]));
+    const touched = p ? c.triggers.filter((t) => p.touches[t.id]) : [];
+    const hardest = touched.filter(
+      (t) => t.charge * (p.touches[t.id] ?? 0) >= 6,
+    );
+    const pulled = touched
+      .map((t) => ({
+        trigger: t,
+        defences: t.pulls.map((id) => byId.get(id)).filter((d) => !!d),
+      }))
+      .filter((x) => x.defences.length);
+    const expected = p
+      ? p.expects.map((id) => byId.get(id)).filter((d) => !!d)
+      : [];
+    const within = p ? c.brakes.filter((b) => p.brakes.includes(b.id)) : [];
+    const fastest = within.reduce((f, b) => {
+      if (!f) return b.reach;
+      return REACHES.indexOf(b.reach) < REACHES.indexOf(f) ? b.reach : f;
+    }, null);
+    const bends = p ? bendsOf(p, c) : { up: 0, down: 0, lean: 0 };
+    const went = { calm: 0, vigilant: 0, mixed: 0 };
+    for (const x of all) if (x.went) went[x.went]++;
+    const vig = all.filter((x) => x.went === "vigilant");
+    const vigilantTriggers = c.triggers
+      .map((t) => ({
+        trigger: t,
+        n: vig.filter((x) => x.touches[t.id]).length,
+        of: vig.length,
+      }))
+      .filter((x) => x.n > 0)
+      .sort((a, b) => b.n - a.n)
+      .slice(0, 3);
+    return {
+      known: c.triggers.length,
+      touched,
+      hardest,
+      pulled,
+      expected,
+      within,
+      fastest,
+      ceiling: Math.round(ceilingOf(knobsOf(c.load))),
+      lean: leanOf(bends.lean),
+      up: bends.up,
+      down: bends.down,
+      asked: all.length,
+      walked: all.filter((x) => x.went).length,
+      went,
+      vigilantTriggers,
+    };
+  }
+
+  const list = (xs) =>
+    xs.length <= 1
+      ? xs.join("")
+      : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+
+  /** Facts about the marks, in sentences. None of them is a verdict on the reader. */
+  function readings(t, p, c) {
+    const out = [];
+    if (c.triggers.length === 0)
+      return [
+        "name what sets your alarm off first — the circuit is yours to draw, and the sheet draws nothing you have not said.",
+      ];
+    if (!p) {
+      out.push(
+        `your circuit: ${c.triggers.length} known ${c.triggers.length === 1 ? "trigger" : "triggers"}, ${c.defences.length} ${c.defences.length === 1 ? "defence" : "defences"}, ${c.brakes.length} ${c.brakes.length === 1 ? "brake" : "brakes"}.`,
+      );
+    } else {
+      if (t.touched.length === 0)
+        out.push(
+          `touches none of your ${t.known} known triggers — as far as you have named them.`,
+        );
+      else
+        out.push(
+          `touches ${t.touched.length} of your ${t.known} known ${t.known === 1 ? "trigger" : "triggers"}: ${list(t.touched.map((x) => (t.hardest.includes(x) ? `${x.label} (hits hard)` : x.label)))}.`,
+        );
+      for (const x of t.pulled.slice(0, 3))
+        out.push(
+          `you said ${x.trigger.label} usually pulls ${list(x.defences.map((d) => d.label))}.`,
+        );
+      if (t.expected.length)
+        out.push(`you expect ${list(t.expected.map((d) => d.label))} to fire.`);
+      if (c.brakes.length === 0) out.push("you have named no brakes yet.");
+      else if (t.within.length === 0)
+        out.push(
+          `none of your ${c.brakes.length} brakes is within reach on it.`,
+        );
+      else
+        out.push(
+          `${t.within.length} of your ${c.brakes.length} brakes ${t.within.length === 1 ? "is" : "are"} within reach: ${list(t.within.map((b) => b.label))}${t.fastest === "seconds" ? " — the fastest works in seconds." : t.fastest === "hours" ? " — none faster than hours." : " — none faster than days."}`,
+        );
+    }
+    out.push(
+      `as you are today: sleep debt ${c.load.sleep}, chronic stress ${c.load.stress}, caffeine ${c.load.caffeine}, vagal tone ${c.load.tone} — the brake has ${t.ceiling} of 100 to work with.`,
+    );
+    if (p && (t.up || t.down))
+      out.push(
+        t.lean === "vigilant"
+          ? "as marked, the line runs to hypervigilance."
+          : t.lean === "calm"
+            ? "as marked, the line runs to calm."
+            : "as marked, the line hangs between — the brakes within reach roughly meet what it touches.",
+      );
+    if (t.walked) {
+      out.push(
+        `${t.asked} ${t.asked === 1 ? "pathway" : "pathways"} asked; you said how ${t.walked} went: ${t.went.calm} calm, ${t.went.vigilant} vigilant, ${t.went.mixed} mixed.`,
+      );
+      const v = t.vigilantTriggers[0];
+      if (v && v.of >= 2)
+        out.push(
+          `the ones that went vigilant touched ${v.trigger.label} most often — ${v.n} of ${v.of}.`,
+        );
+    }
+    return out;
+  }
+
+  // validation at the boundary: what comes out of storage, and what the desk asks to keep
+  const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+  const ID = /^[a-z][a-z0-9-]{0,39}$/;
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const strs = (v, n, max) =>
+    Array.isArray(v)
+      ? v
+          .filter((x) => typeof x === "string")
+          .map((x) => x.trim().slice(0, max))
+          .filter(Boolean)
+          .slice(0, n)
+      : [];
+  const num = (v, d) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.round(Math.max(0, Math.min(100, n))) : d;
+  };
+  const dayStr = (v) => (typeof v === "string" ? v.trim() : "");
+
+  function slugOf(title) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 64)
+      .replace(/-+$/g, "");
+    return t || "pathway";
+  }
+
+  /** An id for a named thing in the circuit, from its label. */
+  function idOf(label, taken) {
+    let base = label
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 32);
+    if (!base || !/^[a-z]/.test(base)) base = `x-${base}`.replace(/-+$/, "");
+    let id = base;
+    let n = 2;
+    while (taken.has(id)) id = `${base}-${n++}`;
+    return id;
+  }
+
+  function validateCircuit(c) {
+    if (!c || typeof c !== "object") throw new Error("circuit: not an object");
+    const ids = new Set();
+    const take = (id, what) => {
+      if (!ID.test(id))
+        throw new Error(`circuit: bad ${what} id ${JSON.stringify(id)}`);
+      if (ids.has(id))
+        throw new Error(`circuit: two things called ${JSON.stringify(id)}`);
+      ids.add(id);
+    };
+    const defences = [];
+    for (const x of Array.isArray(c.defences) ? c.defences.slice(0, 40) : []) {
+      if (!x || typeof x !== "object") continue;
+      const id = str(x.id, 40).toLowerCase();
+      take(id, "defence");
+      defences.push({
+        id,
+        label: str(x.label, 80) || id,
+        reflex: REFLEXES.includes(x.reflex) ? x.reflex : "flight",
+        cost: str(x.cost, 300),
+        note: str(x.note, 2000),
+      });
+    }
+    const defenceIds = new Set(defences.map((d) => d.id));
+    const triggers = [];
+    for (const x of Array.isArray(c.triggers) ? c.triggers.slice(0, 60) : []) {
+      if (!x || typeof x !== "object") continue;
+      const id = str(x.id, 40).toLowerCase();
+      take(id, "trigger");
+      const charge = Number(x.charge);
+      triggers.push({
+        id,
+        label: str(x.label, 80) || id,
+        charge: charge === 1 || charge === 3 ? charge : 2,
+        pulls: strs(x.pulls, 20, 40).filter((p) => defenceIds.has(p)),
+        signs: str(x.signs, 300),
+        note: str(x.note, 2000),
+      });
+    }
+    const brakes = [];
+    for (const x of Array.isArray(c.brakes) ? c.brakes.slice(0, 40) : []) {
+      if (!x || typeof x !== "object") continue;
+      const id = str(x.id, 40).toLowerCase();
+      take(id, "brake");
+      brakes.push({
+        id,
+        label: str(x.label, 80) || id,
+        reach: REACHES.includes(x.reach) ? x.reach : "hours",
+        note: str(x.note, 2000),
+      });
+    }
+    const l = c.load ?? {};
+    const load = {
+      sleep: num(l.sleep, DEFAULT_LOAD.sleep),
+      stress: num(l.stress, DEFAULT_LOAD.stress),
+      caffeine: num(l.caffeine, DEFAULT_LOAD.caffeine),
+      tone: num(l.tone, DEFAULT_LOAD.tone),
+    };
+    const loadDay = dayStr(c.loadDay);
+    return {
+      triggers,
+      defences,
+      brakes,
+      load,
+      loadDay: DAY.test(loadDay) ? loadDay : null,
+    };
+  }
+
+  /** A kept pathway read back as it was kept, the way niwa reads a hand-edited file. */
+  function pathwayOf(d) {
+    if (!d || typeof d !== "object") return null;
+    const slug = str(d.slug, 80);
+    if (!SLUG.test(slug)) return null;
+    const touches = {};
+    if (d.touches && typeof d.touches === "object")
+      for (const [id, v] of Object.entries(d.touches)) {
+        const n = Number(v);
+        if (n === 1 || n === 2 || n === 3) touches[id] = n;
+      }
+    const went = dayStr(d.went);
+    return {
+      slug,
+      title: str(d.title, 200) || slug,
+      put: str(d.put, 5000),
+      touches,
+      brakes: strs(d.brakes, 40, 40),
+      expects: strs(d.expects, 40, 40),
+      stones: strs(d.stones, 40, 200),
+      asked: dayStr(d.asked),
+      went: WENTS.includes(went) ? went : null,
+      wentDay: DAY.test(dayStr(d.wentDay)) ? dayStr(d.wentDay) : null,
+      note: typeof d.note === "string" ? d.note.trim() : "",
+    };
+  }
+
+  function validatePathway(p, c, today) {
+    if (!p || typeof p !== "object") throw new Error("pathway: not an object");
+    const title = str(p.title, 200);
+    if (!title) throw new Error("pathway: it needs a title");
+    const slugIn = str(p.slug, 80);
+    const slug = slugIn || slugOf(title);
+    if (!SLUG.test(slug)) throw new Error("pathway: bad slug");
+    const triggerIds = new Set(c.triggers.map((t) => t.id));
+    const touches = {};
+    if (p.touches && typeof p.touches === "object")
+      for (const [id, v] of Object.entries(p.touches)) {
+        const n = Number(v);
+        if (triggerIds.has(id) && (n === 1 || n === 2 || n === 3))
+          touches[id] = n;
+      }
+    const brakeIds = new Set(c.brakes.map((b) => b.id));
+    const defenceIds = new Set(c.defences.map((d) => d.id));
+    const asked = dayStr(p.asked);
+    const went = WENTS.includes(p.went) ? p.went : null;
+    const wentDay = dayStr(p.wentDay);
+    return {
+      slug,
+      title,
+      put: str(p.put, 5000),
+      touches,
+      brakes: strs(p.brakes, 40, 40).filter((id) => brakeIds.has(id)),
+      expects: strs(p.expects, 40, 40).filter((id) => defenceIds.has(id)),
+      stones: strs(p.stones, 40, 200),
+      asked: DAY.test(asked) ? asked : today,
+      went,
+      wentDay: went ? (DAY.test(wentDay) ? wentDay : today) : null,
+      note: typeof p.note === "string" ? p.note.trim().slice(0, 20000) : "",
+    };
+  }
+
+  const emptyPathway = (today, title = "", stones = []) => ({
+    slug: "",
+    title,
+    put: "",
+    touches: {},
+    brakes: [],
+    expects: [],
+    stones,
+    asked: today,
+    went: null,
+    wentDay: null,
+    note: "",
+  });
+
+  // ---- the hand: deterministic pen strokes, from niwa's lib/hand.ts ----
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b, starting and stopping just past the ends. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(w, h, seed) {
+    const r = rand(seed);
+    const x0 = 0.5;
+    const y0 = 0.5;
+    const x1 = w - 0.5;
+    const y1 = h - 0.5;
+    return [
+      stroke([x0, y0], [x1, y0], r, 1.1, 3),
+      stroke([x1, y0], [x1, y1], r, 1.1, 3),
+      stroke([x1, y1], [x0, y1], r, 1.1, 3),
+      stroke([x0, y1], [x0, y0], r, 1.1, 3),
+    ].join("");
+  }
+
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+
+  /** The circling: once round a w×h box and a little past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+  // ---- pure: end ------------------------------------------------------------------------------
+
+  // ---- Specimen A: a synthetic circuit with three pathways. Fiction; nobody's nervous system. ----
+  const SPECIMEN_CIRCUIT = {
+    triggers: [
+      {
+        id: "being-watched-while-working",
+        label: "Being watched while working",
+        charge: 3,
+        pulls: ["over-preparing", "going-quiet"],
+        signs: "shoulders up, breath high in the chest",
+        note: "Since the open-plan job. I can feel a gaze on the back of my neck before I see it.",
+      },
+      {
+        id: "unanswered-messages",
+        label: "Unanswered messages",
+        charge: 2,
+        pulls: ["checking"],
+        signs: "a hollow under the ribs",
+        note: "",
+      },
+      {
+        id: "raised-voices",
+        label: "Raised voices",
+        charge: 3,
+        pulls: ["going-quiet", "keeping-the-peace"],
+        signs: "everything goes very still and very clear",
+        note: "The back of his head, again.",
+      },
+      {
+        id: "a-room-i-cant-leave",
+        label: "A room I can't leave",
+        charge: 2,
+        pulls: ["sarcasm"],
+        signs: "counting the exits",
+        note: "",
+      },
+    ],
+    defences: [
+      {
+        id: "over-preparing",
+        label: "Over-preparing",
+        reflex: "flight",
+        cost: "the evening before, every time",
+        note: "",
+      },
+      {
+        id: "going-quiet",
+        label: "Going quiet",
+        reflex: "freeze",
+        cost: "people read it as agreement",
+        note: "",
+      },
+      {
+        id: "keeping-the-peace",
+        label: "Agreeing to keep the peace",
+        reflex: "fawn",
+        cost: "I find out what I wanted a week later",
+        note: "",
+      },
+      {
+        id: "sarcasm",
+        label: "Sarcasm",
+        reflex: "fight",
+        cost: "it lands on the wrong person",
+        note: "",
+      },
+      {
+        id: "checking",
+        label: "Checking the phone",
+        reflex: "flight",
+        cost: "an hour, in pieces",
+        note: "",
+      },
+    ],
+    brakes: [
+      {
+        id: "long-exhale",
+        label: "A long exhale",
+        reach: "seconds",
+        note: "Four in, eight out. Works when I remember it exists.",
+      },
+      { id: "a-walk", label: "A walk", reach: "hours", note: "" },
+      {
+        id: "telling-one-person",
+        label: "Telling one person",
+        reach: "hours",
+        note: "",
+      },
+      { id: "sleep", label: "Sleep", reach: "days", note: "" },
+      { id: "the-piano", label: "The piano, badly", reach: "hours", note: "" },
+    ],
+    load: { sleep: 35, stress: 40, caffeine: 25, tone: 50 },
+    loadDay: "2026-09-19",
+  };
+
+  const SPECIMEN_PATHWAYS = [
+    {
+      slug: "take-the-job-with-the-open-plan-office",
+      title: "Take the job with the open-plan office",
+      put: "Better money, a team I like, and a desk in the middle of forty people with a manager who walks the floor.",
+      touches: {
+        "being-watched-while-working": 3,
+        "raised-voices": 1,
+        "a-room-i-cant-leave": 1,
+      },
+      brakes: ["a-walk", "long-exhale"],
+      expects: ["over-preparing", "going-quiet"],
+      stones: [],
+      asked: "2026-09-12",
+      went: "vigilant",
+      wentDay: "2026-09-19",
+      note: "Three weeks in: the exhale works for about a minute. I have started arriving at seven to have the room to myself.",
+    },
+    {
+      slug: "a-month-at-the-coast",
+      title: "A month at the coast, working half days",
+      put: "The flat sublet, the work done by lunch, the phone in a drawer after that.",
+      touches: { "unanswered-messages": 1 },
+      brakes: ["sleep", "a-walk", "the-piano"],
+      expects: [],
+      stones: [],
+      asked: "2026-09-14",
+      went: "calm",
+      wentDay: "2026-09-19",
+      note: "",
+    },
+    {
+      slug: "ask-my-father-about-the-job-loss",
+      title: "Ask my father about the job loss",
+      put: "At his kitchen table, with the letter I found.",
+      touches: { "raised-voices": 2, "a-room-i-cant-leave": 2 },
+      brakes: ["telling-one-person", "long-exhale"],
+      expects: ["going-quiet", "keeping-the-peace"],
+      stones: [],
+      asked: "2026-09-18",
+      went: null,
+      wentDay: null,
+      note: "Not walked yet.",
+    },
+  ];
+
+  // ---- the page ---------------------------------------------------------------------------------
+  const NS = "http://www.w3.org/2000/svg";
+  const KEY = "pp-alarm";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+  const MON = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const dayOf = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return `${d.getUTCDate()} ${MON[d.getUTCMonth()]}${d.getUTCFullYear() !== new Date().getUTCFullYear() ? ` ${d.getUTCFullYear()}` : ""}`;
+  };
+  const STATE_COLOR = {
+    calm: "var(--alarm-vagal)",
+    rest: "var(--alarm-vagal)",
+    alert: "var(--alarm-symp)",
+    surge: "var(--alarm-symp)",
+    hijack: "var(--alarm-amyg)",
+    freeze: "var(--alarm-freeze)",
+  };
+  const NODE_WORDS = {
+    cue: ["sensory cue", "what the pathway puts in front of you"],
+    thalamus: [
+      "thalamus",
+      "the relay: the signal splits here, low road and high road",
+    ],
+    pfc: [
+      "prefrontal cortex",
+      "the brake — slow appraisal; sleep debt and stress lower its ceiling",
+    ],
+    amygdala: [
+      "amygdala",
+      "the alarm — the low road reaches it first; you flinch before you decide",
+    ],
+    hypothalamus: ["hypothalamus", "the switch to the body"],
+    heart: [
+      "the body",
+      "sympathetic surge: heart, sweat, pupils, muscle; digestion parked",
+    ],
+    vagus: ["vagus", "the other brake — a long exhale pulls on it directly"],
+  };
+  const LOADS = [
+    ["sleep", "sleep debt", "tired = twitchy"],
+    ["stress", "chronic stress", "allostatic wear"],
+    ["caffeine", "caffeine", "tonic sympathetic drive"],
+    ["tone", "vagal tone", "recovery capacity"],
+  ];
+
+  // the sheet's frame and the circuit's nodes
+  const W = 1000;
+  const H = 620;
+  const CUE = [64, 236];
+  const THAL = [292, 176];
+  const PFC = [196, 86];
+  const AMYG = [396, 222];
+  const HYPO = [470, 300];
+  const HEART = [556, 344];
+  const VAGUS = [318, 350];
+  const LX0 = 612;
+  const LX1 = 958;
+  const LY_MID = 222;
+  const LY_SWING = 150;
+  const GY = 424;
+  const TY0 = 532;
+  const TY1 = 606;
+  const SAMPLES = 220;
+
+  // ---- state ----
+  let own = { circuit: EMPTY_CIRCUIT, pathways: [] };
+  let view = "specimen";
+  let selected = null;
+  let draft = null; // { pathway, fresh }
+  let sure = false;
+  let query = "";
+  let circuitOpen = false;
+  let loadDraft = null;
+  let kept = "idle";
+  let capTimer = 0;
+  let keptTimer = 0;
+  // the run
+  let body = null;
+  let samples = [];
+  let running = false;
+  let pressed = [];
+  let summary = null;
+  let runKnobs = null;
+  let pulses = [];
+  let cues = [];
+  let clock = 0;
+  let last = 0;
+  let raf = 0;
+  let accum = { out: 0, brake: 0, sample: 0, quiet: 0 };
+  let heartPhase = 0;
+
+  const isSpec = () => view === "specimen";
+  const writable = () => !isSpec();
+  const circuit = () => (isSpec() ? SPECIMEN_CIRCUIT : own.circuit);
+  const pathways = () => (isSpec() ? SPECIMEN_PATHWAYS : own.pathways);
+  const curLoad = () => loadDraft || circuit().load;
+  const knobs = () => knobsOf(curLoad());
+  const P = () => (draft ? draft.pathway : null);
+  const chosen = () => pathways().find((p) => p.slug === selected) || null;
+  const within = () => {
+    const p = P();
+    if (!p) return [];
+    const by = new Map(circuit().brakes.map((b) => [b.id, b]));
+    return p.brakes.map((id) => by.get(id)).filter((b) => !!b);
+  };
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+
+  // ---- keeping: one key in this browser, and the page still works when storage throws ----
+  function loadStore() {
+    let raw = null;
+    try {
+      raw = localStorage.getItem(KEY);
+    } catch {
+      return;
+    }
+    if (!raw) return;
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return;
+    }
+    if (!data || typeof data !== "object") return;
+    let c = EMPTY_CIRCUIT;
+    try {
+      c = validateCircuit(data.circuit);
+    } catch {
+      c = EMPTY_CIRCUIT;
+    }
+    const ps = (Array.isArray(data.pathways) ? data.pathways : [])
+      .map(pathwayOf)
+      .filter((p) => !!p)
+      .sort((a, b) => (a.asked < b.asked ? 1 : a.asked > b.asked ? -1 : 0));
+    own = { circuit: c, pathways: ps };
+    if (data.view === "own") view = "own";
+  }
+  function saveStore() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          view,
+          circuit: own.circuit,
+          pathways: own.pathways,
+        }),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function settleKept(state) {
+    kept = state;
+    renderPokes();
+    clearTimeout(keptTimer);
+    keptTimer = setTimeout(() => {
+      kept = "idle";
+      renderPokes();
+    }, 1600);
+  }
+  function say(msg) {
+    clearTimeout(capTimer);
+    const el = $("cap");
+    el.textContent = `— ${msg}`;
+    el.hidden = false;
+    el.classList.remove("fade");
+    void el.offsetWidth;
+    el.classList.add("fade");
+    capTimer = setTimeout(() => (el.hidden = true), 2600);
+  }
+
+  /** Ask a pathway, or rewrite one. A fresh one whose slug is taken gets a numbered one. */
+  function putPathway(pw, fresh) {
+    if (!writable()) return null;
+    let k;
+    try {
+      k = validatePathway(pw, own.circuit, todayStr());
+    } catch (e) {
+      settleKept("error");
+      say(String(e.message).replace(/^pathway: /, ""));
+      return null;
+    }
+    if (fresh) {
+      const taken = new Set(own.pathways.map((x) => x.slug));
+      const base = k.slug;
+      let n = 2;
+      while (taken.has(k.slug)) k.slug = `${base}-${n++}`;
+    }
+    own.pathways = fresh
+      ? [k, ...own.pathways.filter((x) => x.slug !== k.slug)]
+      : own.pathways.map((x) => (x.slug === k.slug ? k : x));
+    settleKept(saveStore() ? "kept" : "error");
+    return k;
+  }
+
+  function putCircuit(next) {
+    if (!writable()) return;
+    try {
+      own.circuit = validateCircuit(next);
+    } catch (e) {
+      settleKept("error");
+      say(String(e.message).replace(/^circuit: /, ""));
+      return;
+    }
+    settleKept(saveStore() ? "kept" : "error");
+    render();
+  }
+
+  function remove(slug) {
+    if (!writable()) return;
+    own.pathways = own.pathways.filter((x) => x.slug !== slug);
+    saveStore();
+    selected = null;
+    draft = null;
+    sure = false;
+    render();
+    say("taken back.");
+  }
+
+  function keepDraft() {
+    if (!draft || !writable()) return;
+    if (!draft.pathway.title.trim()) {
+      say("it needs a title.");
+      $("pwTitle")?.focus();
+      return;
+    }
+    const wasFresh = draft.fresh;
+    const k = putPathway(draft.pathway, draft.fresh);
+    if (!k) return;
+    say(wasFresh ? "asked." : "kept.");
+    selected = k.slug;
+    draft = { pathway: clone(k), fresh: false };
+    render();
+  }
+
+  function begin(title = "") {
+    if (!writable()) {
+      say(
+        isSpec() ? "the specimen is not yours to change." : "read-only here.",
+      );
+      return;
+    }
+    selected = null;
+    draft = { pathway: emptyPathway(todayStr(), title), fresh: true };
+    sure = false;
+    render();
+    $("pwTitle")?.focus();
+  }
+
+  function pick(slug) {
+    selected = slug;
+    const c = chosen();
+    draft = c ? { pathway: clone(c), fresh: false } : null;
+    sure = false;
+    render();
+  }
+
+  function close() {
+    selected = null;
+    draft = null;
+    sure = false;
+    render();
+  }
+
+  function setField(k, v) {
+    if (!draft) return;
+    draft = { ...draft, pathway: { ...draft.pathway, [k]: v } };
+  }
+
+  function sayWent(w) {
+    if (!draft || !writable()) return;
+    const next = { ...draft.pathway, went: w, wentDay: w ? todayStr() : null };
+    draft = { ...draft, pathway: next };
+    if (!draft.fresh) {
+      const k = putPathway(next, false);
+      if (k) say(w ? `went ${w}.` : "unsaid.");
+    }
+    render();
+  }
+
+  /** A stranger meets the specimen with its first pathway already on the desk. */
+  function openSpecimen() {
+    selected = SPECIMEN_PATHWAYS[0].slug;
+    draft = { pathway: clone(SPECIMEN_PATHWAYS[0]), fresh: false };
+  }
+
+  function setView(v) {
+    if (v === view) return;
+    reset();
+    view = v;
+    selected = null;
+    draft = null;
+    sure = false;
+    loadDraft = null;
+    if (v === "own" && own.circuit.triggers.length === 0) circuitOpen = true;
+    if (v === "specimen") openSpecimen();
+    saveStore();
+    render();
+  }
+
+  // ---- the drawing -----------------------------------------------------------------------------
+  const bez = (a, c1, c2, b) =>
+    `M${a[0]} ${a[1]}C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${b[0]} ${b[1]}`;
+  const WIRES = (() => {
+    const r = rand(seedOf("alarm-wires"));
+    return {
+      stim: bez(
+        [CUE[0] + 20, CUE[1]],
+        [150, 236],
+        [230, 205],
+        [THAL[0] - 22, THAL[1] + 6],
+      ),
+      high: bez(
+        [THAL[0] - 14, THAL[1] - 14],
+        [260, 120],
+        [240, 100],
+        [PFC[0] + 26, PFC[1] + 14],
+      ),
+      low: bez(
+        [THAL[0] + 16, THAL[1] + 12],
+        [330, 200],
+        [352, 210],
+        [AMYG[0] - 20, AMYG[1] - 6],
+      ),
+      brake: bez(
+        [PFC[0] + 24, PFC[1] + 26],
+        [280, 150],
+        [340, 200],
+        [AMYG[0] - 16, AMYG[1] - 12],
+      ),
+      vagus: bez(
+        [VAGUS[0], VAGUS[1]],
+        [340, 300],
+        [380, 260],
+        [AMYG[0] - 4, AMYG[1] + 14],
+      ),
+      out: bez(
+        [AMYG[0] + 18, AMYG[1] + 8],
+        [440, 250],
+        [460, 280],
+        [HYPO[0] - 2, HYPO[1] - 10],
+      ),
+      out2: bez(
+        [HYPO[0] + 8, HYPO[1] + 8],
+        [500, 320],
+        [520, 330],
+        [HEART[0] - 22, HEART[1] - 6],
+      ),
+      vagusHeart: bez(
+        [VAGUS[0] + 10, VAGUS[1] + 4],
+        [400, 372],
+        [480, 372],
+        [HEART[0] - 20, HEART[1] + 8],
+      ),
+      axis: stroke([LX0, LY_MID], [LX1, LY_MID], r, 1.0, 3),
+    };
+  })();
+  const OUT_D = `${WIRES.out}${WIRES.out2.replace(/^M[^C]*/, "L" + WIRES.out2.slice(1).split("C")[0])}`;
+
+  const GAUGES = [
+    {
+      key: "hr",
+      label: "heart rate",
+      unit: "bpm",
+      min: 40,
+      max: 190,
+      color: "var(--alarm-amyg)",
+    },
+    {
+      key: "hrv",
+      label: "HRV",
+      unit: "ms",
+      min: 0,
+      max: 180,
+      color: "var(--alarm-vagal)",
+    },
+    {
+      key: "breath",
+      label: "breathing",
+      unit: "/min",
+      min: 4,
+      max: 40,
+      color: "var(--alarm-symp)",
+    },
+    {
+      key: "sweat",
+      label: "skin sweat",
+      unit: "µS",
+      min: 0,
+      max: 22,
+      color: "var(--alarm-symp)",
+      digits: 1,
+    },
+    {
+      key: "pupil",
+      label: "pupil",
+      unit: "mm",
+      min: 2.5,
+      max: 8,
+      color: "var(--alarm-amyg)",
+      digits: 1,
+    },
+    {
+      key: "bp",
+      label: "blood pressure",
+      unit: "sys",
+      min: 108,
+      max: 178,
+      color: "var(--alarm-amyg)",
+    },
+    {
+      key: "muscle",
+      label: "muscle tension",
+      unit: "%",
+      min: 0,
+      max: 100,
+      color: "var(--alarm-amyg)",
+    },
+    {
+      key: "digestion",
+      label: "digestion",
+      unit: "%",
+      min: 0,
+      max: 100,
+      color: "var(--alarm-vagal)",
+    },
+  ];
+
+  function buildSheet() {
+    const re = (w, h, seed, steps) =>
+      roughEllipse(w, h, seedOf(seed), { pad: 0, steps });
+    let s = `<defs><marker id="a-arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+    // the brain, faint, and the stalk to the body
+    s += `<path id="brain" d="M120 200 C118 110 190 60 300 56 C420 52 520 66 560 118 C588 154 574 214 500 232 C460 244 420 240 400 240 C360 242 300 244 240 242 C180 240 122 224 120 200 Z" fill="var(--ink)" fill-opacity="0.03" stroke="var(--rule)" stroke-width="1.2"/>`;
+    s += `<path d="M470 246 C466 270 478 290 480 312 C482 326 482 334 480 342" fill="none" stroke="var(--rule)" stroke-width="9" stroke-linecap="round" opacity="0.7"/>`;
+    // the wires: the solid ones draw on, the dashed ones fade in
+    s += `<path class="appear" d="${WIRES.stim}" fill="none" stroke="var(--faint)" stroke-width="1.4" stroke-dasharray="1 5" stroke-linecap="round"/>`;
+    s += `<path class="draw" pathLength="1" d="${WIRES.high}" fill="none" stroke="var(--alarm-pfc)" stroke-width="2" opacity="0.6" marker-end="url(#a-arw)"/>`;
+    s += `<path class="draw" pathLength="1" d="${WIRES.low}" fill="none" stroke="var(--alarm-amyg)" stroke-width="2.4" opacity="0.7" marker-end="url(#a-arw)"/>`;
+    s += `<path class="appear" d="${WIRES.brake}" fill="none" stroke="var(--alarm-vagal)" stroke-width="1.8" opacity="0.55" stroke-dasharray="5 4" marker-end="url(#a-arw)"/>`;
+    s += `<path class="appear" d="${WIRES.vagus}" fill="none" stroke="var(--alarm-vagal)" stroke-width="1.6" opacity="0.5" stroke-dasharray="5 4" marker-end="url(#a-arw)"/>`;
+    s += `<path class="appear" d="${WIRES.vagusHeart}" fill="none" stroke="var(--alarm-vagal)" stroke-width="1.4" opacity="0.4" stroke-dasharray="5 4"/>`;
+    s += `<path class="draw" pathLength="1" d="${OUT_D}" fill="none" stroke="var(--alarm-symp)" stroke-width="2.2" opacity="0.55" marker-end="url(#a-arw)"/>`;
+    // the tracks the pulses run along: the same wires, unpainted
+    s += `<g fill="none" stroke="none">`;
+    for (const [k, d] of [
+      ["stim", WIRES.stim],
+      ["high", WIRES.high],
+      ["low", WIRES.low],
+      ["brake", WIRES.brake],
+      ["out", OUT_D],
+    ])
+      s += `<path id="track-${k}" d="${d}"/>`;
+    s += `</g>`;
+    // the nodes
+    s += `<g class="a-node" data-node="cue"><ellipse cx="${CUE[0]}" cy="${CUE[1]}" rx="17" ry="10" fill="none" stroke="var(--muted)" stroke-width="1.4"/><circle id="cueDot" cx="${CUE[0]}" cy="${CUE[1]}" r="4.5" fill="var(--muted)"/><text class="h" x="${CUE[0]}" y="${CUE[1] + 28}" text-anchor="middle" font-size="12" fill="var(--faint)">sensory cue</text></g>`;
+    s += `<g class="a-node" data-node="thalamus"><path d="${re(44, 30, "thalamus", 14)}" transform="translate(${THAL[0] - 22} ${THAL[1] - 15})" fill="var(--ink)" fill-opacity="0.08" stroke="var(--muted)" stroke-width="1.2"/><text class="h" x="${THAL[0] + 30}" y="${THAL[1] - 2}" font-size="13" fill="var(--ink)">thalamus</text><text class="h" x="${THAL[0] + 30}" y="${THAL[1] + 12}" font-size="11" fill="var(--faint)">the relay</text></g>`;
+    s += `<g class="a-node" id="pfcG" data-node="pfc"><circle id="pfcGlow" cx="${PFC[0]}" cy="${PFC[1]}" r="30" fill="var(--alarm-pfc)" opacity="0"/><path id="pfcBody" d="${re(60, 60, "pfc", 16)}" transform="translate(${PFC[0] - 30} ${PFC[1] - 30})" fill="var(--alarm-pfc)" fill-opacity="0.1" stroke="var(--alarm-pfc)" stroke-width="1.5"/><text class="h" x="${PFC[0] - 38}" y="${PFC[1] - 4}" text-anchor="end" font-size="13" fill="var(--ink)">prefrontal cortex</text><text class="h" id="pfcSub" x="${PFC[0] - 38}" y="${PFC[1] + 10}" text-anchor="end" font-size="11" fill="var(--faint)"></text></g>`;
+    s += `<text class="h" id="offline" x="${PFC[0]}" y="${PFC[1] + 48}" text-anchor="middle" font-size="12" fill="var(--alarm-amyg)" visibility="hidden">offline</text>`;
+    s += `<g class="a-node" data-node="amygdala"><circle id="amygGlow" cx="${AMYG[0]}" cy="${AMYG[1]}" r="16" fill="var(--alarm-amyg)" opacity="0"/><path id="amygBody" d="${re(42, 28, "amygdala", 14)}" transform="translate(${AMYG[0] - 21} ${AMYG[1] - 14}) rotate(-20 21 14)" fill="var(--alarm-amyg)" fill-opacity="0.14" stroke="var(--alarm-amyg)" stroke-width="1.5"/><text class="h" x="${AMYG[0] + 4}" y="${AMYG[1] - 22}" font-size="13" fill="var(--ink)">amygdala</text><text class="h" x="${AMYG[0] + 4}" y="${AMYG[1] - 9}" font-size="11" fill="var(--faint)">the alarm</text></g>`;
+    s += `<g class="a-node" data-node="hypothalamus"><circle id="hypoBody" cx="${HYPO[0]}" cy="${HYPO[1]}" r="10" fill="var(--alarm-symp)" fill-opacity="0.12" stroke="var(--alarm-symp)" stroke-width="1.2"/><text class="h" x="${HYPO[0] + 16}" y="${HYPO[1] + 4}" font-size="11" fill="var(--faint)">hypothalamus</text></g>`;
+    s += `<g class="a-node" data-node="vagus"><circle id="vagusBody" cx="${VAGUS[0]}" cy="${VAGUS[1]}" r="8" fill="var(--alarm-vagal)" fill-opacity="0.1" stroke="var(--alarm-vagal)" stroke-width="1.2"/><text class="h" x="${VAGUS[0] - 14}" y="${VAGUS[1] + 4}" text-anchor="end" font-size="11.5" fill="var(--faint)">vagus · the other brake</text></g>`;
+    s += `<g class="a-node" data-node="heart"><g id="heartG" transform="translate(${HEART[0]} ${HEART[1]})"><path id="heartBody" d="M0 14 C-18 2 -20 -14 -8 -16 C-2 -17 0 -12 0 -10 C0 -12 2 -17 8 -16 C20 -14 18 2 0 14 Z" fill="var(--alarm-amyg)" fill-opacity="0.25" stroke="var(--alarm-amyg)" stroke-width="1.3"/></g><text class="h" x="${HEART[0]}" y="${HEART[1] + 34}" text-anchor="middle" font-size="11.5" fill="var(--faint)">the body</text></g>`;
+    s += `<g id="pulses"></g>`;
+    // the two exits, and the line the marks draw
+    s += `<path d="${ribbon(WIRES.axis, 1.4, seedOf("alarm-axis"))}" fill="var(--ink)" opacity="0.25"/>`;
+    s += `<text class="m" x="${LX1}" y="${LY_MID - LY_SWING - 12}" text-anchor="end" font-size="9" fill="var(--alarm-symp)">hypervigilance</text>`;
+    s += `<text class="m" x="${LX1}" y="${LY_MID + LY_SWING + 14}" text-anchor="end" font-size="9" fill="var(--alarm-vagal)">calm</text>`;
+    s += `<line x1="${LX1}" x2="${LX1}" y1="${LY_MID - LY_SWING}" y2="${LY_MID + LY_SWING}" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 3"/>`;
+    s += `<text class="m" id="lineHead" x="${LX0}" y="${LY_MID - LY_SWING - 12}" font-size="9" fill="var(--faint)"></text>`;
+    s += `<g id="lineG"></g>`;
+    // the autonomic balance
+    s += `<text class="m" x="20" y="${GY - 22}" font-size="9" fill="var(--faint)">parasympathetic · rest</text>`;
+    s += `<text class="m" x="${W - 20}" y="${GY - 22}" text-anchor="end" font-size="9" fill="var(--faint)">sympathetic · mobilise</text>`;
+    s += `<line x1="20" x2="${W - 20}" y1="${GY - 14}" y2="${GY - 14}" stroke="var(--rule)" stroke-width="1"/>`;
+    s += `<line id="balMark" x1="500" x2="500" y1="${GY - 20}" y2="${GY - 8}" stroke="var(--ink)" stroke-width="2"/>`;
+    // downstream in the body
+    GAUGES.forEach((ga, i) => {
+      const x0 = 20 + i * ((W - 40) / 8);
+      s += `<g><text class="m g" x="${x0}" y="${GY + 8}" font-size="9" fill="var(--faint)">${ga.label}</text>`;
+      s += `<text class="h" x="${x0}" y="${GY + 30}" font-size="18" fill="var(--ink)"><tspan id="gv-${ga.key}"></tspan><tspan font-size="10.5" fill="var(--faint)"> ${ga.unit}</tspan></text>`;
+      s += `<line x1="${x0}" x2="${x0 + 112}" y1="${GY + 40}" y2="${GY + 40}" stroke="var(--rule)" stroke-width="2"/>`;
+      s += `<line id="gb-${ga.key}" x1="${x0}" x2="${x0}" y1="${GY + 40}" y2="${GY + 40}" stroke="${ga.color}" stroke-width="2.4"/></g>`;
+    });
+    // the timeline: the last forty seconds of a run
+    s += `<text class="m" x="40" y="${TY0 - 8}" font-size="9" fill="var(--faint)"><tspan fill="var(--alarm-amyg)">heart rate</tspan><tspan> · </tspan><tspan fill="var(--alarm-symp)">sympathetic arousal</tspan><tspan> · </tspan><tspan fill="var(--alarm-vagal)">vagal brake</tspan><tspan> · the run, last 40 seconds</tspan></text>`;
+    for (const k of [1, 2, 3])
+      s += `<line x1="40" x2="${W - 20}" y1="${TY0 + ((TY1 - TY0) * k) / 4}" y2="${TY0 + ((TY1 - TY0) * k) / 4}" stroke="var(--rule)" stroke-width="0.8"/>`;
+    s += `<line x1="40" x2="${W - 20}" y1="${TY1}" y2="${TY1}" stroke="var(--rule)" stroke-width="1"/>`;
+    s += `<g id="tl"></g>`;
+    $("sheet").innerHTML = s;
+  }
+
+  const setA = (id, attrs) => {
+    const el = $(id);
+    if (el) for (const k in attrs) el.setAttribute(k, attrs[k]);
+  };
+
+  /** The body as it is now: the nodes light, the gauges move, the state is named. */
+  function renderBody() {
+    const shown = body || rest(knobs());
+    const g = gaugesOf(shown);
+    const st = stateOf(shown);
+    const hijack = st === "hijack";
+    $("stName").textContent = STATE_LABEL[st];
+    $("stName").style.color = STATE_COLOR[st];
+    $("stWords").textContent = STATE_WORDS[st];
+    setA("brain", {
+      fill: hijack ? "var(--alarm-amyg)" : "var(--ink)",
+      "fill-opacity": hijack ? 0.04 : 0.03,
+    });
+    setA("cueDot", {
+      r: 4.5 + (shown.symp / 130) * 2.5,
+      fill: shown.amyg > 20 ? "var(--alarm-amyg)" : "var(--muted)",
+    });
+    setA("pfcG", { opacity: hijack ? 0.35 : 1 });
+    setA("pfcGlow", { opacity: (shown.pfc / 100) * 0.25 });
+    setA("pfcBody", { "fill-opacity": 0.1 + (shown.pfc / 100) * 0.45 });
+    $("pfcSub").textContent =
+      `the brake · ceiling ${Math.round(ceilingOf(knobs()))}`;
+    setA("offline", { visibility: hijack ? "visible" : "hidden" });
+    setA("amygGlow", {
+      r: 16 + (shown.amyg / 100) * 24,
+      opacity: (shown.amyg / 100) * 0.4,
+    });
+    setA("amygBody", { "fill-opacity": 0.14 + (shown.amyg / 100) * 0.62 });
+    setA("hypoBody", { "fill-opacity": 0.12 + (shown.symp / 130) * 0.6 });
+    setA("vagusBody", { "fill-opacity": 0.1 + (shown.vagal / 100) * 0.5 });
+    setA("heartBody", { "fill-opacity": 0.25 + (shown.symp / 130) * 0.6 });
+    const bx = 20 + ((g.balance + 100) / 200) * (W - 40);
+    setA("balMark", {
+      x1: bx,
+      x2: bx,
+      stroke:
+        g.balance > 25
+          ? "var(--alarm-symp)"
+          : g.balance < -25
+            ? "var(--alarm-vagal)"
+            : "var(--ink)",
+    });
+    GAUGES.forEach((ga, i) => {
+      const v = g[ga.key];
+      const x0 = 20 + i * ((W - 40) / 8);
+      const frac = clamp((v - ga.min) / (ga.max - ga.min), 0, 1);
+      $(`gv-${ga.key}`).textContent = ga.digits
+        ? v.toFixed(ga.digits)
+        : Math.round(v);
+      setA(`gb-${ga.key}`, { x2: x0 + 112 * frac });
+    });
+  }
+
+  function renderTimeline() {
+    const p = P();
+    if (samples.length < 2) {
+      $("tl").innerHTML =
+        `<text class="h" x="${(W + 20) / 2}" y="${(TY0 + TY1) / 2 + 4}" text-anchor="middle" font-size="13.5" fill="var(--faint)">${p ? "poke it, and the run draws here" : "the run draws here"}</text>`;
+      return;
+    }
+    const x = (i) => 40 + ((W - 60) * i) / (SAMPLES - 1);
+    const y = (v, min, max) =>
+      TY1 - ((v - min) / (max - min)) * (TY1 - TY0) * 0.92 - (TY1 - TY0) * 0.04;
+    const poly = (key, min, max) =>
+      samples
+        .map((s, i) => `${x(i).toFixed(1)},${y(s[key], min, max).toFixed(1)}`)
+        .join(" ");
+    let h = `<polyline points="${poly("vagal", 0, 100)}" fill="none" stroke="var(--alarm-vagal)" stroke-width="1.6" stroke-linejoin="round"/>`;
+    h += `<polyline points="${poly("symp", 0, 130)}" fill="none" stroke="var(--alarm-symp)" stroke-width="1.6" stroke-linejoin="round"/>`;
+    h += `<polyline points="${poly("hr", 40, 192)}" fill="none" stroke="var(--alarm-amyg)" stroke-width="1.8" stroke-linejoin="round"/>`;
+    for (const pr of pressed) {
+      const px = x(Math.min(SAMPLES - 1, Math.round(pr.at / 0.18)));
+      h += `<line x1="${px}" x2="${px}" y1="${TY0}" y2="${TY1}" stroke="var(--alarm-vagal)" stroke-width="1" stroke-dasharray="2 3"/>`;
+      h += `<text class="h" x="${px + 3}" y="${TY0 + 10}" font-size="11" fill="var(--alarm-vagal)">${esc(short(pr.label, 16))}</text>`;
+    }
+    $("tl").innerHTML = h;
+  }
+
+  /** The pathway's line, from the alarm out to an exit, bending per mark. */
+  let lineState = null;
+  function renderLine() {
+    const p = P();
+    $("lineHead").textContent = p
+      ? "the pathway, as marked"
+      : "no pathway on the desk";
+    const c = circuit();
+    const bends = p ? bendsOf(p, c) : null;
+    const g = $("lineG");
+    if (!bends) {
+      g.innerHTML = "";
+      $("a-line-mask")?.remove();
+      lineState = null;
+      return;
+    }
+    const n = bends.bends.length;
+    const k = LY_SWING / Math.max(6, bends.up + bends.down);
+    const pts = [[LX0, LY_MID]];
+    const marks = [];
+    let y = LY_MID;
+    for (let i = 0; i < n; i++) {
+      const b = bends.bends[i];
+      const x = LX0 + ((i + 1) * (LX1 - LX0 - 30)) / (n + 1);
+      y = clamp(
+        y + (b.kind === "trigger" ? -1 : 1) * b.amount * k,
+        LY_MID - LY_SWING,
+        LY_MID + LY_SWING,
+      );
+      pts.push([x, y]);
+      marks.push({ x, y, i });
+    }
+    const endY = clamp(
+      LY_MID - bends.lean * LY_SWING,
+      LY_MID - LY_SWING,
+      LY_MID + LY_SWING,
+    );
+    pts.push([LX1 - 6, endY]);
+    let d = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1];
+      const b = pts[i];
+      const mx = (a[0] + b[0]) / 2;
+      d += `C${mx} ${a[1]} ${mx} ${b[1]} ${b[0]} ${b[1]}`;
+    }
+    const lean = leanOf(bends.lean);
+    const tone =
+      lean === "vigilant"
+        ? "var(--alarm-symp)"
+        : lean === "calm"
+          ? "var(--alarm-vagal)"
+          : "var(--ink)";
+    // the mask draws the line on once, when a pathway first comes onto the desk
+    let mask = $("a-line-mask");
+    if (!mask) {
+      mask = document.createElementNS(NS, "mask");
+      mask.id = "a-line-mask";
+      mask.setAttribute("maskUnits", "userSpaceOnUse");
+      mask.setAttribute("x", LX0 - 20);
+      mask.setAttribute("y", 0);
+      mask.setAttribute("width", LX1 - LX0 + 60);
+      mask.setAttribute("height", H);
+      mask.innerHTML = `<path pathLength="1" class="draw late" fill="none" stroke="white" stroke-width="10" stroke-linecap="round"/>`;
+      $("sheet").querySelector("defs").appendChild(mask);
+    }
+    mask.firstChild.setAttribute("d", d);
+    let h = `<path d="${ribbon(d, 2.2, seedOf(`line-${p.slug || "fresh"}`))}" fill="${tone}" mask="url(#a-line-mask)"/>`;
+    for (const m of marks) {
+      const b = bends.bends[m.i];
+      const trig = b.kind === "trigger";
+      const sz = 9 + b.amount * 0.6;
+      h += `<g data-bend="${m.i}"><circle cx="${m.x}" cy="${m.y}" r="11" fill="transparent"/>`;
+      h += `<path d="${roughEllipse(sz, sz, seedOf(b.id), { pad: 0, steps: 12 })}" transform="translate(${m.x - sz / 2} ${m.y - sz / 2})" fill="${trig ? "var(--alarm-amyg)" : "var(--alarm-vagal)"}" fill-opacity="0.8" stroke="var(--surface)" stroke-width="1"/>`;
+      h += `<text class="h" x="${m.x}" y="${m.y + (trig ? -12 : 18)}" text-anchor="middle" font-size="11.5" fill="var(--muted)" stroke="var(--surface)" stroke-width="3" paint-order="stroke">${esc(short(b.label, 22))}</text></g>`;
+    }
+    h += `<path d="${roughEllipse(14, 14, seedOf("line-end"), { pad: 0, steps: 12 })}" transform="translate(${LX1 - 13} ${endY - 7})" fill="none" stroke="${tone}" stroke-width="1.4"/>`;
+    if (!marks.length)
+      h += `<text class="h" x="${(LX0 + LX1) / 2}" y="${LY_MID - 16}" text-anchor="middle" font-size="13" fill="var(--faint)">nothing marked yet — say what it touches, and what is within reach</text>`;
+    g.innerHTML = h;
+    lineState = { bends };
+  }
+
+  // ---- the hover card ----
+  function showHover(ev, el) {
+    const svg = $("sheet");
+    const box = svg.getBoundingClientRect();
+    const x = ((ev.clientX - box.left) / box.width) * W;
+    const y = ((ev.clientY - box.top) / box.height) * H;
+    let h = "";
+    if (el.dataset.node) {
+      const [name, words] = NODE_WORDS[el.dataset.node] || [
+        el.dataset.node,
+        "",
+      ];
+      h = `<div class="meta faint">${esc(name)}</div><div class="hand" style="font-size:15px;margin-top:2px">${esc(words)}</div>`;
+    } else {
+      const b = lineState && lineState.bends.bends[+el.dataset.bend];
+      if (!b) return hideHover();
+      const c = circuit();
+      const p = P();
+      const tr =
+        b.kind === "trigger" ? c.triggers.find((x) => x.id === b.id) : null;
+      const br =
+        b.kind === "brake" ? c.brakes.find((x) => x.id === b.id) : null;
+      h = `<div class="meta" style="color:${b.kind === "trigger" ? "var(--alarm-amyg)" : "var(--alarm-vagal)"}">${b.kind === "trigger" ? "touches" : "within reach"}<span class="faint">${tr ? ` · hits ${"·".repeat(tr.charge)} · ${"·".repeat(p?.touches[tr.id] ?? 0)} of it on this path` : ""}${br ? ` · works in ${br.reach}` : ""}</span></div>`;
+      h += `<div class="hand" style="font-size:16px;margin-top:2px">${esc(b.label)}</div>`;
+      if (tr?.signs)
+        h += `<div class="hand muted" style="font-size:14px">first sign: ${esc(tr.signs)}</div>`;
+      if (tr && tr.pulls.length)
+        h += `<div class="hand muted" style="font-size:14px">usually pulls ${esc(tr.pulls.map((id) => c.defences.find((d) => d.id === id)?.label ?? id).join(", "))}</div>`;
+      if (br?.note)
+        h += `<div class="hand muted" style="font-size:14px">${esc(short(br.note, 120))}</div>`;
+    }
+    const card = $("hover");
+    const flip = x > W * 0.62;
+    card.style.left = `${(x / W) * 100}%`;
+    card.style.top = `${(y / H) * 100}%`;
+    card.style.transform = flip
+      ? "translate(calc(-100% - 12px), -8px)"
+      : "translate(12px, -8px)";
+    if (card.innerHTML !== h) card.innerHTML = h;
+    card.hidden = false;
+  }
+  function hideHover() {
+    $("hover").hidden = true;
+  }
+
+  // ---- the run ----------------------------------------------------------------------------------
+  function pulse(key, speed, color, r, onArrive) {
+    const path = $(`track-${key}`);
+    const g = $("pulses");
+    if (!path || !g) return;
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("r", r);
+    c.setAttribute("fill", color);
+    const pt = path.getPointAtLength(0);
+    c.setAttribute("cx", pt.x);
+    c.setAttribute("cy", pt.y);
+    g.appendChild(c);
+    pulses.push({
+      el: c,
+      path,
+      len: path.getTotalLength(),
+      pos: 0,
+      speed,
+      onArrive,
+    });
+  }
+
+  function stopRun() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    running = false;
+    for (const q of pulses) q.el.remove();
+    pulses = [];
+    cues = [];
+  }
+
+  function loop(now) {
+    if (!body) return;
+    const k = runKnobs;
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    clock += dt;
+    // cues due
+    while (cues.length && clock >= cues[0].at) {
+      const hit = cues.shift().hit;
+      pulse("stim", 660, "var(--muted)", 4, () => {
+        pulse("low", 330, "var(--alarm-amyg)", 5.5, () => {
+          body = cue(body, k, hit);
+        });
+        pulse("high", 150, "var(--alarm-pfc)", 5);
+      });
+    }
+    // pulses first, so a cue that arrives this tick lands before the step
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      const q = pulses[i];
+      q.pos += q.speed * dt;
+      if (q.pos >= q.len) {
+        q.onArrive?.();
+        q.el.remove();
+        pulses.splice(i, 1);
+      } else {
+        const pt = q.path.getPointAtLength(q.pos);
+        q.el.setAttribute("cx", pt.x);
+        q.el.setAttribute("cy", pt.y);
+      }
+    }
+    const b = step(body, k, dt);
+    // emissions
+    const a = accum;
+    if (b.amyg > 16) {
+      a.out += dt;
+      const iv = Math.max(0.26, 0.9 - b.amyg / 140);
+      if (a.out > iv) {
+        a.out = 0;
+        pulse("out", 250, "var(--alarm-symp)", 4);
+      }
+    }
+    if ((b.pfc > 12 || b.vagal > 25) && b.amyg > 18) {
+      a.brake += dt;
+      const iv = Math.max(0.4, 1.1 - (b.pfc + b.vagal) / 220);
+      if (a.brake > iv) {
+        a.brake = 0;
+        pulse("brake", 270, "var(--alarm-vagal)", 4, () => {
+          body = { ...body, amyg: Math.max(0, body.amyg - 5) };
+        });
+      }
+    }
+    // the heart
+    heartPhase += dt * (b.hr / 60);
+    const beat = 1 + 0.16 * Math.max(0, Math.sin(heartPhase * Math.PI * 2));
+    $("heartG").setAttribute(
+      "transform",
+      `translate(${HEART[0]} ${HEART[1]}) scale(${beat.toFixed(3)})`,
+    );
+    body = b;
+    // samples, and the render
+    a.sample += dt;
+    if (a.sample > 0.18) {
+      a.sample = 0;
+      samples = [
+        ...samples.slice(-(SAMPLES - 1)),
+        {
+          hr: body.hr,
+          symp: body.symp,
+          vagal: body.vagal,
+          state: stateOf(body),
+        },
+      ];
+      renderBody();
+      renderTimeline();
+    }
+    // done when quiet after the last cue
+    const s = stateOf(body);
+    if (!cues.length && !pulses.length && (s === "calm" || s === "rest"))
+      a.quiet += dt;
+    else a.quiet = 0;
+    if (a.quiet > 3 || clock > 90) {
+      running = false;
+      raf = 0;
+      sumUp();
+      renderPokes();
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  function poke() {
+    const p = P();
+    if (!p) {
+      say("mark a pathway first — or ask one.");
+      return;
+    }
+    const hits = circuit()
+      .triggers.filter((x) => p.touches[x.id])
+      .map((x) => ({
+        hit: Math.min(10, x.charge * (p.touches[x.id] ?? 1) + 1),
+        label: x.label,
+      }));
+    if (!hits.length) {
+      say("it touches none of your known triggers — nothing to poke it with.");
+      return;
+    }
+    stopRun();
+    runKnobs = knobs();
+    body = rest(runKnobs);
+    clock = 0;
+    last = performance.now();
+    accum = { out: 0, brake: 0, sample: 0, quiet: 0 };
+    cues = hits.map((h, i) => ({
+      at: 0.4 + i * 1.6,
+      hit: h.hit,
+      label: h.label,
+    }));
+    samples = [];
+    pressed = [];
+    summary = null;
+    running = true;
+    renderSummary();
+    renderBody();
+    renderTimeline();
+    renderPokes();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function press(b) {
+    if (!running || !body) return;
+    body = apply(body, b.reach);
+    pressed = [...pressed, { at: clock, label: b.label }];
+    say(
+      `${b.label.toLowerCase()} — ${b.reach === "seconds" ? "the vagus pulls" : b.reach === "hours" ? "reaches in, slower" : "barely reaches a run this short"}.`,
+    );
+  }
+
+  function reset() {
+    stopRun();
+    body = null;
+    samples = [];
+    pressed = [];
+    summary = null;
+    $("heartG").setAttribute("transform", `translate(${HEART[0]} ${HEART[1]})`);
+    renderSummary();
+    renderBody();
+    renderTimeline();
+    renderPokes();
+  }
+
+  /** The run's summary, once it stops on its own. */
+  function sumUp() {
+    if (samples.length < 10) return;
+    let peak = "calm";
+    let peakI = 0;
+    let peakHr = 0;
+    samples.forEach((s, i) => {
+      if (rankOf(s.state) > rankOf(peak)) {
+        peak = s.state;
+        peakI = i;
+      }
+      if (s.hr > peakHr) peakHr = s.hr;
+    });
+    const secs = (peakI * 0.18).toFixed(0);
+    const vig = VIGILANT.includes(peak);
+    const pressedWords = pressed.length
+      ? ` you pressed ${pressed.map((x) => `${x.label.toLowerCase()} at ${x.at.toFixed(0)} s`).join(", ")}.`
+      : " no brake was pressed.";
+    summary = `in the run: it reached ${STATE_LABEL[peak].toLowerCase()} at ${secs} s, heart up to ${Math.round(peakHr)}; ${vig ? "the vigilant path" : "the alarm never had the wheel"}.${pressedWords} a toy body, as loaded as you said you are.`;
+    renderSummary();
+  }
+  function renderSummary() {
+    $("summary").hidden = !summary;
+    $("summary").textContent = summary || "";
+    redrawSketches();
+  }
+
+  // ---- the desk ---------------------------------------------------------------------------------
+  /** Replace a container's markup only when it changed, and keep the focus where it was. */
+  function put(el, html) {
+    if (el.__html === html) return false;
+    const a = document.activeElement;
+    const k = a && el.contains(a) ? a.getAttribute("data-k") : null;
+    el.innerHTML = html;
+    el.__html = html;
+    if (k)
+      el.querySelector(`[data-k="${CSS.escape(k)}"]`)?.focus({
+        preventScroll: true,
+      });
+    return true;
+  }
+
+  const chip = ({
+    on,
+    color,
+    disabled,
+    title,
+    act,
+    args = {},
+    label,
+    k,
+    cls = "",
+  }) => {
+    const data = Object.entries(args)
+      .map(([n, v]) => ` data-${n}="${esc(v)}"`)
+      .join("");
+    const style = `color:${on ? color || "var(--ink)" : "var(--faint)"};${on && color ? `border-color:${color};` : ""}`;
+    return `<button type="button" class="chip ${cls}" data-act="${act}"${data} data-k="${esc(k || act + JSON.stringify(args))}"${disabled ? " disabled" : ""}${title ? ` title="${esc(title)}"` : ""} aria-pressed="${!!on}" style="${style}">${label}</button>`;
+  };
+
+  function renderWhose() {
+    put(
+      $("whose"),
+      isSpec()
+        ? `<span>Specimen A&rsquo;s circuit — a synthetic nervous system, fiction to show the instrument; nobody&rsquo;s.</span><button type="button" class="link" data-act="view" data-v="own" data-k="view">make your own</button>`
+        : `<span>Your circuit — kept in this browser, and nowhere else.</span><button type="button" class="link" data-act="view" data-v="specimen" data-k="view">show the specimen</button>`,
+    );
+    $("whereKept").textContent = isSpec()
+      ? ""
+      : `kept in this browser, under ${KEY}; nothing leaves it.`;
+  }
+
+  function renderPokes() {
+    const p = P();
+    let h = chip({
+      on: true,
+      color: "var(--alarm-amyg)",
+      disabled: !p,
+      title: "space",
+      act: "poke",
+      label: running ? "poke it again" : "poke it",
+    });
+    for (const b of within())
+      h += chip({
+        on: running,
+        color: "var(--alarm-vagal)",
+        disabled: !running,
+        title: b.reach,
+        act: "press",
+        args: { id: b.id },
+        label: esc(short(b.label, 18)),
+      });
+    if (body || running)
+      h += chip({ act: "reset", title: "r", label: "reset" });
+    const status =
+      kept === "saving"
+        ? "keeping…"
+        : kept === "kept"
+          ? "kept"
+          : kept === "error"
+            ? "not kept"
+            : writable()
+              ? ""
+              : "specimen";
+    h += `<span class="meta" style="color:${kept === "error" ? "var(--accent)" : "var(--faint)"}">${status}</span>`;
+    put($("pokes"), h);
+  }
+
+  function rowHTML(x) {
+    const c =
+      x.went === "vigilant"
+        ? "var(--alarm-symp)"
+        : x.went === "calm"
+          ? "var(--alarm-vagal)"
+          : "var(--faint)";
+    return `<li><button type="button" class="row${selected === x.slug ? " on" : ""}" data-act="pick" data-slug="${esc(x.slug)}" data-k="pick-${esc(x.slug)}"><span class="hand">${esc(x.title)}</span><span class="meta plain" style="color:${c}">${esc(x.went ?? dayOf(x.asked))}</span></button></li>`;
+  }
+
+  function renderSearch() {
+    put(
+      $("qLabel"),
+      `a pathway asked${writable() ? ` · <button type="button" class="link-in" data-act="begin" data-k="begin" style="color:var(--muted);text-transform:none;letter-spacing:0;text-decoration:underline">ask a new one</button>` : ""}`,
+    );
+    const q = query.trim().toLowerCase();
+    const results =
+      q.length < 2
+        ? []
+        : pathways()
+            .filter(
+              (x) =>
+                x.title.toLowerCase().includes(q) ||
+                x.put.toLowerCase().includes(q) ||
+                x.note.toLowerCase().includes(q),
+            )
+            .slice(0, 8);
+    $("found").hidden = !results.length;
+    put($("foundIn"), results.map(rowHTML).join(""));
+  }
+
+  function dirty() {
+    const c = chosen();
+    return draft && c && !draft.fresh
+      ? JSON.stringify(draft.pathway) !== JSON.stringify(c)
+      : Boolean(draft?.fresh);
+  }
+
+  function renderPathway() {
+    const p = P();
+    $("pw").hidden = !p;
+    if (!p) {
+      put($("pwIn"), "");
+      return;
+    }
+    pwSketch.reseed(`pathway-${p.slug || "fresh"}`);
+    const c = circuit();
+    const ro = writable() ? "" : " readonly";
+    const dis = !writable();
+    const lean = leanOf(bendsOf(p, c).lean);
+    let h = `<div class="pw-head"><div class="meta" style="color:var(--accent)">${draft.fresh ? "asking" : "on the desk"}<span class="faint"> · ${lean === "vigilant" ? "runs to hypervigilance" : lean === "calm" ? "runs to calm" : "hangs between"}</span></div><button type="button" class="meta faint" data-act="close" data-k="close" aria-label="Close">esc</button></div>`;
+    h += `<input id="pwTitle" data-field="title" data-k="title" class="search hand title mt1" maxlength="200" placeholder="the decision, the plan, the road" aria-label="Title"${ro} />`;
+    h += `<textarea id="pwPut" data-field="put" data-k="put" class="search hand mt1" rows="2" maxlength="5000" placeholder="in words — what it would actually be like, day to day" aria-label="The pathway in words"${ro}></textarea>`;
+    h += `<div class="meta mt" style="color:var(--alarm-amyg)">what it touches <span class="faint">· how much of each is on it</span></div>`;
+    if (!c.triggers.length)
+      h += `<p class="hand faint note">no triggers named yet — open your circuit below.</p>`;
+    else {
+      h += `<ul class="doses">`;
+      for (const tr of c.triggers) {
+        const dose = p.touches[tr.id] ?? 0;
+        h += `<li><span class="hand" style="color:${dose ? "var(--ink)" : "var(--muted)"}">${esc(tr.label)}<span class="faint"> ${"·".repeat(tr.charge)}</span></span><span class="set">`;
+        for (const n of [0, 1, 2, 3]) {
+          const on = dose === n;
+          h += `<button type="button" class="chip dot" data-act="touch" data-id="${esc(tr.id)}" data-n="${n}" data-k="touch-${esc(tr.id)}-${n}"${dis ? " disabled" : ""} aria-pressed="${on}" aria-label="${esc(tr.label)}: ${n ? `${n} of 3` : "not on it"}" style="color:${on ? (n ? "var(--alarm-amyg)" : "var(--ink)") : "var(--faint)"};${on && n ? "border-color:var(--alarm-amyg);" : ""}">${n === 0 ? "—" : "·".repeat(n)}</button>`;
+        }
+        h += `</span></li>`;
+      }
+      h += `</ul>`;
+    }
+    h += `<div class="meta mt" style="color:var(--alarm-vagal)">brakes within reach on it</div>`;
+    if (!c.brakes.length)
+      h += `<p class="hand faint note">no brakes named yet.</p>`;
+    else
+      h += `<div class="chips">${c.brakes
+        .map((b) =>
+          chip({
+            on: p.brakes.includes(b.id),
+            color: "var(--alarm-vagal)",
+            disabled: dis,
+            title: b.reach,
+            act: "brake",
+            args: { id: b.id },
+            label: esc(short(b.label, 22)),
+          }),
+        )
+        .join("")}</div>`;
+    if (c.defences.length)
+      h += `<div class="meta mt" style="color:var(--alarm-freeze)">what you expect to fire</div><div class="chips">${c.defences
+        .map((d) =>
+          chip({
+            on: p.expects.includes(d.id),
+            color: "var(--alarm-freeze)",
+            disabled: dis,
+            title: d.reflex,
+            act: "expect",
+            args: { id: d.id },
+            label: esc(short(d.label, 22)),
+          }),
+        )
+        .join("")}</div>`;
+    h += `<label class="meta faint mt" style="display:block" for="pwNote">note</label>`;
+    h += `<textarea id="pwNote" data-field="note" data-k="note" class="search hand mt1" rows="2" maxlength="20000" placeholder="what you know already"${ro}></textarea>`;
+    h += `<div class="chips" style="margin-top:10px">`;
+    if (writable())
+      h += `<button type="button" class="chip" id="keepBtn" data-act="keep" data-k="keep" style="color:var(--accent);border-color:var(--accent)">${draft.fresh ? "ask it" : "keep"}</button>`;
+    const ch = chosen();
+    if (writable() && !draft.fresh && ch)
+      h += `<button type="button" class="chip" data-act="take" data-k="take" style="color:${sure ? "var(--accent)" : "var(--faint)"};${sure ? "border-color:var(--accent)" : ""}">${sure ? "yes, take it back" : "take it back"}</button>`;
+    h += `</div>`;
+    if (!draft.fresh && ch) {
+      h += `<div class="mt"><div class="meta faint">after the fact · how did it go?</div><div class="chips">${WENTS.map(
+        (w) =>
+          chip({
+            on: p.went === w,
+            color:
+              w === "vigilant"
+                ? "var(--alarm-symp)"
+                : w === "calm"
+                  ? "var(--alarm-vagal)"
+                  : "var(--ink)",
+            disabled: dis,
+            act: "went",
+            args: { w },
+            label: w,
+          }),
+      ).join("")}</div>`;
+      h += `<p class="meta plain faint" style="margin:8px 0 0">asked ${esc(dayOf(ch.asked))}${ch.went ? ` · said ${esc(ch.went)} ${esc(dayOf(ch.wentDay))}` : ""}</p></div>`;
+    }
+    const rebuilt = put($("pwIn"), h);
+    // the text the reader is typing is set once per pathway, never re-rendered under the caret
+    const sig = `${p.slug}|${draft.fresh}|${view}`;
+    if (rebuilt || $("pwIn").__sig !== sig) {
+      for (const [id, k] of [
+        ["pwTitle", "title"],
+        ["pwPut", "put"],
+        ["pwNote", "note"],
+      ]) {
+        const el = $(id);
+        if (el && document.activeElement !== el) el.value = p[k];
+        if (el && el.tagName === "TEXTAREA") fit(el);
+      }
+      $("pwIn").__sig = sig;
+    }
+    updateDirty();
+  }
+  /** A textarea as tall as what is in it. */
+  function fit(el) {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight + 2}px`;
+  }
+  function updateDirty() {
+    const k = $("keepBtn");
+    if (k) k.hidden = !(dirty() || draft?.fresh);
+  }
+
+  function renderReading() {
+    const p = P();
+    const c = circuit();
+    const words = readings(tally(p, c, pathways()), p, c);
+    let h = `<ul class="reading mt1">${words.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>`;
+    if (writable() && c.triggers.length === 0)
+      h += `<div style="margin-top:12px">${chip({ act: "view", args: { v: "specimen" }, label: "show the specimen · a synthetic circuit", k: "spec-chip" })}</div>`;
+    put($("readingIn"), h);
+  }
+
+  function renderLoad() {
+    const c = circuit();
+    const l = curLoad();
+    let h = `<div class="meta faint between"><span>as you are today${c.loadDay ? ` · set ${esc(dayOf(c.loadDay))}` : ""}</span><span id="ceil" style="color:var(--alarm-pfc)">ceiling ${Math.round(ceilingOf(knobs()))}</span></div><ul class="dials mt1">`;
+    for (const [k, label, hint] of LOADS)
+      h += `<li><label class="hand" for="dial-${k}">${label}<span class="hint"> · ${hint}</span></label><input type="range" class="dial" id="dial-${k}" data-dial="${k}" data-k="dial-${k}" min="0" max="100" value="${l[k]}"${writable() ? "" : " disabled"} /><span class="meta plain v" id="dv-${k}">${l[k]}</span></li>`;
+    h += `</ul>`;
+    put($("load"), h);
+  }
+
+  function editLabel(kind, x) {
+    return `<input class="search hand small" data-edit="${kind}" data-id="${esc(x.id)}" data-k="edit-${kind}-${esc(x.id)}" value="${esc(x.label)}" aria-label="${kind} name"${writable() ? "" : " readonly"} />`;
+  }
+  function removeBtn(kind, x) {
+    return writable()
+      ? `<button type="button" class="x" data-act="rm" data-kind="${kind}" data-id="${esc(x.id)}" data-k="rm-${kind}-${esc(x.id)}" aria-label="Remove ${esc(x.label)}">×</button>`
+      : "";
+  }
+
+  function renderCircuit() {
+    const c = circuit();
+    const op = $("opener");
+    op.setAttribute("aria-expanded", String(circuitOpen));
+    put(
+      op,
+      `<span class="tick" aria-hidden="true">›</span>your circuit · ${c.triggers.length} triggers · ${c.defences.length} defences · ${c.brakes.length} brakes`,
+    );
+    $("circ").hidden = !circuitOpen;
+    if (!circuitOpen) return;
+    const dis = !writable();
+    const ro = dis ? " readonly" : "";
+    let h = `<div class="meta" style="color:var(--alarm-amyg)">triggers <span class="faint">· what sets it off, and how hard</span></div><ul class="named mt1">`;
+    for (const tr of c.triggers) {
+      h += `<li><div class="top">${editLabel("trigger", tr)}${removeBtn("trigger", tr)}</div><div class="line">`;
+      for (const n of [1, 2, 3])
+        h += chip({
+          on: tr.charge === n,
+          color: "var(--alarm-amyg)",
+          disabled: dis,
+          act: "charge",
+          args: { id: tr.id, n },
+          label: "·".repeat(n),
+          cls: "dot",
+        });
+      h += `<input class="search hand small" data-edit2="signs" data-id="${esc(tr.id)}" data-k="signs-${esc(tr.id)}" value="${esc(tr.signs)}" placeholder="first sign in the body" aria-label="First sign in the body"${ro} /></div>`;
+      if (c.defences.length) {
+        h += `<div class="line"><span class="meta plain faint">usually pulls</span>`;
+        for (const d of c.defences)
+          h += chip({
+            on: tr.pulls.includes(d.id),
+            color: "var(--alarm-freeze)",
+            disabled: dis,
+            act: "pull",
+            args: { id: tr.id, d: d.id },
+            label: esc(short(d.label, 18)),
+          });
+        h += `</div>`;
+      }
+      h += `</li>`;
+    }
+    h += `</ul>`;
+    if (!dis)
+      h += `<input class="search hand mt1" data-new="trigger" data-k="new-trigger" placeholder="a trigger you know · enter" aria-label="A trigger you know" />`;
+    h += `<div class="meta mt" style="color:var(--alarm-freeze)">defences <span class="faint">· what fires on its own, and its shape</span></div><ul class="named mt1">`;
+    for (const d of c.defences) {
+      h += `<li><div class="top">${editLabel("defence", d)}${removeBtn("defence", d)}</div><div class="line">`;
+      for (const r of REFLEXES)
+        h += chip({
+          on: d.reflex === r,
+          color: "var(--alarm-freeze)",
+          disabled: dis,
+          act: "reflex",
+          args: { id: d.id, r },
+          label: r,
+        });
+      h += `<input class="search hand small" data-edit2="cost" data-id="${esc(d.id)}" data-k="cost-${esc(d.id)}" value="${esc(d.cost)}" placeholder="what it costs" aria-label="What it costs"${ro} /></div></li>`;
+    }
+    h += `</ul>`;
+    if (!dis)
+      h += `<input class="search hand mt1" data-new="defence" data-k="new-defence" placeholder="a defence you know · enter" aria-label="A defence you know" />`;
+    h += `<div class="meta mt" style="color:var(--alarm-vagal)">brakes <span class="faint">· what brings it down, and how fast</span></div><ul class="named mt1">`;
+    for (const b of c.brakes) {
+      h += `<li><div class="top">${editLabel("brake", b)}${removeBtn("brake", b)}</div><div class="line">`;
+      for (const r of REACHES)
+        h += chip({
+          on: b.reach === r,
+          color: "var(--alarm-vagal)",
+          disabled: dis,
+          act: "reach",
+          args: { id: b.id, r },
+          label: r,
+        });
+      h += `</div></li>`;
+    }
+    h += `</ul>`;
+    if (!dis)
+      h += `<input class="search hand mt1" data-new="brake" data-k="new-brake" placeholder="a brake you know · enter" aria-label="A brake you know" />`;
+    h += `<p class="hand faint" style="font-size:14px;line-height:1.35;margin:12px 0 0">${dis ? "the specimen&rsquo;s, and not yours to change." : "kept in this browser."} a trigger&rsquo;s dots are how hard it hits; a defence&rsquo;s shape is fight, flight, freeze or fawn; a brake&rsquo;s reach is how fast it works.</p>`;
+    put($("circIn"), h);
+  }
+
+  function renderAsked() {
+    const ps = pathways();
+    put(
+      $("asked"),
+      ps.length
+        ? `<div class="meta faint">pathways asked · ${ps.length}</div><ul class="mt1">${ps.map(rowHTML).join("")}</ul>`
+        : "",
+    );
+  }
+
+  // A rebuild while a pointer is down would swap the element under it and lose the click.
+  let pointerDown = false;
+  let pending = false;
+  function render() {
+    if (pointerDown) {
+      pending = true;
+      return;
+    }
+    pending = false;
+    renderWhose();
+    renderPokes();
+    renderLine();
+    renderBody();
+    renderTimeline();
+    renderSearch();
+    renderPathway();
+    renderReading();
+    renderLoad();
+    renderCircuit();
+    renderAsked();
+    redrawSketches();
+  }
+  document.addEventListener("pointerdown", () => (pointerDown = true), true);
+  const release = () => {
+    pointerDown = false;
+    if (pending) setTimeout(() => pending && render(), 0);
+  };
+  document.addEventListener("pointerup", release, true);
+  document.addEventListener("pointercancel", release, true);
+
+  // ---- sketched borders: a pen line laid over the panel it sits in ----
+  let maskN = 0;
+  const SKETCHES = [];
+  const redrawSketches = () => SKETCHES.forEach((d) => d());
+  function sketch(el, seed, color = "var(--pen)", width = 1.7) {
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("preserveAspectRatio", "none");
+    const id = `sk${++maskN}`;
+    svg.innerHTML = `<defs><mask id="${id}" maskUnits="userSpaceOnUse"><path pathLength="1" class="draw" fill="none" stroke="white" stroke-width="${width * 2 + 4}" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><path fill="${color}" mask="url(#${id})"/>`;
+    el.prepend(svg);
+    const mask = svg.querySelector("mask");
+    const ink = svg.lastChild;
+    const st = { seed, w: 0, h: 0, drawn: null };
+    const draw = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (!w || !h) return;
+      if (w === st.w && h === st.h && st.drawn === st.seed) return;
+      st.w = w;
+      st.h = h;
+      const fresh = st.drawn !== st.seed;
+      st.drawn = st.seed;
+      const s = seedOf(st.seed);
+      const line = roughRect(w, h, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      mask.setAttribute("x", -40);
+      mask.setAttribute("y", -40);
+      mask.setAttribute("width", w + 80);
+      mask.setAttribute("height", h + 80);
+      let mp = mask.firstChild;
+      if (fresh) {
+        // a new line draws on again from where the pen lands
+        const next = mp.cloneNode();
+        mask.replaceChild(next, mp);
+        mp = next;
+      }
+      mp.setAttribute("d", line);
+      ink.setAttribute("d", ribbon(line, width, s));
+    };
+    new ResizeObserver(draw).observe(el);
+    SKETCHES.push(draw);
+    return {
+      reseed(next) {
+        if (next === st.seed) return;
+        st.seed = next;
+        draw();
+      },
+    };
+  }
+
+  // ---- input -------------------------------------------------------------------------------------
+  function act(btn) {
+    const a = btn.dataset.act;
+    const c = circuit();
+    const p = P();
+    const id = btn.dataset.id;
+    const upd = (key, fn) =>
+      putCircuit({ ...c, [key]: c[key].map((x) => (x.id === id ? fn(x) : x)) });
+    switch (a) {
+      case "poke":
+        return poke();
+      case "reset":
+        return reset();
+      case "press": {
+        const b = c.brakes.find((x) => x.id === id);
+        if (b) press(b);
+        return;
+      }
+      case "begin":
+        return begin();
+      case "close":
+        return close();
+      case "keep":
+        return keepDraft();
+      case "take":
+        if (sure) return remove(chosen().slug);
+        sure = true;
+        return renderPathway();
+      case "went":
+        return sayWent(p.went === btn.dataset.w ? null : btn.dataset.w);
+      case "pick":
+        return pick(btn.dataset.slug);
+      case "view":
+        return setView(btn.dataset.v);
+      case "circuit":
+        circuitOpen = !circuitOpen;
+        return renderCircuit();
+      case "touch": {
+        if (!writable() || !p) return;
+        const n = +btn.dataset.n;
+        const next = { ...p.touches };
+        if (n === 0) delete next[id];
+        else next[id] = n;
+        setField("touches", next);
+        return render();
+      }
+      case "brake":
+        if (!writable() || !p) return;
+        setField(
+          "brakes",
+          p.brakes.includes(id)
+            ? p.brakes.filter((x) => x !== id)
+            : [...p.brakes, id],
+        );
+        return render();
+      case "expect":
+        if (!writable() || !p) return;
+        setField(
+          "expects",
+          p.expects.includes(id)
+            ? p.expects.filter((x) => x !== id)
+            : [...p.expects, id],
+        );
+        return render();
+      case "charge":
+        return upd("triggers", (x) => ({ ...x, charge: +btn.dataset.n }));
+      case "pull":
+        return upd("triggers", (x) => ({
+          ...x,
+          pulls: x.pulls.includes(btn.dataset.d)
+            ? x.pulls.filter((y) => y !== btn.dataset.d)
+            : [...x.pulls, btn.dataset.d],
+        }));
+      case "reflex":
+        return upd("defences", (x) => ({ ...x, reflex: btn.dataset.r }));
+      case "reach":
+        return upd("brakes", (x) => ({ ...x, reach: btn.dataset.r }));
+      case "rm": {
+        const kind = btn.dataset.kind;
+        if (kind === "trigger")
+          return putCircuit({
+            ...c,
+            triggers: c.triggers.filter((x) => x.id !== id),
+          });
+        if (kind === "brake")
+          return putCircuit({
+            ...c,
+            brakes: c.brakes.filter((x) => x.id !== id),
+          });
+        return putCircuit({
+          ...c,
+          defences: c.defences.filter((x) => x.id !== id),
+          triggers: c.triggers.map((tr) => ({
+            ...tr,
+            pulls: tr.pulls.filter((y) => y !== id),
+          })),
+        });
+      }
+    }
+  }
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-act]");
+    if (btn && !btn.disabled) act(btn);
+  });
+
+  const KIND_KEY = {
+    trigger: "triggers",
+    defence: "defences",
+    brake: "brakes",
+  };
+  function commitEdit(el) {
+    if (!writable()) return;
+    const c = circuit();
+    const id = el.dataset.id;
+    const v = el.value.trim();
+    if (el.dataset.edit) {
+      const key = KIND_KEY[el.dataset.edit];
+      const x = c[key].find((y) => y.id === id);
+      if (x && v && v !== x.label)
+        putCircuit({
+          ...c,
+          [key]: c[key].map((y) => (y.id === id ? { ...y, label: v } : y)),
+        });
+    } else if (el.dataset.edit2 === "signs") {
+      const x = c.triggers.find((y) => y.id === id);
+      if (x && v !== x.signs)
+        putCircuit({
+          ...c,
+          triggers: c.triggers.map((y) =>
+            y.id === id ? { ...y, signs: v } : y,
+          ),
+        });
+    } else if (el.dataset.edit2 === "cost") {
+      const x = c.defences.find((y) => y.id === id);
+      if (x && v !== x.cost)
+        putCircuit({
+          ...c,
+          defences: c.defences.map((y) =>
+            y.id === id ? { ...y, cost: v } : y,
+          ),
+        });
+    }
+  }
+  document.addEventListener("focusout", (e) => {
+    const el = e.target;
+    if (el.matches?.("[data-edit], [data-edit2]")) commitEdit(el);
+    if (el.matches?.("[data-dial]")) dialDone();
+  });
+
+  function addNamed(el) {
+    const label = el.value.trim();
+    if (!label || !writable()) return;
+    const c = circuit();
+    const id = idOf(
+      label,
+      new Set([...c.triggers, ...c.defences, ...c.brakes].map((x) => x.id)),
+    );
+    const kind = el.dataset.new;
+    el.value = "";
+    if (kind === "trigger")
+      putCircuit({
+        ...c,
+        triggers: [
+          ...c.triggers,
+          { id, label, charge: 2, pulls: [], signs: "", note: "" },
+        ],
+      });
+    else if (kind === "defence")
+      putCircuit({
+        ...c,
+        defences: [
+          ...c.defences,
+          { id, label, reflex: "flight", cost: "", note: "" },
+        ],
+      });
+    else
+      putCircuit({
+        ...c,
+        brakes: [...c.brakes, { id, label, reach: "hours", note: "" }],
+      });
+  }
+
+  document.addEventListener("input", (e) => {
+    const el = e.target;
+    if (el.id === "q") {
+      query = el.value;
+      return renderSearch();
+    }
+    if (el.dataset.field && draft && writable()) {
+      setField(el.dataset.field, el.value);
+      if (el.tagName === "TEXTAREA") fit(el);
+      updateDirty();
+      if (el.dataset.field === "title") renderLine();
+      return;
+    }
+    if (el.dataset.dial && writable()) {
+      loadDraft = { ...curLoad(), [el.dataset.dial]: +el.value };
+      $(`dv-${el.dataset.dial}`).textContent = el.value;
+      $("ceil").textContent = `ceiling ${Math.round(ceilingOf(knobs()))}`;
+      if (!running) renderBody();
+      else
+        $("pfcSub").textContent =
+          `the brake · ceiling ${Math.round(ceilingOf(knobs()))}`;
+    }
+  });
+  function dialDone() {
+    if (!loadDraft || !writable()) return;
+    const next = { ...circuit(), load: loadDraft, loadDay: todayStr() };
+    loadDraft = null;
+    putCircuit(next);
+  }
+  document.addEventListener("pointerup", (e) => {
+    if (e.target.matches?.("[data-dial]")) setTimeout(dialDone, 0);
+  });
+  document.addEventListener("keyup", (e) => {
+    if (e.target.matches?.("[data-dial]")) dialDone();
+  });
+
+  // ---- keys ----
+  window.addEventListener("keydown", (e) => {
+    const el = e.target;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const typing =
+      el &&
+      (el.tagName === "INPUT" ||
+        el.tagName === "TEXTAREA" ||
+        el.tagName === "SELECT" ||
+        el.isContentEditable);
+    if (typing) {
+      if (e.key === "Escape") el.blur();
+      else if (e.key === "Enter" && el.id === "pwTitle") {
+        e.preventDefault();
+        keepDraft();
+      } else if (e.key === "Enter" && el.dataset.new) {
+        e.preventDefault();
+        addNamed(el);
+      } else if (e.key === "Enter" && (el.dataset.edit || el.dataset.edit2))
+        el.blur();
+      return;
+    }
+    // a focused button keeps its own space and enter
+    if (el && el.tagName === "BUTTON" && (e.key === " " || e.key === "Enter"))
+      return;
+    if (e.key === "/") {
+      e.preventDefault();
+      $("q").focus();
+    } else if (e.key === "Escape") close();
+    else if (e.key === " ") {
+      e.preventDefault();
+      poke();
+    } else if (e.key === "r") reset();
+    else if (e.key === "b" && within()[0]) press(within()[0]);
+    else if (e.key === "n") {
+      e.preventDefault();
+      begin();
+    }
+  });
+
+  // ---- hover on the sheet ----
+  $("sheet").addEventListener("pointermove", (e) => {
+    const el = e.target.closest("[data-node], [data-bend]");
+    if (el) showHover(e, el);
+    else hideHover();
+  });
+  $("sheet").addEventListener("pointerleave", hideHover);
+
+  // ---- begin ----
+  buildSheet();
+  sketch($("sheetPanel"), "alarm-sheet");
+  sketch($("reading"), "alarm-reading");
+  sketch($("circ"), "alarm-circuit");
+  sketch($("found"), "alarm-found");
+  const pwSketch = sketch($("pw"), "pathway-fresh", "var(--accent)");
+  loadStore();
+  if (isSpec()) openSpecimen();
+  render();
+</script>

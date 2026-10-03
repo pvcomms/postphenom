@@ -1,0 +1,3586 @@
+<title>Bearing</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Your values, drawn as one sheet. Set a decision down where you judge it sits and read what that placement says: which values it serves, which it is silent on. The sheet surfaces; you decide."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Karesansui at noon: ink on bone. One accent, terracotta, is only ever a
+     decision (its stone, its heading, its trail). The six value hues are only
+     ever the reader's values. Everything else is ink. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d71;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --value-0: #b08a3e;
+    --value-1: #4f5f8a;
+    --value-2: #5e7a4e;
+    --value-3: #7e5a78;
+    --value-4: #3f6b66;
+    --value-5: #8c5a45;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --grain-blend: multiply;
+    --grain: 0.06;
+  }
+  /* The same sheet after dark: sumi ink reversed. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #888172;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --value-0: #d2aa5a;
+      --value-1: #8393c4;
+      --value-2: #8dae78;
+      --value-3: #b48aad;
+      --value-4: #7fa8a1;
+      --value-5: #c4876a;
+      --grain-blend: screen;
+      --grain: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #888172;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --value-0: #d2aa5a;
+    --value-1: #8393c4;
+    --value-2: #8dae78;
+    --value-3: #b48aad;
+    --value-4: #7fa8a1;
+    --value-5: #c4876a;
+    --grain-blend: screen;
+    --grain: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    color-scheme: inherit;
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 3.4vw, 40px);
+    padding-block: 0 88px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .wrap {
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .hand {
+    font-style: italic;
+    letter-spacing: 0.004em;
+  }
+  .ink {
+    color: var(--ink);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .faint {
+    color: var(--faint);
+  }
+  .acc {
+    color: var(--accent);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: 24px 56px;
+    align-items: end;
+    padding-block: 52px 28px;
+  }
+  .mast .meta {
+    margin-bottom: 18px;
+  }
+  .mast h1 {
+    font-size: clamp(52px, 8vw, 92px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    font-size: clamp(18px, 2vw, 21px);
+    line-height: 1.4;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+
+  /* which sheet is this */
+  .mode {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    padding-block: 12px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .mode .tag {
+    color: var(--accent);
+  }
+  .mode .what {
+    flex: 1 1 22rem;
+    font-size: 15.5px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .mode .acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 6px 11px;
+    line-height: 1.2;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--ink) 30%, var(--rule));
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.go {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+  }
+  .chip.go:hover {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  /* the bench: the sheet, and the desk beside it */
+  .bench {
+    margin-top: 24px;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    align-items: start;
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .sketched {
+    border-color: transparent;
+  }
+  .sheet-panel {
+    padding: 12px;
+  }
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  #sheet {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 900 / 640;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .b-mono {
+    font-family: var(--mono);
+  }
+  .b-hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  #sheet text {
+    pointer-events: none;
+  }
+  /* The rings draw on one after another, each from where the pen landed. */
+  #sheet .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 1100ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 130ms + 120ms);
+  }
+  #sheet .b-tint,
+  #sheet .b-lens {
+    transition: fill-opacity 260ms var(--ease);
+  }
+  #sheet .b-ring path,
+  #sheet .b-label,
+  #sheet .b-stone,
+  #sheet .b-lead,
+  #sheet .b-trail {
+    transition: opacity 260ms var(--ease);
+  }
+  #sheet .b-handle {
+    cursor: grab;
+  }
+  #sheet .b-handle:active {
+    cursor: grabbing;
+  }
+  /* A stone set down: it lands, rather than appears. */
+  #sheet .b-set {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: b-set 520ms var(--ease) both;
+  }
+  @keyframes b-set {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* the caption under the sheet: what is under the pointer, or held */
+  .caption {
+    position: relative;
+    margin-top: 8px;
+    min-height: 5.2rem;
+    padding: 2px 0 2px 12px;
+    border-left: 2px solid var(--rule);
+    transition: border-color 220ms var(--ease);
+  }
+  .caption .say {
+    margin-top: 4px;
+    font-size: 15.5px;
+    line-height: 1.35;
+  }
+  .caption .body {
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .caption .region {
+    margin-top: 2px;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .inline {
+    font: inherit;
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 160ms var(--ease);
+  }
+  .inline:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  /* the desk */
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    min-width: 0;
+  }
+  .search {
+    display: block;
+    width: 100%;
+    font: inherit;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 8px 12px;
+    outline: none;
+    transition:
+      border-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  /* The outline is replaced, not removed: a ring in the accent. */
+  .search:focus,
+  .search:focus-visible {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--rule));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .search::placeholder {
+    color: var(--faint);
+  }
+  textarea.search {
+    resize: vertical;
+    line-height: 1.45;
+  }
+  #draft {
+    margin-top: 8px;
+  }
+  .hint {
+    margin-top: 6px;
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+
+  .reading {
+    padding: 18px;
+  }
+  .reading .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .reading h2 {
+    font-style: italic;
+    font-size: 23px;
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+  .reading .region {
+    margin-top: 4px;
+    font-size: 21px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .reading .prose {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .reading .moved {
+    margin-top: 6px;
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+  .reading .part {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .reading textarea {
+    margin-top: 16px;
+    font-style: italic;
+    font-size: 16px;
+  }
+  .reading .foot {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .reading .chip {
+    margin-top: 12px;
+  }
+  .textbtn {
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .textbtn:hover {
+    color: var(--ink);
+  }
+  .stones {
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .stones li {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .gone {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 8px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    animation: fade 220ms var(--ease) both;
+  }
+  .gone span {
+    min-width: 0;
+    flex: 1;
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .rows {
+    margin-top: 6px;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    gap: 9px;
+    padding-block: 4px;
+    text-align: left;
+    transition: color 160ms var(--ease);
+  }
+  .row .dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    transform: translateY(-1px);
+  }
+  .row .t {
+    position: relative;
+    min-width: 0;
+    flex: 1;
+  }
+  .row .t > span {
+    display: block;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.25;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 160ms var(--ease);
+  }
+  .row[aria-current] .t > span,
+  .row:hover .t > span,
+  .row:hover .vname,
+  .row[aria-pressed="true"] .vname {
+    color: var(--ink);
+  }
+  .row .where {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+  }
+  .row .where i {
+    font-style: normal;
+    opacity: 0.75;
+  }
+  .row.v {
+    align-items: center;
+  }
+  .row.v .dot {
+    width: 7px;
+    height: 7px;
+    transform: none;
+  }
+  .vname {
+    position: relative;
+    font-size: 15px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .row .n {
+    margin-left: auto;
+  }
+  .vstones {
+    margin: 0 0 8px 16px;
+  }
+  .split {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .note-foot {
+    margin-top: 12px;
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+
+  /* the notes: where the values find what is about them */
+  .notes .line {
+    margin-top: 6px;
+    font-size: 14.5px;
+    line-height: 1.4;
+  }
+  .notes .acts {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .vh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+  }
+  .vh:focus-visible + label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  label.chip {
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  /* the values, edited in place */
+  .editor {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .editor .seg {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 0 4px;
+    color: var(--faint);
+    transition: color 180ms var(--ease);
+  }
+  .editor .seg:hover,
+  .editor .seg[aria-pressed="true"] {
+    color: var(--ink);
+  }
+  .editor .ed-value {
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+  }
+  .swatches {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    transition: transform 180ms var(--ease);
+  }
+  .swatch:hover {
+    transform: scale(1.25);
+  }
+  .swatch[aria-checked="true"] {
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 3.5px var(--sw);
+  }
+  .arrow {
+    padding: 2px 6px;
+    color: var(--faint);
+    font-family: var(--mono);
+    transition: color 160ms var(--ease);
+  }
+  .arrow:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .ed-name {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-block: 6px;
+  }
+  .ed-blurb {
+    margin-top: 6px;
+    font-size: 14.5px;
+    padding-block: 6px;
+  }
+  .terms {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .term {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 3px 1px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .term button {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    line-height: 1;
+    color: var(--faint);
+    transition:
+      color 160ms var(--ease),
+      background-color 160ms var(--ease);
+  }
+  .term button:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+  .terms .search {
+    flex: 1;
+    min-width: 9rem;
+    width: auto;
+    font-size: 13px;
+    padding: 3px 8px;
+  }
+  .ed-region .head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .ed-region .head .dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+  }
+  .ed-region .names {
+    margin-left: auto;
+    min-width: 0;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--faint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ed-region .search {
+    margin-top: 6px;
+    padding-block: 4px;
+  }
+  .ed-region .rname {
+    font-style: italic;
+    font-size: 16px;
+  }
+  .ed-region .rblurb {
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .ed-regions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  /* below the bench: what the sheet is for */
+  .about {
+    margin-top: 72px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 40rem);
+    gap: 16px 48px;
+  }
+  .about .claim {
+    font-size: clamp(20px, 2.2vw, 24px);
+    line-height: 1.38;
+    letter-spacing: -0.005em;
+  }
+  .about p + p {
+    margin-top: 1em;
+  }
+  .keys {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px 18px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .keys dt {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    padding-top: 2px;
+  }
+  .keys dd {
+    margin: 0;
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    color: var(--faint);
+  }
+
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .gone,
+    .sketch .draw,
+    #sheet .b-set {
+      animation: none;
+    }
+    #sheet .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 40px;
+    }
+    .sheet-panel {
+      padding: 6px;
+    }
+    .about {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 56px;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast rise">
+    <div>
+      <p class="meta faint">
+        Center for Applied Post-Phenomenology · Instrument
+      </p>
+      <h1>Bearing</h1>
+    </div>
+    <p class="deck hand">
+      Your values, drawn as one sheet. Set a decision down where you judge it
+      sits and read what that placement says. The sheet surfaces; you decide.
+    </p>
+  </header>
+
+  <div class="mode rise" id="mode" style="animation-delay: 40ms"></div>
+
+  <div class="bench">
+    <section
+      class="panel sketched sheet-panel rise"
+      id="sheetPanel"
+      aria-label="The bearing"
+      style="animation-delay: 60ms"
+    >
+      <svg
+        id="sheet"
+        viewBox="0 0 900 640"
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+      ></svg>
+      <div class="caption" id="caption" aria-live="polite"></div>
+    </section>
+
+    <aside class="desk rise" id="desk" style="animation-delay: 140ms">
+      <form id="draftForm" autocomplete="off">
+        <label class="meta faint" id="draftLabel" for="draft"
+          >set a decision down</label
+        >
+        <input
+          id="draft"
+          class="search"
+          maxlength="200"
+          autocomplete="off"
+          placeholder="the thing you are weighing  /"
+        />
+        <p class="hint hand faint" id="draftHint"></p>
+      </form>
+
+      <section
+        class="panel sketched reading"
+        id="reading"
+        aria-label="The reading"
+        hidden
+      >
+        <div id="readingBody"></div>
+      </section>
+
+      <div class="gone" id="gone" role="status" hidden></div>
+
+      <section id="decisions" aria-label="Decisions" hidden></section>
+
+      <section id="values" aria-label="Values"></section>
+
+      <section class="notes" id="notes" aria-label="Notes"></section>
+    </aside>
+  </div>
+
+  <section class="about" aria-label="What the bearing argues">
+    <p class="meta faint">The claim</p>
+    <div>
+      <p class="claim">
+        Where a decision sits among your values is a judgment, and a sheet
+        cannot make it for you. What a sheet can do is take the judgment you
+        made with your hand and read it back in words you can argue with: which
+        values it serves, which it is silent on, what the overlap is called, and
+        how the judgment moved since you first set it down.
+      </p>
+      <p class="muted" style="margin-top: 1em">
+        Nothing on the sheet ranks or scores. Outside every circle is allowed to
+        be the honest answer. A heading drawn from a decision says what the move
+        would gain, leave and keep, and stops there. The notes about each value
+        are found by matching the words you gave it against titles, tags and
+        first lines, never bodies: a value named once in passing is not what a
+        note is about.
+      </p>
+      <dl class="keys">
+        <dt>hover · click</dt>
+        <dd>read a value or an overlap; click to hold it lit</dd>
+        <dt>double-click</dt>
+        <dd>set a stone down there, then name it</dd>
+        <dt>drag</dt>
+        <dd>move a stone, or the tip of its heading</dd>
+        <dt>← → ↑ ↓</dt>
+        <dd>nudge the chosen stone; with shift, further</dd>
+        <dt>/</dt>
+        <dd>type a decision</dd>
+        <dt>esc</dt>
+        <dd>think again; let go of what is held</dd>
+      </dl>
+      <p class="muted" style="margin-top: 1.4em">
+        Your sheet, its values and its decisions, is kept in this browser and
+        nowhere else. A folder of notes you open is read in the page, never
+        uploaded, and forgotten when you leave.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="meta">Bearing · CAPP · prototype, October 2026</span>
+    <span class="meta">No network · kept in this browser only</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  // ── the bearing: geometry, readings, words. Ported by hand from niwa's
+  //    lib/bearing.ts; the maths and the sentences are unchanged. Pure. ──────
+
+  /** The sheet's frame: every coordinate below is in these units. */
+  const FRAME = { w: 900, h: 640 };
+  /** How many value hues the palette carries. */
+  const HUES = 6;
+
+  /**
+   * Pre-solved geometry. Placing circles so that named overlaps are real
+   * regions is a geometry problem, not a slider; these two were solved by hand.
+   */
+  const LAYOUTS = {
+    3: {
+      slots: [
+        { cx: 450, cy: 233.5, r: 195, lx: 450, ly: 28, anchor: "middle" },
+        { cx: 350, cy: 406.7, r: 195, lx: 145, ly: 412, anchor: "end" },
+        { cx: 550, cy: 406.7, r: 195, lx: 755, ly: 412, anchor: "start" },
+      ],
+      pairs: [
+        { ids: [0, 1], ax: 361, ay: 297.6 },
+        { ids: [0, 2], ax: 539, ay: 297.6 },
+        { ids: [1, 2], ax: 450, ay: 451.7 },
+      ],
+      triple: { ids: [0, 1, 2], mx: 450, my: 349 },
+    },
+    5: {
+      slots: [
+        { cx: 300, cy: 255, r: 178, lx: 300, ly: 60, anchor: "middle" },
+        { cx: 560, cy: 255, r: 178, lx: 560, ly: 60, anchor: "middle" },
+        { cx: 430, cy: 445, r: 152, lx: 430, ly: 617, anchor: "middle" },
+        { cx: 190, cy: 420, r: 115, lx: 120, ly: 290, anchor: "middle" },
+        { cx: 665, cy: 430, r: 112, lx: 795, ly: 415, anchor: "middle" },
+      ],
+      pairs: [
+        { ids: [0, 1], ax: 430, ay: 225 },
+        { ids: [0, 3], ax: 221, ay: 358 },
+        { ids: [0, 2], ax: 352, ay: 380 },
+        { ids: [1, 2], ax: 512, ay: 380 },
+        { ids: [1, 4], ax: 637, ay: 362 },
+        { ids: [2, 3], ax: 286, ay: 470 },
+        { ids: [2, 4], ax: 571, ay: 463 },
+      ],
+      triple: { ids: [0, 1, 2], mx: 430, my: 325 },
+    },
+  };
+
+  /** The sample five: what the specimen's made-up person values. */
+  const DEFAULT_CONFIG = {
+    layout: 5,
+    values: [
+      {
+        id: "craft",
+        name: "craft",
+        blurb: "Made properly, including the parts nobody will check.",
+        terms: ["craft", "quality", "made", "design"],
+      },
+      {
+        id: "candour",
+        name: "candour",
+        blurb: "Said plainly, error bars left in.",
+        terms: ["candour", "honest", "plain", "truth"],
+      },
+      {
+        id: "curiosity",
+        name: "curiosity",
+        blurb: "Followed because it pulled, not because it paid.",
+        terms: ["curiosity", "question", "wonder", "learn"],
+      },
+      {
+        id: "care",
+        name: "care",
+        blurb: "Someone is on the other end of it.",
+        terms: ["care", "kind", "people", "family"],
+      },
+      {
+        id: "quiet",
+        name: "quiet",
+        blurb: "Kept small, kept close, not for a feed.",
+        terms: ["quiet", "private", "local", "small"],
+      },
+    ],
+    regions: {
+      "candour+craft": {
+        name: "the honest object",
+        blurb: "made well and described exactly.",
+      },
+      "care+craft": { name: "made for someone", blurb: "the good room." },
+      "craft+curiosity": {
+        name: "the rabbit hole, finished",
+        blurb: "followed all the way down and built at the bottom.",
+      },
+      "candour+curiosity": {
+        name: "the open question",
+        blurb: "asked out loud, answer unknown.",
+      },
+      "candour+quiet": {
+        name: "the private ledger",
+        blurb: "true, and not for show.",
+      },
+      "care+curiosity": {
+        name: "asking after",
+        blurb: "curious about a person, not a topic.",
+      },
+      "curiosity+quiet": {
+        name: "for its own sake",
+        blurb: "nobody watching, still doing it.",
+      },
+      "candour+craft+curiosity": {
+        name: "the work worth doing",
+        blurb: "rare on purpose.",
+      },
+    },
+  };
+
+  const keyOf = (ids) => [...ids].sort().join("+");
+
+  /** Every region of a layout that can carry a name: the pure pairs, and the triple. */
+  function regionsOf(layout) {
+    return [
+      ...layout.pairs.map((p) => [...p.ids]),
+      ...(layout.triple ? [[...layout.triple.ids]] : []),
+    ];
+  }
+
+  /**
+   * Set a decision down somewhere. Moving it on the day it was last set down
+   * just moves it; moving it on a later day keeps where it was, and since
+   * when, so the sheet can show how the judgment travelled.
+   */
+  function setDown(b, at, today) {
+    if (!b.at) return { ...b, at, since: today };
+    if (b.since === today) return { ...b, at };
+    return {
+      ...b,
+      at,
+      since: today,
+      trail: [...b.trail, [b.at[0], b.at[1], b.since]],
+    };
+  }
+
+  /** Which circles a point of the sheet falls inside, as slot indices in order. */
+  function slotsAt(layout, p) {
+    const out = [];
+    layout.slots.forEach((s, i) => {
+      const dx = p[0] - s.cx;
+      const dy = p[1] - s.cy;
+      if (dx * dx + dy * dy <= s.r * s.r) out.push(i);
+    });
+    return out;
+  }
+
+  /**
+   * One short code per value for the set expressions: the shortest prefix of
+   * its name that no other value shares, so "taste" and "trust" read as Ta
+   * and Tr, and "care" beside "candour" as Car and Can.
+   */
+  function codes(values) {
+    const names = values.map((v) => v.name.trim().toLowerCase() || "?");
+    return names.map((n, i) => {
+      let k = 1;
+      while (
+        k < n.length &&
+        names.some((o, j) => j !== i && o.slice(0, k) === n.slice(0, k))
+      )
+        k++;
+      const p = n.slice(0, k);
+      return p.charAt(0).toUpperCase() + p.slice(1);
+    });
+  }
+
+  /** `T ∩ P`, or the complement when the point is in no value at all. */
+  function expression(inside, values) {
+    const c = codes(values);
+    if (inside.length === 0) return `𝒰 ∖ (${c.join(" ∪ ")})`;
+    return inside.map((i) => c[i]).join(" ∩ ");
+  }
+
+  /** The name the reader gave this region, if they gave it one. */
+  function regionName(inside, config) {
+    if (inside.length === 0) return null;
+    if (inside.length === 1) {
+      const v = config.values[inside[0]];
+      return { name: v.name, blurb: v.blurb };
+    }
+    return (
+      config.regions[keyOf(inside.map((i) => config.values[i].id))] ?? null
+    );
+  }
+
+  /** "a, b and c" */
+  function andList(names) {
+    if (names.length <= 1) return names.join("");
+    return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  }
+
+  /** What a placement says, in words the reader can argue with. */
+  function prose(inside, values) {
+    const serves = inside.map((i) => values[i].name);
+    const silent = values
+      .filter((_, i) => !inside.includes(i))
+      .map((v) => v.name);
+    if (serves.length === 0) return "outside every value you drew.";
+    if (silent.length === 0)
+      return `serves ${andList(serves)} — all of them at once.`;
+    return `serves ${andList(serves)}. silent on ${andList(silent)}.`;
+  }
+
+  /** The difference a heading makes: what it walks into, out of, and keeps. */
+  function heading(from, to, values) {
+    const name = (i) => values[i].name;
+    return {
+      gains: to.filter((i) => !from.includes(i)).map(name),
+      leaves: from.filter((i) => !to.includes(i)).map(name),
+      keeps: from.filter((i) => to.includes(i)).map(name),
+    };
+  }
+
+  function headingProse(from, to, values) {
+    const h = heading(from, to, values);
+    const parts = [];
+    if (h.gains.length) parts.push(`gains ${andList(h.gains)}`);
+    if (h.leaves.length) parts.push(`leaves ${andList(h.leaves)}`);
+    if (!parts.length)
+      return h.keeps.length
+        ? `stays within ${andList(h.keeps)}.`
+        : "stays outside every value.";
+    if (h.keeps.length) parts.push(`keeps ${andList(h.keeps)}`);
+    return `${parts.join(" · ")}.`;
+  }
+
+  /**
+   * The notes that are about a value: a term found in the title, the tags or
+   * the first line. Ranked by how many terms hit, then by how connected the
+   * note is. Bodies are not searched.
+   */
+  function stonesFor(value, nodes, limit = 6) {
+    const terms = value.terms.map((t) => t.toLowerCase()).filter(Boolean);
+    if (!terms.length) return [];
+    const scored = [];
+    for (const n of nodes) {
+      if (n.kind === "ghost" || n.kind === "repo") continue;
+      const hay =
+        `${n.label}\n${(n.tags ?? []).join(" ")}\n${n.description}`.toLowerCase();
+      const hits = terms.filter((t) => hay.includes(t)).length;
+      if (hits) scored.push({ n, hits });
+    }
+    scored.sort((a, b) => b.hits - a.hits || b.n.degree - a.n.degree);
+    return scored.slice(0, limit).map((s) => s.n);
+  }
+
+  function slugOf(title) {
+    const s = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60);
+    return s || "decision";
+  }
+
+  /** Validation at the boundary: stored values may be from an older page, or wrong. */
+  function validateConfig(input) {
+    const c = input;
+    if (!c || typeof c !== "object") throw new Error("values: not an object");
+    const layout = c.layout === 3 ? 3 : c.layout === 5 ? 5 : null;
+    if (!layout) throw new Error("values: layout must be 3 or 5");
+    if (!Array.isArray(c.values) || c.values.length !== layout)
+      throw new Error(`values: need exactly ${layout} values for this layout`);
+    const values = c.values.map((v, i) => {
+      if (!v || typeof v !== "object" || !v.name)
+        throw new Error(`values: value ${i} has no name`);
+      const hue = Number(v.hue);
+      return {
+        id: String(v.id ?? slugOf(String(v.name))),
+        name: String(v.name),
+        blurb: String(v.blurb ?? ""),
+        terms: Array.isArray(v.terms) ? v.terms.map(String) : [String(v.name)],
+        ...(Number.isInteger(hue) && hue >= 0 && hue < HUES ? { hue } : {}),
+      };
+    });
+    const ids = new Set(values.map((v) => v.id));
+    if (ids.size !== values.length)
+      throw new Error("values: ids must be unique");
+    const regions = {};
+    for (const [k, r] of Object.entries(c.regions ?? {})) {
+      const key = keyOf(k.split("+").map((s) => s.trim()));
+      if (!key.split("+").every((id) => ids.has(id))) continue;
+      regions[key] = {
+        name: String(r?.name ?? ""),
+        blurb: String(r?.blurb ?? ""),
+      };
+    }
+    return { layout, values, regions };
+  }
+
+  // A decision read back from storage, checked the way niwa's route checked a write.
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const ptOf = (v) =>
+    Array.isArray(v) &&
+    v.length === 2 &&
+    v.every((n) => Number.isFinite(Number(n)))
+      ? [Number(v[0]), Number(v[1])]
+      : null;
+  const dayOr = (v, fallback) =>
+    typeof v === "string" && DAY.test(v) ? v : fallback;
+  function cleanBearing(b) {
+    if (!b || typeof b.title !== "string" || !b.title.trim()) return null;
+    const title = b.title.trim().slice(0, 200);
+    const placed = dayOr(b.placed, today());
+    const trail = Array.isArray(b.trail)
+      ? b.trail.flatMap((e) => {
+          const p = Array.isArray(e) ? ptOf(e.slice(0, 2)) : null;
+          return p && typeof e[2] === "string" && DAY.test(e[2])
+            ? [[p[0], p[1], e[2]]]
+            : [];
+        })
+      : [];
+    return {
+      slug: typeof b.slug === "string" && b.slug ? b.slug : slugOf(title),
+      title,
+      placed,
+      since: dayOr(b.since, placed),
+      at: ptOf(b.at),
+      leads: ptOf(b.leads),
+      note: typeof b.note === "string" ? b.note.slice(0, 20000) : "",
+      trail: trail.slice(-40),
+    };
+  }
+
+  // ── the hand: deterministic pen strokes, ported from niwa's lib/hand.ts ──
+
+  /** mulberry32 — small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const fx = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b, a cubic a little off the straight line. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${fx(s[0])} ${fx(s[1])}C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(e[0])} ${fx(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** Catmull-Rom through the points, as cubics. */
+  function smooth(pts) {
+    let d = `M${fx(pts[0][0])} ${fx(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${fx(c1[0])} ${fx(c1[1])} ${fx(c2[0])} ${fx(c2[1])} ${fx(p2[0])} ${fx(p2[1])}`;
+    }
+    return d;
+  }
+
+  /** The circling: once round a w×h box and a little past its own start. */
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** A path of M, C and L, sampled into points per subpath. */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${fx(q[0])} ${fx(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  // ── the specimen: a made-up person's sheet, and the notes it reads ──────
+
+  const SPECIMEN_BEARINGS = [
+    {
+      slug: "finish-the-book-before-taking-new-clients",
+      title: "Finish the book before taking new clients",
+      placed: "2026-08-12",
+      since: "2026-09-02",
+      at: [418, 300],
+      leads: null,
+      note: "First I put it in craft and candour only. Then I saw why I want to write it at all.",
+      trail: [[440, 180, "2026-08-12"]],
+    },
+    {
+      slug: "say-no-to-the-conference-talk",
+      title: "Say no to the conference talk",
+      placed: "2026-09-08",
+      since: "2026-09-08",
+      at: [650, 330],
+      leads: null,
+      note: "Honest reason: I have nothing new to say yet.",
+      trail: [],
+    },
+    {
+      slug: "move-the-newsletter-behind-a-paywall",
+      title: "Move the newsletter behind a paywall",
+      placed: "2026-09-21",
+      since: "2026-09-21",
+      at: [812, 590],
+      leads: [700, 500],
+      note: "Outside all five, as it stands. A paid list of forty readers would at least be small.",
+      trail: [],
+    },
+    {
+      slug: "call-dad-on-sundays-instead-of-texting",
+      title: "Call Dad on Sundays instead of texting",
+      placed: "2026-08-20",
+      since: "2026-09-14",
+      at: [130, 500],
+      leads: null,
+      note: "",
+      trail: [[90, 590, "2026-08-20"]],
+    },
+    {
+      slug: "learn-to-sail-this-winter",
+      title: "Learn to sail this winter",
+      placed: "2026-09-30",
+      since: "2026-09-30",
+      at: null,
+      leads: null,
+      note: "",
+      trail: [],
+    },
+  ];
+
+  // Sixteen invented notes. Only their titles, tags and first lines are read.
+  const SPECIMEN_NOTES = [
+    [
+      "On finishing the parts nobody checks",
+      ["craft"],
+      "The back of the drawer is made too.",
+      7,
+      "2026-09-12",
+    ],
+    [
+      "Design notes for the reading lamp",
+      ["design"],
+      "Brass, linen cord, one switch, made to be mended.",
+      3,
+      "2026-07-30",
+    ],
+    [
+      "Writing plainly about money",
+      ["candour"],
+      "Say the number, then the error bars.",
+      5,
+      "2026-09-03",
+    ],
+    [
+      "An honest invoice",
+      [],
+      "Line items a client can argue with.",
+      2,
+      "2026-06-18",
+    ],
+    [
+      "Questions I keep coming back to",
+      ["curiosity"],
+      "Why tides lag the moon. Why bread goes stale.",
+      6,
+      "2026-09-20",
+    ],
+    [
+      "Learning the Japanese joinery cuts",
+      ["craft"],
+      "Twelve weeks of sawing badly, so I could learn.",
+      4,
+      "2026-08-08",
+    ],
+    [
+      "Sunday calls",
+      ["family"],
+      "What Dad remembers, written down after.",
+      5,
+      "2026-09-14",
+    ],
+    [
+      "Being kind without being agreeable",
+      ["care"],
+      "Care is not the same as comfort.",
+      3,
+      "2026-05-02",
+    ],
+    [
+      "A small local web",
+      ["quiet"],
+      "Pages for twelve people, not twelve thousand.",
+      4,
+      "2026-08-27",
+    ],
+    [
+      "Keeping a private ledger",
+      [],
+      "True, and not for show.",
+      2,
+      "2026-04-11",
+    ],
+    [
+      "The wonder log",
+      [],
+      "Things that stopped me on the street.",
+      1,
+      "2026-09-29",
+    ],
+    [
+      "Why I left the group chat",
+      ["people"],
+      "Too many people, too little said.",
+      2,
+      "2026-07-06",
+    ],
+    [
+      "Truth in the margins",
+      [],
+      "Footnotes are where the honest part goes.",
+      3,
+      "2026-06-01",
+    ],
+    [
+      "Quality is a habit, not a pass",
+      [],
+      "Nobody reviews the tenth draft.",
+      2,
+      "2026-03-22",
+    ],
+    [
+      "Notes on the book's second draft",
+      ["writing"],
+      "Cut the chapter that was only for show.",
+      8,
+      "2026-10-01",
+    ],
+    ["Reading list, autumn", ["reading"], "", 1, "2026-09-25"],
+  ].map(([label, tags, description, degree, modified]) => ({
+    id: `specimen:${slugOf(label)}`,
+    label,
+    kind: "garden",
+    tags,
+    description,
+    degree,
+    modified,
+  }));
+
+  // ── your own notes: a folder of markdown, read in the page ─────────────
+
+  const normRef = (s) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\.md$/, "")
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+
+  /** Lenient frontmatter: `key: value`, `key: [a, b]`, and `- item` lists. */
+  function frontmatter(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    let listKey = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s*-\s+(.*)$/);
+      if (item && listKey) {
+        data[listKey].push(item[1].trim().replace(/^["']|["']$/g, ""));
+        continue;
+      }
+      const field = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, key, rawValue] = field;
+      const value = rawValue.trim();
+      if (!value) {
+        data[key] = [];
+        listKey = key;
+        continue;
+      }
+      listKey = null;
+      if (/^\[.*\]$/.test(value))
+        data[key] = value
+          .slice(1, -1)
+          .split(",")
+          .map((s) => s.trim().replace(/^["']|["']$/g, ""))
+          .filter(Boolean);
+      else data[key] = value.replace(/^["']|["']$/g, "");
+    }
+    return { data, content: m[2] };
+  }
+
+  const firstLine = (body) => {
+    for (const line of body.split(/\r?\n/)) {
+      const t = line.trim();
+      if (!t || /^(#|>|```|---|\||!\[)/.test(t)) continue;
+      return t.replace(/\[\[([^\]|]*)(?:\|[^\]]*)?\]\]/g, "$1").slice(0, 240);
+    }
+    return "";
+  };
+
+  /**
+   * Notes as niwa's garden reads its vault: one note per file, named by its
+   * slug; the title from frontmatter; `[[links]]` and `related:` resolved by
+   * slug, then by name; a note named in another's prose is a mention. Each
+   * thread adds one to both ends' degree, which only breaks ties here.
+   */
+  function gardenOf(files) {
+    const nodes = [];
+    const bodies = new Map();
+    const bySlug = new Map();
+    const byNorm = new Map();
+    const related = new Map();
+    for (const f of files) {
+      const { data, content } = frontmatter(f.raw);
+      const label =
+        typeof data.title === "string" && data.title.trim()
+          ? data.title.trim()
+          : f.slug;
+      const summary =
+        typeof data.summary === "string"
+          ? data.summary
+          : typeof data.description === "string"
+            ? data.description
+            : firstLine(content);
+      const tended =
+        typeof data.tended === "string" ? new Date(data.tended) : null;
+      const modified =
+        tended && !Number.isNaN(tended.getTime()) ? tended : new Date(f.mtime);
+      const tags = Array.isArray(data.topics)
+        ? data.topics
+        : Array.isArray(data.tags)
+          ? data.tags
+          : typeof data.tags === "string"
+            ? data.tags.split(/[,\s]+/).filter(Boolean)
+            : [];
+      const id = `note:${f.path}`;
+      const node = {
+        id,
+        label,
+        kind: "note",
+        description: summary === label ? "" : summary,
+        tags: tags.map(String),
+        degree: 0,
+        modified: Number.isNaN(modified.getTime())
+          ? null
+          : modified.toISOString(),
+      };
+      nodes.push(node);
+      bodies.set(id, content);
+      if (!bySlug.has(f.slug)) bySlug.set(f.slug, id);
+      for (const k of [normRef(f.slug), normRef(label)])
+        if (k && !byNorm.has(k)) byNorm.set(k, id);
+      if (Array.isArray(data.related)) related.set(id, data.related);
+    }
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const seen = new Set();
+    const joined = new Set();
+    const pair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const addLink = (s, t, kind) => {
+      if (s === t) return;
+      const key = `${s}→${t}:${kind}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      joined.add(pair(s, t));
+      const a = byId.get(s);
+      const b = byId.get(t);
+      if (a) a.degree++;
+      if (b) b.degree++;
+    };
+    const resolve = (ref) =>
+      bySlug.get(ref.trim()) || byNorm.get(normRef(ref)) || null;
+    for (const [id, refs] of related)
+      for (const ref of refs) {
+        const t = resolve(String(ref));
+        if (t) addLink(id, t, "link");
+      }
+    for (const [id, body] of bodies) {
+      const prose = body.replace(/```[\s\S]*?```|`[^`\n]*`/g, (m) =>
+        " ".repeat(m.length),
+      );
+      for (const m of body.matchAll(
+        /\[\[([^\]\[\n`|#]{2,80})(?:[|#][^\]\n]*)?\]\]/g,
+      )) {
+        const ref = m[1].replace(/\\$/, "").trim();
+        if (!ref || /^[^A-Za-z0-9]/.test(ref)) continue;
+        const t = resolve(ref);
+        if (t) addLink(id, t, "link");
+        else if (prose[m.index] === "[")
+          addLink(id, `ghost:${normRef(ref)}`, "seed");
+      }
+    }
+    // Mentions: a note named in another's prose, where no thread joins them yet.
+    const named = nodes
+      .filter(
+        (n) =>
+          /\s/.test(n.label.trim()) &&
+          n.label.trim().length >= 10 &&
+          /^[A-Za-z]/.test(n.label) &&
+          !/_/.test(n.label),
+      )
+      .map((n) => ({
+        id: n.id,
+        label: n.label.trim(),
+        lower: n.label.trim().toLowerCase(),
+        exact: n.label.trim().split(/\s+/).length <= 2,
+        re: null,
+      }));
+    if (nodes.length <= 3000)
+      for (const [id, body] of bodies) {
+        const prose = body
+          .replace(/\[\[[^\]\n]*\]\]/g, " ")
+          .replace(/\]\([^)\n]*\)/g, "]");
+        const lower = prose.toLowerCase();
+        for (const t of named) {
+          if (t.id === id || !lower.includes(t.lower)) continue;
+          if (joined.has(pair(id, t.id))) continue;
+          t.re ??= new RegExp(
+            `(?<![\\w-])${t.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`,
+            t.exact ? "" : "i",
+          );
+          if (t.re.test(prose)) addLink(id, t.id, "mention");
+        }
+      }
+    return nodes;
+  }
+
+  // ── state ───────────────────────────────────────────────────────────────
+
+  const KEY = "pp-bearing";
+  const EDGE = { x0: 28, y0: 26, x1: FRAME.w - 28, y1: FRAME.h - 28 };
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  const today = () => new Date().toISOString().slice(0, 10);
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const same = (a, b) => a.length === b.length && a.every((n, i) => n === b[i]);
+  const short = (s, n) => (s.length > n ? `${s.slice(0, n)}…` : s);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const day = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso || "—";
+    const sameYear = d.getFullYear() === new Date().getFullYear();
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      ...(sameYear ? {} : { year: "numeric" }),
+    });
+  };
+  const shortDay = (iso) => {
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime())
+      ? iso
+      : d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  };
+
+  function freshSpecimen() {
+    return {
+      config: clone(DEFAULT_CONFIG),
+      bearings: clone(SPECIMEN_BEARINGS),
+    };
+  }
+
+  function loadMine() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const d = JSON.parse(raw);
+      const seen = new Set();
+      const bearings = (Array.isArray(d.bearings) ? d.bearings : [])
+        .map(cleanBearing)
+        .filter((b) => b && !seen.has(b.slug) && seen.add(b.slug));
+      return { config: validateConfig(d.config), bearings };
+    } catch {
+      return null;
+    }
+  }
+
+  const S = {
+    mode: "specimen",
+    specimen: freshSpecimen(),
+    mine: null,
+    folder: null, // { nodes, name, files }
+    selected: null,
+    held: [],
+    hov: [],
+    hovFromDesk: false,
+    pointer: null,
+    dragging: null,
+    hoverSlug: null,
+    pendingAt: null,
+    editing: false,
+    focus: null,
+    focusPending: false,
+    kept: "idle",
+    gone: null,
+    note: "",
+    noteFor: null,
+    termDraft: {},
+    reduce: matchMedia("(prefers-reduced-motion: reduce)").matches,
+  };
+  S.mine = loadMine();
+  if (S.mine) S.mode = "own";
+
+  const sheetData = () => (S.mode === "own" ? S.mine : S.specimen);
+  const config = () => sheetData().config;
+  const bearings = () => sheetData().bearings;
+  const layoutNow = () => LAYOUTS[config().layout];
+  const gardenNodes = () =>
+    S.folder ? S.folder.nodes : S.mode === "specimen" ? SPECIMEN_NOTES : null;
+
+  function persist() {
+    if (S.mode !== "own") return;
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          config: S.mine.config,
+          bearings: S.mine.bearings,
+        }),
+      );
+      S.kept = "kept";
+    } catch {
+      S.kept = "error";
+    }
+  }
+
+  function setBearings(next, keep = true) {
+    sheetData().bearings = next;
+    if (keep) persist();
+  }
+
+  function setConfig(next) {
+    sheetData().config = next;
+    persist();
+    render();
+  }
+
+  // The notes about each value, worked out once per change of values or notes.
+  let stonesMemo = { key: "", map: new Map() };
+  function stones() {
+    const nodes = gardenNodes();
+    const vals = config().values;
+    const key = `${S.folder ? S.folder.stamp : S.mode}|${JSON.stringify(vals.map((v) => [v.id, v.terms]))}`;
+    if (stonesMemo.key === key) return stonesMemo.map;
+    const map = new Map();
+    if (nodes) for (const v of vals) map.set(v.id, stonesFor(v, nodes, 999));
+    stonesMemo = { key, map };
+    return map;
+  }
+
+  const hueOf = (i) => `var(--value-${config().values[i]?.hue ?? i})`;
+
+  // ── drawing in the hand on the page ─────────────────────────────────────
+
+  const NS = "http://www.w3.org/2000/svg";
+  let maskN = 0;
+  function el(tag, attrs = {}, parent) {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs))
+      if (v != null) n.setAttribute(k, v);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  const PEN = { box: 1.7, ring: 1.6, underline: 1.5 };
+  /** A pen line laid over the element it sits in, drawn on as it arrives. */
+  function sketch(
+    host,
+    { kind = "box", seed, color = "var(--pen)", draw = true },
+  ) {
+    const w = host.offsetWidth;
+    const h = host.offsetHeight;
+    if (!w || !h) return;
+    const s = seedOf(seed);
+    const pen = PEN[kind];
+    const line =
+      kind === "box"
+        ? roughRect(w, h, s)
+        : kind === "ring"
+          ? roughEllipse(w, h, s, { pad: 3, grow: 1.18 })
+          : roughUnderline(w, s, { y: h - 0.5 });
+    const ink = ribbon(line, pen, s);
+    let svg = host.querySelector(":scope > svg.sketch");
+    if (svg && svg.dataset.seed === seed) {
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.querySelector(".ink").setAttribute("d", ink);
+      const m = svg.querySelector(".draw");
+      if (m) m.setAttribute("d", line);
+      const mk = svg.querySelector("mask");
+      if (mk) {
+        mk.setAttribute("width", w + 80);
+        mk.setAttribute("height", h + 80);
+      }
+      return;
+    }
+    if (svg) svg.remove();
+    svg = el("svg", {
+      class: "sketch",
+      "aria-hidden": "true",
+      viewBox: `0 0 ${w} ${h}`,
+    });
+    svg.dataset.seed = seed;
+    const id = `sk${++maskN}`;
+    if (draw && !S.reduce) {
+      const mk = el(
+        "mask",
+        {
+          id,
+          maskUnits: "userSpaceOnUse",
+          x: -40,
+          y: -40,
+          width: w + 80,
+          height: h + 80,
+        },
+        el("defs", {}, svg),
+      );
+      el(
+        "path",
+        {
+          class: "draw",
+          d: line,
+          pathLength: 1,
+          fill: "none",
+          stroke: "white", // mask luminance: white reveals
+          "stroke-width": pen * 2 + 4,
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round",
+        },
+        mk,
+      );
+    }
+    el(
+      "path",
+      {
+        class: "ink",
+        d: ink,
+        fill: color,
+        mask: draw && !S.reduce ? `url(#${id})` : null,
+      },
+      svg,
+    );
+    host.appendChild(svg);
+  }
+
+  /** The two drawn boxes that live as long as the page, redrawn to size. */
+  const sheetPanel = document.getElementById("sheetPanel");
+  const readingPanel = document.getElementById("reading");
+  const panels = new ResizeObserver(() => {
+    sketch(sheetPanel, { seed: "bearing-sheet" });
+    if (!readingPanel.hidden && S.selected)
+      sketch(readingPanel, {
+        seed: `read-${S.selected}`,
+        color: "var(--accent)",
+      });
+  });
+  panels.observe(sheetPanel);
+  panels.observe(readingPanel);
+
+  // ── the sheet ───────────────────────────────────────────────────────────
+
+  const svg = document.getElementById("sheet");
+  let L = null; // the built sheet: element references for the current layout
+  let builtFor = null;
+
+  /** The parts of the sheet that only change with the layout. */
+  function buildSheet() {
+    const layout = layoutNow();
+    svg.textContent = "";
+    const defs = el("defs", {}, svg);
+    const bloom = el(
+      "filter",
+      { id: "b-bloom", x: "-20%", y: "-20%", width: "140%", height: "140%" },
+      defs,
+    );
+    el("feGaussianBlur", { stdDeviation: 6 }, bloom);
+    layout.slots.forEach((s, i) => {
+      el(
+        "circle",
+        { cx: s.cx, cy: s.cy, r: s.r },
+        el("clipPath", { id: `b-clip-${i}` }, defs),
+      );
+    });
+    const rings = layout.slots.map((s, i) => {
+      const seed = seedOf(`ring-${i}-${s.cx}`);
+      const line = roughEllipse(s.r * 2, s.r * 2, seed, {
+        wobble: 2.6,
+        pad: 0,
+        steps: 24,
+      });
+      return {
+        line,
+        rest: ribbon(line, 2.2, seed),
+        lit: ribbon(line, 3.6, seed + 1),
+      };
+    });
+    if (!S.reduce)
+      rings.forEach((r, i) => {
+        const mk = el(
+          "mask",
+          {
+            id: `b-draw-${i}`,
+            maskUnits: "userSpaceOnUse",
+            x: -20,
+            y: -20,
+            width: layout.slots[i].r * 2 + 40,
+            height: layout.slots[i].r * 2 + 40,
+          },
+          defs,
+        );
+        const p = el(
+          "path",
+          {
+            d: r.line,
+            pathLength: 1,
+            fill: "none",
+            stroke: "white", // mask luminance: white reveals
+            "stroke-width": 14,
+            "stroke-linecap": "round",
+            class: "draw",
+          },
+          mk,
+        );
+        p.style.setProperty("--i", i);
+      });
+
+    const tints = layout.slots.map((s) =>
+      el("circle", { class: "b-tint", cx: s.cx, cy: s.cy, r: s.r }, svg),
+    );
+    const lenses = layout.pairs.map((p) => {
+      const [a, b] = p.ids;
+      const g = el("g", { "clip-path": `url(#b-clip-${a})` }, svg);
+      const s = layout.slots[b];
+      return {
+        a,
+        b,
+        c: el("circle", { class: "b-lens", cx: s.cx, cy: s.cy, r: s.r }, g),
+      };
+    });
+    const ringEls = layout.slots.map((s, i) => {
+      const g = el(
+        "g",
+        {
+          class: "b-ring",
+          transform: `translate(${s.cx - s.r} ${s.cy - s.r})`,
+          mask: S.reduce ? null : `url(#b-draw-${i})`,
+        },
+        svg,
+      );
+      return {
+        glow: el("path", { d: rings[i].lit, filter: "url(#b-bloom)" }, g),
+        rest: el("path", { d: rings[i].rest }, g),
+        lit: el("path", { d: rings[i].lit }, g),
+      };
+    });
+    const names = layout.slots.map((s) =>
+      el(
+        "text",
+        {
+          class: "b-mono b-label",
+          x: s.lx,
+          y: s.ly,
+          "text-anchor": s.anchor,
+          "font-size": 14,
+          "letter-spacing": 2,
+          style: "text-transform:uppercase",
+        },
+        svg,
+      ),
+    );
+    const pairs = layout.pairs.map((p) => {
+      const g = el("g", { class: "b-label" }, svg);
+      return {
+        a: p.ids[0],
+        b: p.ids[1],
+        g,
+        name: el(
+          "text",
+          { class: "b-hand", x: p.ax, y: p.ay, "text-anchor": "middle" },
+          g,
+        ),
+        expr: el(
+          "text",
+          {
+            class: "b-mono",
+            x: p.ax,
+            y: p.ay + 13,
+            "text-anchor": "middle",
+            "font-size": 9,
+            "letter-spacing": 1.4,
+            fill: "var(--faint)",
+          },
+          g,
+        ),
+      };
+    });
+    const triple = layout.triple
+      ? el(
+          "text",
+          {
+            class: "b-hand b-label",
+            x: layout.triple.mx,
+            y: layout.triple.my,
+            "text-anchor": "middle",
+          },
+          svg,
+        )
+      : null;
+    const motes = [0, 1].map((i) => {
+      const g = el("g", { class: "b-mote", opacity: 0.75 }, svg);
+      return {
+        g,
+        c: el(
+          "circle",
+          { cx: i ? 800 : 120, cy: i ? 120 : 560, r: 4, fill: "var(--faint)" },
+          g,
+        ),
+        t: el(
+          "text",
+          { class: "b-hand", "font-size": 11.5, fill: "var(--faint)" },
+          g,
+        ),
+      };
+    });
+    const trails = el("g", {}, svg);
+    const leads = el("g", {}, svg);
+    const stoneLayer = el("g", {}, svg);
+    const pending = el("g", { "pointer-events": "none" }, svg);
+    const tray = el(
+      "text",
+      {
+        class: "b-hand",
+        x: FRAME.w - 24,
+        y: 30,
+        "text-anchor": "end",
+        "font-size": 13,
+        fill: "var(--faint)",
+      },
+      svg,
+    );
+    const reticle = el("g", { "pointer-events": "none" }, svg);
+    const cursor = el(
+      "text",
+      {
+        class: "b-mono",
+        x: 22,
+        y: 30,
+        "font-size": 10.5,
+        "letter-spacing": 1.2,
+        fill: "var(--muted)",
+        "pointer-events": "none",
+      },
+      svg,
+    );
+    L = {
+      layout,
+      tints,
+      lenses,
+      rings: ringEls,
+      names,
+      pairs,
+      triple,
+      motes,
+      trails,
+      leads,
+      stoneLayer,
+      stones: new Map(),
+      pending,
+      tray,
+      reticle,
+      cursor,
+    };
+    builtFor = config().layout;
+    startMotes();
+  }
+
+  const set = (n, attrs) => {
+    for (const [k, v] of Object.entries(attrs))
+      if (v == null) n.removeAttribute(k);
+      else if (n.getAttribute(k) !== String(v)) n.setAttribute(k, v);
+  };
+  const setText = (n, t) => {
+    if (n.textContent !== t) n.textContent = t;
+  };
+
+  /** A small ring in the hand, for the chosen stone. */
+  const ringMemo = new Map();
+  const chosenRing = (slug) => {
+    if (!ringMemo.has(slug))
+      ringMemo.set(
+        slug,
+        ribbon(
+          roughEllipse(24, 24, seedOf(slug), {
+            wobble: 1.1,
+            pad: 0,
+            steps: 12,
+          }),
+          1.5,
+          seedOf(slug),
+        ),
+      );
+    return ringMemo.get(slug);
+  };
+
+  function updateSheet() {
+    if (builtFor !== config().layout || !L) buildSheet();
+    const { layout } = L;
+    const cfg = config();
+    const values = cfg.values;
+    const all = bearings();
+    const lit = S.hov.length ? S.hov : S.held;
+    const selected = S.selected;
+    const quiet = (slug) =>
+      (selected !== null && selected !== slug) ||
+      (S.hoverSlug !== null && S.hoverSlug !== slug);
+
+    // the flood, the lenses, the rings, the names
+    L.tints.forEach((c, i) =>
+      set(c, {
+        fill: hueOf(i),
+        "fill-opacity": lit.includes(i) ? 0.075 : 0.014,
+      }),
+    );
+    L.lenses.forEach(({ a, b, c }) => {
+      const both = lit.includes(a) && lit.includes(b) && lit.length === 2;
+      const one = lit.length === 1 && (lit[0] === a || lit[0] === b);
+      set(c, {
+        fill: hueOf(one && lit[0] === b ? b : a),
+        "fill-opacity": both ? 0.12 : one ? 0.05 : 0,
+      });
+    });
+    L.rings.forEach((r, i) => {
+      const on = lit.includes(i);
+      const dim = lit.length > 0 && !on;
+      set(r.glow, { fill: hueOf(i), opacity: on ? 0.55 : 0 });
+      set(r.rest, { fill: hueOf(i), opacity: dim ? 0.16 : 0.8 });
+      set(r.lit, { fill: hueOf(i), opacity: on ? 1 : 0 });
+    });
+    L.names.forEach((t, i) => {
+      const on = lit.includes(i);
+      set(t, { fill: hueOf(i), opacity: lit.length > 0 && !on ? 0.3 : 1 });
+      setText(t, values[i]?.name || "—");
+    });
+
+    // the named regions, and while editing the ones still waiting for a name
+    L.pairs.forEach(({ a, b, g, name, expr }) => {
+      const r = regionName([a, b], cfg);
+      const show = !!r || S.editing;
+      set(g, { display: show ? null : "none" });
+      if (!show) return;
+      const both = lit.includes(a) && lit.includes(b) && lit.length === 2;
+      const one = lit.length === 1 && (lit[0] === a || lit[0] === b);
+      set(g, { opacity: both ? 1 : one ? 0.9 : lit.length ? 0.18 : 0.62 });
+      set(name, {
+        "font-size": r ? 18.5 : 14,
+        fill: r ? "var(--ink)" : "var(--faint)",
+      });
+      setText(name, r ? r.name : "name it");
+      setText(expr, expression([a, b], values));
+    });
+    if (L.triple) {
+      const ids = layout.triple.ids;
+      const r = regionName(ids, cfg);
+      const show = !!r || S.editing;
+      set(L.triple, { display: show ? null : "none" });
+      if (show) {
+        const allLit = ids.every((i) => lit.includes(i));
+        set(L.triple, {
+          "font-size": r ? 13.5 : 12,
+          fill: r ? "var(--muted)" : "var(--faint)",
+          opacity: allLit ? 1 : lit.length ? 0.2 : 0.7,
+        });
+        setText(L.triple, r ? r.name : "name it");
+      }
+    }
+
+    // the motes: the two freshest notes, passing through
+    const fresh = motesNow();
+    L.motes.forEach((m, i) => {
+      set(m.g, { display: !S.reduce && fresh[i] ? null : "none" });
+      setText(m.t, fresh[i] ?? "");
+    });
+
+    // the trails: where a decision used to sit, in pencil
+    const placed = all.filter((b) => b.at);
+    const unplaced = all.filter((b) => !b.at);
+    let html = "";
+    for (const b of placed) {
+      if (!b.trail.length) continue;
+      const isSel = b.slug === selected;
+      const pts = [...b.trail.map((t) => [t[0], t[1]]), b.at];
+      html += `<g class="b-trail" opacity="${isSel ? 0.75 : quiet(b.slug) ? 0.12 : 0.3}"><path d="${pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("")}" fill="none" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 4" stroke-linecap="round"/>`;
+      for (const t of b.trail)
+        html += `<g transform="translate(${t[0]} ${t[1]})"><circle r="4.5" fill="var(--bg)" stroke="var(--accent)" stroke-width="1"/>${isSel ? `<text class="b-hand" x="8" y="-4" font-size="10.5" fill="var(--muted)">${esc(shortDay(t[2]))}</text>` : ""}</g>`;
+      html += `</g>`;
+    }
+    if (L.trails.dataset.h !== html) {
+      L.trails.innerHTML = html;
+      L.trails.dataset.h = html;
+    }
+
+    // the headings: where a decision leads, drawn as one stroke
+    html = "";
+    for (const b of placed) {
+      if (!b.leads) continue;
+      const r = rand(seedOf(`lead-${b.slug}`));
+      const line = stroke(b.at, b.leads, r, 2.4, 0);
+      const dx = b.leads[0] - b.at[0];
+      const dy = b.leads[1] - b.at[1];
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const head = (a) => [
+        b.leads[0] - (ux * Math.cos(a) - uy * Math.sin(a)) * 11,
+        b.leads[1] - (ux * Math.sin(a) + uy * Math.cos(a)) * 11,
+      ];
+      const isSel = b.slug === selected;
+      const to = slotsAt(layout, b.leads);
+      const s = seedOf(b.slug);
+      html += `<g class="b-lead" opacity="${quiet(b.slug) ? 0.3 : 1}"><path d="${ribbon(line, 1.6, s)}" fill="var(--accent)"/><path d="${ribbon(stroke(head(0.5), b.leads, r, 0.6, 0), 1.6, s + 2)}" fill="var(--accent)"/><path d="${ribbon(stroke(head(-0.5), b.leads, r, 0.6, 0), 1.6, s + 3)}" fill="var(--accent)"/>`;
+      if (isSel)
+        html += `<text class="b-mono" x="${b.leads[0] + (ux >= 0 ? 12 : -12)}" y="${b.leads[1] + 4}" text-anchor="${ux >= 0 ? "start" : "end"}" font-size="9" letter-spacing="1.2" fill="var(--accent)">→ ${esc(to.length ? expression(to, values) : "outside")}</text>`;
+      html += `<circle class="b-handle" cx="${b.leads[0]}" cy="${b.leads[1]}" r="13" fill="transparent" data-slug="${esc(b.slug)}" data-part="leads"/></g>`;
+    }
+    if (L.leads.dataset.h !== html) {
+      L.leads.innerHTML = html;
+      L.leads.dataset.h = html;
+    }
+
+    // the stones: decisions set down by hand, and the tray of those not yet
+    const want = new Set();
+    const place = (b, x, y, side) => {
+      want.add(b.slug);
+      let st = L.stones.get(b.slug);
+      if (!st) {
+        const g = el("g", { class: "b-stone" });
+        const inner = el("g", { class: S.reduce ? null : "b-set" }, g);
+        st = {
+          g,
+          bloom: el(
+            "circle",
+            {
+              r: 11,
+              fill: "var(--accent)",
+              opacity: 0.18,
+              filter: "url(#b-bloom)",
+            },
+            inner,
+          ),
+          ring: el(
+            "path",
+            {
+              transform: "translate(-12 -12)",
+              d: chosenRing(b.slug),
+              fill: "var(--pen)",
+            },
+            inner,
+          ),
+          dot: el("circle", { r: 6.4, fill: "var(--accent)" }, inner),
+          label: el("text", { class: "b-hand", y: 5, "font-size": 15 }, inner),
+          sub: el(
+            "text",
+            {
+              class: "b-mono",
+              y: 18,
+              "font-size": 9,
+              "letter-spacing": 1.2,
+              fill: "var(--accent)",
+            },
+            inner,
+          ),
+          handle: el(
+            "circle",
+            {
+              class: "b-handle",
+              r: 15,
+              fill: "transparent",
+              "data-part": "at",
+            },
+            g,
+          ),
+        };
+        st.handle.dataset.slug = b.slug;
+        L.stones.set(b.slug, st);
+      }
+      L.stoneLayer.appendChild(st.g);
+      const isSel = b.slug === selected;
+      const isHot = isSel || S.hoverSlug === b.slug || S.dragging === b.slug;
+      const ids = b.at ? slotsAt(layout, b.at) : null;
+      set(st.g, {
+        transform: `translate(${x} ${y})`,
+        opacity: quiet(b.slug) && !isHot ? 0.4 : 1,
+      });
+      set(st.bloom, { display: isSel ? null : "none" });
+      set(st.ring, { display: isSel ? null : "none" });
+      set(st.dot, { "fill-opacity": b.at ? 1 : 0.85 });
+      const lx = side === "right" ? 15 : -15;
+      const anchor = side === "right" ? "start" : "end";
+      set(st.label, {
+        x: lx,
+        "text-anchor": anchor,
+        fill: isHot ? "var(--ink)" : "var(--muted)",
+      });
+      setText(st.label, short(b.title, 34));
+      set(st.sub, {
+        x: lx,
+        "text-anchor": anchor,
+        display: isHot && ids ? null : "none",
+      });
+      if (ids)
+        setText(
+          st.sub,
+          ids.length ? `d ∈ ${expression(ids, values)}` : "outside every value",
+        );
+    };
+    for (const b of placed)
+      place(b, b.at[0], b.at[1], b.at[0] > FRAME.w - 190 ? "left" : "right");
+    unplaced
+      .slice(0, 9)
+      .forEach((b, i) => place(b, FRAME.w - 34, 54 + i * 24, "left"));
+    for (const [slug, st] of L.stones)
+      if (!want.has(slug)) {
+        st.g.remove();
+        L.stones.delete(slug);
+      }
+
+    // a stone about to be set down
+    if (S.pendingAt) {
+      const wide = matchMedia("(min-width: 1024px)").matches;
+      L.pending.innerHTML = `<g transform="translate(${S.pendingAt[0]} ${S.pendingAt[1]})"><circle r="7" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="2 3"/><text class="b-hand" x="${S.pendingAt[0] > FRAME.w - 220 ? -14 : 14}" y="5" text-anchor="${S.pendingAt[0] > FRAME.w - 220 ? "end" : "start"}" font-size="14" fill="var(--accent)">${wide ? "name it, on the right →" : "name it, below ↓"}</text></g>`;
+    } else L.pending.textContent = "";
+
+    setText(
+      L.tray,
+      unplaced.length
+        ? "not yet set down — drag one in"
+        : all.length === 0
+          ? "nothing set down yet — double-click where a decision sits"
+          : "",
+    );
+
+    // the reticle: where the pointer is, and what that means
+    const p = S.pointer;
+    if (p && !S.dragging)
+      L.reticle.innerHTML = `<line x1="${p[0]}" y1="0" x2="${p[0]}" y2="${FRAME.h}" stroke="var(--faint)" stroke-opacity="0.35" stroke-dasharray="2 5"/><line x1="0" y1="${p[1]}" x2="${FRAME.w}" y2="${p[1]}" stroke="var(--faint)" stroke-opacity="0.35" stroke-dasharray="2 5"/><circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="none" stroke="var(--faint)"/>`;
+    else L.reticle.textContent = "";
+    const cursorIds = p ? slotsAt(layout, p) : null;
+    const cursorRegion = cursorIds ? regionName(cursorIds, cfg) : null;
+    set(L.cursor, { opacity: cursorIds && !S.dragging ? 1 : 0 });
+    const ch = `cursor ∈ ${cursorIds ? esc(expression(cursorIds, values)) : ""}${cursorRegion ? `<tspan class="b-hand" font-size="14" letter-spacing="0" fill="var(--ink)">   ${esc(cursorRegion.name)}</tspan>` : ""}`;
+    if (L.cursor.dataset.h !== ch) {
+      L.cursor.innerHTML = ch;
+      L.cursor.dataset.h = ch;
+    }
+
+    svg.setAttribute(
+      "aria-label",
+      `${values.map((v) => v.name).join(", ")} drawn as overlapping circles, with ${placed.length} decisions placed`,
+    );
+  }
+
+  function motesNow() {
+    const nodes = gardenNodes();
+    if (!nodes) return [];
+    return nodes
+      .filter((n) => n.modified && n.kind !== "ghost" && n.kind !== "repo")
+      .sort((a, b) => (b.modified > a.modified ? 1 : -1))
+      .slice(0, 2)
+      .map((n) => short(n.label, 40));
+  }
+
+  // The motes drift, bounce off the margin and shy away from the pointer.
+  let moteRaf = 0;
+  function startMotes() {
+    cancelAnimationFrame(moteRaf);
+    if (S.reduce) return;
+    const ms = [
+      { x: 120, y: 560, vx: 32, vy: -22 },
+      { x: 800, y: 120, vx: -27, vy: 30 },
+    ];
+    let last = null;
+    const tick = (now) => {
+      if (!L || !motesNow().length) {
+        last = null;
+        moteRaf = requestAnimationFrame(tick);
+        return;
+      }
+      if (last === null) last = now;
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      const pt = pointerNow;
+      const layout = L.layout;
+      const values = config().values;
+      ms.forEach((m, i) => {
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        if (m.x < EDGE.x0 || m.x > EDGE.x1) {
+          m.vx *= -1;
+          m.x = clamp(m.x, EDGE.x0, EDGE.x1);
+        }
+        if (m.y < EDGE.y0 || m.y > EDGE.y1) {
+          m.vy *= -1;
+          m.y = clamp(m.y, EDGE.y0, EDGE.y1);
+        }
+        if (pt) {
+          const dx = m.x - pt[0];
+          const dy = m.y - pt[1];
+          const d = Math.max(Math.hypot(dx, dy), 4);
+          if (d < 100) {
+            const press = (1 - d / 100) * 220;
+            m.vx += (dx / d) * press * dt;
+            m.vy += (dy / d) * press * dt;
+          }
+        }
+        const spd = Math.hypot(m.vx, m.vy);
+        if (spd > 130) {
+          m.vx *= 130 / spd;
+          m.vy *= 130 / spd;
+        } else if (spd > 34) {
+          const settle = Math.pow(0.055, dt);
+          const k = (34 + (spd - 34) * settle) / Math.max(spd, 0.0001);
+          m.vx *= k;
+          m.vy *= k;
+        }
+        const inside = slotsAt(layout, [m.x, m.y]);
+        const mt = L.motes[i];
+        mt.c.setAttribute("cx", m.x.toFixed(1));
+        mt.c.setAttribute("cy", m.y.toFixed(1));
+        mt.c.setAttribute(
+          "fill",
+          inside.length
+            ? `var(--value-${values[inside[0]]?.hue ?? inside[0]})`
+            : "var(--faint)",
+        );
+        mt.t.setAttribute("x", (m.x + 8).toFixed(1));
+        mt.t.setAttribute("y", (m.y + 3.5).toFixed(1));
+      });
+      moteRaf = requestAnimationFrame(tick);
+    };
+    moteRaf = requestAnimationFrame(tick);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelAnimationFrame(moteRaf);
+    else if (L) startMotes();
+  });
+
+  // ── the pointer on the sheet ────────────────────────────────────────────
+
+  let drag = null;
+  let skipClick = false;
+  let pointerNow = null;
+
+  const toFrame = (e) => {
+    const box = svg.getBoundingClientRect();
+    return [
+      ((e.clientX - box.left) / box.width) * FRAME.w,
+      ((e.clientY - box.top) / box.height) * FRAME.h,
+    ];
+  };
+  const find = (slug) => bearings().find((b) => b.slug === slug);
+  const replace = (next, keep = true) =>
+    setBearings(
+      bearings().map((b) => (b.slug === next.slug ? next : b)),
+      keep,
+    );
+
+  svg.addEventListener("pointerdown", (e) => {
+    const h = e.target.closest(".b-handle");
+    if (!h) return;
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      svg.setPointerCapture(e.pointerId);
+    } catch {
+      /* not capturable */
+    }
+    const slug = h.dataset.slug;
+    const part = h.dataset.part;
+    const b = find(slug);
+    const start = toFrame(e);
+    drag = {
+      slug,
+      part,
+      moved: false,
+      start,
+      last: start,
+      origin: b?.[part] ?? null,
+    };
+    skipClick = true;
+    S.selected = slug;
+    S.held = [];
+    S.pendingAt = null;
+    render();
+  });
+
+  svg.addEventListener("pointermove", (e) => {
+    const p = toFrame(e);
+    pointerNow = p;
+    const layout = layoutNow();
+    if (drag) {
+      if (
+        !drag.moved &&
+        Math.hypot(p[0] - drag.start[0], p[1] - drag.start[1]) < 3
+      )
+        return;
+      drag.moved = true;
+      const at = [clamp(p[0], EDGE.x0, EDGE.x1), clamp(p[1], EDGE.y0, EDGE.y1)];
+      drag.last = at;
+      const b = find(drag.slug);
+      if (b) replace({ ...b, [drag.part]: at }, false);
+      S.hov = slotsAt(layout, at);
+      S.hovFromDesk = false;
+      S.pointer = null;
+      S.dragging = drag.slug;
+      render();
+      return;
+    }
+    S.pointer = p;
+    S.hov = slotsAt(layout, p);
+    S.hovFromDesk = false;
+    render();
+  });
+
+  const up = (e) => {
+    const d = drag;
+    if (!d) return;
+    drag = null;
+    S.dragging = null;
+    try {
+      svg.releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
+    if (!d.moved) return render();
+    const b = find(d.slug);
+    if (!b) return render();
+    const next =
+      d.part === "at"
+        ? setDown({ ...b, at: d.origin }, d.last, today())
+        : { ...b, leads: d.last };
+    replace(next);
+    render();
+  };
+  svg.addEventListener("pointerup", up);
+  svg.addEventListener("pointercancel", up);
+  svg.addEventListener("pointerleave", () => {
+    pointerNow = null;
+    if (drag) return;
+    S.pointer = null;
+    S.hov = [];
+    render();
+  });
+
+  /** Click a region to hold it lit; click it again, or the paper, to let go. */
+  svg.addEventListener("click", (e) => {
+    if (skipClick) {
+      skipClick = false;
+      return;
+    }
+    const s = slotsAt(layoutNow(), toFrame(e));
+    if (s.length === 0) {
+      S.held = [];
+      S.selected = null;
+      S.pendingAt = null;
+      return render();
+    }
+    S.held = same(S.held, s) ? [] : s;
+    if (S.editing) {
+      const vals = config().values;
+      S.focus =
+        s.length === 1
+          ? { kind: "value", key: vals[s[0]].id }
+          : { kind: "region", key: keyOf(s.map((i) => vals[i].id)) };
+      S.focusPending = true;
+    }
+    render();
+  });
+
+  /** Double-click where a decision sits; then say what it is. */
+  svg.addEventListener("dblclick", (e) => {
+    const p = toFrame(e);
+    S.pendingAt = [
+      clamp(p[0], EDGE.x0, EDGE.x1),
+      clamp(p[1], EDGE.y0, EDGE.y1),
+    ];
+    S.selected = null;
+    S.held = [];
+    render();
+    draft.focus({ preventScroll: !matchMedia("(max-width: 1023px)").matches });
+  });
+
+  // ── decisions ───────────────────────────────────────────────────────────
+
+  const draft = document.getElementById("draft");
+  let goneTimer = 0;
+
+  function create(title, at) {
+    const t = title.trim();
+    if (!t) return;
+    const b = cleanBearing({
+      title: t,
+      placed: today(),
+      since: today(),
+      at,
+      leads: null,
+      note: "",
+      trail: [],
+    });
+    const taken = new Set(bearings().map((x) => x.slug));
+    let n = 2;
+    const base = b.slug;
+    while (taken.has(b.slug)) b.slug = `${base}-${n++}`;
+    setBearings([b, ...bearings()]);
+    S.selected = b.slug;
+    S.pendingAt = null;
+    draft.value = "";
+    render();
+  }
+
+  function patch(slug, change) {
+    const b = find(slug);
+    if (!b) return;
+    replace({ ...b, ...change });
+    render();
+  }
+
+  function letGo(slug) {
+    const b = find(slug);
+    if (!b) return;
+    setBearings(bearings().filter((x) => x.slug !== slug));
+    if (S.selected === slug) S.selected = null;
+    S.gone = { b, mode: S.mode };
+    clearTimeout(goneTimer);
+    goneTimer = setTimeout(() => {
+      S.gone = null;
+      render();
+    }, 9000);
+    render();
+  }
+
+  function putBack() {
+    if (!S.gone || S.gone.mode !== S.mode) return;
+    const b = S.gone.b;
+    S.gone = null;
+    setBearings([b, ...bearings().filter((x) => x.slug !== b.slug)]);
+    S.selected = b.slug;
+    render();
+  }
+
+  document.getElementById("draftForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    create(draft.value, S.pendingAt);
+  });
+
+  // ── the desk ────────────────────────────────────────────────────────────
+
+  const $ = (id) => document.getElementById(id);
+  let rendering = false;
+
+  /** Replace a container's markup only when it changed, keeping focus and caret. */
+  function swap(node, html) {
+    if (node.dataset.h === html) return false;
+    const a = document.activeElement;
+    const id = a && node.contains(a) && a.id ? a.id : null;
+    let sel = null;
+    if (id && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))
+      try {
+        sel = [a.selectionStart, a.selectionEnd];
+      } catch {
+        sel = null;
+      }
+    node.innerHTML = html;
+    node.dataset.h = html;
+    if (id) {
+      const n = document.getElementById(id);
+      if (n) {
+        n.focus({ preventScroll: true });
+        if (sel && n.setSelectionRange)
+          try {
+            n.setSelectionRange(sel[0], sel[1]);
+          } catch {
+            /* not a text field */
+          }
+      }
+    }
+    node.querySelectorAll("[data-sketch]").forEach((h) => {
+      const [kind, seed, color] = h.dataset.sketch.split("|");
+      sketch(h, { kind, seed, color });
+    });
+    return true;
+  }
+
+  function renderMode() {
+    const own = S.mode === "own";
+    const failed = S.kept === "error";
+    const html = own
+      ? `<span class="meta tag">your sheet</span><p class="what hand">${
+          failed
+            ? "this browser would not keep it, so it lasts until you leave the page."
+            : "kept in this browser and nowhere else. nothing on it is sent anywhere."
+        }</p><div class="acts"><button class="chip" type="button" data-act="specimen">see the specimen</button></div>`
+      : `<span class="meta tag">specimen</span><p class="what hand">a made-up person's five values, five decisions and sixteen notes. move things about; nothing you do to the specimen is kept.</p><div class="acts"><button class="chip go" type="button" data-act="mine" title="${
+          S.mine
+            ? ""
+            : "starts with the values on the sheet now, ready to edit, and no decisions"
+        }">${S.mine ? "back to your sheet" : "start your own sheet"}</button></div>`;
+    swap($("mode"), html);
+  }
+
+  function renderCaption() {
+    const cfg = config();
+    const values = cfg.values;
+    const ids = S.hov.length ? S.hov : S.held.length ? S.held : null;
+    const isHeld = ids !== null && S.hov.length === 0;
+    const notes = gardenNodes();
+    const st = stones();
+    const wide = matchMedia("(min-width: 1024px)").matches;
+    let html;
+    let border = "var(--rule)";
+    if (!ids) {
+      html = `<div class="meta faint">𝒰 · your values</div><p class="say hand muted">hover a value to read it, click a region to hold it. double-click where a decision sits, or type one ${wide ? "on the right" : "below"} and drag its stone in — the sheet reads the placement back. arrow keys nudge the chosen stone.</p>`;
+    } else if (ids.length === 1) {
+      const v = values[ids[0]];
+      border = hueOf(ids[0]);
+      const n = st.get(v.id)?.length ?? 0;
+      html = `<div class="meta" style="color:${hueOf(ids[0])}">${esc(v.name || "unnamed")}<span class="faint">${notes ? ` · ${n} ${n === 1 ? "note" : "notes"} about it` : ""}${isHeld ? " · held" : " · click to hold"}</span></div><p class="body ink">${esc(v.blurb || "no words for it yet.")}</p>`;
+    } else {
+      border = "var(--accent)";
+      const r = regionName(ids, cfg);
+      const key = keyOf(ids.map((i) => values[i].id));
+      html = `<div class="meta acc">${esc(expression(ids, values))}<span class="faint">  ${esc(ids.map((i) => values[i].name).join(" · "))}${isHeld ? " · held" : ""}</span></div>`;
+      html += r
+        ? `<div class="region ink">${esc(r.name)}</div><p class="say hand muted">${esc(r.blurb)}</p>`
+        : `<p class="say hand muted">rare air — a region you have not named yet.${isHeld ? ` <button class="inline" type="button" data-act="name-region" data-key="${esc(key)}">name it</button>` : ""}</p>`;
+    }
+    const cap = $("caption");
+    cap.style.borderLeftColor = border;
+    swap(cap, html);
+  }
+
+  function renderDraft() {
+    const values = config().values;
+    const ids = S.pendingAt ? slotsAt(layoutNow(), S.pendingAt) : null;
+    const label = $("draftLabel");
+    label.textContent = S.pendingAt
+      ? `name the stone at ${ids.length ? expression(ids, values) : "the edge"}`
+      : "set a decision down";
+    label.classList.toggle("acc", !!S.pendingAt);
+    label.classList.toggle("faint", !S.pendingAt);
+    draft.placeholder = S.pendingAt
+      ? "what is it?  enter to set it down"
+      : "the thing you are weighing  /";
+    $("draftHint").textContent = S.pendingAt
+      ? "esc to think again."
+      : "enter, then drag the stone to where it sits. outside every circle is allowed to be the honest answer.";
+  }
+
+  function stoneList(list, n) {
+    return `<ul class="stones">${list
+      .slice(0, n)
+      .map(
+        (node) =>
+          `<li title="${esc(node.description || "")}">${esc(short(node.label, 36))}</li>`,
+      )
+      .join("")}</ul>`;
+  }
+
+  function renderReading() {
+    const cur = S.selected ? find(S.selected) : null;
+    if (!cur) {
+      readingPanel.hidden = true;
+      S.noteFor = null;
+      return;
+    }
+    const wasHidden = readingPanel.hidden;
+    readingPanel.hidden = false;
+    if (S.noteFor !== cur.slug) {
+      S.noteFor = cur.slug;
+      S.note = cur.note;
+    }
+    const cfg = config();
+    const values = cfg.values;
+    const layout = layoutNow();
+    const at = cur.at ? slotsAt(layout, cur.at) : null;
+    const to = cur.leads ? slotsAt(layout, cur.leads) : null;
+    const notes = gardenNodes();
+    const st = stones();
+    let html = `<div class="top"><h2 class="ink">${esc(cur.title)}</h2><button class="meta textbtn" type="button" data-act="close" aria-label="Close the reading">esc</button></div>`;
+    if (!at) {
+      html += `<p class="moved hand muted" style="font-size:15.5px">not set down yet — it waits in the top corner of the sheet. drag it in.</p>`;
+    } else {
+      html += `<div class="meta acc" style="margin-top:12px">d ∈ ${esc(expression(at, values))}</div>`;
+      const r = regionName(at, cfg);
+      if (r && at.length > 1)
+        html += `<div class="region ink">${esc(r.name)}</div>`;
+      html += `<p class="prose ink">${esc(prose(at, values))}</p>`;
+      if (cur.trail.length)
+        html += `<p class="moved hand faint">moved ${cur.trail.length} ${cur.trail.length === 1 ? "time" : "times"} since ${esc(day(cur.placed))} · here since ${esc(day(cur.since))}</p>`;
+      if (cur.leads && to) {
+        html += `<div class="part"><div class="meta acc">→ leads into ${esc(to.length ? expression(to, values) : "no value")}</div><p class="prose ink" style="margin-top:4px">${esc(headingProse(at, to, values))}</p><button class="meta textbtn" style="margin-top:8px" type="button" data-act="unlead">let go of the heading</button></div>`;
+      } else {
+        html += `<button class="chip" type="button" data-act="lead">draw where it leads →</button>`;
+      }
+      if (at.length > 0 && notes) {
+        html += `<div class="part"><div class="meta faint">what the notes say</div>`;
+        for (const i of at) {
+          const v = values[i];
+          const list = st.get(v.id) ?? [];
+          html += `<div style="margin-top:8px"><div class="meta" style="color:${hueOf(i)}">${esc(v.name)}<span class="faint"> · ${list.length ? `${list.length} ${list.length === 1 ? "note" : "notes"}` : "nothing yet"}</span></div>${list.length ? stoneList(list, 5) : ""}</div>`;
+        }
+        html += `</div>`;
+      }
+    }
+    html += `<textarea class="search" id="note" rows="3" placeholder="your working, in your own hand">${esc(S.note)}</textarea>`;
+    html += `<div class="foot"><span class="meta faint">set down ${esc(day(cur.placed))}</span><button class="meta textbtn" type="button" data-act="letgo">let go</button></div>`;
+    swap($("readingBody"), html);
+    const n = $("note");
+    if (n && document.activeElement !== n && n.value !== S.note)
+      n.value = S.note;
+    // Shown again: the border is drawn again, as a sheet freshly laid down.
+    if (wasHidden) readingPanel.querySelector(":scope > svg.sketch")?.remove();
+    sketch(readingPanel, { seed: `read-${cur.slug}`, color: "var(--accent)" });
+  }
+
+  function renderGone() {
+    const g = $("gone");
+    if (!S.gone || S.gone.mode !== S.mode) {
+      g.hidden = true;
+      return;
+    }
+    g.hidden = false;
+    swap(
+      g,
+      `<span class="hand muted">let go of “${esc(S.gone.b.title)}”</span><button class="meta acc" type="button" data-act="putback">put it back</button>`,
+    );
+  }
+
+  function renderDecisions() {
+    const all = bearings();
+    const sec = $("decisions");
+    sec.hidden = all.length === 0;
+    if (!all.length) return;
+    const values = config().values;
+    const layout = layoutNow();
+    const placed = all.filter((b) => b.at).length;
+    const waiting = all.length - placed;
+    let html = `<div class="meta faint">decisions · ${placed} placed${waiting ? ` · ${waiting} waiting` : ""}</div><ul class="rows" id="dlist">`;
+    for (const b of all) {
+      const ids = b.at ? slotsAt(layout, b.at) : null;
+      const on = b.slug === S.selected;
+      html += `<li><button class="row" type="button" data-act="pick" data-slug="${esc(b.slug)}" data-hs="${esc(b.slug)}" id="d-${esc(b.slug)}"${on ? ' aria-current="true"' : ""}><span class="dot" aria-hidden="true" style="background:var(--accent);opacity:${ids ? 1 : 0.45}"></span><span class="t"${on ? ` data-sketch="underline|${esc(b.slug)}|var(--accent)"` : ""}><span>${esc(b.title)}</span></span><span class="where">${esc(ids ? (ids.length ? expression(ids, values) : "outside") : "waiting")}<i> · ${esc(day(b.since || b.placed))}</i></span></button></li>`;
+    }
+    html += `</ul>`;
+    swap(sec, html);
+  }
+
+  function renderValues() {
+    const sec = $("values");
+    if (S.editing) return renderEditor(sec);
+    const values = config().values;
+    const notes = gardenNodes();
+    const st = stones();
+    let html = `<div class="split"><span class="meta faint">the values</span><button class="chip" type="button" data-act="edit" id="v-edit">edit</button></div><ul class="rows">`;
+    values.forEach((v, i) => {
+      const on = same(S.held, [i]);
+      const list = st.get(v.id) ?? [];
+      html += `<li><button class="row v" type="button" data-act="hold" data-i="${i}" data-hv="${i}" id="v-${i}" aria-pressed="${on}"><span class="dot" aria-hidden="true" style="background:${hueOf(i)}"></span><span class="vname"${on ? ` data-sketch="ring|${esc(v.id)}|${hueOf(i)}"` : ""}>${esc(v.name || "unnamed")}</span>${notes ? `<span class="meta faint n">${list.length} ${list.length === 1 ? "note" : "notes"}</span>` : ""}</button>${on && list.length ? `<div class="vstones">${stoneList(list, 8)}</div>` : ""}</li>`;
+    });
+    html += `</ul><p class="note-foot hand faint">${
+      S.mode === "own"
+        ? "your own, kept in this browser."
+        : "the sample five. edit them here to try them; start your own sheet to keep them."
+    }</p>`;
+    swap(sec, html);
+  }
+
+  const ORD = ["first", "second", "third", "fourth", "fifth"];
+  function renderEditor(sec) {
+    const cfg = config();
+    const values = cfg.values;
+    const layout = layoutNow();
+    const own = S.mode === "own";
+    const status = !own
+      ? "not kept here"
+      : S.kept === "error"
+        ? "not kept"
+        : S.kept === "kept"
+          ? "kept"
+          : "";
+    let html = `<div class="editor" id="editor"><div class="split"><span class="meta faint">the values · editing</span><span style="display:flex;align-items:center;gap:12px"><span class="meta ${S.kept === "error" && own ? "acc" : "faint"}">${status}</span><button class="chip" type="button" data-act="done" id="ed-done" style="color:var(--ink)">done</button></span></div>`;
+    html += `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="meta faint">circles</span>`;
+    for (const n of [3, 5]) {
+      const on = cfg.layout === n;
+      html += `<button class="seg" type="button" data-act="layout" data-n="${n}" id="ed-layout-${n}" aria-pressed="${on}"${on ? ` data-sketch="underline|circles-${n}|var(--accent)"` : ""}>${n}</button>`;
+    }
+    html += `<span class="hand faint" style="margin-left:auto;font-size:14px">${cfg.layout === 5 ? "five: not every overlap is drawable" : "three: every region is real"}</span></div><ol style="display:flex;flex-direction:column;gap:16px">`;
+    values.forEach((v, i) => {
+      html += `<li class="ed-value" data-value="${esc(v.id)}"><div style="display:flex;align-items:center;gap:8px"><div class="swatches" role="radiogroup" aria-label="Hue">`;
+      for (let h = 0; h < HUES; h++) {
+        const on = (v.hue ?? i) === h;
+        html += `<button class="swatch" type="button" role="radio" aria-checked="${on}" aria-label="hue ${h + 1}" data-act="hue" data-i="${i}" data-h="${h}" id="ed-hue-${i}-${h}" style="background:var(--value-${h});--sw:var(--value-${h})"></button>`;
+      }
+      html += `</div><span style="margin-left:auto;display:flex;gap:2px"><button class="arrow" type="button" data-act="up" data-i="${i}" id="ed-up-${i}" aria-label="Move up"${i === 0 ? " disabled" : ""}>↑</button><button class="arrow" type="button" data-act="down" data-i="${i}" id="ed-down-${i}" aria-label="Move down"${i === values.length - 1 ? " disabled" : ""}>↓</button></span></div>`;
+      html += `<input class="search ed-name" id="ed-name-${i}" data-field="name" data-i="${i}" value="${esc(v.name)}" placeholder="the ${ORD[i]} value" aria-label="Name" />`;
+      html += `<textarea class="search ed-blurb" id="ed-blurb-${i}" data-field="blurb" data-i="${i}" rows="2" placeholder="what it means, in your words" aria-label="Meaning">${esc(v.blurb)}</textarea>`;
+      html += `<div class="terms">`;
+      for (const t of v.terms)
+        html += `<span class="term">${esc(t)}<button type="button" data-act="drop-term" data-i="${i}" data-t="${esc(t)}" aria-label="Drop the term ${esc(t)}">×</button></span>`;
+      html += `<input class="search" id="ed-term-${i}" data-field="term" data-i="${i}" value="${esc(S.termDraft[v.id] ?? "")}" placeholder="${v.terms.length ? "another term" : "words that mark a note as about it"}" aria-label="Add a term" /></div></li>`;
+    });
+    html += `</ol><div style="border-top:1px solid var(--rule);padding-top:12px"><div class="meta faint">the regions · name where they overlap</div><ol class="ed-regions">`;
+    for (const ids of regionsOf(layout)) {
+      const key = keyOf(ids.map((i) => values[i]?.id ?? "").filter(Boolean));
+      const r = cfg.regions[key] ?? { name: "", blurb: "" };
+      html += `<li class="ed-region" data-region="${esc(key)}"><div class="head">${ids.map((i) => `<span class="dot" aria-hidden="true" style="background:${hueOf(i)}"></span>`).join("")}<span class="meta muted" style="text-transform:none">${esc(expression(ids, values))}</span><span class="names">${esc(ids.map((i) => values[i]?.name || "—").join(" · "))}</span></div><input class="search rname" id="ed-rname-${esc(key)}" data-field="rname" data-key="${esc(key)}" value="${esc(r.name)}" placeholder="its name" aria-label="Region name" /><input class="search rblurb" id="ed-rblurb-${esc(key)}" data-field="rblurb" data-key="${esc(key)}" value="${esc(r.blurb)}" placeholder="one line on it" aria-label="Region blurb" /></li>`;
+    }
+    html += `</ol></div><p class="hand faint" style="font-size:14.5px;line-height:1.35">${
+      own
+        ? "kept in this browser with your decisions, and nowhere else."
+        : "the specimen keeps no edits; they last until you leave the page. start your own sheet to keep them."
+    }</p></div>`;
+    swap(sec, html);
+    if (S.focusPending && S.focus) {
+      S.focusPending = false;
+      const node = sec.querySelector(
+        `[data-${S.focus.kind}="${CSS.escape(S.focus.key)}"]`,
+      );
+      if (node) {
+        node.scrollIntoView({
+          block: "nearest",
+          behavior: S.reduce ? "auto" : "smooth",
+        });
+        node.querySelector("input")?.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  function renderNotes() {
+    const n = S.folder;
+    let line;
+    if (n)
+      line = `${n.nodes.length} notes from <span class="ink">${esc(n.name)}</span>, read in this page and never uploaded. they are forgotten when you leave.`;
+    else if (S.mode === "specimen")
+      line =
+        "the specimen's sixteen notes, invented. each value finds the notes whose title, tags or first line carries one of its words.";
+    else
+      line =
+        "no notes open. open a folder of markdown notes and each value finds the ones whose title, tags or first line carries one of its words.";
+    swap(
+      $("notes"),
+      `<div class="meta faint">the notes the values read</div><p class="line hand muted">${line}</p><div class="acts"><input type="file" id="folder" class="vh" webkitdirectory multiple /><label class="chip" for="folder">${n ? "open another folder" : "open a folder of notes"}</label>${n ? `<button class="chip" type="button" data-act="close-folder">put them away</button>` : ""}</div>`,
+    );
+  }
+
+  function render() {
+    rendering = true;
+    try {
+      updateSheet();
+      renderMode();
+      renderCaption();
+      renderDraft();
+      renderReading();
+      renderGone();
+      renderDecisions();
+      renderValues();
+      renderNotes();
+    } finally {
+      rendering = false;
+    }
+  }
+
+  // ── the desk's hands ────────────────────────────────────────────────────
+
+  function switchTo(mode) {
+    if (mode === "own" && !S.mine) {
+      // A sheet of your own starts from the values on the sheet now, and no decisions.
+      S.mine = { config: clone(config()), bearings: [] };
+      S.mode = "own";
+      persist();
+    } else {
+      S.mode = mode;
+      if (mode === "specimen") S.specimen = freshSpecimen();
+    }
+    Object.assign(S, {
+      selected: null,
+      held: [],
+      hov: [],
+      pendingAt: null,
+      gone: null,
+      focus: null,
+    });
+    render();
+    $("mode").scrollIntoView({
+      block: "nearest",
+      behavior: S.reduce ? "auto" : "smooth",
+    });
+  }
+
+  const desk = $("desk");
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act;
+    const cfg = config();
+    const i = Number(b.dataset.i);
+    switch (act) {
+      case "mine":
+        return switchTo("own");
+      case "specimen":
+        return switchTo("specimen");
+      case "close":
+        S.selected = null;
+        return render();
+      case "pick":
+        S.selected = S.selected === b.dataset.slug ? null : b.dataset.slug;
+        return render();
+      case "lead": {
+        const cur = find(S.selected);
+        if (!cur?.at) return;
+        return patch(cur.slug, {
+          leads: [
+            clamp(cur.at[0] + 80, EDGE.x0, EDGE.x1),
+            clamp(cur.at[1] - 56, EDGE.y0, EDGE.y1),
+          ],
+        });
+      }
+      case "unlead":
+        return patch(S.selected, { leads: null });
+      case "letgo":
+        return letGo(S.selected);
+      case "putback":
+        return putBack();
+      case "hold":
+        S.held = same(S.held, [i]) ? [] : [i];
+        return render();
+      case "edit":
+        S.editing = true;
+        return render();
+      case "done":
+        S.editing = false;
+        S.focus = null;
+        render();
+        $("v-edit")?.focus({ preventScroll: true });
+        return;
+      case "name-region":
+        S.editing = true;
+        S.focus = { kind: "region", key: b.dataset.key };
+        S.focusPending = true;
+        return render();
+      case "layout":
+        return setLayout(Number(b.dataset.n));
+      case "hue":
+        return setValue(i, { hue: Number(b.dataset.h) });
+      case "up":
+      case "down": {
+        const j = i + (act === "up" ? -1 : 1);
+        if (j < 0 || j >= cfg.values.length) return;
+        const next = [...cfg.values];
+        [next[i], next[j]] = [next[j], next[i]];
+        return setConfig({ ...cfg, values: next });
+      }
+      case "drop-term":
+        return setValue(i, {
+          terms: cfg.values[i].terms.filter((t) => t !== b.dataset.t),
+        });
+      case "close-folder":
+        S.folder = null;
+        return render();
+    }
+  });
+
+  function setValue(i, change) {
+    const cfg = config();
+    setConfig({
+      ...cfg,
+      values: cfg.values.map((v, k) => (k === i ? { ...v, ...change } : v)),
+    });
+  }
+
+  let blankN = 0;
+  function setLayout(n) {
+    const cfg = config();
+    if (n === cfg.layout) return;
+    const values = cfg.values;
+    const next =
+      n < values.length
+        ? values.slice(0, n)
+        : [
+            ...values,
+            ...Array.from({ length: n - values.length }, (_, k) => ({
+              id: `value-${values.length + k + 1}-${Date.now().toString(36)}${blankN++}`,
+              name: "",
+              blurb: "",
+              terms: [],
+            })),
+          ];
+    S.held = [];
+    S.hov = [];
+    setConfig({ ...cfg, layout: n, values: next });
+  }
+
+  function setRegion(key, change) {
+    const cfg = config();
+    setConfig({
+      ...cfg,
+      regions: {
+        ...cfg.regions,
+        [key]: { ...(cfg.regions[key] ?? { name: "", blurb: "" }), ...change },
+      },
+    });
+  }
+
+  function addTerm(i) {
+    const v = config().values[i];
+    if (!v) return;
+    const t = (S.termDraft[v.id] ?? "").trim().toLowerCase();
+    S.termDraft[v.id] = "";
+    if (!t || v.terms.includes(t)) return render();
+    setValue(i, { terms: [...v.terms, t] });
+  }
+
+  desk.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.id === "note") {
+      S.note = t.value;
+      return;
+    }
+    const f = t.dataset.field;
+    if (!f) return;
+    const i = Number(t.dataset.i);
+    if (f === "name") setValue(i, { name: t.value });
+    else if (f === "blurb") setValue(i, { blurb: t.value });
+    else if (f === "term") S.termDraft[config().values[i].id] = t.value;
+    else if (f === "rname") setRegion(t.dataset.key, { name: t.value });
+    else if (f === "rblurb") setRegion(t.dataset.key, { blurb: t.value });
+  });
+
+  desk.addEventListener("keydown", (e) => {
+    const t = e.target;
+    if (t.dataset?.field !== "term") return;
+    const i = Number(t.dataset.i);
+    const v = config().values[i];
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTerm(i);
+    } else if (e.key === "Backspace" && !t.value && v.terms.length) {
+      setValue(i, { terms: v.terms.slice(0, -1) });
+    }
+  });
+
+  desk.addEventListener("focusout", (e) => {
+    if (rendering) return;
+    const t = e.target;
+    if (t.id === "note") {
+      const cur = find(S.selected);
+      if (cur && S.note !== cur.note) patch(cur.slug, { note: S.note });
+    } else if (t.dataset?.field === "term") {
+      const i = Number(t.dataset.i);
+      if ((S.termDraft[config().values[i]?.id] ?? "").trim()) addTerm(i);
+    }
+  });
+
+  // Hovering the desk's lists lights the sheet, as hovering the sheet does.
+  desk.addEventListener("pointerover", (e) => {
+    if (drag) return;
+    const hv = e.target.closest("[data-hv]");
+    const want = hv ? [Number(hv.dataset.hv)] : [];
+    let changed = false;
+    if ((hv || S.hovFromDesk) && !same(S.hov, want)) {
+      S.hov = want;
+      S.hovFromDesk = !!hv;
+      changed = true;
+    }
+    const hs = e.target.closest("#dlist")
+      ? e.target.closest("[data-hs]")
+      : null;
+    const slug = hs ? hs.dataset.hs : null;
+    if (slug !== S.hoverSlug && (slug || !e.target.closest("#dlist"))) {
+      S.hoverSlug = slug;
+      changed = true;
+    }
+    if (changed) render();
+  });
+  desk.addEventListener("pointerleave", () => {
+    if (drag) return;
+    let changed = false;
+    if (S.hovFromDesk) {
+      S.hov = [];
+      S.hovFromDesk = false;
+      changed = true;
+    }
+    if (S.hoverSlug) {
+      S.hoverSlug = null;
+      changed = true;
+    }
+    if (changed) render();
+  });
+
+  // A folder of notes, read here and kept only in this page's memory.
+  desk.addEventListener("change", async (e) => {
+    if (e.target.id !== "folder") return;
+    const files = [...(e.target.files || [])].filter((f) => {
+      const p = f.webkitRelativePath || f.name;
+      return (
+        /\.md$/i.test(f.name) && !f.name.startsWith("_") && !/(^|\/)\./.test(p)
+      );
+    });
+    if (!files.length) {
+      S.folder = {
+        nodes: [],
+        name: "a folder with no markdown in it",
+        stamp: Date.now(),
+      };
+      return render();
+    }
+    const read = await Promise.all(
+      files.slice(0, 5000).map(async (f) => ({
+        path: f.webkitRelativePath || f.name,
+        slug: f.name.replace(/\.md$/i, ""),
+        mtime: f.lastModified,
+        raw: await f.text().catch(() => ""),
+      })),
+    );
+    const top =
+      (files[0].webkitRelativePath || "").split("/")[0] || "your folder";
+    S.folder = { nodes: gardenOf(read), name: top, stamp: Date.now() };
+    render();
+  });
+
+  // ── the keys ────────────────────────────────────────────────────────────
+
+  window.addEventListener("keydown", (e) => {
+    const typing =
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement;
+    if (e.key === "Escape") {
+      if (S.pendingAt) S.pendingAt = null;
+      else {
+        S.selected = null;
+        S.held = [];
+      }
+      e.target?.blur?.();
+      render();
+    } else if (e.key === "/" && !typing) {
+      e.preventDefault();
+      draft.focus();
+    } else if (
+      !typing &&
+      S.selected &&
+      ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+    ) {
+      const b = find(S.selected);
+      if (!b?.at) return;
+      e.preventDefault();
+      const step = e.shiftKey ? 16 : 4;
+      const dx =
+        e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0;
+      const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+      replace(
+        setDown(
+          b,
+          [
+            clamp(b.at[0] + dx, EDGE.x0, EDGE.x1),
+            clamp(b.at[1] + dy, EDGE.y0, EDGE.y1),
+          ],
+          today(),
+        ),
+      );
+      render();
+    }
+  });
+
+  matchMedia("(min-width: 1024px)").addEventListener("change", render);
+
+  render();
+</script>

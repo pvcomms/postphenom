@@ -1,0 +1,2862 @@
+<title>The Sieve</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Bayes drawn as areas, by hand. Worlds as columns as wide as you weigh them, a sighting shading each by how much of that world would show it, and only the shaded areas compared."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a primer's page with the pen left on it. Ink on bone; the worlds take their hues in
+     order and nothing else is coloured; the accent is only ever the reader's hand on the sheet. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #857d72;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --value-0: #b08a3e;
+    --value-1: #4f5f8a;
+    --value-2: #5e7a4e;
+    --value-3: #7e5a78;
+    --value-4: #3f6b66;
+    --value-5: #8c5a45;
+    --noise-blend: multiply;
+    --noise: 0.06;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #857e71;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --value-0: #d2aa5a;
+      --value-1: #8393c4;
+      --value-2: #8dae78;
+      --value-3: #b48aad;
+      --value-4: #7fa8a1;
+      --value-5: #c4876a;
+      --noise-blend: screen;
+      --noise: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #857e71;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --value-0: #d2aa5a;
+    --value-1: #8393c4;
+    --value-2: #8dae78;
+    --value-3: #b48aad;
+    --value-4: #7fa8a1;
+    --value-5: #c4876a;
+    --noise-blend: screen;
+    --noise: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 3vw, 40px);
+    padding-block: 0 80px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture and never as dirt. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--noise);
+    mix-blend-mode: var(--noise-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0;
+  }
+  h1 {
+    font-weight: 400;
+    margin: 0;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .wrap {
+    max-width: 86rem;
+    margin-inline: auto;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .lower {
+    text-transform: none;
+    letter-spacing: 0.06em;
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+    letter-spacing: 0.004em;
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .faint {
+    color: var(--faint);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 16px 56px;
+    align-items: end;
+    padding-block: 44px 28px;
+  }
+  .mast .meta {
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .mast h1 {
+    font-size: clamp(44px, 7vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .deck {
+    margin-top: 14px;
+    font-size: clamp(18px, 2vw, 21px);
+    line-height: 1.35;
+    color: var(--muted);
+    max-width: 30em;
+  }
+  .when {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--muted);
+    border-left: 1px solid var(--rule);
+    padding-left: 18px;
+    max-width: 34em;
+  }
+  .when .hand {
+    display: block;
+    color: var(--ink);
+    font-size: 19px;
+    margin-bottom: 6px;
+  }
+
+  /* the sheet and the desk */
+  .grid {
+    display: grid;
+    gap: 24px;
+  }
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+    }
+  }
+  .panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    min-width: 0;
+  }
+  .sketched {
+    border-color: transparent;
+  }
+  .sheet {
+    padding: clamp(18px, 2.4vw, 28px);
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .desk .panel {
+    padding: 16px;
+  }
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* A pen line laid over the element it sits in. */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke: white;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .ink-pen {
+    fill: var(--pen);
+  }
+  .ink-accent {
+    fill: var(--accent);
+  }
+  .ink-muted {
+    fill: var(--muted);
+  }
+
+  .chip {
+    position: relative;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition:
+      color 160ms var(--ease),
+      border-color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:hover {
+    color: var(--ink);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .sheet-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .case {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 8px;
+    padding: 4px 0;
+    resize: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: clamp(22px, 2.6vw, 29px);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    transition: border-color 220ms var(--ease);
+  }
+  .case::placeholder,
+  .saw::placeholder {
+    color: var(--faint);
+  }
+  .case:focus,
+  .saw:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+
+  .work {
+    display: grid;
+    gap: 20px 32px;
+    margin-top: 20px;
+  }
+  .ladder,
+  .boxcol {
+    min-width: 0;
+  }
+  .ladder {
+    order: 2;
+  }
+  .boxcol {
+    order: 1;
+  }
+  @media (min-width: 1280px) {
+    .work {
+      grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+    }
+    .ladder {
+      order: 1;
+    }
+    .boxcol {
+      order: 2;
+    }
+  }
+
+  /* the ladder */
+  .names {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 4px;
+  }
+  .world {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    align-self: center;
+    flex: none;
+    opacity: 0.75;
+  }
+  .colon {
+    margin-inline: 4px;
+    font-size: 20px;
+    color: var(--faint);
+  }
+  /* A field exactly as wide as its word: the word is written again, unseen, in the same cell. */
+  .grow {
+    display: inline-grid;
+  }
+  .grow::after {
+    content: attr(data-v) " ";
+    visibility: hidden;
+    white-space: pre;
+    grid-area: 1 / 1;
+  }
+  .grow::after,
+  .name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .name {
+    grid-area: 1 / 1;
+    min-width: 2ch;
+    width: 100%;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    color: var(--ink);
+    transition: border-color 160ms var(--ease);
+  }
+  .name::placeholder {
+    color: var(--faint);
+  }
+  .name:hover {
+    border-bottom-color: var(--faint);
+  }
+  .name:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+  .link {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .link:hover,
+  .link.on {
+    color: var(--accent);
+  }
+  .rungs {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: 4px 16px;
+    margin-top: 16px;
+  }
+  .rung-label {
+    font-size: 16px;
+    color: var(--faint);
+  }
+  .ratio {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  .ratio > span {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .ratio .sep {
+    margin-inline: 6px;
+    color: var(--faint);
+  }
+  /* A number in the hand: it looks written until it is clicked, then it is typed. */
+  .num {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dotted transparent;
+    padding: 0;
+    text-align: center;
+    line-height: 1.1;
+    color: var(--ink);
+    appearance: textfield;
+    transition: border-color 160ms var(--ease);
+  }
+  .num.accent,
+  .val.accent {
+    color: var(--accent);
+  }
+  .num:not([readonly]):hover {
+    border-bottom-color: var(--faint);
+    cursor: text;
+  }
+  .num:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+  .num[readonly]:focus-visible {
+    outline: 2px solid var(--accent);
+  }
+  .passes-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 12px;
+  }
+  .down {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: center;
+  }
+  .rule-line {
+    position: relative;
+    display: block;
+    height: 3px;
+    max-width: 14rem;
+    margin-top: 4px;
+  }
+  .shares {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .weighs {
+    margin-top: 4px;
+    font-size: 16px;
+    color: var(--faint);
+  }
+
+  /* the box */
+  .box {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .box .t {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .box .t-name {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    fill: var(--ink);
+  }
+  .box .t-ink {
+    fill: var(--ink);
+  }
+  .box .t-muted {
+    fill: var(--muted);
+  }
+  .box .lead {
+    stroke: var(--muted);
+    stroke-width: 1;
+  }
+  /* A shade settles to its depth and a column to its width; while the hand is on it, it follows the hand. */
+  .shade {
+    opacity: 0.34;
+    transition:
+      height 200ms var(--ease),
+      x 240ms var(--ease),
+      width 240ms var(--ease);
+  }
+  .box.dragging .shade {
+    transition: none;
+  }
+  .grip {
+    fill: transparent;
+  }
+  .grip-pass {
+    cursor: ns-resize;
+  }
+  .grip-split {
+    cursor: ew-resize;
+  }
+  .grip:focus {
+    outline: none;
+  }
+  .knob-line {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .knob {
+    fill: var(--surface);
+    stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+  .v0 {
+    fill: var(--value-0);
+  }
+  .v1 {
+    fill: var(--value-1);
+  }
+  .v2 {
+    fill: var(--value-2);
+  }
+  .v3 {
+    fill: var(--value-3);
+  }
+  .v4 {
+    fill: var(--value-4);
+  }
+  .v5 {
+    fill: var(--value-5);
+  }
+  .bg0 {
+    background: var(--value-0);
+  }
+  .bg1 {
+    background: var(--value-1);
+  }
+  .bg2 {
+    background: var(--value-2);
+  }
+  .bg3 {
+    background: var(--value-3);
+  }
+  .bg4 {
+    background: var(--value-4);
+  }
+  .bg5 {
+    background: var(--value-5);
+  }
+
+  .under {
+    margin-top: 4px;
+    padding-inline: 4px;
+  }
+  .under .note {
+    font-size: 16px;
+    color: var(--faint);
+  }
+  .sighting-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+  .saw {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding: 2px 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 20px;
+    color: var(--ink);
+    transition: border-color 220ms var(--ease);
+  }
+
+  /* The steps under the box: a thumbnail each, the chosen one framed in the accent. */
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 4px 2px 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+  }
+  .step {
+    position: relative;
+    flex: none;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition:
+      background-color 160ms var(--ease),
+      transform 180ms var(--ease);
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+  .step:hover {
+    background: color-mix(in srgb, var(--ink) 3%, transparent);
+  }
+  .step:active {
+    transform: scale(0.98);
+  }
+  .step svg.thumb {
+    display: block;
+  }
+  .thumb .t-line,
+  .thumb .t-frame {
+    stroke: var(--pen);
+    fill: none;
+  }
+  .thumb rect.v0,
+  .thumb rect.v1,
+  .thumb rect.v2,
+  .thumb rect.v3,
+  .thumb rect.v4,
+  .thumb rect.v5 {
+    opacity: 0.42;
+  }
+  .step .meta {
+    margin-top: 4px;
+    max-width: 124px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--faint);
+  }
+  .step[aria-pressed="true"] .meta {
+    color: var(--ink);
+  }
+  .sift-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 124px;
+    height: 76px;
+    border: 1px dashed var(--faint);
+    border-radius: 2px;
+    font-size: 18px;
+    color: var(--muted);
+    transition: color 160ms var(--ease);
+  }
+  .sift:hover .sift-box {
+    color: var(--accent);
+  }
+  .hint {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--faint);
+  }
+  .trouble {
+    margin-top: 8px;
+  }
+
+  /* the desk */
+  .reading {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .row:hover {
+    background: color-mix(in srgb, var(--ink) 3%, transparent);
+  }
+  .row .title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 16.5px;
+    letter-spacing: -0.01em;
+  }
+  .row[aria-current="true"] .title {
+    color: var(--accent);
+  }
+  .row .meta {
+    flex: none;
+    color: var(--faint);
+  }
+  .sub {
+    margin-top: 14px;
+  }
+  .laws {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+  }
+
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      padding-block: 28px 20px;
+    }
+    .when {
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .step,
+    .sketch .draw {
+      animation: none;
+    }
+    .shade {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>The Sieve</h1>
+      <p class="deck hand">
+        Widths are how you weigh the worlds before looking. A sighting shades
+        each column by how much of that world would show it. Only the shaded
+        areas are compared.
+      </p>
+    </div>
+    <p class="when">
+      <span class="hand">If two stories fit what you saw.</span>
+      Put the question down with the worlds that could answer it, and give each
+      a width: how you weigh them before looking. Then sift what you saw: for
+      each world, how many in a hundred of it would show this. The box shades
+      that much of each column and only the shaded areas are compared. Sift the
+      next thing through what passed. Every number is yours.
+    </p>
+  </header>
+
+  <div class="grid">
+    <section
+      class="panel sketched sheet rise"
+      id="sheet"
+      aria-label="The sieve"
+    >
+      <div class="sheet-top">
+        <p class="meta accent" id="status"></p>
+        <button class="chip accent" id="keep" data-k="keep"></button>
+      </div>
+      <textarea
+        id="question"
+        class="case"
+        rows="1"
+        data-k="question"
+        placeholder="what are you trying to tell apart? the thing you saw could be one of these"
+        aria-label="The question"
+      ></textarea>
+
+      <div class="work">
+        <div class="ladder">
+          <div class="names" id="names"></div>
+          <p class="meta accent lower" id="nameWarn" hidden>
+            again to take it off — every sighting loses its column
+          </p>
+          <div class="rungs" id="rungs"></div>
+          <p class="hand shares" id="shares"></p>
+          <p class="hand weighs" id="weighs" hidden></p>
+        </div>
+        <div class="boxcol">
+          <svg
+            class="box"
+            id="box"
+            viewBox="0 0 760 472"
+            role="group"
+            aria-label="The worlds as columns, as wide as their parts"
+          >
+            <g id="shadeG"></g>
+            <g id="inkG" transform="translate(30 84)"></g>
+            <g id="labelG"></g>
+            <g id="gripG"></g>
+            <g id="knobG" pointer-events="none"></g>
+          </svg>
+          <div class="under" id="under"></div>
+        </div>
+      </div>
+
+      <div class="steps" id="steps" aria-label="The steps"></div>
+
+      <p class="hand hint">
+        drag the line between two columns to reweigh them · drag a shade’s edge
+        to say how much of that world passes · or tab to a line and move it with
+        the arrow keys, shift for ten · click any number to type it · + sift to
+        pass the next thing you saw through what passed the last
+      </p>
+      <p class="meta accent lower trouble" id="trouble" role="alert" hidden></p>
+    </section>
+
+    <aside class="desk">
+      <section
+        class="panel sketched rise"
+        id="readingPanel"
+        style="animation-delay: 100ms"
+        aria-label="The reading"
+      >
+        <p class="meta accent">the reading</p>
+        <p class="reading" id="reading"></p>
+      </section>
+
+      <section
+        class="panel sketched rise"
+        id="listPanel"
+        style="animation-delay: 160ms"
+        aria-label="On the sieve"
+      >
+        <p class="meta accent">on the sieve</p>
+        <div id="list"></div>
+        <p class="meta lower faint sub" id="whole"></p>
+        <p class="meta faint sub">the specimen · fiction</p>
+        <ol class="list" id="specimens"></ol>
+        <div class="chips">
+          <button class="chip" id="newQ" data-k="newQ">new question</button>
+          <button class="chip" id="snooper" data-k="snooper">
+            the snooper
+          </button>
+          <button class="chip" id="quiet" data-k="quiet">the quiet one</button>
+        </div>
+      </section>
+
+      <section
+        class="panel sketched rise"
+        id="lawsPanel"
+        style="animation-delay: 220ms"
+        aria-label="What the sieve holds to"
+      >
+        <p class="meta accent">what the sieve holds to</p>
+        <p class="laws">
+          A sighting is sifted through every world at once, and it is the ratio
+          of what passes that moves the columns, not how much passes of the
+          world you favour. A world a hundredth as wide can still pass most of
+          itself. Nothing passes at 0 or 100: a world that says never cannot
+          come back.
+        </p>
+        <div class="chips" id="offWrap" hidden>
+          <button class="chip" id="off" data-k="off"></button>
+        </div>
+        <p class="meta lower faint sub" id="where"></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">The Sieve · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept only in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const KEY = "pp-sieve";
+
+  /* ── the pen (lib/hand.ts) ─────────────────────────────────────────────
+     Hand-drawn strokes. Every path is deterministic for its seed, so a re-render never
+     redraws a border differently. */
+
+  /** mulberry32: small, fast, and the same number sequence everywhere. */
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  /** One pen stroke from a to b: a cubic a little off the straight line, running just past its ends. */
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+
+  /** A box drawn as four strokes, each running a little past its corner. */
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset;
+    const y0 = inset;
+    const x1 = w - inset;
+    const y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+
+  /** A line drawn under something: a touch before, a touch after, a slight sag. */
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+
+  /** A path from this file (M, C and L only, absolute), sampled into points per subpath. */
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+
+  /** The pen's pressure: a centreline turned into a filled ribbon, thin where the pen lands and lifts. */
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /** A pen line laid over a positioned element: a box round it, or a line under it. */
+  let maskN = 0;
+  function sketch(
+    el,
+    seed,
+    { kind = "box", cls = "ink-pen", width, draw = false, observe = true } = {},
+  ) {
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    el.append(svg);
+    const pen = width ?? (kind === "box" ? 1.7 : 1.5);
+    let first = draw;
+    let size = "";
+    const paint = () => {
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+      if (!w || !h || size === `${w}x${h}`) return;
+      size = `${w}x${h}`;
+      const s = seedOf(seed);
+      const line =
+        kind === "box"
+          ? roughRect(w, h, s)
+          : roughUnderline(w, s, { y: h - 0.5 });
+      const ink = ribbon(line, pen, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      if (first) {
+        const id = `m${++maskN}`;
+        svg.innerHTML = `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}"><path class="draw" d="${line}" pathLength="1" fill="none" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><path class="${cls}" d="${ink}" mask="url(#${id})"/>`;
+        first = false;
+      } else svg.innerHTML = `<path class="${cls}" d="${ink}"/>`;
+    };
+    paint();
+    if (observe) new ResizeObserver(paint).observe(el);
+  }
+
+  /* ── the sieve (lib/sieve.ts) ──────────────────────────────────────────
+     A question is put down with the worlds that could answer it, and each world is given a
+     width: how the reader weighs them before looking, in parts. A sighting is sifted: for each
+     world, how many in a hundred of it would show what was seen. Only the shaded areas are
+     compared, and the next sighting is sifted through what passed the last. Every width and
+     every shade is the reader's number; this multiplies and draws, and never supplies one. */
+
+  const MIN_WORLDS = 2;
+  const MAX_WORLDS = 5;
+
+  /** Nothing passes at 0 or 100: a world that says never cannot come back, and one that says always has stopped looking. */
+  const clampPasses = (n) =>
+    Math.min(99, Math.max(1, Math.round(Number.isFinite(n) ? n : 50)));
+
+  /** A width is any positive number of parts; the drawing needs it finite and above nothing. */
+  const clampParts = (n) =>
+    Number.isFinite(n) && n > 0
+      ? Math.min(1_000_000, Math.max(0.01, Math.round(n * 1000) / 1000))
+      : 1;
+
+  const emptySieve = (today) => ({
+    slug: "",
+    title: "",
+    question: "",
+    worlds: [
+      { name: "", parts: 1 },
+      { name: "", parts: 1 },
+    ],
+    sightings: [],
+    stone: null,
+    opened: today,
+    touched: today,
+    note: "",
+  });
+
+  const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+
+  /** Each world's share of the whole, by parts. */
+  const shares = (parts) => {
+    const s = sum(parts) || 1;
+    return parts.map((p) => p / s);
+  };
+
+  /** What passes of each world: its parts, shaded to how many in a hundred show the sighting. */
+  const pass = (parts, passes) =>
+    parts.map((p, i) => (p * (passes[i] ?? 50)) / 100);
+
+  /** Reduced so the smallest part is 1, which is how a ratio is said aloud. */
+  const reduce = (parts) => {
+    const m = Math.min(...parts.filter((p) => p > 0));
+    if (!Number.isFinite(m) || m <= 0) return parts;
+    return parts.map((p) => p / m);
+  };
+
+  /** A number said plainly: 1, 12.5, 0.08. */
+  const fmt = (n) => {
+    if (!Number.isFinite(n)) return "—";
+    const d = n >= 100 ? 0 : n >= 10 ? 1 : n >= 1 ? 2 : 3;
+    return String(Math.round(n * 10 ** d) / 10 ** d);
+  };
+
+  /** A share as parts in a hundred: 7.4, 92.6, <1. */
+  const inHundred = (share) => {
+    const p = share * 100;
+    if (p > 0 && p < 1) return "<1";
+    if (p > 99 && p < 100) return ">99";
+    return fmt(Math.round(p * 10) / 10);
+  };
+
+  const ratio = (parts) => reduce(parts).map(fmt).join(" : ");
+  const plain = (parts) => parts.map(fmt).join(" : ");
+
+  /** Each sighting in order, sifted through what passed the one before. */
+  function stagesOf(s) {
+    const out = [];
+    let before = s.worlds.map((w) => w.parts);
+    for (const g of s.sightings) {
+      const product = pass(before, g.passes);
+      const after = reduce(product);
+      out.push({ before, passes: g.passes, after, product });
+      before = after;
+    }
+    return out;
+  }
+
+  /** The parts as they stand: the last thing that passed, or the widths before looking. */
+  const partsNow = (s) =>
+    stagesOf(s).at(-1)?.after ?? s.worlds.map((w) => w.parts);
+
+  /** A sighting's weight between two worlds, said as at-least-one-to-one for the world it favours. */
+  function weight(passes, i, j) {
+    const a = passes[i] ?? 50;
+    const b = passes[j] ?? 50;
+    return a >= b
+      ? { for: i, against: j, factor: a / b }
+      : { for: j, against: i, factor: b / a };
+  }
+
+  /** The strongest weight a sighting carries between any two of the worlds. */
+  function heaviest(passes) {
+    let hi = 0;
+    let lo = 0;
+    passes.forEach((p, i) => {
+      if (p > (passes[hi] ?? 0)) hi = i;
+      if (p < (passes[lo] ?? Infinity)) lo = i;
+    });
+    return weight(passes, hi, lo);
+  }
+
+  /** The world with the most parts; ties go to the earlier one. */
+  const leader = (parts) =>
+    parts.reduce((best, p, i) => (p > (parts[best] ?? -1) ? i : best), 0);
+
+  /** Dragging the line between two columns: the pair keeps its parts between them and splits them by the new fraction. */
+  function splitPair(parts, i, f) {
+    const a = parts[i];
+    const b = parts[i + 1];
+    if (a === undefined || b === undefined) return parts;
+    const total = a + b;
+    const t = Math.min(0.99, Math.max(0.01, f));
+    const round = (n) =>
+      total >= 20
+        ? Math.max(1, Math.round(n))
+        : Math.max(0.1, Math.round(n * 10) / 10);
+    const na = round(total * t);
+    const nb = round(total - na);
+    const out = parts.slice();
+    out[i] = clampParts(na);
+    out[i + 1] = clampParts(nb);
+    return out;
+  }
+
+  function tally(s) {
+    const names = s.worlds.map((w) => w.name);
+    const start = s.worlds.map((w) => w.parts);
+    const stages = stagesOf(s);
+    const now = stages.at(-1)?.after ?? start;
+    const ledBefore = leader(start);
+    const lead = leader(now);
+    const turns = [];
+    let led = ledBefore;
+    stages.forEach((st, i) => {
+      const l = leader(st.after);
+      if (l !== led) {
+        turns.push({ after: i, lead: l });
+        led = l;
+      }
+    });
+    let heavy = null;
+    s.sightings.forEach((g, i) => {
+      const h = heaviest(g.passes);
+      if (!heavy || h.factor > heavy.factor) heavy = { i, ...h };
+    });
+    let level = null;
+    if (now.length >= 2) {
+      const order = now.map((p, i) => ({ p, i })).sort((a, b) => b.p - a.p);
+      const first = order[0];
+      const second = order[1];
+      if (first && second && first.p > second.p)
+        level = { for: second.i, against: first.i, factor: first.p / second.p };
+    }
+    return {
+      n: s.sightings.length,
+      names,
+      start,
+      now,
+      startShares: shares(start),
+      nowShares: shares(now),
+      ledBefore,
+      lead,
+      turns,
+      heaviest: heavy,
+      level,
+      stages,
+    };
+  }
+
+  const nOf = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const quote = (saw) => {
+    const s = saw.replace(/\s+/g, " ").trim();
+    if (!s) return "an unnamed sighting";
+    return `‘${s.length > 40 ? `${s.slice(0, 37).trim()}…` : s}’`;
+  };
+  const factorOf = (f) => `${fmt(f)} to 1`;
+
+  /** Facts about one sieve's numbers, all of them the reader's; none a verdict on the worlds. */
+  function readings(s, t) {
+    const out = [];
+    const nm = (i) => t.names[i] ?? `world ${i + 1}`;
+    const pair =
+      t.names.length === 2 ? `${nm(0)} : ${nm(1)}` : t.names.join(" : ");
+    const hundreds = (sh) =>
+      sh.map((x, i) => `${nm(i)} ${inHundred(x)} in 100`).join(", ");
+    if (!t.n) {
+      out.push("nothing sifted yet");
+      out.push(
+        `before looking, ${pair} at ${ratio(t.start)} — ${hundreds(t.startShares)}`,
+      );
+    } else {
+      out.push(`before looking, ${pair} at ${ratio(t.start)}`);
+      const said = s.sightings.slice(0, 4).map((g) => {
+        const h = heaviest(g.passes);
+        const passed =
+          g.passes.length === 2
+            ? `passed ${g.passes[0]} in 100 of ${nm(0)} and ${g.passes[1]} in 100 of ${nm(1)}`
+            : `passed ${g.passes.join(" · ")} in 100 of ${t.names.join(", ")}`;
+        return `${quote(g.saw)} ${passed} — ${factorOf(h.factor)} for ${nm(h.for)}`;
+      });
+      out.push(
+        `${nOf(t.n, "sighting")} sifted: ${said.join("; ")}${t.n > 4 ? `; and ${t.n - 4} more` : ""}`,
+      );
+      out.push(
+        `what passes, by your numbers: ${ratio(t.now)} — ${hundreds(t.nowShares)}`,
+      );
+      if (!t.turns.length)
+        out.push(
+          `${nm(t.ledBefore)} was widest before looking and is widest now`,
+        );
+      else
+        out.push(
+          `the widest column changed hands ${nOf(t.turns.length, "time")}: ${t.turns
+            .map(
+              (x) =>
+                `after ${quote(s.sightings[x.after]?.saw ?? "")}, ${nm(x.lead)}`,
+            )
+            .join("; ")}`,
+        );
+      if (t.heaviest && t.n > 1)
+        out.push(
+          `the sighting that weighed most was ${quote(s.sightings[t.heaviest.i]?.saw ?? "")}, ${factorOf(t.heaviest.factor)} for ${nm(t.heaviest.for)}`,
+        );
+    }
+    if (t.level)
+      out.push(
+        `for ${nm(t.level.for)} to draw level with ${nm(t.level.against)} would take a sighting weighing ${factorOf(t.level.factor)} for it`,
+      );
+    else if (t.names.length >= 2)
+      out.push("the two widest columns stand level");
+    return out;
+  }
+
+  /** Facts about every question on the sieve. */
+  function wholeReadings(sieves) {
+    if (!sieves.length) return ["nothing on the sieve yet"];
+    const sifted = sum(sieves.map((s) => s.sightings.length));
+    const out = [
+      `${nOf(sieves.length, "question")} on the sieve · ${nOf(sifted, "sighting")} sifted in all`,
+    ];
+    const bare = sieves.filter((s) => !s.sightings.length).length;
+    if (bare) out.push(`${bare} with nothing sifted yet`);
+    const turned = sieves.filter((s) => tally(s).turns.length).length;
+    if (turned) out.push(`${turned} where the widest column has changed hands`);
+    const many = sieves.filter((s) => s.worlds.length > 2).length;
+    if (many) out.push(`${many} with more than two worlds`);
+    return out;
+  }
+
+  const sentencesOf = (text) =>
+    text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1);
+
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+
+  function titleOf(s) {
+    if (s.title.trim()) return s.title.trim();
+    const first = (sentencesOf(s.question)[0] ?? s.question.trim())
+      .replace(/[.!…]+$/, "")
+      .trim();
+    if (first)
+      return first.length > 72 ? `${first.slice(0, 69).trim()}…` : first;
+    return "a question";
+  }
+
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+
+  /** Validation at the boundary: a sieve arrives from the sheet, or from this browser's storage. */
+  function validateSieve(input, today) {
+    const r = input ?? {};
+    const question =
+      typeof r.question === "string" ? r.question.trim().slice(0, 2000) : "";
+    if (!question) throw new Error("a question needs its words");
+    const day = (v, fallback = today) =>
+      typeof v === "string" && DAY.test(v) ? v : fallback;
+    const long = (v, max) =>
+      typeof v === "string" ? v.trim().slice(0, max) : "";
+    const worlds = (Array.isArray(r.worlds) ? r.worlds : [])
+      .slice(0, MAX_WORLDS)
+      .map((x, i) => {
+        const o = x ?? {};
+        return {
+          name: str(o.name, 60) || `world ${i + 1}`,
+          parts: clampParts(Number(o.parts)),
+        };
+      });
+    if (worlds.length < MIN_WORLDS)
+      throw new Error("a sieve needs at least two worlds");
+    const sightings = (Array.isArray(r.sightings) ? r.sightings : [])
+      .slice(0, 500)
+      .map((x) => {
+        const o = x ?? {};
+        const given = Array.isArray(o.passes) ? o.passes : [];
+        return {
+          on: day(o.on),
+          saw: long(o.saw, 2000),
+          passes: worlds.map((_, i) => clampPasses(Number(given[i]))),
+        };
+      });
+    const s = {
+      slug: str(r.slug, 120),
+      title: str(r.title, 120),
+      question,
+      worlds,
+      sightings,
+      stone: str(r.stone, 200) || null,
+      opened: day(r.opened),
+      touched: day(r.touched),
+      note: long(r.note, 4000),
+    };
+    s.title = titleOf(s);
+    if (!s.slug) s.slug = slugOf(s.title, s.opened);
+    return s;
+  }
+
+  /* ── the specimen (content/sieve.ts) ───────────────────────────────────
+     A synthetic life with two questions on it. The first is its own: the quiet junior, two
+     worlds weighed by its own count and sifted twice. The second is the one every primer
+     draws, kept because the numbers are the point: a world a hundredth as wide can still pass
+     most of itself. Fiction. */
+
+  const SPECIMEN = [
+    {
+      slug: "2026-09-22-is-the-quiet-junior-lost-or-quiet",
+      title: "Is the quiet junior lost, or quiet",
+      question:
+        "The new junior says nothing at standup. Is he lost, or is he quiet by nature?",
+      worlds: [
+        { name: "lost", parts: 1 },
+        { name: "quiet", parts: 3 },
+      ],
+      sightings: [
+        {
+          on: "2026-09-22",
+          saw: "A whole week without a question, in the room or in the channel.",
+          passes: [70, 40],
+        },
+        {
+          on: "2026-09-24",
+          saw: "His first change came in clean, with a note explaining a choice nobody had asked about.",
+          passes: [15, 60],
+        },
+      ],
+      stone: null,
+      opened: "2026-09-22",
+      touched: "2026-09-24",
+      note: "",
+    },
+    {
+      slug: "2026-09-20-someone-round-the-side-of-the-house",
+      title: "Someone round the side of the house",
+      question:
+        "Someone is snooping round the side of the house at night. A robber, or someone honest looking for a cat?",
+      worlds: [
+        { name: "robber", parts: 1 },
+        { name: "honest", parts: 100 },
+      ],
+      sightings: [
+        {
+          on: "2026-09-20",
+          saw: "Snooping: along the fence with a torch, twice, without calling anything.",
+          passes: [80, 10],
+        },
+      ],
+      stone: null,
+      opened: "2026-09-20",
+      touched: "2026-09-20",
+      note: "",
+    },
+  ];
+
+  /** Two questions to start from, drawn the way a primer draws them: the snooper and the shy one at the party. Drafts. */
+  const EXAMPLES = [
+    {
+      ...SPECIMEN[1],
+      slug: "",
+      opened: "",
+      touched: "",
+      sightings: [{ ...SPECIMEN[1].sightings[0], saw: "snooping" }],
+    },
+    {
+      slug: "",
+      title: "The quiet one at the party",
+      question:
+        "Someone at the party is quiet and keeps to the edge. A maths PhD, or someone from the business school?",
+      worlds: [
+        { name: "maths PhD", parts: 1 },
+        { name: "business", parts: 10 },
+      ],
+      sightings: [{ on: "", saw: "shy", passes: [75, 15] }],
+      stone: null,
+      opened: "",
+      touched: "",
+      note: "",
+    },
+  ];
+
+  /* ── the page ────────────────────────────────────────────────────────── */
+
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const localToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const today = localToday();
+  const short = (s, max = 14) => {
+    const t = s.replace(/\s+/g, " ").trim();
+    if (t.length <= max) return t;
+    const cut = t.slice(0, max).replace(/\s+\S*$/, "");
+    return `${cut || t.slice(0, max - 1)}…`;
+  };
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+  const vc = (i) => `v${i % 6}`;
+
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) el.append(c);
+    return el;
+  }
+  function s(tag, attrs) {
+    const el = document.createElementNS(SVGNS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+    return el;
+  }
+
+  /*
+   * State. `kind` is what is on the sheet: one of the reader's kept questions, a specimen
+   * question (fiction, editable, never kept unless copied), or a draft.
+   */
+  const S = {
+    kept: [],
+    open: null,
+    kind: "draft",
+    step: 0,
+    sure: null,
+    trouble: null,
+    gen: 0,
+    stored: false,
+    drag: null,
+  };
+
+  /* ── keeping: one key in this browser, never anywhere else ───────────── */
+
+  function readStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw === null) return null;
+      S.stored = true;
+      const o = JSON.parse(raw);
+      const sieves = (Array.isArray(o?.sieves) ? o.sieves : [])
+        .map((x) => {
+          try {
+            return validateSieve(x, today);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      return { sieves, open: typeof o?.open === "string" ? o.open : null };
+    } catch {
+      return null;
+    }
+  }
+  function writeStore() {
+    if (!S.kept.length && !S.stored) return true;
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          sieves: S.kept,
+          open: S.kind === "kept" ? S.open.slug : null,
+        }),
+      );
+      S.stored = true;
+      return true;
+    } catch {
+      S.trouble = "not kept — this browser would not hold it";
+      return false;
+    }
+  }
+  const byTouched = (a, b) =>
+    a.touched < b.touched ? 1 : a.touched > b.touched ? -1 : 0;
+
+  /** Keep the open question: validated as a file would be, with a fresh slug numbered if taken. */
+  function save(fresh) {
+    const cur = S.open;
+    let out;
+    try {
+      out = validateSieve({ ...cur, touched: today }, today);
+    } catch (e) {
+      S.trouble = e.message;
+      return false;
+    }
+    out.touched = today;
+    if (fresh) {
+      const taken = new Set(S.kept.map((x) => x.slug));
+      const base = out.slug;
+      let n = 2;
+      while (taken.has(out.slug)) out.slug = `${base}-${n++}`;
+    }
+    const before = S.kept;
+    S.kept = S.kept.some((x) => x.slug === out.slug)
+      ? S.kept.map((x) => (x.slug === out.slug ? out : x))
+      : [out, ...S.kept];
+    const wasKind = S.kind;
+    S.kind = "kept";
+    if (!writeStore()) {
+      S.kept = before;
+      S.kind = wasKind;
+      return false;
+    }
+    S.open = { ...cur, slug: out.slug, title: out.title, touched: out.touched };
+    S.trouble = null;
+    return true;
+  }
+  const commit = () => {
+    if (S.kind === "kept") save(false);
+  };
+  function apply(fn) {
+    if (!S.open) return;
+    S.open = fn(S.open);
+    commit();
+  }
+
+  function load(sv, kind, at) {
+    S.open = clone(sv);
+    S.kind = kind;
+    S.step = at ?? (sv.sightings.length ? sv.sightings.length : 0);
+    S.sure = null;
+    S.trouble = null;
+    S.gen++;
+    writeStore();
+  }
+
+  function keep() {
+    const cur = S.open;
+    if (!cur) return;
+    if (!cur.question.trim()) {
+      S.trouble = "a question needs its words before it is kept";
+      return;
+    }
+    S.open = { ...cur, opened: cur.opened || today, touched: today };
+    save(true);
+  }
+
+  function removeOpen() {
+    if (S.kind !== "kept") return;
+    const slug = S.open.slug;
+    const before = S.kept;
+    S.kept = S.kept.filter((x) => x.slug !== slug);
+    if (!writeStore()) {
+      S.kept = before;
+      return;
+    }
+    const rest = [...S.kept].sort(byTouched);
+    if (rest[0]) load(rest[0], "kept");
+    else load({ ...EXAMPLES[0], opened: today, touched: today }, "draft");
+  }
+
+  /* ── the worlds and the sightings ────────────────────────────────────── */
+
+  const setName = (i, name) => {
+    S.open.worlds = S.open.worlds.map((w, k) => (k === i ? { ...w, name } : w));
+  };
+  const setParts = (parts) => {
+    S.open.worlds = S.open.worlds.map((w, i) => ({
+      ...w,
+      parts: parts[i] ?? w.parts,
+    }));
+  };
+  const setPass = (k, i, v) => {
+    S.open.sightings = S.open.sightings.map((g, gi) =>
+      gi === k
+        ? { ...g, passes: g.passes.map((x, xi) => (xi === i ? v : x)) }
+        : g,
+    );
+  };
+  const setSaw = (k, saw) => {
+    S.open.sightings = S.open.sightings.map((g, gi) =>
+      gi === k ? { ...g, saw } : g,
+    );
+  };
+
+  let focusSaw = false;
+  function sift() {
+    const n = S.open.sightings.length;
+    focusSaw = true;
+    apply((cur) => ({
+      ...cur,
+      sightings: [
+        ...cur.sightings,
+        { on: today, saw: "", passes: cur.worlds.map(() => 50) },
+      ],
+    }));
+    S.step = n + 1;
+    S.sure = null;
+  }
+  function takeBack(k) {
+    apply((cur) => ({
+      ...cur,
+      sightings: cur.sightings.filter((_, i) => i !== k),
+    }));
+    const left = S.open.sightings.length;
+    S.step = left >= 1 ? Math.min(k, left - 1) + 1 : 0;
+    S.sure = null;
+  }
+  function addWorld() {
+    apply((cur) =>
+      cur.worlds.length >= MAX_WORLDS
+        ? cur
+        : {
+            ...cur,
+            worlds: [
+              ...cur.worlds,
+              { name: `world ${cur.worlds.length + 1}`, parts: 1 },
+            ],
+            sightings: cur.sightings.map((g) => ({
+              ...g,
+              passes: [...g.passes, 50],
+            })),
+          },
+    );
+  }
+  function removeWorld(i) {
+    apply((cur) =>
+      cur.worlds.length <= MIN_WORLDS
+        ? cur
+        : {
+            ...cur,
+            worlds: cur.worlds.filter((_, k) => k !== i),
+            sightings: cur.sightings.map((g) => ({
+              ...g,
+              passes: g.passes.filter((_, k) => k !== i),
+            })),
+          },
+    );
+    S.sure = null;
+  }
+
+  /* ── the steps ───────────────────────────────────────────────────────── */
+
+  /** Before looking, then each sighting in order, then what passes — when anything has. */
+  const stepsOf = (sv) => [
+    { kind: "before" },
+    ...sv.sightings.map((_, i) => ({ kind: "sighting", i })),
+    ...(sv.sightings.length ? [{ kind: "now" }] : []),
+  ];
+
+  /** What the box draws at one step: the widths, and the shades if a sighting is on it. */
+  function viewOf(sv, step) {
+    if (step.kind === "before")
+      return { parts: sv.worlds.map((w) => w.parts), passes: null, saw: "" };
+    if (step.kind === "now")
+      return { parts: partsNow(sv), passes: null, saw: "" };
+    const st = stagesOf(sv)[step.i];
+    return st
+      ? {
+          parts: st.before,
+          passes: st.passes,
+          saw: sv.sightings[step.i]?.saw ?? "",
+        }
+      : { parts: sv.worlds.map((w) => w.parts), passes: null, saw: "" };
+  }
+
+  function current() {
+    const steps = stepsOf(S.open);
+    const k = Math.min(S.step, Math.max(0, steps.length - 1));
+    const at = steps[k] ?? { kind: "before" };
+    return { steps, k, at, view: viewOf(S.open, at) };
+  }
+
+  /* ── the box ─────────────────────────────────────────────────────────── */
+
+  const BW = 700;
+  const BH = 372;
+  const TOP = 84;
+  const LEFT = 30;
+  const W = BW + 2 * LEFT;
+
+  const box = $("box");
+  const shadeG = $("shadeG");
+  const inkG = $("inkG");
+  const labelG = $("labelG");
+  const gripG = $("gripG");
+  const knobG = $("knobG");
+  let gripSig = "";
+
+  function columns(parts) {
+    const sh = shares(parts);
+    const xs = [];
+    const ws = [];
+    let x = LEFT;
+    for (let i = 0; i < parts.length; i++) {
+      xs.push(x);
+      ws.push(sh[i] * BW);
+      x += sh[i] * BW;
+    }
+    return { sh, xs, ws };
+  }
+
+  /**
+   * The whole, drawn large and by hand: worlds as columns as wide as their parts; with a
+   * sighting on it, each column shaded from the top by how many in a hundred of that world
+   * would show it. The line between two columns drags to reweigh them; a shade's edge drags
+   * to say how much passes. Every mark on it is a number the reader set.
+   */
+  function renderBox({ parts, passes, saw }, names, seed, canParts, canPasses) {
+    const n = parts.length;
+    const { sh, xs, ws } = columns(parts);
+    const sd = seedOf(seed);
+
+    // the shades: kept as elements so a step change lets them settle rather than jump
+    while (shadeG.children.length > n) shadeG.lastChild.remove();
+    while (shadeG.children.length < n) shadeG.append(s("rect", { y: TOP }));
+    [...shadeG.children].forEach((r, i) => {
+      r.setAttribute("class", `shade ${vc(i)}`);
+      r.setAttribute("x", xs[i]);
+      r.setAttribute("width", Math.max(0, ws[i]));
+      r.setAttribute("height", passes ? (BH * passes[i]) / 100 : 0);
+    });
+
+    // the ink: the frame, the lines between columns, the shades' edges
+    let ink = "";
+    if (passes)
+      passes.forEach((p, i) => {
+        const y = (BH * p) / 100;
+        const d = stroke(
+          [xs[i] - LEFT, y],
+          [xs[i] - LEFT + ws[i], y],
+          rand(sd + 101 + i * 13),
+          1.0,
+          2,
+        );
+        ink += `<path class="${vc(i)}" d="${ribbon(d, 1.7, sd + 101 + i * 13)}"/>`;
+      });
+    for (let i = 1; i < n; i++) {
+      const d = stroke(
+        [xs[i] - LEFT, -2],
+        [xs[i] - LEFT, BH + 2],
+        rand(sd + i * 7),
+        1.1,
+        3,
+      );
+      ink += `<path class="ink-pen" d="${ribbon(d, 1.6, sd + i * 7)}"/>`;
+    }
+    ink += `<path class="ink-pen" d="${ribbon(roughRect(BW, BH, sd, { overshoot: 5, wobble: 1.3 }), 2, sd)}"/>`;
+    inkG.innerHTML = ink;
+
+    // the names, in the hand
+    const stagger = n > 2 || ws.some((w) => w < 150);
+    const word = short(saw, 16);
+    let lab = "";
+    names.forEach((name, i) => {
+      const w = ws[i];
+      const cx = xs[i] + w / 2;
+      const y = TOP - 16 - (stagger ? i % 2 : 0) * 28;
+      const anchor =
+        w < 150 && i === 0
+          ? "start"
+          : w < 150 && i === n - 1
+            ? "end"
+            : "middle";
+      const lx = anchor === "start" ? xs[i] : anchor === "end" ? xs[i] + w : cx;
+      if (w < 60)
+        lab += `<line class="lead" x1="${lx + (anchor === "start" ? 14 : anchor === "end" ? -14 : 0)}" y1="${y + 6}" x2="${cx}" y2="${TOP - 3}"/>`;
+      lab += `<text class="t t-name" x="${lx}" y="${y}" font-size="21" text-anchor="${anchor}">${esc(`${inHundred(sh[i])}% ${name}`)}</text>`;
+    });
+    // what passes, written in the shade
+    if (passes)
+      passes.forEach((p, i) => {
+        const w = ws[i];
+        const hh = (BH * p) / 100;
+        const cx = xs[i] + w / 2;
+        const label = `${p}%${word ? ` ${word}` : ""}`;
+        if (w >= 150 && hh >= 34)
+          lab += `<text class="t t-ink" x="${cx}" y="${TOP + hh - 12}" font-size="19" text-anchor="middle">${esc(label)}</text>`;
+        else if (w >= 60 && hh >= 34)
+          lab += `<text class="t t-ink" x="${cx}" y="${TOP + hh - 12}" font-size="18" text-anchor="middle">${p}%</text>`;
+        else {
+          const right = i < n - 1 || xs[i] + w < W - 200;
+          const lx = right ? xs[i] + w + 22 : xs[i] - 22;
+          const ly = TOP + Math.max(hh, 28);
+          lab += `<line class="lead" x1="${right ? lx - 4 : lx + 4}" y1="${ly - 6}" x2="${right ? xs[i] + w + 2 : xs[i] - 2}" y2="${TOP + hh}"/>`;
+          lab += `<text class="t t-muted" x="${lx}" y="${ly}" font-size="18" text-anchor="${right ? "start" : "end"}">${esc(label)}</text>`;
+        }
+      });
+    labelG.innerHTML = lab;
+
+    box.setAttribute(
+      "aria-label",
+      passes
+        ? `The worlds as columns, each shaded by how much of it passes ${saw || "the sighting"}`
+        : "The worlds as columns, as wide as their parts",
+    );
+
+    // the hands: the shades' edges, then the lines between columns on top. Kept as elements,
+    // so a focused line keeps its focus while the keys move it.
+    const sig = `${n}|${passes && canPasses ? 1 : 0}|${canParts ? 1 : 0}`;
+    if (sig !== gripSig) {
+      gripSig = sig;
+      gripG.replaceChildren();
+      if (passes && canPasses)
+        for (let i = 0; i < n; i++)
+          gripG.append(
+            s("rect", {
+              class: "grip grip-pass",
+              "data-kind": "pass",
+              "data-i": i,
+              "data-k": `grip-pass-${i}`,
+              tabindex: 0,
+              role: "slider",
+              "aria-orientation": "vertical",
+              "aria-valuemin": 1,
+              "aria-valuemax": 99,
+            }),
+          );
+      if (canParts)
+        for (let i = 1; i < n; i++)
+          gripG.append(
+            s("rect", {
+              class: "grip grip-split",
+              "data-kind": "split",
+              "data-i": i,
+              "data-k": `grip-split-${i}`,
+              tabindex: 0,
+              role: "slider",
+              "aria-orientation": "horizontal",
+              "aria-valuemin": 1,
+              "aria-valuemax": 99,
+            }),
+          );
+    }
+    for (const g of gripG.children) {
+      const i = +g.dataset.i;
+      if (g.dataset.kind === "pass") {
+        const p = passes[i];
+        g.setAttribute("x", xs[i] - Math.max(0, (18 - ws[i]) / 2));
+        g.setAttribute("y", TOP);
+        g.setAttribute("width", Math.max(ws[i], 18));
+        g.setAttribute("height", BH);
+        g.setAttribute(
+          "aria-label",
+          `How much of ${names[i] || `world ${i + 1}`} passes`,
+        );
+        g.setAttribute("aria-valuenow", p);
+        g.setAttribute("aria-valuetext", `${p} in 100`);
+      } else {
+        const a = parts[i - 1];
+        const b = parts[i];
+        g.setAttribute("x", xs[i] - 10);
+        g.setAttribute("y", TOP - 4);
+        g.setAttribute("width", 20);
+        g.setAttribute("height", BH + 8);
+        g.setAttribute(
+          "aria-label",
+          `Reweigh ${names[i - 1] || `world ${i}`} against ${names[i] || `world ${i + 1}`}`,
+        );
+        g.setAttribute("aria-valuenow", Math.round((a / (a + b)) * 100));
+        g.setAttribute("aria-valuetext", `${fmt(a)} : ${fmt(b)}`);
+      }
+    }
+
+    // the hand on it: whichever line is held or has the keys gets a mark in the accent
+    const held =
+      S.drag?.el ??
+      (document.activeElement?.classList?.contains("grip") &&
+      document.activeElement.matches(":focus-visible")
+        ? document.activeElement
+        : null);
+    let knob = "";
+    if (held && held.parentNode === gripG) {
+      const i = +held.dataset.i;
+      if (held.dataset.kind === "pass" && passes) {
+        const y = TOP + (BH * passes[i]) / 100;
+        knob = `<line class="knob-line" x1="${xs[i] + 3}" y1="${y}" x2="${xs[i] + ws[i] - 3}" y2="${y}"/><circle class="knob" cx="${xs[i] + ws[i] / 2}" cy="${y}" r="7"/>`;
+      } else if (held.dataset.kind === "split") {
+        knob = `<line class="knob-line" x1="${xs[i]}" y1="${TOP + 2}" x2="${xs[i]}" y2="${TOP + BH - 2}"/><circle class="knob" cx="${xs[i]}" cy="${TOP + BH / 2}" r="7"/>`;
+      }
+    }
+    knobG.innerHTML = knob;
+    box.classList.toggle("dragging", !!S.drag);
+  }
+
+  const toSvg = (cx, cy) => {
+    const m = box.getScreenCTM();
+    if (!m) return null;
+    const pt = box.createSVGPoint();
+    pt.x = cx;
+    pt.y = cy;
+    const p = pt.matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  };
+
+  gripG.addEventListener("pointerdown", (e) => {
+    const g = e.target.closest(".grip");
+    if (!g || e.button !== 0) return;
+    e.preventDefault();
+    if (document.activeElement && document.activeElement !== g)
+      document.activeElement.blur?.();
+    g.focus({ preventScroll: true });
+    const { at, view } = current();
+    const i = +g.dataset.i;
+    let move;
+    if (g.dataset.kind === "pass") {
+      const k = at.i;
+      move = (p) => setPass(k, i, clampPasses(((p.y - TOP) / BH) * 100));
+    } else {
+      const parts0 = view.parts.slice();
+      const { xs, ws } = columns(parts0);
+      const left = xs[i - 1];
+      const span = ws[i - 1] + ws[i];
+      move = (p) => setParts(splitPair(parts0, i - 1, (p.x - left) / span));
+    }
+    S.drag = { el: g };
+    const onMove = (ev) => {
+      const p = toSvg(ev.clientX, ev.clientY);
+      if (p) {
+        move(p);
+        render();
+      }
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      S.drag = null;
+      commit();
+      render();
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    onMove(e);
+  });
+
+  /* The same two hands from the keyboard. A shade's edge moves the way the arrow points: down
+     shades more of the column, up shades less. A line between columns moves one part at a time
+     (a tenth when the pair holds fewer than twenty), shift for ten. */
+  gripG.addEventListener("keydown", (e) => {
+    const g = e.target.closest(".grip");
+    if (!g) return;
+    const big = e.shiftKey ? 10 : 1;
+    const { at, view } = current();
+    const i = +g.dataset.i;
+    if (g.dataset.kind === "pass") {
+      const p = at.kind === "sighting" ? S.open.sightings[at.i].passes[i] : 50;
+      const next =
+        e.key === "ArrowDown" || e.key === "ArrowRight"
+          ? p + big
+          : e.key === "ArrowUp" || e.key === "ArrowLeft"
+            ? p - big
+            : e.key === "PageDown"
+              ? p + 10
+              : e.key === "PageUp"
+                ? p - 10
+                : e.key === "Home"
+                  ? 1
+                  : e.key === "End"
+                    ? 99
+                    : null;
+      if (next === null) return;
+      e.preventDefault();
+      setPass(at.i, i, clampPasses(next));
+    } else {
+      const a = view.parts[i - 1];
+      const b = view.parts[i];
+      const total = a + b;
+      const unit = total >= 20 ? 1 : 0.1;
+      const na =
+        e.key === "ArrowRight" || e.key === "ArrowUp"
+          ? a + unit * big
+          : e.key === "ArrowLeft" || e.key === "ArrowDown"
+            ? a - unit * big
+            : e.key === "PageUp"
+              ? a + unit * 10
+              : e.key === "PageDown"
+                ? a - unit * 10
+                : e.key === "Home"
+                  ? 0
+                  : e.key === "End"
+                    ? total
+                    : null;
+      if (na === null) return;
+      e.preventDefault();
+      setParts(splitPair(view.parts, i - 1, na / total));
+    }
+    commit();
+    render();
+  });
+  gripG.addEventListener("focusin", () => render());
+  gripG.addEventListener("focusout", () => requestAnimationFrame(render));
+
+  /** One step, small: the columns and their shades and nothing else. */
+  function thumb(parts, passes, w = 124, hh = 76) {
+    const sh = shares(parts);
+    let x = 1;
+    let out = "";
+    sh.forEach((sv, i) => {
+      const cw = sv * (w - 2);
+      if (passes)
+        out += `<rect class="${vc(i)}" x="${x}" y="1" width="${cw}" height="${((hh - 2) * (passes[i] ?? 0)) / 100}"/>`;
+      if (i > 0)
+        out += `<line class="t-line" x1="${x}" x2="${x}" y1="1" y2="${hh - 1}" stroke-width="1"/>`;
+      x += cw;
+    });
+    out += `<rect class="t-frame" x="1" y="1" width="${w - 2}" height="${hh - 2}" stroke-width="1.2"/>`;
+    return out;
+  }
+
+  /** A short arrow drawn down the page, the way the primer draws the step to what passes. */
+  const DOWN = (() => {
+    const r = rand(7);
+    return (
+      ribbon(stroke([7, 0], [7, 30], r, 0.9, 0), 1.6, 7) +
+      ribbon(stroke([1, 23], [7, 31], r, 0.6, 0), 1.4, 8) +
+      ribbon(stroke([13, 23], [7, 31], r, 0.6, 0), 1.4, 9)
+    );
+  })();
+
+  /* ── the ladder ──────────────────────────────────────────────────────── */
+
+  /** A number written in the hand that can be clicked and retyped; it commits on blur or return. */
+  function num(value, clamp, onCommit, editable, size, label, key, accent) {
+    const shown = fmt(value);
+    const width = (t) => `${Math.max(1.4, t.length * 0.62 + 0.6)}em`;
+    const el = h("input", {
+      class: `num hand${accent ? " accent" : ""}`,
+      value: shown,
+      inputmode: "decimal",
+      "aria-label": label,
+      "data-k": key,
+      readonly: !editable,
+      style: `font-size:${size}px;width:${width(shown)}`,
+    });
+    let cancel = false;
+    el.addEventListener("focus", () => {
+      if (editable) el.select();
+    });
+    el.addEventListener("input", () => (el.style.width = width(el.value)));
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") el.blur();
+      if (e.key === "Escape") {
+        cancel = true;
+        el.value = shown;
+        el.blur();
+      }
+    });
+    el.addEventListener("blur", () => {
+      if (!editable || cancel) {
+        cancel = false;
+        return;
+      }
+      const v = Number(el.value);
+      // after the focus has landed wherever it was going, so the redraw can hand it back
+      if (Number.isFinite(v) && v > 0 && clamp(v) !== value)
+        setTimeout(() => {
+          onCommit(clamp(v));
+          render();
+        }, 0);
+      else el.value = shown;
+    });
+    return el;
+  }
+
+  /** Numbers side by side with the colon between, like a ratio said aloud. */
+  function ratioEl(
+    values,
+    { clamp = clampParts, onCommit, label, key, size = 26, accent } = {},
+  ) {
+    return h(
+      "span",
+      { class: "ratio" },
+      values.map((v, i) =>
+        h(
+          "span",
+          null,
+          i > 0
+            ? h(
+                "span",
+                { class: "hand sep", style: `font-size:${size * 0.8}px` },
+                ":",
+              )
+            : null,
+          onCommit
+            ? num(
+                v,
+                clamp,
+                (n) => onCommit(i, n),
+                true,
+                size,
+                `${label}, world ${i + 1}`,
+                `${key}-${i}`,
+                accent,
+              )
+            : h(
+                "span",
+                {
+                  class: `hand val${accent ? " accent" : ""}`,
+                  style: `font-size:${size}px`,
+                },
+                fmt(v),
+              ),
+        ),
+      ),
+    );
+  }
+
+  let namesKey = "";
+  function renderNames() {
+    const sv = S.open;
+    const key = `${S.gen}|${sv.worlds.length}|${S.sure}`;
+    $("nameWarn").hidden = !S.sure?.startsWith("world-");
+    if (key === namesKey) return;
+    namesKey = key;
+    const wrap = $("names");
+    wrap.replaceChildren(
+      ...sv.worlds.map((w, i) => {
+        const input = h("input", {
+          class: "name",
+          size: 1,
+          value: w.name,
+          placeholder: "world",
+          "aria-label": `World ${i + 1}`,
+          "data-k": `name-${i}`,
+          oninput: (e) => {
+            setName(i, e.target.value);
+            grow.dataset.v = e.target.value || "world";
+            render();
+          },
+          onblur: () => {
+            commit();
+            render();
+          },
+          onfocus: (e) => e.target.select(),
+          onkeydown: (e) => {
+            if (e.key === "Enter") e.target.blur();
+          },
+        });
+        const grow = h(
+          "span",
+          { class: "grow", "data-v": w.name || "world" },
+          input,
+        );
+        const on = S.sure === `world-${i}`;
+        return h(
+          "span",
+          { class: "world" },
+          i > 0 ? h("span", { class: "hand colon" }, ":") : null,
+          h("span", { class: `swatch bg${i % 6}`, "aria-hidden": "true" }),
+          grow,
+          sv.worlds.length > MIN_WORLDS
+            ? h(
+                "button",
+                {
+                  class: `link${on ? " on" : ""}`,
+                  style: "margin-left:2px",
+                  "aria-label": `Take ${w.name || `world ${i + 1}`} off`,
+                  title: on ? "again to take it off" : "take this world off",
+                  "data-k": `x-${i}`,
+                  onclick: () => {
+                    if (S.sure === `world-${i}`) removeWorld(i);
+                    else S.sure = `world-${i}`;
+                    render();
+                  },
+                },
+                "×",
+              )
+            : null,
+        );
+      }),
+      sv.worlds.length < MAX_WORLDS
+        ? h(
+            "button",
+            {
+              class: "link",
+              style: "margin-left:4px",
+              "aria-label": "Another world",
+              title: "another world",
+              "data-k": "addw",
+              onclick: () => {
+                addWorld();
+                render();
+              },
+            },
+            "+ world",
+          )
+        : null,
+    );
+  }
+
+  function renderRungs(at, view, stage, sighting, seed) {
+    const rungs = $("rungs");
+    const label = (t) => h("span", { class: "hand rung-label" }, t);
+    const kids = [];
+    if (at.kind === "before") {
+      kids.push(
+        label("before looking"),
+        ratioEl(view.parts, {
+          label: "Parts before looking",
+          key: "nb",
+          onCommit: (i, n) => {
+            setParts(view.parts.map((p, k) => (k === i ? n : p)));
+            commit();
+          },
+        }),
+      );
+    }
+    let ruleEl = null;
+    if (at.kind === "sighting" && stage && sighting) {
+      ruleEl = h("span", { class: "rule-line" });
+      kids.push(
+        label("before"),
+        ratioEl(stage.before, {
+          label: "Parts before",
+          key: "nb",
+          onCommit:
+            at.i === 0
+              ? (i, n) => {
+                  setParts(stage.before.map((p, k) => (k === i ? n : p)));
+                  commit();
+                }
+              : undefined,
+        }),
+        label(short(sighting.saw, 12) || "passes"),
+        ratioEl(stage.passes, {
+          clamp: clampPasses,
+          label: `In a hundred that show ${sighting.saw || "it"}`,
+          key: "np",
+          onCommit: (i, n) => {
+            setPass(at.i, i, n);
+            commit();
+          },
+        }),
+        h("span"),
+        ruleEl,
+        h(
+          "span",
+          { class: "down" },
+          (() => {
+            const svg = s("svg", {
+              viewBox: "-1 -1 16 34",
+              width: 12,
+              height: 26,
+              "aria-hidden": "true",
+            });
+            svg.innerHTML = `<path class="ink-muted" d="${DOWN}"/>`;
+            return svg;
+          })(),
+          h("span", { class: "hand rung-label" }, "what passes"),
+        ),
+        h(
+          "span",
+          { class: "passes-row" },
+          ratioEl(
+            stage.before.map((b, i) => b * (stage.passes[i] ?? 50)),
+            { size: 22 },
+          ),
+          h("span", { class: "hand faint", style: "font-size:18px" }, "="),
+          ratioEl(stage.after, { accent: true }),
+        ),
+      );
+    }
+    if (at.kind === "now")
+      kids.push(label("what passes"), ratioEl(view.parts, { accent: true }));
+    rungs.replaceChildren(...kids);
+    if (ruleEl)
+      sketch(ruleEl, `rule-${seed}`, { kind: "underline", observe: false });
+
+    $("shares").textContent = S.open.worlds
+      .map(
+        (w, i) =>
+          `${w.name} ${inHundred(shares(at.kind === "sighting" && stage ? stage.after : view.parts)[i])} in 100`,
+      )
+      .join(" · ");
+    const weighs = $("weighs");
+    weighs.hidden = at.kind !== "sighting";
+    if (at.kind === "sighting") {
+      const ps = stage?.passes ?? [1];
+      const hi = Math.max(...ps);
+      const lo = Math.min(...ps);
+      const who = S.open.worlds[ps.indexOf(hi)]?.name ?? "";
+      weighs.textContent =
+        hi === lo
+          ? "it weighs nothing either way"
+          : `it weighs ${plain([hi / lo])} to 1 for ${who}`;
+    }
+  }
+
+  let underKey = "";
+  function renderUnder(at, sighting) {
+    const under = $("under");
+    const sv = S.open;
+    const key = `${S.gen}|${at.kind}|${at.i ?? ""}|${S.sure}|${sv.sightings.length}`;
+    if (key === underKey) return;
+    underKey = key;
+    if (at.kind === "sighting" && sighting) {
+      const on = S.sure === `back-${at.i}`;
+      const k = at.i;
+      under.replaceChildren(
+        h(
+          "div",
+          { class: "sighting-row" },
+          h(
+            "span",
+            { class: "meta accent", style: "flex:none" },
+            `sighting ${k + 1}${sighting.on ? ` · ${sighting.on}` : ""}`,
+          ),
+          h("input", {
+            id: "saw",
+            class: "saw hand",
+            value: sighting.saw,
+            placeholder: "what did you see? a word or two — snooping",
+            "aria-label": "What was seen",
+            "data-k": "saw",
+            oninput: (e) => {
+              setSaw(k, e.target.value);
+              render();
+            },
+            onblur: () => {
+              commit();
+              render();
+            },
+            onkeydown: (e) => {
+              if (e.key === "Enter") e.target.blur();
+            },
+          }),
+          h(
+            "button",
+            {
+              class: `link meta lower${on ? " on" : ""}`,
+              style: "flex:none",
+              "data-k": "back",
+              onclick: () => {
+                if (S.sure === `back-${k}`) takeBack(k);
+                else S.sure = `back-${k}`;
+                render();
+              },
+            },
+            on ? "take it back — sure?" : "take it back",
+          ),
+        ),
+      );
+    } else if (at.kind === "before") {
+      under.replaceChildren(
+        h(
+          "p",
+          { class: "hand note" },
+          sv.sightings.length
+            ? "how you weighed them before anything was seen"
+            : "nothing sifted yet — weigh the worlds, then sift what you saw",
+        ),
+      );
+    } else {
+      under.replaceChildren(
+        h(
+          "p",
+          { class: "hand note" },
+          `what passes after ${sv.sightings.length === 1 ? "one sighting" : `${sv.sightings.length} sightings`}, by your numbers`,
+        ),
+      );
+    }
+  }
+
+  let stepsKey = "";
+  function renderSteps(steps, k) {
+    const wrap = $("steps");
+    const sv = S.open;
+    const labels = steps.map((st) =>
+      st.kind === "before"
+        ? "before"
+        : st.kind === "now"
+          ? "what passes"
+          : `${st.i + 1} · ${short(sv.sightings[st.i]?.saw ?? "", 11) || "unnamed"}`,
+    );
+    const key = `${S.gen}|${k}|${labels.join("¦")}`;
+    if (key !== stepsKey) {
+      stepsKey = key;
+      const btns = steps.map((st, j) => {
+        const svg = s("svg", {
+          class: "thumb",
+          viewBox: "0 0 124 76",
+          width: 124,
+          height: 76,
+          "aria-hidden": "true",
+        });
+        return h(
+          "button",
+          {
+            class: "step",
+            "aria-pressed": j === k ? "true" : "false",
+            "aria-label": labels[j],
+            "data-k": `step-${j}`,
+            style: `--i:${j}`,
+            onclick: () => {
+              S.step = j;
+              S.sure = null;
+              render();
+            },
+          },
+          svg,
+          h("div", { class: "meta lower" }, labels[j]),
+        );
+      });
+      const siftBtn = h(
+        "button",
+        {
+          class: "step sift",
+          "aria-label": "Sift another sighting",
+          "data-k": "sift",
+          style: `--i:${steps.length}`,
+          onclick: () => {
+            sift();
+            render();
+          },
+        },
+        h("div", { class: "sift-box hand" }, "+ sift"),
+        h("div", { class: "meta lower" }, "another sighting"),
+      );
+      wrap.replaceChildren(...btns, siftBtn);
+      const on = btns[k];
+      if (on) {
+        sketch(on, `step-${k}-${sv.slug || "draft"}`, {
+          cls: "ink-accent",
+          observe: false,
+        });
+        // on a narrow sheet the strip scrolls: keep the chosen step in view
+        if (wrap.scrollWidth > wrap.clientWidth) {
+          const a = on.getBoundingClientRect();
+          const b = wrap.getBoundingClientRect();
+          wrap.scrollLeft += a.left - b.left - (wrap.clientWidth - a.width) / 2;
+        }
+      }
+    }
+    steps.forEach((st, j) => {
+      const v = viewOf(sv, st);
+      const svg = wrap.children[j]?.querySelector("svg.thumb");
+      if (svg) svg.innerHTML = thumb(v.parts, v.passes);
+    });
+  }
+
+  /* ── the desk ────────────────────────────────────────────────────────── */
+
+  function row(sv, kind, on) {
+    return h(
+      "li",
+      null,
+      h(
+        "button",
+        {
+          class: "row",
+          "aria-current": on ? "true" : null,
+          "data-k": `row-${kind}-${sv.slug}`,
+          onclick: () => {
+            load(sv, kind);
+            render();
+          },
+        },
+        h("span", { class: "title" }, sv.title),
+        h("span", { class: "meta lower" }, ratio(partsNow(sv))),
+      ),
+    );
+  }
+
+  function renderDesk() {
+    const sv = S.open;
+    $("reading").textContent = readings(sv, tally(sv)).join(" · ");
+    const kept = [...S.kept].sort(byTouched);
+    $("list").replaceChildren(
+      kept.length
+        ? h(
+            "ol",
+            { class: "list" },
+            kept.map((x) =>
+              row(x, "kept", S.kind === "kept" && sv.slug === x.slug),
+            ),
+          )
+        : h(
+            "p",
+            { class: "hand muted", style: "margin-top:8px;font-size:16px" },
+            "nothing kept yet — the specimen is on the sheet to start from",
+          ),
+    );
+    $("whole").textContent = wholeReadings(S.kept).join(" · ");
+    $("specimens").replaceChildren(
+      ...SPECIMEN.map((x) =>
+        row(x, "specimen", S.kind === "specimen" && sv.slug === x.slug),
+      ),
+    );
+    const offWrap = $("offWrap");
+    offWrap.hidden = S.kind !== "kept";
+    const off = $("off");
+    off.textContent =
+      S.sure === "sieve"
+        ? "take it off the sieve — sure?"
+        : "take it off the sieve";
+    off.classList.toggle("accent", S.sure === "sieve");
+    $("where").textContent =
+      S.kind === "kept"
+        ? `kept in this browser only, under ${KEY} · nowhere else`
+        : S.kind === "specimen"
+          ? "fiction, like the rest of the specimen · keep a copy to make it yours"
+          : `kept questions stay in this browser, under ${KEY}`;
+  }
+
+  /* ── drawing it all ──────────────────────────────────────────────────── */
+
+  let questionGen = -1;
+  function render() {
+    const sv = S.open;
+    if (!sv) return;
+    const focusKey = document.activeElement?.getAttribute?.("data-k");
+    const { steps, k, at, view } = current();
+    const stage = at.kind === "sighting" ? stagesOf(sv)[at.i] : null;
+    const sighting = at.kind === "sighting" ? sv.sightings[at.i] : null;
+    const seed = `${sv.slug || sv.title || "draft"}-${at.kind}${at.kind === "sighting" ? at.i : ""}`;
+    const names = sv.worlds.map((w) => w.name);
+
+    $("status").textContent =
+      S.kind === "kept"
+        ? `on the sieve · ${sv.opened}`
+        : S.kind === "specimen"
+          ? "the specimen · fiction · not kept"
+          : "a draft · not kept";
+    const keepBtn = $("keep");
+    keepBtn.hidden = S.kind === "kept";
+    keepBtn.textContent =
+      S.kind === "specimen" ? "keep a copy" : "keep this question";
+    if (questionGen !== S.gen) {
+      questionGen = S.gen;
+      $("question").value = sv.question;
+      fitQuestion();
+    }
+
+    renderNames();
+    renderRungs(at, view, stage, sighting, seed);
+    renderBox(
+      view,
+      names,
+      seed,
+      at.kind === "before" || (at.kind === "sighting" && at.i === 0),
+      at.kind === "sighting",
+    );
+    renderUnder(at, sighting);
+    renderSteps(steps, k);
+    renderDesk();
+
+    const tr = $("trouble");
+    tr.hidden = !S.trouble;
+    tr.textContent = S.trouble ?? "";
+
+    if (focusSaw && $("saw")) {
+      focusSaw = false;
+      $("saw").focus();
+    } else if (
+      focusKey &&
+      (!document.activeElement || document.activeElement === document.body)
+    ) {
+      document
+        .querySelector(`[data-k="${CSS.escape(focusKey)}"]`)
+        ?.focus({ preventScroll: true });
+    }
+  }
+
+  /* ── wiring ──────────────────────────────────────────────────────────── */
+
+  /** The question's field grows with the question, so nothing of it is hidden. */
+  function fitQuestion() {
+    const q = $("question");
+    q.rows = q.value ? 1 : 2;
+    q.style.height = "auto";
+    q.style.height = `${q.scrollHeight + 2}px`;
+  }
+  window.addEventListener("resize", fitQuestion);
+  $("question").addEventListener("input", (e) => {
+    S.open.question = e.target.value;
+    fitQuestion();
+  });
+  $("question").addEventListener("blur", () => {
+    commit();
+    render();
+  });
+  $("keep").addEventListener("click", () => {
+    keep();
+    render();
+  });
+  $("off").addEventListener("click", () => {
+    if (S.sure === "sieve") removeOpen();
+    else S.sure = "sieve";
+    render();
+  });
+  $("newQ").addEventListener("click", () => {
+    load(emptySieve(today), "draft", 0);
+    render();
+    $("question").focus();
+  });
+  $("snooper").addEventListener("click", () => {
+    load({ ...EXAMPLES[0], opened: today, touched: today }, "draft");
+    render();
+  });
+  $("quiet").addEventListener("click", () => {
+    load({ ...EXAMPLES[1], opened: today, touched: today }, "draft");
+    render();
+  });
+
+  // Opens on what this browser kept, and on the specimen when it has kept nothing.
+  const stored = readStore();
+  S.kept = stored?.sieves ?? [];
+  const wanted = stored?.open
+    ? S.kept.find((x) => x.slug === stored.open)
+    : null;
+  const first = [...S.kept].sort(byTouched)[0];
+  if (wanted) load(wanted, "kept");
+  else if (first) load(first, "kept");
+  else load(SPECIMEN[0], "specimen");
+  render();
+
+  sketch($("sheet"), `sheet-${S.open.slug || "draft"}`, { draw: true });
+  sketch($("readingPanel"), "sieve-reading", { draw: true });
+  sketch($("listPanel"), "sieve-list", { draw: true });
+  sketch($("lawsPanel"), "sieve-laws", { draw: true });
+</script>

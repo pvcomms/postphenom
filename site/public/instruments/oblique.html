@@ -1,0 +1,1557 @@
+<title>Oblique</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="A card, dealt at random, to come at the thing from an angle. Take it literally for ten minutes, then say what it turned up."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Layout: a card table. Bone paper, sumi ink, one rust accent for where a card came from
+     and what is in hand. The borders are drawn, the way a card is ruled by hand. */
+  :root {
+    color-scheme: light;
+    --paper: #f4f2ed;
+    --sheet: #faf9f6;
+    --ink: #23211e;
+    --ink-2: #5f594f;
+    --ink-3: #7d766b;
+    --rule: #e2ded5;
+    --rule-2: #c9c2b4;
+    --accent: #b5532a;
+    --accent-wash: rgba(181, 83, 42, 0.1);
+    --pen: color-mix(in srgb, var(--ink) 88%, var(--paper));
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #16150f;
+      --sheet: #1f1e17;
+      --ink: #ede9df;
+      --ink-2: #a39c8e;
+      --ink-3: #857e70;
+      --rule: #302e25;
+      --rule-2: #4a473b;
+      --accent: #d9763f;
+      --accent-wash: rgba(217, 118, 63, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #16150f;
+    --sheet: #1f1e17;
+    --ink: #ede9df;
+    --ink-2: #a39c8e;
+    --ink-3: #857e70;
+    --rule: #302e25;
+    --rule-2: #4a473b;
+    --accent: #d9763f;
+    --accent-wash: rgba(217, 118, 63, 0.14);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .wrap {
+    max-width: 1120px;
+    margin-inline: auto;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+
+  /* the drawn line: a pen ribbon laid over whatever it sits in */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .ink {
+    fill: var(--pen);
+  }
+  .sketch .ink.accent {
+    fill: var(--accent);
+  }
+  .sketch mask path {
+    stroke: white;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: end;
+    padding-block: 64px 36px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mast .label {
+    margin: 0 0 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 22px 0 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.36;
+    color: var(--ink-2);
+    max-width: 32ch;
+  }
+  .deck em {
+    color: var(--ink);
+  }
+  .keys {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+  .keys li {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15.5px;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .keys kbd,
+  .keys b {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    padding-top: 2px;
+  }
+
+  /* the table: the card, and the desk beside it */
+  .table {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 28px;
+    padding-block: 40px 24px;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .accent {
+    color: var(--accent);
+  }
+  .faint {
+    color: var(--ink-3);
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 26rem;
+    padding: 40px;
+    text-align: left;
+    background: var(--sheet);
+    border-radius: 3px;
+    transition:
+      transform 220ms var(--ease),
+      background-color 220ms var(--ease);
+  }
+  .card:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+  .card:not(:disabled):active {
+    transform: scale(0.995);
+  }
+  .face {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .face.dealt {
+    animation: deal 520ms var(--ease) both;
+  }
+  @keyframes deal {
+    from {
+      opacity: 0;
+      transform: translateY(14px) rotate(-0.8deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .face.empty {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .card .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+  }
+  .card .words {
+    margin: 24px 0;
+    max-width: 18em;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .face.empty .words {
+    margin: 0;
+    max-width: none;
+  }
+  .card .foot {
+    font-size: 15.5px;
+    color: var(--ink-3);
+  }
+  .face.empty .foot {
+    margin-top: 12px;
+    font-size: 17px;
+    color: var(--ink-2);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .chip {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    padding: 6px 11px;
+    color: var(--ink-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    transition:
+      color 180ms var(--ease),
+      border-color 180ms var(--ease),
+      transform 160ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--ink);
+  }
+  .chip:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+  }
+  .chip.on {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.off {
+    color: var(--ink-3);
+  }
+  .chip.sure {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chips .count {
+    margin-left: auto;
+  }
+  .under {
+    display: grid;
+    gap: 18px;
+    margin-top: 16px;
+  }
+
+  .turned {
+    display: grid;
+    gap: 8px;
+  }
+  .field {
+    display: block;
+    width: 100%;
+    resize: none;
+    font: inherit;
+    font-size: 16.5px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule-2);
+    border-radius: 0;
+    padding: 4px 0;
+    transition: border-color 180ms var(--ease);
+  }
+  .field::placeholder {
+    color: var(--ink-3);
+    font-style: italic;
+  }
+  .field:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    box-shadow: 0 1px 0 0 var(--accent);
+  }
+  .said {
+    font-size: 15px;
+    color: var(--ink-3);
+    min-height: 1.4em;
+  }
+
+  .history {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+  }
+  .draw-item {
+    position: relative;
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    color: var(--ink-3);
+    transition: color 160ms var(--ease);
+  }
+  .draw-item:hover {
+    color: var(--accent);
+  }
+  .draw-item[aria-current="true"] {
+    color: var(--ink);
+    overflow: visible;
+  }
+  .draw-item[aria-current="true"] .clip {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* the desk */
+  .desk {
+    display: grid;
+    gap: 20px;
+    align-content: start;
+  }
+  .panel {
+    position: relative;
+    padding: 20px 20px 18px;
+    background: var(--sheet);
+    border-radius: 3px;
+  }
+  .panel > :not(.sketch) {
+    position: relative;
+    z-index: 2;
+  }
+  .panel .sub {
+    margin: 4px 0 0;
+    font-size: 15px;
+    color: var(--ink-3);
+  }
+  .panel .meta + .chips,
+  .panel .sub + .meta {
+    margin-top: 10px;
+  }
+  .panel .chips {
+    gap: 6px;
+  }
+  .gap {
+    margin-top: 18px;
+  }
+  .reading {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .notes {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .notes li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 8px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .notes .about {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .notes .when {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+  .notes .x {
+    grid-row: 1 / span 3;
+    grid-column: 2;
+    align-self: start;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    transition:
+      color 140ms var(--ease),
+      background-color 140ms var(--ease);
+  }
+  .notes .x:hover {
+    color: var(--ink);
+    background: var(--accent-wash);
+  }
+  .trouble {
+    margin: 10px 0 0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--accent);
+  }
+  .newdeck {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    width: 100%;
+  }
+  .newdeck .field {
+    font-size: 15px;
+  }
+
+  /* the claim */
+  .lede {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 56px 24px;
+    border-top: 1px solid var(--rule-2);
+    margin-top: 32px;
+  }
+  .lede .body {
+    max-width: 64ch;
+  }
+  .claim {
+    font-size: clamp(22px, 2.7vw, 27px);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.1em;
+  }
+  .small {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* entry */
+  .rise {
+    animation: rise 600ms var(--ease) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise,
+    .face.dealt,
+    .sketch .draw {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .card:not(:disabled):hover {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .table {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 760px) {
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      padding-top: 44px;
+    }
+    .lede {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+    .card {
+      min-height: 21rem;
+      padding: 24px 22px;
+    }
+    .draw-item {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="rise">
+      <p class="label">Center for Applied Post-Phenomenology · Instrument</p>
+      <h1>Oblique</h1>
+      <p class="deck">
+        <em>If you are going round in circles.</em> A card, dealt, to come at
+        the thing from an angle. Take it literally for ten minutes, then say
+        what it turned up.
+      </p>
+    </div>
+    <ul
+      class="keys rise"
+      style="animation-delay: 60ms"
+      aria-label="How it deals"
+    >
+      <li><kbd>click · space · →</kbd><span>deal the next card</span></li>
+      <li><kbd>←</kbd><span>go back along this sitting's draws</span></li>
+      <li><b>strike</b><span>leave a deck out of the shuffle</span></li>
+      <li>
+        <b>add</b><span>a card of your own, or paste a deck you own</span>
+      </li>
+    </ul>
+  </header>
+
+  <main class="table">
+    <section class="rise" style="animation-delay: 100ms" aria-label="The card">
+      <button class="card" id="card" type="button"></button>
+      <div class="under">
+        <div class="chips">
+          <button class="chip on" id="deal" type="button">deal</button>
+          <button class="chip" id="back" type="button">← back</button>
+          <button
+            class="chip"
+            id="again"
+            type="button"
+            title="Shuffle the pool again"
+          >
+            shuffle
+          </button>
+          <button class="chip" id="takeBack" type="button" hidden></button>
+          <span class="meta faint count" id="count"></span>
+        </div>
+        <div class="turned" id="turned" hidden>
+          <span class="meta accent">what it turned up</span>
+          <textarea
+            class="field"
+            id="note"
+            rows="2"
+            placeholder="after ten minutes with it, in your words"
+            aria-label="What the card turned up"
+          ></textarea>
+          <div class="chips">
+            <button class="chip" id="keepNote" type="button">
+              keep the note
+            </button>
+            <span class="said hand" id="noteSaid" aria-live="polite"></span>
+          </div>
+        </div>
+        <div
+          class="history"
+          id="history"
+          aria-label="Dealt this sitting"
+          hidden
+        ></div>
+      </div>
+    </section>
+
+    <aside class="desk">
+      <section
+        class="panel rise"
+        id="shufflePanel"
+        style="animation-delay: 160ms"
+        aria-label="The shuffle"
+      >
+        <div class="meta accent">in the shuffle</div>
+        <p class="sub hand">strike a deck to leave it out</p>
+        <div class="meta faint">decks</div>
+        <div class="chips" id="decks"></div>
+
+        <div class="meta accent gap">add a card</div>
+        <textarea
+          class="field"
+          id="draft"
+          rows="2"
+          placeholder="in your words, one card"
+          aria-label="A new card"
+          style="margin-top: 6px"
+        ></textarea>
+        <div class="chips" id="into" style="margin-top: 10px"></div>
+        <p class="sub hand" style="margin-top: 10px">
+          or paste a whole deck you own, one card per paragraph
+        </p>
+        <p class="trouble" id="trouble" role="alert" hidden></p>
+      </section>
+
+      <section
+        class="panel rise"
+        id="readingPanel"
+        style="animation-delay: 220ms"
+        aria-label="The reading"
+      >
+        <div class="meta accent">the reading</div>
+        <p class="reading" id="reading"></p>
+        <div id="notesWrap" hidden>
+          <div class="meta faint gap">what cards turned up</div>
+          <ol class="notes" id="notes"></ol>
+        </div>
+        <p
+          class="meta faint gap"
+          style="text-transform: none; letter-spacing: 0.02em"
+        >
+          your decks and notes stay in this browser
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <section class="lede">
+    <div class="rail"><span class="label">The claim</span></div>
+    <div class="body">
+      <p class="claim">
+        Going round in circles is staying at the one angle you keep choosing. A
+        card you did not choose, taken literally, puts you somewhere you would
+        not have stood, and what you see from there is yours to say. The
+        instrument picks no card over another and never says what one means.
+      </p>
+      <p>
+        The starter deck is fifty-six prompts in this page's own words, dealt in
+        a seeded shuffle so that nothing repeats until the pool is out. Your own
+        cards go into decks beside it. Strike any deck and it leaves the shuffle
+        until you put it back.
+      </p>
+      <p>
+        The form is borrowed from Brian Eno and Peter Schmidt's
+        <em>Oblique Strategies</em> (1975), and that deck is theirs. If you own
+        it, type or paste the cards you want into a deck of your own here.
+      </p>
+      <p class="small">
+        It counts what is in the shuffle, what was dealt this sitting and how
+        many notes you have kept. It never weighs a card, never picks one for
+        you, and never says what one means. Your decks and notes are kept in
+        this browser and go nowhere else; the sitting's draws are forgotten on
+        reload.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Oblique · CAPP · prototype, 3 October 2026</span>
+    <span class="label">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+  (() => {
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) =>
+      String(s).replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      );
+
+    /* ── the starter deck: prompts in this page's own words ───────────── */
+    const STARTER = {
+      slug: "starter",
+      title: "the starter deck",
+      own: false,
+      cards: [
+        "Turn it over. What is on the back?",
+        "Say it to a child. Then to the person you least want to hear it.",
+        "Remove the part you are proudest of.",
+        "What would this look like if it were easy?",
+        "Do the smallest version today.",
+        "Take the thing you keep postponing and make it the first step.",
+        "Which word are you leaning on? Take it out.",
+        "Ask what the fallow bed knows.",
+        "Make the constraint the subject.",
+        "Do it in the wrong order.",
+        "Who is not in the room? Speak as them.",
+        "Repeat the last move until it breaks.",
+        "Stop before it is finished.",
+        "What is the boring answer? Do that.",
+        "Change the unit: hours to days, words to sentences, one to many.",
+        "Find the earliest version. Go back to it.",
+        "Give it away.",
+        "What would you do if no one would ever see it?",
+        "What would you do if everyone would?",
+        "Take the opposite as given. Now argue back.",
+        "Leave a gap on purpose.",
+        "Ask the body first.",
+        "Which of your reasons are on the record? Use only those.",
+        "Use only the hollow ones.",
+        "Name what it costs. Now name what not doing it costs.",
+        "Slow it down until you can see the joints.",
+        "Speed it up until only the shape is left.",
+        "Make it worse in one specific way.",
+        "What did you believe about this a year ago?",
+        "Borrow the structure of something unrelated.",
+        "Delete the introduction.",
+        "Do it by hand.",
+        "Trust the mistake. Follow it for ten minutes.",
+        "Say what you actually want. Then subtract the audience.",
+        "Cut it in half. Which half do you keep?",
+        "Wait one day. Draw again.",
+        "Look for what is already finished.",
+        "Do it as a gift to one named person.",
+        "What am I protecting?",
+        "Use the last thing you read.",
+        "Write the ending first.",
+        "Which rule are you obeying that no one set?",
+        "What if this is the second draft?",
+        "Let the material decide.",
+        "Move it to a different room.",
+        "Reverse the roles: you are the input.",
+        "Find the number in it. Then remove the number.",
+        "Leave it where you found it.",
+        "Take out every adjective. See what is still standing.",
+        "Make a list of what you will not do.",
+        "Describe it without its name.",
+        "Ask: whose problem is this, actually?",
+        "Finish the sentence you keep starting.",
+        "Do the part that needs no permission.",
+        "Put a date on it and see what the date does.",
+        "Read the margin. You already said something about this.",
+      ],
+    };
+
+    /* ── the hand: deterministic pen strokes (niwa lib/hand.ts) ───────── */
+    function rand(seed) {
+      let a = seed >>> 0;
+      return () => {
+        a = (a + 0x6d2b79f5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function seedOf(s) {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+    const f1 = (n) => String(Math.round(n * 10) / 10);
+    const spread = (r, amp) => (r() * 2 - 1) * amp;
+    function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+      const dx = b[0] - a[0];
+      const dy = b[1] - a[1];
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const nx = -uy;
+      const ny = ux;
+      const back = r() * overshoot;
+      const past = r() * overshoot;
+      const s = [
+        a[0] - ux * back + nx * spread(r, wobble * 0.4),
+        a[1] - uy * back + ny * spread(r, wobble * 0.4),
+      ];
+      const e = [
+        b[0] + ux * past + nx * spread(r, wobble * 0.4),
+        b[1] + uy * past + ny * spread(r, wobble * 0.4),
+      ];
+      const bow = spread(r, wobble);
+      const t1 = 0.25 + r() * 0.15;
+      const t2 = 0.6 + r() * 0.15;
+      const c1 = [
+        a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+        a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+      ];
+      const c2 = [
+        a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+        a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+      ];
+      return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+    }
+    function roughRect(w, h, seed) {
+      const r = rand(seed);
+      const i = 0.5;
+      return [
+        stroke([i, i], [w - i, i], r, 1.1, 3),
+        stroke([w - i, i], [w - i, h - i], r, 1.1, 3),
+        stroke([w - i, h - i], [i, h - i], r, 1.1, 3),
+        stroke([i, h - i], [i, i], r, 1.1, 3),
+      ].join("");
+    }
+    function roughUnderline(w, seed, y) {
+      const r = rand(seed);
+      return stroke(
+        [-1 - r() * 2, y],
+        [w + 1 + r() * 2, y + spread(r, 0.8)],
+        r,
+        0.8,
+        0,
+      );
+    }
+    function roughStrike(w, h, seed) {
+      const r = rand(seed);
+      return stroke(
+        [-2 - r() * 2, h * 0.58],
+        [w + 2 + r() * 2, h * 0.42],
+        r,
+        0.9,
+        0,
+      );
+    }
+    function sample(d) {
+      const subs = [];
+      let cur = [0, 0];
+      let pts = [];
+      const re = /([MCL])([^MCL]*)/g;
+      let m;
+      while ((m = re.exec(d))) {
+        const n = m[2]
+          .trim()
+          .split(/[\s,]+/)
+          .filter(Boolean)
+          .map(Number);
+        if (m[1] === "M") {
+          if (pts.length > 1) subs.push(pts);
+          cur = [n[0], n[1]];
+          pts = [cur];
+        } else if (m[1] === "L") {
+          const b = [n[0], n[1]];
+          for (let i = 1; i <= 3; i++) {
+            const t = i / 3;
+            pts.push([
+              cur[0] + (b[0] - cur[0]) * t,
+              cur[1] + (b[1] - cur[1]) * t,
+            ]);
+          }
+          cur = b;
+        } else {
+          const [x1, y1, x2, y2, x, y] = n;
+          for (let i = 1; i <= 10; i++) {
+            const t = i / 10;
+            const u = 1 - t;
+            pts.push([
+              u * u * u * cur[0] +
+                3 * u * u * t * x1 +
+                3 * u * t * t * x2 +
+                t * t * t * x,
+              u * u * u * cur[1] +
+                3 * u * u * t * y1 +
+                3 * u * t * t * y2 +
+                t * t * t * y,
+            ]);
+          }
+          cur = [x, y];
+        }
+      }
+      if (pts.length > 1) subs.push(pts);
+      return subs;
+    }
+    function ribbon(d, width = 1.5, seed = 1) {
+      const r = rand(seed);
+      const out = [];
+      for (const pts of sample(d)) {
+        const n = pts.length;
+        const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+        const left = [];
+        const right = [];
+        for (let i = 0; i < n; i++) {
+          const a = pts[Math.max(0, i - 1)];
+          const b = pts[Math.min(n - 1, i + 1)];
+          let tx = b[0] - a[0];
+          let ty = b[1] - a[1];
+          const len = Math.hypot(tx, ty) || 1;
+          tx /= len;
+          ty /= len;
+          const t = i / (n - 1);
+          const k = t * 4;
+          const ki = Math.min(3, Math.floor(k));
+          const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+          const w = Math.max(
+            0.45,
+            width *
+              (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) *
+              press,
+          );
+          const nx = (-ty * w) / 2;
+          const ny = (tx * w) / 2;
+          left.push([pts[i][0] + nx, pts[i][1] + ny]);
+          right.push([pts[i][0] - nx, pts[i][1] - ny]);
+        }
+        const poly = [...left, ...right.reverse()];
+        out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+      }
+      return out.join("");
+    }
+
+    /* A pen line over an element: drawn on when it first appears, re-drawn only when its size changes. */
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const PEN = { box: 1.7, underline: 1.5, strike: 1.5 };
+    let maskN = 0;
+    const ro = new ResizeObserver((es) =>
+      es.forEach((e) => paint(e.target, false)),
+    );
+    function sketch(host, kind, seed, draw = true, tone = "") {
+      const prev = host._sk;
+      const same =
+        prev && prev.kind === kind && prev.seed === seed && prev.tone === tone;
+      host._sk = {
+        kind,
+        seed,
+        tone,
+        w: same ? prev.w : 0,
+        h: same ? prev.h : 0,
+      };
+      if (!prev) ro.observe(host);
+      paint(host, draw && !same);
+    }
+    function paint(host, draw) {
+      const sk = host._sk;
+      if (!sk) return;
+      const w = host.offsetWidth;
+      const h = host.offsetHeight;
+      if (!w || !h) return;
+      if (!draw && sk.w === w && sk.h === h) return;
+      sk.w = w;
+      sk.h = h;
+      let svg = host.querySelector(":scope > svg.sketch");
+      if (!svg) {
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "sketch");
+        svg.setAttribute("aria-hidden", "true");
+        host.appendChild(svg);
+      }
+      const s = seedOf(sk.seed);
+      const line =
+        sk.kind === "box"
+          ? roughRect(w, h, s)
+          : sk.kind === "underline"
+            ? roughUnderline(w, s, h - 0.5)
+            : roughStrike(w, h, s);
+      const pen = PEN[sk.kind];
+      const ink = ribbon(line, pen, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      if (draw && !reduced) {
+        const id = `pen${++maskN}`;
+        svg.innerHTML =
+          `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+          `<path class="draw" d="${line}" pathLength="1" fill="none" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>` +
+          `<path class="ink ${sk.tone}" d="${ink}" mask="url(#${id})"/>`;
+      } else svg.innerHTML = `<path class="ink ${sk.tone}" d="${ink}"/>`;
+    }
+
+    /* ── the oblique (niwa lib/oblique.ts) ───────────────────────────── */
+    const SLUG = /^[a-z0-9][a-z0-9-]{0,80}$/;
+    const clean = (s) => s.replace(/\s+/g, " ").trim();
+
+    /** One card per paragraph; a leading dash or star is dropped, and a line beginning with # is a heading, not a card. */
+    function parseCards(raw) {
+      let content = raw;
+      let title = "";
+      const fm = raw.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
+      if (fm) {
+        content = raw.slice(fm[0].length);
+        const t = fm[1].match(/^title:\s*(.+)$/m);
+        if (t) title = t[1].trim().replace(/^["']|["']$/g, "");
+      }
+      const cards = content
+        .split(/\n\s*\n/)
+        .map((p) =>
+          p
+            .split("\n")
+            .map((l) => l.replace(/^\s*[-*]\s+/, "").trim())
+            .filter((l) => l && !l.startsWith("#"))
+            .join(" "),
+        )
+        .map(clean)
+        .filter(Boolean);
+      return { title, cards };
+    }
+
+    /** A card is one paragraph, up to 300 characters. */
+    function validateCard(text) {
+      if (typeof text !== "string") throw new Error("a card is text");
+      const t = clean(text);
+      if (!t) throw new Error("an empty card");
+      if (t.length > 300) throw new Error("a card is at most 300 characters");
+      return t;
+    }
+
+    const deckCards = (d) =>
+      d.cards.map((text, i) => ({ id: `${d.slug}:${i}`, text, from: d.slug }));
+
+    /** Fisher–Yates on a seed: the same seed deals the same order, and nothing repeats until the pool is out. */
+    function shuffle(items, seed) {
+      const r = rand(seed);
+      const a = items.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(r() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+    /** Facts about the shuffle, none a verdict on any card. */
+    function readings(decks, { pool, dealt, notes }) {
+      const cards = decks.reduce((s, d) => s + d.cards.length, 0);
+      return [
+        decks.length
+          ? `${plural(cards, "card")} in ${plural(decks.length, "deck")}: ` +
+            decks.map((d) => `${d.title} (${d.cards.length})`).join(", ")
+          : "no deck",
+        pool
+          ? `${pool} in the shuffle now`
+          : "nothing in the shuffle — every deck is struck",
+        dealt
+          ? `dealt ${dealt} this sitting`
+          : "nothing dealt yet this sitting",
+        notes
+          ? `${plural(notes, "note")} on what a card turned up`
+          : "no note yet on what a card turned up",
+      ];
+    }
+
+    /* ── what this browser keeps: the reader's decks and notes ───────── */
+    const KEY = "pp-oblique";
+    function load() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+        if (!raw || typeof raw !== "object") return { decks: [], notes: [] };
+        const decks = (Array.isArray(raw.decks) ? raw.decks : [])
+          .filter(
+            (d) =>
+              d &&
+              typeof d.slug === "string" &&
+              SLUG.test(d.slug) &&
+              d.slug !== "starter",
+          )
+          .map((d) => ({
+            slug: d.slug,
+            title:
+              typeof d.title === "string" && d.title.trim()
+                ? clean(d.title).slice(0, 80)
+                : d.slug,
+            own: true,
+            cards: (Array.isArray(d.cards) ? d.cards : [])
+              .filter(
+                (c) =>
+                  typeof c === "string" && clean(c) && clean(c).length <= 300,
+              )
+              .map(clean),
+          }));
+        const notes = (Array.isArray(raw.notes) ? raw.notes : []).filter(
+          (n) => n && typeof n.said === "string" && typeof n.at === "string",
+        );
+        return { decks, notes };
+      } catch {
+        return { decks: [], notes: [] };
+      }
+    }
+    function save() {
+      try {
+        localStorage.setItem(
+          KEY,
+          JSON.stringify({
+            decks: own.map(({ slug, title, cards }) => ({
+              slug,
+              title,
+              cards,
+            })),
+            notes,
+          }),
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    /* ── state ────────────────────────────────────────────────────────── */
+    const kept = load();
+    let own = kept.decks;
+    let notes = kept.notes;
+    const off = new Set();
+    let seed = Math.floor(Math.random() * 1e9);
+    let history = [];
+    let at = -1;
+    let pos = 0;
+    let pool = [];
+    let order = [];
+    let into = "deck";
+    let naming = false;
+    let sure = false;
+    let shownKey = "";
+
+    const decks = () => [STARTER, ...own];
+    function rebuild() {
+      pool = [];
+      for (const d of decks()) if (!off.has(d.slug)) pool.push(...deckCards(d));
+      order = shuffle(pool, seed);
+      pos = 0;
+    }
+    const card = () => (at >= 0 ? history[at] : null);
+
+    function deal() {
+      if (at < history.length - 1) {
+        at++;
+        sure = false;
+        return render();
+      }
+      if (!order.length) return;
+      let next;
+      if (pos >= order.length) {
+        seed += 1;
+        order = shuffle(pool, seed);
+        next = order[0];
+        pos = 1;
+      } else next = order[pos++];
+      history.push(next);
+      at = history.length - 1;
+      sure = false;
+      render();
+    }
+    function back() {
+      if (at > 0) at--;
+      sure = false;
+      render();
+    }
+    function again() {
+      seed += 7;
+      order = shuffle(pool, seed);
+      pos = 0;
+      sure = false;
+      render();
+    }
+    function trouble(msg) {
+      $("trouble").hidden = !msg;
+      $("trouble").textContent = msg || "";
+    }
+
+    function add() {
+      const raw = $("draft").value;
+      if (!raw.trim()) return;
+      trouble(null);
+      let texts;
+      try {
+        texts = /\n\s*\n/.test(raw.trim())
+          ? parseCards(raw).cards.map(validateCard)
+          : [validateCard(raw)];
+      } catch (e) {
+        return trouble(e.message);
+      }
+      if (!texts.length) return trouble("an empty card");
+      let d = own.find((x) => x.slug === into);
+      if (!d) {
+        d = {
+          slug: into,
+          title: into === "deck" ? "your deck" : into.replace(/-/g, " "),
+          cards: [],
+          own: true,
+        };
+        own.push(d);
+      }
+      d.cards.push(...texts);
+      if (!save()) trouble("not kept: this browser will not store it");
+      $("draft").value = "";
+      rebuild();
+      render(true);
+    }
+    function takeBack() {
+      const c = card();
+      const d = c && own.find((x) => x.slug === c.from);
+      if (!d) return;
+      const index = Number(c.id.split(":")[1]);
+      if (!(index >= 0 && index < d.cards.length)) return;
+      d.cards.splice(index, 1);
+      if (!save()) trouble("not kept: this browser will not store it");
+      sure = false;
+      rebuild();
+      render(true);
+    }
+    function keepNote() {
+      const c = card();
+      const said = $("note").value.trim();
+      if (!c || !said) return;
+      const d = decks().find((x) => x.slug === c.from);
+      notes.unshift({
+        id:
+          Math.random().toString(36).slice(2, 8) +
+          Date.now().toString(36).slice(-3),
+        card: c.text,
+        deck: d ? d.title : c.from,
+        said: said.slice(0, 2000),
+        at: new Date().toISOString(),
+      });
+      const ok = save();
+      $("note").value = "";
+      $("noteSaid").textContent = ok
+        ? "kept"
+        : "not kept: this browser will not store it";
+      render();
+    }
+
+    /* ── drawing the page ─────────────────────────────────────────────── */
+    function renderCard() {
+      const c = card();
+      const el = $("card");
+      el.disabled = !pool.length && !c;
+      el.setAttribute("aria-label", c ? "Deal the next card" : "Deal a card");
+      const key = c ? `${at}:${c.id}` : `empty:${pool.length ? 1 : 0}`;
+      if (key === shownKey) return;
+      shownKey = key;
+      const svg = el.querySelector(":scope > svg.sketch");
+      el.innerHTML = "";
+      if (c) {
+        const d = decks().find((x) => x.slug === c.from);
+        el.innerHTML =
+          `<div class="face dealt"><div class="head meta"><span class="accent">${esc(d ? d.title : c.from)}</span>` +
+          `<span class="faint">${at + 1} of ${history.length} this sitting</span></div>` +
+          `<p class="words">${esc(c.text)}</p>` +
+          `<span class="foot hand">click, space or → for the next · ← back</span></div>`;
+      } else {
+        el.innerHTML =
+          `<div class="face empty"><p class="words">${pool.length ? "Deal a card." : "Every deck is struck. Unstrike one."}</p>` +
+          (pool.length
+            ? `<span class="foot hand">click here, or press space · ${pool.length} in the shuffle</span>`
+            : "") +
+          `</div>`;
+      }
+      if (svg) el.appendChild(svg);
+      sketch(el, "box", c ? c.id + ":" + at : "oblique-empty");
+    }
+
+    function renderControls() {
+      const c = card();
+      $("deal").disabled = !pool.length && !(at < history.length - 1);
+      $("back").disabled = at <= 0;
+      $("again").disabled = !pool.length;
+      const d = c && own.find((x) => x.slug === c.from);
+      const tb = $("takeBack");
+      tb.hidden = !d;
+      tb.textContent = sure ? "take it back — sure?" : "take this card back";
+      tb.classList.toggle("sure", sure);
+      $("count").textContent = pool.length
+        ? `${Math.min(pos, order.length)} of ${pool.length} in this shuffle`
+        : "";
+      $("turned").hidden = !c;
+    }
+
+    function renderHistory() {
+      const h = $("history");
+      h.hidden = history.length < 2;
+      if (h.hidden) return (h.innerHTML = "");
+      h.innerHTML =
+        `<span class="meta faint">dealt</span>` +
+        history
+          .map(
+            (c, i) =>
+              `<button type="button" class="draw-item hand" data-i="${i}"${i === at ? ' aria-current="true"' : ""}><span class="clip">${esc(c.text)}</span></button>`,
+          )
+          .join("");
+      const cur = h.querySelector('[aria-current="true"]');
+      if (cur) sketch(cur, "underline", `draw-${at}`, true, "accent");
+    }
+
+    function renderDesk() {
+      const box = $("decks");
+      box.innerHTML = decks()
+        .map((d) => {
+          const on = !off.has(d.slug);
+          return `<button type="button" class="chip ${on ? "on" : "off"}" data-deck="${esc(d.slug)}" aria-pressed="${on}">${esc(d.title)} · ${d.cards.length}</button>`;
+        })
+        .join("");
+      box
+        .querySelectorAll(".chip.off")
+        .forEach((b) => sketch(b, "strike", `deck-${b.dataset.deck}`));
+
+      const slugs = [...new Set(["deck", ...own.map((d) => d.slug), into])];
+      $("into").innerHTML =
+        `<span class="meta faint">into</span>` +
+        slugs
+          .map((s) => {
+            const d = own.find((x) => x.slug === s);
+            const title = d
+              ? d.title
+              : s === "deck"
+                ? "your deck"
+                : s.replace(/-/g, " ");
+            return `<button type="button" class="chip${into === s ? " on" : ""}" data-into="${esc(s)}" aria-pressed="${into === s}">${esc(title)}</button>`;
+          })
+          .join("") +
+        (naming
+          ? `<span class="newdeck"><input class="field" id="deckName" maxlength="60" placeholder="name a new deck" aria-label="A new deck's name" autocomplete="off" /></span>`
+          : `<button type="button" class="chip" id="nameDeck">+ a deck</button>`) +
+        `<button type="button" class="chip on count" id="keep"${$("draft").value.trim() ? "" : " disabled"}>keep</button>`;
+      if (naming) $("deckName").focus();
+    }
+
+    function renderReading() {
+      $("reading").textContent = readings(decks(), {
+        pool: pool.length,
+        dealt: history.length,
+        notes: notes.length,
+      }).join(" · ");
+      $("notesWrap").hidden = !notes.length;
+      $("notes").innerHTML = notes
+        .slice(0, 8)
+        .map(
+          (n) =>
+            `<li><span class="about hand">${esc(n.card || "")}</span>` +
+            `<span>${esc(n.said)}</span>` +
+            `<span class="when">${esc(n.at.slice(0, 10))}${n.deck ? " · " + esc(n.deck) : ""}</span>` +
+            `<button type="button" class="x" data-note="${esc(n.id)}" aria-label="Take this note back" title="take this note back">×</button></li>`,
+        )
+        .join("");
+    }
+
+    /** The sitting: the card, its controls, the draws and the reading. The desk is drawn only when it changes. */
+    function render(desk = false) {
+      renderCard();
+      renderControls();
+      renderHistory();
+      if (desk) renderDesk();
+      renderReading();
+    }
+
+    /* ── hands ────────────────────────────────────────────────────────── */
+    $("card").addEventListener("click", deal);
+    $("deal").addEventListener("click", deal);
+    $("back").addEventListener("click", back);
+    $("again").addEventListener("click", again);
+    $("takeBack").addEventListener("click", () => {
+      if (sure) takeBack();
+      else {
+        sure = true;
+        renderControls();
+      }
+    });
+    $("history").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-i]");
+      if (!b) return;
+      at = Number(b.dataset.i);
+      sure = false;
+      render();
+    });
+    $("decks").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-deck]");
+      if (!b) return;
+      const k = b.dataset.deck;
+      if (off.has(k)) off.delete(k);
+      else off.add(k);
+      rebuild();
+      render(true);
+    });
+    $("into").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.into) {
+        into = b.dataset.into;
+        naming = false;
+        renderDesk();
+      } else if (b.id === "nameDeck") {
+        naming = true;
+        renderDesk();
+      } else if (b.id === "keep") add();
+    });
+    $("into").addEventListener("keydown", (e) => {
+      if (e.target.id !== "deckName") return;
+      if (e.key === "Escape") {
+        naming = false;
+        return renderDesk();
+      }
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const slug = e.target.value
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60);
+      naming = false;
+      if (slug && SLUG.test(slug) && slug !== "starter") into = slug;
+      else if (slug) trouble("that name will not make a deck");
+      renderDesk();
+      $("draft").focus();
+    });
+    $("draft").addEventListener("input", () => {
+      const k = $("keep");
+      if (k) k.disabled = !$("draft").value.trim();
+    });
+    $("draft").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        add();
+      }
+    });
+    $("keepNote").addEventListener("click", keepNote);
+    $("note").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        keepNote();
+      }
+    });
+    $("note").addEventListener("input", () => ($("noteSaid").textContent = ""));
+    $("notes").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-note]");
+      if (!b) return;
+      notes = notes.filter((n) => n.id !== b.dataset.note);
+      save();
+      renderReading();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.isContentEditable)
+      )
+        return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // A focused button takes space and enter itself; the card is one.
+      const onControl = t && (t.tagName === "BUTTON" || t.tagName === "A");
+      if (
+        e.key === "ArrowRight" ||
+        (!onControl && (e.key === " " || e.key === "Enter"))
+      ) {
+        e.preventDefault();
+        deal();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        back();
+      }
+    });
+
+    rebuild();
+    render(true);
+    sketch($("shufflePanel"), "box", "oblique-desk");
+    sketch($("readingPanel"), "box", "oblique-reading");
+  })();
+</script>

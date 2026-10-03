@@ -1,0 +1,3368 @@
+<title>Canon</title>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
+<meta
+  name="description"
+  content="Which stories a garden of notes actually tells. A note many others reach for, the strand that gathers round it along time, and whether it is one story. The count is the page's; the call is yours."
+/>
+<meta name="robots" content="noindex" />
+<style>
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Newsreader";
+    src: url(fonts/newsreader-latin-italic.woff2) format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Plex Mono";
+    src: url(fonts/plexmono-latin-400.woff2) format("woff2");
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Karesansui at noon: ink on bone. The accent is only ever the root, a touchpoint, and the
+     reader's own marks; everything the page counts is ink, muted or faint. */
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ed;
+    --surface: #faf9f6;
+    --ink: #23211e;
+    --muted: #6b655c;
+    --faint: #8c8478;
+    --rule: #e2ded5;
+    --accent: #b5532a;
+    --pen: color-mix(in srgb, var(--ink) 90%, var(--bg));
+    --wash: color-mix(in srgb, var(--ink) 3%, transparent);
+    --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: "Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --grain-blend: multiply;
+    --grain: 0.06;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #16150f;
+      --surface: #1f1e17;
+      --ink: #ede9df;
+      --muted: #a39c8e;
+      --faint: #827a6d;
+      --rule: #302e25;
+      --accent: #d9763f;
+      --grain-blend: screen;
+      --grain: 0.045;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #16150f;
+    --surface: #1f1e17;
+    --ink: #ede9df;
+    --muted: #a39c8e;
+    --faint: #827a6d;
+    --rule: #302e25;
+    --accent: #d9763f;
+    --grain-blend: screen;
+    --grain: 0.045;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    color-scheme: inherit;
+  }
+  body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 0 96px;
+  }
+  /* Paper has tooth: one fixed sheet of noise, faint enough to read as texture. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: var(--grain);
+    mix-blend-mode: var(--grain-blend);
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  p {
+    margin: 0 0 1em;
+  }
+  h1,
+  h2 {
+    font-weight: 400;
+    margin: 0;
+    text-wrap: balance;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .wrap {
+    max-width: 80rem;
+    margin-inline: auto;
+  }
+  .mono {
+    font-family: var(--mono);
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meta.lower {
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .display {
+    font-family: var(--serif);
+    letter-spacing: -0.02em;
+  }
+  /* niwa's Caveat hand becomes Newsreader italic. */
+  .hand {
+    font-family: var(--serif);
+    font-style: italic;
+    letter-spacing: 0;
+  }
+  .small {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .tiny {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--faint);
+  }
+
+  /* masthead */
+  .mast {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 48px;
+    align-items: end;
+    padding-block: 56px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mast .meta {
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: clamp(56px, 9vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .deck {
+    margin: 18px 0 0;
+    font-size: clamp(19px, 2.2vw, 22px);
+    line-height: 1.38;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .claim {
+    font-size: clamp(18px, 2vw, 20px);
+    line-height: 1.5;
+    margin: 0 0 14px;
+    max-width: 52ch;
+  }
+  .how {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  /* the garden bar */
+  .garden {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 20px;
+    align-items: baseline;
+    padding-block: 22px 4px;
+  }
+  .gsw {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .gnote {
+    grid-column: 2;
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 72ch;
+  }
+  .file {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .file input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .file:focus-within {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* chips */
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition:
+      background-color 220ms var(--ease),
+      border-color 220ms var(--ease),
+      color 220ms var(--ease),
+      transform 180ms var(--ease);
+  }
+  .chip:not(:disabled):hover {
+    color: var(--accent);
+    background: var(--wash);
+  }
+  .chip:active {
+    transform: scale(0.97);
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .chip.accent {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip:disabled {
+    opacity: 0.5;
+  }
+
+  /* the rig: the sheet, and the desk beside it */
+  .rig {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24rem;
+    gap: 24px;
+    margin-top: 22px;
+    align-items: start;
+  }
+  .desk {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .panel {
+    position: relative;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 18px;
+    min-width: 0;
+    animation: rise 600ms var(--ease) both;
+  }
+  .sheet {
+    padding: clamp(20px, 3vw, 30px);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* A pen line laid over the element it sits in. */
+  .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .sketch .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 560ms var(--ease) both;
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* the sheet */
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .case {
+    display: block;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 4px 0;
+    color: var(--ink);
+    transition:
+      border-color 220ms var(--ease),
+      box-shadow 220ms var(--ease);
+  }
+  .case:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .case::placeholder {
+    color: var(--faint);
+  }
+  .case[readonly] {
+    border-bottom-color: transparent;
+  }
+  .name {
+    font-size: clamp(26px, 3.2vw, 31px);
+    line-height: 1.2;
+    margin-top: 8px;
+    letter-spacing: -0.02em;
+  }
+  .grown {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .grown b {
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .specnote {
+    margin: 8px 0 0;
+    font-size: 15px;
+    color: var(--faint);
+  }
+  .drawwrap {
+    margin: 20px -4px 0;
+    overflow-x: auto;
+  }
+  .drawwrap > div {
+    min-width: 34rem;
+    padding-inline: 4px;
+  }
+  .drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .drawing .side,
+  .drawing .tick {
+    font-family: var(--mono);
+    fill: var(--faint);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .drawing .tick {
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .drawing .root-label {
+    font-family: var(--serif);
+    font-style: italic;
+    fill: var(--accent);
+    font-size: 15px;
+  }
+  .drawing .touch-label {
+    font-family: var(--serif);
+    font-style: italic;
+    fill: var(--ink);
+    font-size: 13px;
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 3px;
+  }
+  .drawing .axis {
+    fill: var(--ink);
+    opacity: 0.55;
+  }
+  .drawing .stem {
+    stroke: var(--rule);
+    stroke-width: 1;
+  }
+  .drawing .rootdot,
+  .drawing .ink-accent {
+    fill: var(--accent);
+  }
+  .drawing .offer {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-dasharray: 2.2 2.4;
+    opacity: 0.8;
+  }
+  .drawing .dot {
+    stroke-width: 1.2;
+    fill: var(--surface);
+    stroke: var(--ink);
+  }
+  .drawing .dot.links {
+    fill: var(--ink);
+  }
+  .drawing .dot.names {
+    fill: var(--muted);
+  }
+  .drawing .dot.kin {
+    stroke: var(--faint);
+  }
+  .drawing .dot.approx {
+    stroke-dasharray: 1.6 1.6;
+  }
+  .drawing .hit {
+    fill: transparent;
+  }
+  .mark {
+    transition: opacity 260ms var(--ease);
+  }
+  .mark.live {
+    cursor: pointer;
+  }
+  .mark.live .dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 180ms var(--ease);
+  }
+  .mark.live:hover .dot {
+    transform: scale(1.35);
+  }
+  .caption {
+    margin-top: 4px;
+  }
+
+  .stones {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .row {
+    animation: rise 480ms var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 32ms);
+  }
+  .stone {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 8px;
+    padding-block: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .stone .lbl {
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .stone.out {
+    opacity: 0.5;
+  }
+  .stone.out .lbl {
+    text-decoration: line-through;
+  }
+  .offered {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--accent);
+    opacity: 0.85;
+  }
+  .ringbtn {
+    margin-top: 2px;
+    border-radius: 999px;
+    line-height: 0;
+    transition: transform 180ms var(--ease);
+  }
+  .ringbtn:not(:disabled):hover {
+    transform: scale(1.12);
+  }
+  .ringbtn circle {
+    fill: none;
+    stroke: var(--faint);
+    stroke-width: 1.3;
+  }
+  .ringbtn.offer circle {
+    stroke: var(--accent);
+    stroke-dasharray: 2 2.2;
+  }
+  .ringbtn.on circle {
+    fill: var(--accent);
+    stroke: var(--accent);
+    stroke-dasharray: none;
+  }
+  .lnk {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+    margin-top: 3px;
+    transition: color 160ms var(--ease);
+  }
+  .lnk:not(:disabled):hover,
+  .seg:not(:disabled):hover {
+    color: var(--accent);
+  }
+  .arrive {
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px dashed var(--rule);
+    border-radius: 3px;
+    animation: rise 360ms var(--ease) both;
+  }
+
+  .questions {
+    display: grid;
+    gap: 26px;
+    margin-top: 34px;
+  }
+  .q {
+    font-size: 20px;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .segs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 4px;
+    margin-top: 8px;
+  }
+  .seg {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    transition: color 160ms var(--ease);
+  }
+  .seg[aria-pressed="true"] {
+    color: var(--ink);
+  }
+  .seg:disabled {
+    opacity: 0.6;
+  }
+  .seg[aria-pressed="true"]:disabled {
+    opacity: 1;
+  }
+  .dotsep {
+    padding-inline: 6px;
+    font-size: 11px;
+    color: var(--faint);
+  }
+  .note {
+    margin-top: 8px;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  .story {
+    margin-top: 8px;
+    font-size: 19px;
+    line-height: 1.38;
+  }
+  .call {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 34px;
+  }
+  .call .label {
+    margin-right: 8px;
+  }
+  .trouble {
+    margin: 12px 0 0;
+    font-size: 15.5px;
+    color: var(--accent);
+  }
+
+  /* the desk */
+  .reading {
+    margin: 8px 0 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .shelf h3 {
+    margin: 14px 0 0;
+    font-weight: 400;
+  }
+  .list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .pick {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    width: calc(100% + 12px);
+    margin-inline: -6px;
+    padding: 6px;
+    border-radius: 3px;
+    text-align: left;
+    transition: background-color 160ms var(--ease);
+  }
+  .pick:hover {
+    background: var(--wash);
+  }
+  .pick .t {
+    font-size: 16px;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .pick[aria-current="true"] .t {
+    color: var(--accent);
+  }
+  .pick .spec {
+    font-size: 13px;
+    color: var(--faint);
+    margin-left: 6px;
+  }
+  .rootpick {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+  }
+  .rootpick .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .rootpick .t {
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+  .rootpick .mk {
+    margin-left: 8px;
+    font-size: 13.5px;
+    color: var(--faint);
+  }
+  .rootpick .by {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--faint);
+  }
+  .find {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .holds {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .holds li {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 72px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 1040px) {
+    .rig {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .mast {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+      padding-block: 40px 28px;
+    }
+  }
+  @media (max-width: 640px) {
+    .garden {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .gnote {
+      grid-column: 1;
+    }
+    .panel {
+      padding: 16px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .row,
+    .arrive,
+    .sketch .draw {
+      animation: none;
+    }
+    .mark.live .dot,
+    .ringbtn,
+    .chip {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="meta">Center for Applied Post-Phenomenology · instrument</p>
+      <h1>Canon</h1>
+      <p class="deck" id="blurb"></p>
+    </div>
+    <div>
+      <p class="claim">
+        How often a note is reached for is a count, and a count is not a
+        meaning. Whether what gathers round it is one story, whether the idea
+        moved along it, whether it is of use and whether it belongs in the canon
+        are judgements, and only the reader can make them.
+      </p>
+      <p class="how">
+        Pick a root, a note three or more others reach for. The strand is drawn
+        along time: what reaches for it above the line, its nearest kin by words
+        below. Ring the touchpoints, up to ten; the page offers a few, dashed,
+        each with why. Strike what is not the story. Say whether it is one
+        story, whether the idea moved along it, whether it is of use, each in a
+        line if you want. Write the story. Then the call: into the canon, or
+        leave it out.
+      </p>
+    </div>
+  </header>
+
+  <section class="garden" aria-label="The garden">
+    <span class="label">the garden</span>
+    <div class="gsw">
+      <button class="chip" type="button" data-g="specimen" aria-pressed="true">
+        Specimen A's garden
+      </button>
+      <button class="chip" type="button" data-g="folder" aria-pressed="false">
+        your folder
+      </button>
+      <label class="chip file" id="fileLabel"
+        >open a folder of notes
+        <input
+          id="folder"
+          type="file"
+          webkitdirectory
+          multiple
+          aria-label="Open a folder of markdown notes"
+      /></label>
+    </div>
+    <p class="gnote" id="gnote"></p>
+  </section>
+
+  <div class="rig">
+    <section class="panel sheet" id="sheet" aria-label="The strand"></section>
+    <aside class="desk">
+      <section
+        class="panel"
+        id="readingPanel"
+        aria-label="The reading"
+        style="animation-delay: 100ms"
+      >
+        <span class="label">the reading</span>
+        <p class="reading" id="reading">reading…</p>
+      </section>
+      <section
+        class="panel shelf"
+        id="shelfPanel"
+        aria-label="The canon"
+        style="animation-delay: 140ms"
+        hidden
+      >
+        <span class="label">the canon</span>
+        <div id="shelf"></div>
+      </section>
+      <section
+        class="panel"
+        id="rootsPanel"
+        aria-label="The roots"
+        style="animation-delay: 180ms"
+        hidden
+      >
+        <span class="label">the roots</span>
+        <p class="small" style="margin: 4px 0 0">
+          every note three or more others reach for; the number is how many
+        </p>
+        <input
+          id="find"
+          class="case find"
+          placeholder="find a root"
+          aria-label="Find a root"
+          autocomplete="off"
+        />
+        <ol class="list" id="roots"></ol>
+        <button class="lnk" type="button" id="allRoots" hidden></button>
+      </section>
+      <section
+        class="panel"
+        id="recordPanel"
+        aria-label="The record"
+        style="animation-delay: 220ms"
+      >
+        <span class="label">the record</span>
+        <p class="reading" id="record">reading…</p>
+      </section>
+      <section
+        class="panel"
+        id="holdsPanel"
+        aria-label="What it holds to"
+        style="animation-delay: 260ms"
+      >
+        <span class="label">what it holds to</span>
+        <ul class="holds" id="holds"></ul>
+        <p class="tiny" style="margin: 12px 0 0">
+          what you keep stays in this browser, under one key; a folder you open
+          is read in the page and never sent anywhere
+        </p>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <span class="meta">Canon · CAPP · prototype, 3 October 2026</span>
+    <span class="meta">No network · kept in this browser</span>
+  </footer>
+</div>
+
+<script>
+  "use strict";
+
+  /* ── the hand ────────────────────────────────────────────────────────────
+     Hand-drawn strokes, deterministic for their seed, so a re-render never
+     redraws a border differently. Ported from niwa's lib/hand.ts. */
+
+  function rand(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seedOf(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  const f1 = (n) => String(Math.round(n * 10) / 10);
+  const spread = (r, amp) => (r() * 2 - 1) * amp;
+
+  function stroke(a, b, r, wobble = 1.1, overshoot = 0) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const nx = -uy;
+    const ny = ux;
+    const back = r() * overshoot;
+    const past = r() * overshoot;
+    const s = [
+      a[0] - ux * back + nx * spread(r, wobble * 0.4),
+      a[1] - uy * back + ny * spread(r, wobble * 0.4),
+    ];
+    const e = [
+      b[0] + ux * past + nx * spread(r, wobble * 0.4),
+      b[1] + uy * past + ny * spread(r, wobble * 0.4),
+    ];
+    const bow = spread(r, wobble);
+    const t1 = 0.25 + r() * 0.15;
+    const t2 = 0.6 + r() * 0.15;
+    const c1 = [
+      a[0] + dx * t1 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t1 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    const c2 = [
+      a[0] + dx * t2 + nx * (bow + spread(r, wobble * 0.6)),
+      a[1] + dy * t2 + ny * (bow + spread(r, wobble * 0.6)),
+    ];
+    return `M${f1(s[0])} ${f1(s[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(e[0])} ${f1(e[1])}`;
+  }
+  function roughRect(
+    w,
+    h,
+    seed,
+    { wobble = 1.1, overshoot = 3, inset = 0.5 } = {},
+  ) {
+    const r = rand(seed);
+    const x0 = inset,
+      y0 = inset,
+      x1 = w - inset,
+      y1 = h - inset;
+    return [
+      stroke([x0, y0], [x1, y0], r, wobble, overshoot),
+      stroke([x1, y0], [x1, y1], r, wobble, overshoot),
+      stroke([x1, y1], [x0, y1], r, wobble, overshoot),
+      stroke([x0, y1], [x0, y0], r, wobble, overshoot),
+    ].join("");
+  }
+  function smooth(pts) {
+    let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(p2[0])} ${f1(p2[1])}`;
+    }
+    return d;
+  }
+  function roughEllipse(
+    w,
+    h,
+    seed,
+    { wobble = 1.3, pad = 4, steps = 14, grow = 1 } = {},
+  ) {
+    const r = rand(seed);
+    const cx = w / 2;
+    const cy = h / 2;
+    const rx = (w / 2) * grow + pad;
+    const ry = (h / 2) * (1 + (grow - 1) * 1.6) + pad * 0.8;
+    const tilt = spread(r, 0.06);
+    const a0 = Math.PI * (0.8 + r() * 0.4);
+    const overlap = 1.08 + r() * 0.06;
+    const pts = [];
+    const n = Math.round(steps * overlap);
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (i / steps) * Math.PI * 2;
+      const kx = rx + spread(r, wobble);
+      const ky = ry + spread(r, wobble);
+      const x = Math.cos(a) * kx;
+      const y = Math.sin(a) * ky;
+      pts.push([
+        cx + x * Math.cos(tilt) - y * Math.sin(tilt),
+        cy + x * Math.sin(tilt) + y * Math.cos(tilt),
+      ]);
+    }
+    return smooth(pts);
+  }
+  function roughUnderline(w, seed, { wobble = 0.8, y = 0 } = {}) {
+    const r = rand(seed);
+    return stroke(
+      [-1 - r() * 2, y],
+      [w + 1 + r() * 2, y + spread(r, 0.8)],
+      r,
+      wobble,
+      0,
+    );
+  }
+  function sample(d) {
+    const subs = [];
+    let cur = [0, 0];
+    let pts = [];
+    const re = /([MCL])([^MCL]*)/g;
+    let m;
+    while ((m = re.exec(d))) {
+      const n = m[2]
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (m[1] === "M") {
+        if (pts.length > 1) subs.push(pts);
+        cur = [n[0], n[1]];
+        pts = [cur];
+      } else if (m[1] === "L") {
+        const b = [n[0], n[1]];
+        for (let i = 1; i <= 3; i++) {
+          const t = i / 3;
+          pts.push([
+            cur[0] + (b[0] - cur[0]) * t,
+            cur[1] + (b[1] - cur[1]) * t,
+          ]);
+        }
+        cur = b;
+      } else {
+        const [x1, y1, x2, y2, x, y] = n;
+        for (let i = 1; i <= 10; i++) {
+          const t = i / 10;
+          const u = 1 - t;
+          pts.push([
+            u * u * u * cur[0] +
+              3 * u * u * t * x1 +
+              3 * u * t * t * x2 +
+              t * t * t * x,
+            u * u * u * cur[1] +
+              3 * u * u * t * y1 +
+              3 * u * t * t * y2 +
+              t * t * t * y,
+          ]);
+        }
+        cur = [x, y];
+      }
+    }
+    if (pts.length > 1) subs.push(pts);
+    return subs;
+  }
+  function ribbon(d, width = 1.5, seed = 1) {
+    const r = rand(seed);
+    const out = [];
+    for (const pts of sample(d)) {
+      const n = pts.length;
+      const knots = [0, 1, 2, 3, 4].map(() => 0.78 + r() * 0.44);
+      const left = [];
+      const right = [];
+      for (let i = 0; i < n; i++) {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(n - 1, i + 1)];
+        let tx = b[0] - a[0];
+        let ty = b[1] - a[1];
+        const len = Math.hypot(tx, ty) || 1;
+        tx /= len;
+        ty /= len;
+        const t = i / (n - 1);
+        const k = t * 4;
+        const ki = Math.min(3, Math.floor(k));
+        const press = knots[ki] * (1 - (k - ki)) + knots[ki + 1] * (k - ki);
+        const w = Math.max(
+          0.45,
+          width * (0.42 + 0.58 * Math.pow(Math.sin(Math.PI * t), 0.5)) * press,
+        );
+        const nx = (-ty * w) / 2;
+        const ny = (tx * w) / 2;
+        left.push([pts[i][0] + nx, pts[i][1] + ny]);
+        right.push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      const poly = [...left, ...right.reverse()];
+      out.push(`M${poly.map((q) => `${f1(q[0])} ${f1(q[1])}`).join("L")}Z`);
+    }
+    return out.join("");
+  }
+
+  /* ── the canon ───────────────────────────────────────────────────────────
+     Which stories the garden actually tells. The page counts who reaches for
+     a stone and gathers the strand; which strands are canon, what the story
+     is and which stones carry it are the reader's to say. Ported by hand from
+     niwa's lib/canon.ts; the maths is the same. */
+
+  const HOWS = ["links", "names", "term", "twin", "kin"];
+  const HOW_LABEL = {
+    links: "links to it",
+    names: "names it",
+    term: "uses the term",
+    twin: "the same piece elsewhere",
+    kin: "kin by words",
+  };
+  const HOW_MANY = {
+    links: "link to it",
+    names: "name it",
+    term: "use the term",
+    twin: "the same piece elsewhere",
+    kin: "kin by words",
+  };
+  const HOW_RANK = { links: 0, names: 1, term: 2, twin: 3, kin: 4 };
+  const reaches = (h) => h === "links" || h === "names" || h === "term";
+
+  const MIN_REACHED = 3;
+  const ROOTS_MAX = 100;
+  const KIN_MAX = 5;
+  const KIN_FLOOR = 0.05;
+  const TOUCH_MAX = 10;
+
+  function proposals(members, skip, n = 5) {
+    const pool = members.filter((m) => !skip.has(m.id));
+    const out = new Map();
+    const add = (id, because) => {
+      if (!id) return;
+      const b = out.get(id);
+      if (b) b.push(because);
+      else out.set(id, [because]);
+    };
+    const dated = pool
+      .filter((m) => m.day && !m.approx)
+      .sort((a, b) => (a.day < b.day ? -1 : 1));
+    if (dated.length)
+      add(dated[0].id, `the first on record, ${dayWords(dated[0].day)}`);
+    if (dated.length > 1)
+      add(dated.at(-1).id, `the latest, ${dayWords(dated.at(-1).day)}`);
+    for (const m of pool
+      .filter((m) => m.reached >= 2)
+      .sort((a, b) => b.reached - a.reached)
+      .slice(0, 2))
+      add(m.id, `${m.reached} stones reach for it too`);
+    const threaded = pool
+      .filter((m) => (m.threads ?? 0) >= 2)
+      .sort((a, b) => (b.threads ?? 0) - (a.threads ?? 0))[0];
+    if (threaded)
+      add(threaded.id, `threaded to ${threaded.threads} others in the strand`);
+    return [...out]
+      .slice(0, n)
+      .map(([id, because]) => ({ id, because: because.join(" · ") }));
+  }
+
+  const ONES = ["one", "many", "none"];
+  const MOVEDS = ["moved", "held", "unsure"];
+  const USES = ["use", "notyet", "unsure"];
+  const ONE_LABEL = {
+    one: "one story",
+    many: "more than one",
+    none: "not a story",
+  };
+  const MOVED_LABEL = {
+    moved: "it moved",
+    held: "it held still",
+    unsure: "can't tell",
+  };
+  const USE_LABEL = { use: "of use", notyet: "not yet", unsure: "can't tell" };
+  const CALL_LABEL = { in: "in the canon", out: "left out" };
+
+  const canonFrom = (s, day) => ({
+    slug: "",
+    put: day,
+    touched: day,
+    name: s.root.label,
+    root: {
+      id: s.root.id,
+      label: s.root.label,
+      kind: s.root.kind,
+      day: s.root.day,
+      approx: s.root.approx,
+    },
+    members: s.members.map((m) => ({
+      id: m.id,
+      label: m.label,
+      how: m.how,
+      day: m.day,
+      approx: m.approx,
+      touch: false,
+      out: false,
+    })),
+    one: "",
+    moved: "",
+    use: "",
+    oneNote: "",
+    movedNote: "",
+    useNote: "",
+    story: "",
+    call: "",
+    called: "",
+    threads: s.threads,
+    builds: s.builds,
+  });
+
+  function toggleTouch(c, id) {
+    const m = c.members.find((x) => x.id === id);
+    if (!m) return c;
+    if (!m.touch && c.members.filter((x) => x.touch).length >= TOUCH_MAX)
+      return c;
+    return {
+      ...c,
+      members: c.members.map((x) =>
+        x.id === id
+          ? { ...x, touch: !x.touch, out: x.touch ? x.out : false }
+          : x,
+      ),
+    };
+  }
+  const toggleOut = (c, id) => ({
+    ...c,
+    members: c.members.map((x) =>
+      x.id === id ? { ...x, out: !x.out, touch: x.out ? x.touch : false } : x,
+    ),
+  });
+
+  function sinceKept(c, s) {
+    const was = new Set(
+      c.members.filter((m) => m.how !== "kin").map((m) => m.id),
+    );
+    const now = new Set(
+      s.members.filter((m) => m.how !== "kin").map((m) => m.id),
+    );
+    return {
+      joined: s.members.filter((m) => m.how !== "kin" && !was.has(m.id)),
+      gone: c.members.filter((m) => m.how !== "kin" && !now.has(m.id)),
+    };
+  }
+  const takeIn = (c, joined) => ({
+    ...c,
+    members: [
+      ...c.members,
+      ...joined
+        .filter((m) => !c.members.some((x) => x.id === m.id))
+        .map((m) => ({
+          id: m.id,
+          label: m.label,
+          how: m.how,
+          day: m.day,
+          approx: m.approx,
+          touch: false,
+          out: false,
+        })),
+    ],
+  });
+
+  /* days */
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+  const dayWords = (d) =>
+    DAY.test(d) ? `${+d.slice(8, 10)} ${MON[+d.slice(5, 7) - 1]}` : d;
+  const dayYear = (d) => (DAY.test(d) ? `${dayWords(d)} ${d.slice(0, 4)}` : d);
+  const utc = (d) =>
+    Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  const daysBetween = (a, b) =>
+    DAY.test(a) && DAY.test(b) ? Math.round((utc(b) - utc(a)) / 86400000) : 0;
+
+  function spanOf(c) {
+    const all = [
+      { day: c.root.day, approx: c.root.approx },
+      ...c.members.filter((m) => !m.out),
+    ];
+    const days = all
+      .filter((x) => x.day)
+      .map((x) => x.day)
+      .sort();
+    return {
+      first: days[0] ?? null,
+      last: days.at(-1) ?? null,
+      approx: all.filter((x) => x.day && x.approx).length,
+      undated: all.filter((x) => !x.day).length,
+      crowded: crowdedDay(days),
+    };
+  }
+  function crowdedDay(days) {
+    const c = new Map();
+    for (const d of days) c.set(d, (c.get(d) ?? 0) + 1);
+    let best = null;
+    for (const [day, k] of c)
+      if (k >= 4 && (!best || k > best.n || (k === best.n && day < best.day)))
+        best = { day, n: k };
+    return best;
+  }
+
+  /* the readings */
+  const nOf = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
+  const clipW = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max).replace(/\s+\S*$/, "")}…`;
+  const namesOf = (xs, max = 3) =>
+    xs.length <= max
+      ? xs.map((x) => x.label).join(", ")
+      : `${xs
+          .slice(0, max)
+          .map((x) => x.label)
+          .join(", ")} and ${xs.length - max} more`;
+
+  function readings(c, since) {
+    const reaching = c.members.filter((m) => m.how !== "kin");
+    const counts = ["links", "names", "term", "twin"]
+      .map((h) => [h, reaching.filter((m) => m.how === h).length])
+      .filter(([, k]) => k)
+      .map(([h, k]) => `${k} ${k === 1 ? HOW_LABEL[h] : HOW_MANY[h]}`);
+    const kin = c.members.length - reaching.length;
+    const out = [
+      `grown from ${c.root.label} · ${nOf(reaching.length, "stone")} reach for it${counts.length ? ` (${counts.join(", ")})` : ""} · ${kin} kin by words`,
+    ];
+    const s = spanOf(c);
+    if (s.first && s.last) {
+      const d = daysBetween(s.first, s.last);
+      out.push(
+        `first on record ${dayYear(s.first)} · the latest ${dayYear(s.last)} · ${nOf(d, "day")} between` +
+          (s.approx ? ` · ${s.approx} dated only by their last change` : "") +
+          (s.undated ? ` · ${s.undated} undated` : ""),
+      );
+      if (s.crowded)
+        out.push(
+          `${s.crowded.n} of them first appear on the same day, ${dayYear(s.crowded.day)}`,
+        );
+    } else out.push("no day on record for any of it");
+    out.push(
+      c.threads
+        ? `the strand's stones thread each other ${nOf(c.threads, "time")}, the root not counted`
+        : "the strand's stones do not thread each other, the root not counted",
+    );
+    out.push(
+      c.builds.length
+        ? `put to work: ${nOf(c.builds.length, "build")} reached from the strand — ${c.builds.slice(0, 4).join(", ")}${c.builds.length > 4 ? ` and ${c.builds.length - 4} more` : ""}`
+        : "no build reached from the strand",
+    );
+    const touch = c.members.filter((m) => m.touch).length;
+    const struck = c.members.filter((m) => m.out).length;
+    out.push(
+      `${nOf(touch, "touchpoint")} of at most ${TOUCH_MAX}${struck ? ` · ${struck} struck from the story` : ""}`,
+    );
+    const said = (q, mark, note) =>
+      mark
+        ? `${q} ${mark}${note.trim() ? ` — ${clipW(note.trim(), 90)}` : ""}`
+        : `${q} not said yet`;
+    out.push(said("one story?", c.one ? ONE_LABEL[c.one] : "", c.oneNote));
+    out.push(
+      said("did it move?", c.moved ? MOVED_LABEL[c.moved] : "", c.movedNote),
+    );
+    out.push(said("of use?", c.use ? USE_LABEL[c.use] : "", c.useNote));
+    out.push(
+      c.call === "in"
+        ? `in the canon since ${dayWords(c.called)}`
+        : c.call === "out"
+          ? `left out ${dayWords(c.called)}`
+          : "not called yet",
+    );
+    if (since) {
+      if (!since.joined.length && !since.gone.length)
+        out.push(
+          "since it was kept: nothing has come to reach for it or stopped",
+        );
+      else
+        out.push(
+          `since it was kept: ${[
+            since.joined.length
+              ? `${since.joined.length} more reach for it — ${namesOf(since.joined)}`
+              : "",
+            since.gone.length
+              ? `${since.gone.length} no longer ${since.gone.length === 1 ? "does" : "do"} — ${namesOf(since.gone)}`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" · ")}`,
+        );
+    }
+    return out;
+  }
+
+  function tally(canon, roots) {
+    const held = new Set();
+    for (const c of canon)
+      if (c.call === "in") {
+        held.add(c.root.id);
+        for (const m of c.members) if (!m.out) held.add(m.id);
+      }
+    const seen = new Set(canon.map((c) => c.root.id));
+    return {
+      n: canon.length,
+      in: canon.filter((c) => c.call === "in").length,
+      out: canon.filter((c) => c.call === "out").length,
+      open: canon.filter((c) => !c.call).length,
+      touch: canon.reduce(
+        (s, c) => s + c.members.filter((m) => m.touch).length,
+        0,
+      ),
+      held: held.size,
+      looked: roots.filter((r) => seen.has(r.id)).length,
+    };
+  }
+  function recordReadings(t, roots, corpus) {
+    const out = [];
+    if (!t.n) out.push("no strand looked at yet");
+    else {
+      out.push(
+        `${nOf(t.n, "strand")} looked at · ${t.in} in the canon · ${t.out} left out · ${t.open} not called`,
+      );
+      out.push(`${nOf(t.touch, "touchpoint")} kept across them`);
+      if (corpus)
+        out.push(
+          `${nOf(t.held, "stone")} of the garden's ${corpus} held in strands in the canon`,
+        );
+    }
+    if (roots)
+      out.push(
+        `of the ${roots} stones reached for by ${MIN_REACHED} or more, ${t.looked} ${t.looked === 1 ? "has" : "have"} a strand looked at`,
+      );
+    return out;
+  }
+
+  /* what is kept, checked on the way back in from storage */
+  const str = (v, max) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const long = (v, max) =>
+    typeof v === "string" ? v.trim().slice(0, max) : "";
+  const dayOr = (v, or) => (typeof v === "string" && DAY.test(v) ? v : or);
+  const oneOf = (v, xs, or) => (xs.includes(String(v)) ? v : or);
+  const token = (v, max) => str(v, max).replace(/`/g, "'");
+  const readDay = (v) => {
+    const s =
+      v instanceof Date
+        ? v.toISOString().slice(0, 10)
+        : typeof v === "string"
+          ? v.trim()
+          : "";
+    const approx = s.startsWith("~");
+    const d = approx ? s.slice(1) : s;
+    return DAY.test(d) ? { day: d, approx } : { day: null, approx: false };
+  };
+  function slugOf(title, day) {
+    const t = title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 56)
+      .replace(/-+$/g, "");
+    return `${day.slice(0, 10)}-${t || "way"}`;
+  }
+  function validateCanon(input) {
+    const r = input ?? {};
+    const root = r.root ?? {};
+    const rootId = token(root.id, 200);
+    if (!rootId) throw new Error("a strand needs the stone it grew from");
+    const today = new Date().toISOString().slice(0, 10);
+    const put = dayOr(r.put, today);
+    const rootLabel = token(root.label, 200) || rootId;
+    const name = str(r.name, 200) || rootLabel;
+    let touches = 0;
+    const seen = new Set();
+    const members = [];
+    for (const m of Array.isArray(r.members) ? r.members.slice(0, 80) : []) {
+      const x = m ?? {};
+      const id = token(x.id, 200);
+      if (!id || seen.has(id) || id === rootId) continue;
+      seen.add(id);
+      const out = x.out === true;
+      const touch = x.touch === true && !out && touches < TOUCH_MAX;
+      if (touch) touches++;
+      const d = readDay(x.day);
+      members.push({
+        id,
+        label: token(x.label, 200) || id,
+        how: oneOf(x.how, HOWS, "links"),
+        day: d.day,
+        approx: d.day ? x.approx === true || d.approx : false,
+        touch,
+        out,
+      });
+    }
+    const call = oneOf(r.call, ["", "in", "out"], "");
+    const rd = readDay(root.day);
+    const c = {
+      slug: str(r.slug, 100),
+      put,
+      touched: dayOr(r.touched, put),
+      name,
+      root: {
+        id: rootId,
+        label: rootLabel,
+        kind: str(root.kind, 40) || "note",
+        day: rd.day,
+        approx: rd.day ? root.approx === true || rd.approx : false,
+      },
+      members,
+      one: oneOf(r.one, ["", ...ONES], ""),
+      moved: oneOf(r.moved, ["", ...MOVEDS], ""),
+      use: oneOf(r.use, ["", ...USES], ""),
+      oneNote: long(r.oneNote, 2000),
+      movedNote: long(r.movedNote, 2000),
+      useNote: long(r.useNote, 2000),
+      story: long(r.story, 6000),
+      call,
+      called: call ? dayOr(r.called, today) : "",
+      threads:
+        typeof r.threads === "number" && Number.isFinite(r.threads)
+          ? Math.max(0, Math.round(r.threads))
+          : 0,
+      builds: Array.isArray(r.builds)
+        ? r.builds
+            .map((b) => str(b, 120))
+            .filter(Boolean)
+            .slice(0, 40)
+        : [],
+    };
+    if (!c.slug) c.slug = slugOf(c.name, c.put);
+    return c;
+  }
+
+  /* ── the garden ──────────────────────────────────────────────────────────
+     A folder of markdown notes read into stones and threads with the rules of
+     niwa's lib/garden.ts: a written [[link]] or a `related:` entry; a note's
+     title named in another's prose; a glossary term in use; a ~/Code/ path a
+     note points at. Files under a top-level Glossary/ folder are terms. */
+
+  const MEMORY_PREFIXES = [
+    "project_",
+    "feedback_",
+    "user_",
+    "reference_",
+    "routine_",
+  ];
+  const unq = (s) => s.replace(/^["']|["']$/g, "");
+
+  /** The lenient frontmatter reader niwa falls back on, plus YAML block lists. */
+  function readFront(raw) {
+    const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!m) return { data: {}, content: raw };
+    const data = {};
+    let parent = null;
+    for (const line of m[1].split(/\r?\n/)) {
+      if (!line.trim() || line.trim().startsWith("#")) continue;
+      const item = line.match(/^\s*-\s+(.*)$/);
+      if (item && parent && Array.isArray(data[parent])) {
+        data[parent].push(unq(item[1].trim()));
+        continue;
+      }
+      const field = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!field) continue;
+      const [, indent, key, rawValue] = field;
+      const value = unq(rawValue.trim());
+      if (indent.length > 0 && parent) {
+        if (
+          typeof data[parent] !== "object" ||
+          data[parent] === null ||
+          Array.isArray(data[parent])
+        )
+          data[parent] = {};
+        data[parent][key] = value;
+        continue;
+      }
+      if (!value) {
+        parent = key;
+        data[key] = [];
+        continue;
+      }
+      parent = null;
+      data[key] = value.startsWith("[")
+        ? value
+            .slice(1, -1)
+            .split(",")
+            .map((s) => unq(s.trim()))
+            .filter(Boolean)
+        : value;
+    }
+    return { data, content: m[2] };
+  }
+
+  const norm = (s) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\.md$/, "")
+      .replace(/[\s-]+/g, "_")
+      .replace(/[^a-z0-9_]/g, "");
+  const stripPrefix = (key) => {
+    for (const p of MEMORY_PREFIXES)
+      if (key.startsWith(p)) return key.slice(p.length);
+    return key;
+  };
+  const proseOf = (body) => {
+    const blank = (code) => code.replace(/[^\n]/g, " ");
+    return body.replace(/```[\s\S]*?```/g, blank).replace(/`[^`\n]*`/g, blank);
+  };
+  const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  function conceptMatchers(title, aliases) {
+    const terms = [title, ...aliases].filter((t) => t && t.length >= 4);
+    return terms.map(
+      (t) =>
+        new RegExp(`(?<![\\w-])${escRe(t)}(?![\\w-])`, /\s/.test(t) ? "i" : ""),
+    );
+  }
+
+  const localDay = (ms) => {
+    const d = new Date(ms);
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const dayIn = (v) =>
+    typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v.trim())
+      ? v.trim().slice(0, 10)
+      : null;
+
+  /**
+   * When a stone arrived. niwa reads the day a file first appears in its git
+   * history; a page has no history, so a `created:` or `date:` in the
+   * frontmatter stands in for it. Failing that, the last change — said as
+   * only that — and failing that, undated.
+   */
+  function datedFrom(data, mtime) {
+    const first =
+      dayIn(data.created) ?? dayIn(data.date) ?? dayIn(data.planted);
+    if (first) return { day: first, approx: false };
+    const meta =
+      data.metadata &&
+      typeof data.metadata === "object" &&
+      !Array.isArray(data.metadata)
+        ? data.metadata
+        : {};
+    const changed =
+      dayIn(meta.modified) ??
+      dayIn(data.modified) ??
+      dayIn(data.updated) ??
+      dayIn(data.tended);
+    if (changed) return { day: changed, approx: true };
+    if (typeof mtime === "number" && mtime > 0)
+      return { day: localDay(mtime), approx: true };
+    return { day: null, approx: false };
+  }
+
+  /** files: [{ rel, text, mtime }] with rel relative to the folder opened. */
+  function buildGarden(files) {
+    const nodes = new Map();
+    const links = [];
+    const byKey = new Map();
+    const byBare = new Map();
+    const bodies = new Map();
+    const dated = new Map();
+    const related = new Map();
+    const concepts = [];
+
+    const register = (node, extraKeys) => {
+      nodes.set(node.id, node);
+      for (const k of [
+        norm(node.id.replace(/^\w+:/, "")),
+        ...extraKeys.map(norm),
+      ]) {
+        if (k && !byKey.has(k)) byKey.set(k, node.id);
+        const bare = stripPrefix(k);
+        if (bare && !byBare.has(bare)) byBare.set(bare, node.id);
+      }
+    };
+
+    for (const f of files) {
+      const parts = f.rel.split("/");
+      const base = parts.at(-1).replace(/\.md$/i, "");
+      if (base.startsWith("_")) continue;
+      const { data, content } = readFront(f.text);
+      const glossary =
+        parts.length > 1 && parts[0].toLowerCase() === "glossary";
+      const tags = Array.isArray(data.topics)
+        ? data.topics.map(String)
+        : Array.isArray(data.tags)
+          ? data.tags.map(String)
+          : [];
+      let id;
+      if (glossary) {
+        id = `concept:${base}`;
+        const aliases = Array.isArray(data.aliases)
+          ? data.aliases.filter((a) => typeof a === "string")
+          : [];
+        register(
+          {
+            id,
+            label: base,
+            kind: "concept",
+            description: typeof data.meaning === "string" ? data.meaning : "",
+            body: content.trim(),
+            tags,
+          },
+          [base, ...aliases],
+        );
+        concepts.push({ id, matchers: conceptMatchers(base, aliases) });
+      } else {
+        const rel = f.rel.replace(/\.md$/i, "");
+        id = `note:${rel}`;
+        const title =
+          typeof data.title === "string" && data.title.trim()
+            ? data.title.trim()
+            : "";
+        register(
+          {
+            id,
+            label: title || base,
+            kind: "note",
+            description:
+              typeof data.description === "string"
+                ? data.description
+                : typeof data.summary === "string"
+                  ? data.summary
+                  : "",
+            body: content.trim(),
+            tags,
+          },
+          [rel, base, title],
+        );
+        if (Array.isArray(data.related))
+          related.set(
+            id,
+            data.related.filter((r) => typeof r === "string"),
+          );
+      }
+      bodies.set(id, content);
+      dated.set(id, datedFrom(data, f.mtime));
+    }
+
+    const seen = new Set();
+    const addLink = (source, target, kind) => {
+      if (source === target) return;
+      const key = `${source}→${target}:${kind}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      links.push({ source, target, kind });
+    };
+    const resolve = (ref) => {
+      const k = norm(ref);
+      if (!k) return null;
+      if (byKey.has(k)) return byKey.get(k);
+      const bare = stripPrefix(k);
+      if (byBare.has(bare)) return byBare.get(bare);
+      for (const p of MEMORY_PREFIXES)
+        if (byKey.has(p + k)) return byKey.get(p + k);
+      return null;
+    };
+
+    for (const [id, refs] of related)
+      for (const ref of refs) {
+        const target = resolve(ref);
+        if (target) addLink(id, target, "link");
+      }
+
+    const repoRe = /~\/Code\/([A-Za-z0-9][A-Za-z0-9._-]*)/g;
+    for (const [id, body] of bodies) {
+      const prose = proseOf(body);
+      for (const m of body.matchAll(
+        /\[\[([^\]\[\n`|#]{2,80})(?:[|#][^\]\n]*)?\]\]/g,
+      )) {
+        const ref = m[1].replace(/\\$/, "").trim();
+        if (!ref || /^[^A-Za-z0-9]/.test(ref)) continue;
+        const target = resolve(ref);
+        if (target) addLink(id, target, "link");
+        else if (prose[m.index] === "[") {
+          const ghostId = `ghost:${norm(ref)}`;
+          if (!nodes.has(ghostId))
+            nodes.set(ghostId, {
+              id: ghostId,
+              label: ref,
+              kind: "ghost",
+              description: "",
+              body: "",
+              tags: [],
+            });
+          addLink(id, ghostId, "seed");
+        }
+      }
+      // A page cannot see the code on a disk, so any ~/Code/<name> a note points at counts as a build.
+      for (const m of body.matchAll(repoRe)) {
+        const name = m[1].replace(/[.,;:!?]+$/, "");
+        const rid = `repo:${name.toLowerCase()}`;
+        if (!nodes.has(rid))
+          nodes.set(rid, {
+            id: rid,
+            label: name,
+            kind: "repo",
+            description: "",
+            body: "",
+            tags: [],
+          });
+        addLink(id, rid, "build");
+      }
+      for (const { id: conceptId, matchers } of concepts) {
+        if (conceptId === id) continue;
+        if (matchers.some((re) => re.test(body)))
+          addLink(conceptId, id, "concept");
+      }
+    }
+
+    // Twins need two sources; a folder is one, so none are found. Mentions:
+    const pair = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const joined = new Set(links.map((l) => pair(l.source, l.target)));
+    const named = [...nodes.values()]
+      .filter(
+        (n) =>
+          !["concept", "repo", "ghost"].includes(n.kind) &&
+          /\s/.test(n.label.trim()) &&
+          n.label.trim().length >= 10 &&
+          /^[A-Za-z]/.test(n.label) &&
+          !/_/.test(n.label),
+      )
+      .map((n) => ({
+        id: n.id,
+        label: n.label.trim(),
+        lower: n.label.trim().toLowerCase(),
+        exact: n.label.trim().split(/\s+/).length <= 2,
+        re: null,
+      }));
+    for (const [id, body] of bodies) {
+      const prose = body
+        .replace(/\[\[[^\]\n]*\]\]/g, " ")
+        .replace(/\]\([^)\n]*\)/g, "]");
+      const lower = prose.toLowerCase();
+      for (const t of named) {
+        if (t.id === id || !lower.includes(t.lower)) continue;
+        if (joined.has(pair(id, t.id))) continue;
+        t.re ??= new RegExp(
+          `(?<![\\w-])${escRe(t.label)}(?![\\w-])`,
+          t.exact ? "" : "i",
+        );
+        if (t.re.test(prose)) {
+          addLink(id, t.id, "mention");
+          joined.add(pair(id, t.id));
+        }
+      }
+    }
+    return {
+      nodes: [...nodes.values()],
+      links,
+      dayOf: (n) => dated.get(n.id) ?? { day: null, approx: false },
+    };
+  }
+
+  /* ── words ───────────────────────────────────────────────────────────────
+     tf-idf over every stone with text, unit length so cosine is a dot.
+     Ported from niwa's lib/taste.ts, only the parts kin by words needs. */
+
+  const CORPUS_KINDS = new Set([
+    "concept",
+    "note",
+    "notion",
+    "garden",
+    "reading",
+    "project",
+    "user",
+    "feedback",
+    "reference",
+  ]);
+  const STOP = new Set(
+    `a about above after again against all also am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just let me more most my myself no nor not now of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves ll re ve don didn doesn isn aren wasn weren won wouldn couldn shouldn one two three like get got make made much many may might must ones thing things way well even still already always never ever every something anything nothing everything someone anyone everyone said says say see seen going went come came take took give gave use used using new old first last next back per via etc http https www com html`
+      .split(/\s+/)
+      .filter(Boolean),
+  );
+  function stem(w) {
+    if (w.length <= 3) return w;
+    if (w.endsWith("ies") && w.length > 4) return `${w.slice(0, -3)}y`;
+    if (w.endsWith("ness") && w.length > 6) return w.slice(0, -4);
+    if (w.endsWith("ing") && w.length > 5) return w.slice(0, -3);
+    if (w.endsWith("ed") && w.length > 5) return w.slice(0, -2);
+    if (w.endsWith("ly") && w.length > 5) return w.slice(0, -2);
+    if (/(?:[sxz]|[cs]h)es$/.test(w) && w.length > 4) return w.slice(0, -2);
+    if (w.endsWith("s") && !w.endsWith("ss") && w.length > 4)
+      return w.slice(0, -1);
+    return w;
+  }
+  function tokens(text) {
+    return text
+      .toLowerCase()
+      .replace(/https?:\/\/\S+/g, " ")
+      .replace(/['’]s\b/g, "")
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !STOP.has(w) && !/^\d+$/.test(w))
+      .map((w) => {
+        const st = stem(w);
+        return st.length >= 3 && !STOP.has(st) ? st : w;
+      });
+  }
+  function docText(n) {
+    const body = (n.body ?? "").slice(0, 4000).replace(/[[\]#*_`>|]/g, " ");
+    return {
+      title: n.label,
+      text: `${n.description ?? ""}\n${(n.tags ?? []).join(" ")}\n${body}`,
+    };
+  }
+  function counts(title, text) {
+    const c = new Map();
+    const add = (ts, w) => {
+      for (let i = 0; i < ts.length; i++) {
+        c.set(ts[i], (c.get(ts[i]) ?? 0) + w);
+        if (i + 1 < ts.length) {
+          const p = `${ts[i]}_${ts[i + 1]}`;
+          c.set(p, (c.get(p) ?? 0) + w);
+        }
+      }
+    };
+    add(tokens(title), 2);
+    add(tokens(text), 1);
+    return c;
+  }
+  function normalise(v) {
+    let s = 0;
+    for (const w of v.values()) s += w * w;
+    const n = Math.sqrt(s) || 1;
+    for (const [k, w] of v) v.set(k, w / n);
+    return v;
+  }
+  function weigh(c, idf) {
+    const v = new Map();
+    for (const [t, n] of c) v.set(t, (1 + Math.log(n)) * (idf.get(t) ?? 1));
+    return v;
+  }
+  function buildIndex(nodes) {
+    const raw = nodes
+      .filter((n) => CORPUS_KINDS.has(n.kind))
+      .map((n) => {
+        const { title, text } = docText(n);
+        return { n, c: counts(title, text) };
+      })
+      .filter((d) => d.c.size >= 4);
+    const N = raw.length;
+    const df = new Map();
+    for (const d of raw)
+      for (const t of d.c.keys()) df.set(t, (df.get(t) ?? 0) + 1);
+    const idf = new Map();
+    for (const [t, fq] of df) idf.set(t, Math.log((N + 1) / (fq + 1)) + 1);
+    const docs = raw.map((d) => ({
+      id: d.n.id,
+      label: d.n.label,
+      kind: d.n.kind,
+      vec: normalise(weigh(d.c, idf)),
+    }));
+    return { docs, idf, N };
+  }
+  function dot(a, b) {
+    if (a.size > b.size) [a, b] = [b, a];
+    let s = 0;
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) s += w * x;
+    }
+    return s;
+  }
+  function shared(a, b, n = 6) {
+    const out = [];
+    for (const [t, w] of a) {
+      const x = b.get(t);
+      if (x) out.push([t, w * x]);
+    }
+    return out
+      .sort((p, q) => q[1] - p[1])
+      .slice(0, n)
+      .map((p) => p[0].replace(/_/g, " "));
+  }
+
+  /* ── strands ─────────────────────────────────────────────────────────────
+     Who reaches for whom, the roots, and the strand that grows from one.
+     Ported from niwa's lib/canon-strand.ts. */
+
+  function reachers(links) {
+    const out = new Map();
+    const add = (to, from, how) => {
+      if (to === from) return;
+      let m = out.get(to);
+      if (!m) out.set(to, (m = new Map()));
+      const prev = m.get(from);
+      if (!prev || HOW_RANK[how] < HOW_RANK[prev]) m.set(from, how);
+    };
+    for (const l of links) {
+      if (l.kind === "link") add(l.target, l.source, "links");
+      else if (l.kind === "mention") add(l.target, l.source, "names");
+      else if (l.kind === "concept") add(l.source, l.target, "term");
+      else if (l.kind === "twin") {
+        add(l.target, l.source, "twin");
+        add(l.source, l.target, "twin");
+      }
+    }
+    return out;
+  }
+  const isStone = (n) => !!n && CORPUS_KINDS.has(n.kind);
+  function reachersOf(id, reach, byId) {
+    return [...(reach.get(id) ?? [])]
+      .map(([from, how]) => [byId.get(from), how])
+      .filter((x) => isStone(x[0]));
+  }
+  const reachedOf = (id, reach, byId) =>
+    reachersOf(id, reach, byId).filter(([, h]) => reaches(h)).length;
+  const stoneOf = (n, reach, byId, dayOf) => {
+    const d = dayOf(n);
+    return {
+      id: n.id,
+      label: n.label,
+      kind: n.kind,
+      day: d.day,
+      approx: d.approx,
+      reached: reachedOf(n.id, reach, byId),
+    };
+  };
+  function rootsOf(nodes, reach, dayOf, min = MIN_REACHED, max = ROOTS_MAX) {
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const out = [];
+    for (const n of nodes) {
+      if (!isStone(n)) continue;
+      const by = { links: 0, names: 0, term: 0 };
+      for (const [, h] of reachersOf(n.id, reach, byId))
+        if (h === "links" || h === "names" || h === "term") by[h]++;
+      const reached = by.links + by.names + by.term;
+      if (reached < min) continue;
+      const d = dayOf(n);
+      out.push({
+        id: n.id,
+        label: n.label,
+        kind: n.kind,
+        day: d.day,
+        approx: d.approx,
+        reached,
+        by,
+      });
+    }
+    return out
+      .sort((a, b) => b.reached - a.reached || (a.label < b.label ? -1 : 1))
+      .slice(0, max);
+  }
+  const byDay = (a, b) =>
+    a.day === b.day
+      ? a.label < b.label
+        ? -1
+        : 1
+      : a.day === null
+        ? 1
+        : b.day === null
+          ? -1
+          : a.day < b.day
+            ? -1
+            : 1;
+  const kinWanted = (reached) =>
+    Math.min(KIN_MAX, Math.max(2, Math.round((reached * 3) / 7)));
+
+  function strandOf(rootId, nodes, links, reach, index, dayOf) {
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const rootNode = byId.get(rootId);
+    if (!isStone(rootNode)) return null;
+    const root = stoneOf(rootNode, reach, byId, dayOf);
+    const members = reachersOf(rootId, reach, byId).map(([n, how]) => ({
+      ...stoneOf(n, reach, byId, dayOf),
+      how,
+      shared: [],
+      threads: 0,
+    }));
+    const taken = new Set([rootId, ...members.map((m) => m.id)]);
+    const rootDoc = index?.docs.find((d) => d.id === rootId);
+    if (index && rootDoc) {
+      const want = kinWanted(members.filter((m) => reaches(m.how)).length);
+      const kin = index.docs
+        .filter((d) => !taken.has(d.id))
+        .map((d) => ({ d, sim: dot(rootDoc.vec, d.vec) }))
+        .filter((x) => x.sim >= KIN_FLOOR)
+        .sort((a, b) => b.sim - a.sim)
+        .slice(0, want);
+      for (const { d } of kin) {
+        const n = byId.get(d.id);
+        if (!isStone(n)) continue;
+        members.push({
+          ...stoneOf(n, reach, byId, dayOf),
+          how: "kin",
+          shared: shared(rootDoc.vec, d.vec, 4),
+          threads: 0,
+        });
+        taken.add(d.id);
+      }
+    }
+    const inside = new Set(members.map((m) => m.id));
+    const pairs = new Set();
+    const count = new Map();
+    for (const l of links) {
+      if (l.source === l.target) continue;
+      if (!inside.has(l.source) || !inside.has(l.target)) continue;
+      const key =
+        l.source < l.target
+          ? `${l.source}\u0000${l.target}`
+          : `${l.target}\u0000${l.source}`;
+      if (pairs.has(key)) continue;
+      pairs.add(key);
+      count.set(l.source, (count.get(l.source) ?? 0) + 1);
+      count.set(l.target, (count.get(l.target) ?? 0) + 1);
+    }
+    for (const m of members) m.threads = count.get(m.id) ?? 0;
+    const builds = new Set();
+    const strandIds = new Set([rootId, ...inside]);
+    for (const l of links)
+      if (l.kind === "build" && strandIds.has(l.source)) {
+        const r = byId.get(l.target);
+        builds.add(r?.label ?? l.target);
+      }
+    const reachingM = members.filter((m) => m.how !== "kin").sort(byDay);
+    const kinM = members.filter((m) => m.how === "kin").sort(byDay);
+    return {
+      root,
+      members: [...reachingM, ...kinM],
+      threads: pairs.size,
+      builds: [...builds].sort(),
+    };
+  }
+
+  /** Everything the sheet and desk read from one garden, built once. */
+  function modelOf(files) {
+    const g = buildGarden(files);
+    const reach = reachers(g.links);
+    const index = buildIndex(g.nodes);
+    const stones = g.nodes.filter((n) => CORPUS_KINDS.has(n.kind));
+    return {
+      nodes: g.nodes,
+      links: g.links,
+      reach,
+      index,
+      dayOf: g.dayOf,
+      roots: rootsOf(g.nodes, reach, g.dayOf),
+      corpus: stones.length,
+      notes: files.length,
+      strand: (id) => strandOf(id, g.nodes, g.links, reach, index, g.dayOf),
+    };
+  }
+
+  /* ── the specimen ────────────────────────────────────────────────────────
+     Specimen A's garden: invented, like everything else in it. A small design
+     studio, its rule about what leaves it, and a year spent by a harbour. Two
+     strands are already read; the other roots are there to read yourself. */
+
+  const SPECIMEN_NOTES = [
+    [
+      "what-leaves-the-studio",
+      "title: What leaves the studio\ncreated: 2025-11-03",
+      "Nothing leaves the studio until someone other than the maker has looked at it. That is the whole rule. It began as a Review step at four on a Friday and has been rewritten twice since. The checklist lives in ~/Code/studio-checklist now, which mostly means it gets read.\n\nWhat counts as leaving: a draft to a client, a file to a printer, a post with our name on it. What does not: anything sent between us.",
+    ],
+    [
+      "the-wrong-drafts",
+      "title: The week the wrong drafts went out\ncreated: 2025-11-10",
+      "Three clients got last month's drafts on the same Tuesday. Nobody had checked the folder before sending. [[What leaves the studio]] was written that weekend, and [[Marta]] rang every client herself.\n\nThe drafts were not careless, they were just not the ones anyone had agreed to, and the apology took longer than the work.",
+    ],
+    [
+      "the-review-hour",
+      "title: The review hour\ncreated: 2025-11-21",
+      "Review is at four. Everyone brings one thing and nobody brings their finished thing. It started as a way to look at what leaves the studio before it went (the Friday file check came out of it), and turned into the only hour in the week where we talk about the work and not the clients.",
+    ],
+    [
+      "marta-on-checks",
+      "title: Marta on checks\ncreated: 2025-12-02",
+      "[[Marta]] says a check is not distrust, it is the second half of the work. She does not look for errors first; she reads it as the client will. When she finds one she says it plainly and moves on.\n\nReview, for her, is a courtesy you pay the reader. See [[What leaves the studio]].",
+    ],
+    [
+      "the-friday-file-check",
+      "title: The Friday file check\ncreated: 2026-01-15",
+      "Every Friday at four, whatever is due next week gets opened by someone who did not make it. File names, versions, the right fonts, the right client. Ten minutes a file.\n\nIt was the first form [[What leaves the studio]] took after [[The week the wrong drafts went out]], and the slowest. The list itself is in ~/Code/studio-checklist.",
+    ],
+    [
+      "juniors-see-everything",
+      "title: Juniors see everything\ncreated: 2026-02-20",
+      "The juniors notice what we stopped noticing: that we say we check, and whether we do. If what leaves the studio is held to a rule, they learn the rule. If it is held to a mood, they learn the mood.\n\n[[Marta on checks|Marta]] asked them to run the check for a month. They were stricter than any of us.",
+    ],
+    [
+      "two-pairs-of-eyes",
+      "title: Two pairs of eyes\ncreated: 2026-03-08",
+      "A check by the maker finds what they meant to make. A second reader finds what they actually made. Two pairs of eyes on every file before it leaves: a draft to a client, a file to a printer, a post with a name on it. A studio pays for the second pair in time, and saves it in apologies.",
+    ],
+    [
+      "send-on-tuesday",
+      "title: Send it on the Tuesday\ncreated: 2026-06-04",
+      "We stopped holding work for [[The Friday file check]]. Now it is looked at the day it is ready and sent the next morning, which is usually a Tuesday. The rule in [[What leaves the studio]] stayed; the day went. A second reader still opens every file before a client does.",
+    ],
+    [
+      "the-client-who-never-opens-pdfs",
+      "title: The client who never opens PDFs\ncreated: 2026-07-11",
+      "One client reads everything on her phone, in the preview, and never opens the attachment. Whatever we check in the PDF she never sees. It made me rethink what leaves the studio: the thing that arrives is not the file, it is whatever the client actually looks at. Even [[Send it on the Tuesday]] does not reach her phone.",
+    ],
+    [
+      "what-a-proof-is-for",
+      "title: What a proof is for\ncreated: 2026-08-19",
+      "A proof is not for finding the error. It is for the client to see what will leave, before it leaves, on the thing they will actually read it on. A printer's proof, a draft on a phone, a file opened by someone who did not make it: each is a check on the gap between done and sent, or as Marta on checks has it, a courtesy.",
+    ],
+    [
+      "the-new-starter",
+      "title: The new starter's first send\ncreated: 2026-09-30",
+      "Ines sent her first file to a client today. She asked who had to look at it first, before anyone told her. That is [[What leaves the studio]] working without anyone enforcing it. [[Marta]] looked; it went.",
+    ],
+    [
+      "marta",
+      "title: Marta\ncreated: 2025-09-14",
+      "Marta has run the practice with me since the beginning. She does the numbers and the second read, and says no to people more kindly than I do.",
+    ],
+    [
+      "notes-on-kerning",
+      "title: Notes on kerning\ncreated: 2025-12-19",
+      "Kern the headline, never the body. Look at it upside down. Look at it tomorrow. Optical spacing beats metric spacing in every display size we set.",
+    ],
+    [
+      "a-shelf-of-unread-books",
+      "title: A shelf of unread books\ncreated: 2026-01-03",
+      "Twelve books bought in the January I meant to read more. Three read. The shelf is now a kind of diary of good intentions, spine out.",
+    ],
+    [
+      "the-museum-job",
+      "title: The museum job\ncreated: 2026-03-27",
+      "Wayfinding for a small maritime museum: forty signs, one typeface, a ferry company as co-sponsor. The first retainer, signed the week before I left.",
+    ],
+    [
+      "the-year-by-the-harbour",
+      "title: The year by the harbour\ncreated: 2026-04-02",
+      "A year in a rented flat above the harbour, working half the week. The idea was to find out whether the practice could run on two retainers and a ferry timetable. I also wanted to be closer to my father, though I did not say so when I planned it.",
+    ],
+    [
+      "a-sketchbook-a-week",
+      "title: A sketchbook a week\ncreated: 2026-04-10",
+      "One small sketchbook filled every week, no erasing. Most pages are people on the ferry and the harbour wall. The point is the count, not the drawings.",
+    ],
+    [
+      "the-ferry-in-the-mornings",
+      "title: The ferry in the mornings\ncreated: 2026-04-20",
+      "The 7.40 ferry is the only part of [[The year by the harbour]] with a timetable. Forty minutes across, drawing whoever sits opposite. [[A sketchbook a week]] filled faster on the water than it ever did at a desk.",
+    ],
+    [
+      "a-piano-that-came-with-the-flat",
+      "title: A piano that came with the flat\ncreated: 2026-05-03",
+      "The flat came with an upright piano, out of tune, and a note from the last tenant asking us not to move it. I play it badly in the evenings, after [[The ferry in the mornings]] has worn off. It is the most local thing about [[The year by the harbour]].",
+    ],
+    [
+      "telling-my-father",
+      "title: Telling my father the month\ncreated: 2026-05-17",
+      "I told my father why I had come for the year by the harbour: that I wanted the year near him. He said he had guessed in March. We walked to the end of the pier and talked about his own year away instead.",
+    ],
+    [
+      "slow-mornings",
+      "title: Slow mornings\ncreated: 2026-05-25",
+      "No email before ten. The first hour goes to [[A sketchbook a week]] and coffee on the harbour wall. Nobody at the studio has noticed.",
+    ],
+    [
+      "the-two-retainers",
+      "title: The two retainers\ncreated: 2026-06-01",
+      "The year by the harbour was paid for by two retainers, a museum and a ferry company. Both asked for less than they paid for. [[Marta]] ran the studio while I was away and sent me the invoices on Fridays.",
+    ],
+    [
+      "bremen",
+      "title: His year in Bremen\ncreated: 2026-06-22",
+      "My father spent a year in Bremen at twenty-six, working at a shipyard by the harbour and writing home on Sundays. He says it was the year he decided what kind of father he would be. I keep thinking about a year away as something you do near people, not away from them.",
+    ],
+    [
+      "the-harbour-light",
+      "title: The harbour light\nupdated: 2026-07-02",
+      "At six the light on the harbour goes flat and green, and every page of a sketchbook a week turns into the same drawing. I have stopped fighting it.",
+    ],
+    [
+      "pricing-the-second-year",
+      "title: Pricing the second year\ncreated: 2026-08-30",
+      "Day rates went up by a tenth. Nobody left. The retainers renew in October and I do not know yet whether I want them to.",
+    ],
+    [
+      "money-for-a-year",
+      "title: Money for a year",
+      "What a year away costs when half the week is paid: rent on the flat above the harbour, the ferry pass, the piano tuner once. The retainers covered it with a month to spare. Working the year out in money is what made it feel like a year and not a holiday.",
+    ],
+    [
+      "Glossary/Review",
+      "aliases: [second read]\ncreated: 2025-10-28",
+      "Reading a piece of work as its audience will, before it reaches them. Here it is an hour and a habit.",
+    ],
+  ];
+  const SPECIMEN_FILES = SPECIMEN_NOTES.map(([rel, fm, body]) => ({
+    rel: `${rel}.md`,
+    text: `---\n${fm}\n---\n\n${body}\n`,
+    mtime: null,
+  }));
+
+  const k = (id, label, how, day, extra = {}) => ({
+    id,
+    label,
+    how,
+    day,
+    approx: false,
+    touch: false,
+    out: false,
+    ...extra,
+  });
+
+  const SPECIMEN_CANON = [
+    {
+      slug: "2026-09-21-what-leaves-the-studio",
+      put: "2026-09-21",
+      touched: "2026-09-26",
+      name: "What leaves the studio",
+      root: {
+        id: "note:what-leaves-the-studio",
+        label: "What leaves the studio",
+        kind: "note",
+        day: "2025-11-03",
+        approx: false,
+      },
+      members: [
+        k(
+          "note:the-wrong-drafts",
+          "The week the wrong drafts went out",
+          "links",
+          "2025-11-10",
+          { touch: true },
+        ),
+        k("note:the-review-hour", "The review hour", "names", "2025-11-21"),
+        k("note:marta-on-checks", "Marta on checks", "links", "2025-12-02"),
+        k(
+          "note:the-friday-file-check",
+          "The Friday file check",
+          "links",
+          "2026-01-15",
+          { touch: true },
+        ),
+        k(
+          "note:juniors-see-everything",
+          "Juniors see everything",
+          "names",
+          "2026-02-20",
+        ),
+        k(
+          "note:send-on-tuesday",
+          "Send it on the Tuesday",
+          "links",
+          "2026-06-04",
+          { touch: true },
+        ),
+        k(
+          "note:the-client-who-never-opens-pdfs",
+          "The client who never opens PDFs",
+          "names",
+          "2026-07-11",
+          { out: true },
+        ),
+        k("note:two-pairs-of-eyes", "Two pairs of eyes", "kin", "2026-03-08"),
+        k(
+          "note:what-a-proof-is-for",
+          "What a proof is for",
+          "kin",
+          "2026-08-19",
+        ),
+      ],
+      one: "one",
+      moved: "moved",
+      use: "use",
+      oneNote: "Every one of them is about the gap between done and sent.",
+      movedNote:
+        "It starts as a rule after the wrong drafts and ends as a habit that does not need a day.",
+      useNote: "To the juniors, when they ask why we check at all.",
+      story:
+        "A mistake made a rule; the rule outlived the mistake; the check stayed and the wait went. The studio still looks twice at what leaves, but it looks on the day the work is ready.",
+      call: "in",
+      called: "2026-09-26",
+      threads: 0,
+      builds: ["studio-checklist"],
+    },
+    {
+      slug: "2026-09-24-the-year-by-the-harbour",
+      put: "2026-09-24",
+      touched: "2026-09-24",
+      name: "The year by the harbour",
+      root: {
+        id: "note:the-year-by-the-harbour",
+        label: "The year by the harbour",
+        kind: "note",
+        day: "2026-04-02",
+        approx: false,
+      },
+      members: [
+        k(
+          "note:the-ferry-in-the-mornings",
+          "The ferry in the mornings",
+          "links",
+          "2026-04-20",
+          { touch: true },
+        ),
+        k(
+          "note:a-piano-that-came-with-the-flat",
+          "A piano that came with the flat",
+          "links",
+          "2026-05-03",
+        ),
+        k(
+          "note:telling-my-father",
+          "Telling my father the month",
+          "names",
+          "2026-05-17",
+          { touch: true },
+        ),
+        k("note:the-two-retainers", "The two retainers", "names", "2026-06-01"),
+        k("note:bremen", "His year in Bremen", "kin", "2026-06-22"),
+        k("note:money-for-a-year", "Money for a year", "kin", null),
+      ],
+      one: "many",
+      moved: "unsure",
+      use: "notyet",
+      oneNote:
+        "Two stories: the practice, and the father. The retainers belong to neither.",
+      movedNote: "",
+      useNote: "",
+      story: "",
+      call: "out",
+      called: "2026-09-24",
+      threads: 0,
+      builds: [],
+    },
+  ];
+
+  const CANON_WORDS = {
+    blurb:
+      "Which stories the garden actually tells. A stone many others reach for, what gathers round it, and whether it is one story.",
+    one: "Is it one story?",
+    moved: "Did the idea move along it?",
+    use: "Is it of use — to you, or to anyone?",
+    story:
+      "what the story is, in your words — the thing a newcomer would need to hear",
+    specimen:
+      "Specimen A's strand, kept as they left it and read-only. Any root they have not read is yours to read.",
+  };
+  const CANON_HOLDS = [
+    "The order of the roots is a count of who reaches for each, not how much it matters.",
+    "Kin by words is a likeness of vocabulary, shown with the words it rests on. It is not a claim that two notes say the same thing.",
+    "A touchpoint the garden offers is drawn dashed, with why it was offered, and is nothing until you keep it.",
+    "Whether a strand is one story, whether it moved, whether it is of use, and whether it belongs in the canon are yours to say. Nothing here says them for you.",
+  ];
+
+  /* ── ui ────────────────────────────────────────────────────────────────── */
+
+  const KEY = "pp-canon";
+  const SPEC_SLUGS = new Set(SPECIMEN_CANON.map((c) => c.slug));
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"']/g,
+      (ch) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[ch],
+    );
+  const clip = (s, max) =>
+    s.length <= max ? s : `${s.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
+  const today = () => localDay(Date.now());
+  const reduced = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+
+  const S = {
+    garden: "specimen",
+    model: null,
+    specimenModel: null,
+    folderModel: null,
+    folderName: "",
+    mine: { specimen: [], folder: [] },
+    open: null,
+    kept: false,
+    slug: "",
+    live: null,
+    trouble: null,
+    sure: false,
+    q: "",
+    allRoots: false,
+    stored: true,
+  };
+
+  /* storage: one key, and the page still works when it throws */
+  function loadStore() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      const list = (xs) =>
+        (Array.isArray(xs) ? xs : [])
+          .map((x) => {
+            try {
+              return validateCanon(x);
+            } catch {
+              return null;
+            }
+          })
+          .filter(Boolean);
+      S.mine.specimen = list(d.specimen).filter((c) => !SPEC_SLUGS.has(c.slug));
+      S.mine.folder = list(d.folder);
+      if (typeof d.folderName === "string")
+        S.folderName = d.folderName.slice(0, 120);
+    } catch {
+      S.stored = false;
+    }
+  }
+  function persist() {
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({
+          v: 1,
+          specimen: S.mine.specimen,
+          folder: S.mine.folder,
+          folderName: S.folderName,
+        }),
+      );
+      S.stored = true;
+    } catch {
+      S.stored = false;
+    }
+  }
+
+  const byTouched = (a, b) =>
+    a.touched !== b.touched
+      ? a.touched < b.touched
+        ? 1
+        : -1
+      : a.put < b.put
+        ? 1
+        : a.put > b.put
+          ? -1
+          : 0;
+  function canonList() {
+    const mine = S.mine[S.garden];
+    return (S.garden === "specimen" ? [...SPECIMEN_CANON, ...mine] : [...mine])
+      .slice()
+      .sort(byTouched);
+  }
+  const readOnly = (c) =>
+    S.garden === "specimen" && !!c && SPEC_SLUGS.has(c.slug) && S.kept;
+  const writable = () => !!S.open && !readOnly(S.open);
+  const liveFor = (c) =>
+    S.live && c && S.live.root.id === c.root.id ? S.live : null;
+
+  /* opening */
+  function fresh(s) {
+    S.slug = "";
+    S.kept = false;
+    S.sure = false;
+    S.live = s;
+    S.open = canonFrom(s, today());
+  }
+  function load(c) {
+    S.slug = c.slug;
+    S.kept = true;
+    S.sure = false;
+    S.trouble = null;
+    S.open = clone(c);
+    S.live = S.model ? S.model.strand(c.root.id) : null;
+  }
+  function openRoot(id) {
+    const had = canonList().find((c) => c.root.id === id);
+    if (had) load(had);
+    else {
+      const s = S.model?.strand(id);
+      if (s) {
+        S.trouble = null;
+        fresh(s);
+      } else S.trouble = "that stone has no strand to read";
+    }
+    render();
+    $("sheet").scrollIntoView({
+      behavior: reduced() ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+  function openFirst() {
+    const list = canonList();
+    S.open = null;
+    S.live = null;
+    S.kept = false;
+    S.slug = "";
+    S.trouble = null;
+    if (list[0]) load(list[0]);
+    else if (S.model?.roots[0]) {
+      const s = S.model.strand(S.model.roots[0].id);
+      if (s) fresh(s);
+    }
+  }
+
+  /* keeping */
+  function save(c) {
+    const isFresh = !S.slug;
+    const s = liveFor(c);
+    const body = s ? { ...c, threads: s.threads, builds: s.builds } : c;
+    let out;
+    try {
+      out = validateCanon({ ...body, slug: S.slug || "", touched: today() });
+    } catch (e) {
+      S.trouble = e.message;
+      return null;
+    }
+    const list = S.mine[S.garden];
+    if (isFresh) {
+      const taken = new Set(canonList().map((x) => x.slug));
+      const base = out.slug;
+      let n = 2;
+      while (taken.has(out.slug)) out.slug = `${base}-${n++}`;
+      list.unshift(out);
+    } else {
+      const i = list.findIndex((x) => x.slug === out.slug);
+      if (i >= 0) list[i] = out;
+      else list.unshift(out);
+    }
+    persist();
+    S.slug = out.slug;
+    S.kept = true;
+    S.trouble = S.stored
+      ? null
+      : "kept for now — this browser would not store it, so it goes on reload";
+    if (S.open && S.open.root.id === out.root.id)
+      Object.assign(S.open, {
+        slug: out.slug,
+        put: out.put,
+        touched: out.touched,
+        threads: out.threads,
+        builds: out.builds,
+      });
+    return out;
+  }
+  /** Change, and if the strand is already kept, keep the change. */
+  function set(next) {
+    S.open = next;
+    if (S.kept && writable()) save(next);
+    render();
+  }
+  function commit() {
+    if (S.open && S.kept && writable()) {
+      save(S.open);
+      renderStatus();
+      renderDesk();
+    }
+  }
+  function touch(id) {
+    const c = S.open;
+    if (!c || !writable()) return;
+    const next = toggleTouch(c, id);
+    if (next === c) {
+      S.trouble = `${TOUCH_MAX} touchpoints at most — let one go first`;
+      return render();
+    }
+    S.trouble = null;
+    set(next);
+  }
+  function strike(id) {
+    if (S.open && writable()) set(toggleOut(S.open, id));
+  }
+  function call(kd) {
+    const c = S.open;
+    if (!c || !writable()) return;
+    S.open = { ...c, call: kd, called: kd ? today() : "" };
+    save(S.open);
+    render();
+  }
+  function keepIt() {
+    if (S.open && writable()) {
+      save(S.open);
+      render();
+    }
+  }
+  function remove() {
+    const c = S.open;
+    if (!c || !S.kept || !writable()) return;
+    if (!S.sure) {
+      S.sure = true;
+      return render();
+    }
+    S.mine[S.garden] = S.mine[S.garden].filter((x) => x.slug !== c.slug);
+    persist();
+    const s = liveFor(c);
+    if (s) fresh(s);
+    else {
+      S.open = null;
+      openFirst();
+    }
+    render();
+  }
+
+  /* ── drawing ───────────────────────────────────────────────────────────── */
+
+  let maskN = 0;
+  let observers = [];
+  const PEN = { box: 1.7, ring: 1.6, underline: 1.5 };
+
+  /** A pen line laid over `host`, redrawn only when its size changes, drawn on the first time. */
+  function sketch(
+    host,
+    seed,
+    { kind = "box", color = "var(--pen)", draw = true } = {},
+  ) {
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "sketch");
+    svg.setAttribute("aria-hidden", "true");
+    host.appendChild(svg);
+    const pen = PEN[kind];
+    let last = "";
+    const paint = () => {
+      const w = host.offsetWidth;
+      const h = host.offsetHeight;
+      if (!w || !h) return;
+      const key = `${w}x${h}`;
+      if (key === last) return;
+      const first = !last;
+      last = key;
+      const s = seedOf(seed);
+      const line =
+        kind === "box"
+          ? roughRect(w, h, s)
+          : kind === "ring"
+            ? roughEllipse(w, h, s, { pad: 3, grow: 1.18 })
+            : roughUnderline(w, s, { y: h - 0.5 });
+      const ink = ribbon(line, pen, s);
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      if (draw && first && !reduced()) {
+        const id = `mk${++maskN}`;
+        svg.innerHTML =
+          `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${w + 80}" height="${h + 80}">` +
+          `<path d="${line}" pathLength="1" fill="none" stroke="white" stroke-width="${pen * 2 + 4}" stroke-linecap="round" stroke-linejoin="round" class="draw"/></mask></defs>` +
+          `<path d="${ink}" style="fill:${color}" mask="url(#${id})"/>`;
+      } else svg.innerHTML = `<path d="${ink}" style="fill:${color}"/>`;
+    };
+    paint();
+    requestAnimationFrame(paint);
+    const ro = new ResizeObserver(paint);
+    ro.observe(host);
+    observers.push({ host, ro });
+  }
+  function pruneObservers() {
+    observers = observers.filter((o) =>
+      o.host.isConnected ? true : (o.ro.disconnect(), false),
+    );
+  }
+
+  const W = 720;
+  const H = 268;
+  const AXIS = 150;
+  const X0 = 30;
+  const X1 = 640;
+  const UNDATED_X = 692;
+  const GAP = 15;
+  const LANE = 19;
+
+  /** Marks along time: what reaches for the root above the line, kin below, stacked where they crowd. */
+  function layout(c) {
+    const days = [c.root.day, ...c.members.map((m) => m.day)]
+      .filter((d) => !!d)
+      .sort();
+    const first = days[0] ?? null;
+    const last = days.at(-1) ?? null;
+    const span = first && last ? Math.max(1, daysBetween(first, last)) : 1;
+    const xOf = (d) =>
+      !d || !first
+        ? UNDATED_X
+        : first === last
+          ? (X0 + X1) / 2
+          : X0 + ((X1 - X0) * daysBetween(first, d)) / span;
+    const placed = [];
+    for (const side of ["up", "down"]) {
+      const lanes = [];
+      const max = side === "up" ? 5 : 3;
+      const ms = c.members
+        .filter((m) => (side === "up" ? m.how !== "kin" : m.how === "kin"))
+        .map((m) => ({ m, at: xOf(m.day) }))
+        .sort((a, b) => a.at - b.at);
+      const free = (xs, x) => !xs || xs.every((v) => Math.abs(v - x) >= GAP);
+      for (const { m, at } of ms) {
+        let x = at;
+        let lane = -1;
+        for (let kk = 0; lane === -1 && kk < 40; kk++) {
+          x = at + (kk % 2 ? 1 : -1) * Math.ceil(kk / 2) * GAP;
+          if (x < X0 - 10 || x > UNDATED_X + 10) continue;
+          for (let l = 0; l < max; l++)
+            if (free(lanes[l], x)) {
+              lane = l;
+              break;
+            }
+        }
+        if (lane === -1) {
+          x = at;
+          lane = max - 1;
+        }
+        (lanes[lane] ??= []).push(x);
+        const y =
+          side === "up" ? AXIS - 24 - lane * LANE : AXIS + 28 + lane * LANE;
+        placed.push({ m, x, at, y, lane });
+      }
+    }
+    return { placed, rootX: xOf(c.root.day), first, last };
+  }
+
+  function drawing(c, offered, live) {
+    const seed = seedOf(c.root.id);
+    const { placed, rootX, first, last } = layout(c);
+    const axis = ribbon(
+      stroke([X0 - 12, AXIS], [X1 + 12, AXIS], rand(seed), 1.2, 4),
+      1.6,
+      seed,
+    );
+    const undated = placed.some((p) => p.at === UNDATED_X);
+    const touchOrder = new Map(
+      placed
+        .filter((p) => p.m.touch)
+        .sort((a, b) => a.x - b.x)
+        .map((p, i) => [p.m.id, i]),
+    );
+    const rootMark = ribbon(
+      roughEllipse(18, 18, seed + 7, { pad: 3 }),
+      1.8,
+      seed + 7,
+    );
+    const reachN = c.members.filter((m) => m.how !== "kin").length;
+    let s = `<svg viewBox="0 0 ${W} ${H}" class="drawing" role="img" aria-label="${esc(
+      `The strand along time: ${reachN} reach for ${c.root.label}, drawn above the line; kin by words below`,
+    )}">`;
+    s += `<text x="${X0 - 12}" y="16" class="side">reach for it</text>`;
+    s += `<text x="${X0 - 12}" y="${H - 8}" class="side">kin by words</text>`;
+    s += `<path d="${axis}" class="axis"/>`;
+    if (undated)
+      s += `<text x="${UNDATED_X}" y="${AXIS + 14}" text-anchor="middle" class="tick">undated</text>`;
+    if (first)
+      s += `<text x="${X0}" y="${AXIS + 14}" text-anchor="start" class="tick">${dayYear(first)}</text>`;
+    if (last && last !== first)
+      s += `<text x="${X1}" y="${AXIS + 14}" text-anchor="end" class="tick">${dayYear(last)}</text>`;
+    for (const { m, x, at, y } of placed)
+      s += `<line x1="${f1(x)}" y1="${y}" x2="${f1(at)}" y2="${AXIS}" class="stem" opacity="${m.out ? 0.4 : 1}"/>`;
+    s += `<g transform="translate(${f1(rootX - 12)} ${AXIS - 12})"><circle cx="12" cy="12" r="6.5" class="rootdot"/><path d="${rootMark}" class="ink-accent"/></g>`;
+    s += `<text x="${f1(Math.min(Math.max(rootX, 80), W - 80))}" y="${AXIS + 34}" text-anchor="middle" class="root-label">${esc(clip(c.root.label, 30))}</text>`;
+    const live_ = live;
+    for (const { m, x, y } of placed) {
+      const kin = m.how === "kin";
+      const lift = (touchOrder.get(m.id) ?? 0) % 2 ? 12 : 0;
+      const offer = offered.get(m.id);
+      const sd = seedOf(m.id);
+      const tip = `${m.label} · ${HOW_LABEL[m.how]} · ${m.day ? dayYear(m.day) : "undated"}${m.approx ? " (last change)" : ""}${
+        m.touch ? " · a touchpoint" : offer ? ` · offered: ${offer}` : ""
+      }${m.out ? " · struck" : ""}`;
+      const cls = [
+        "dot",
+        m.how === "links" || m.how === "names" ? m.how : "",
+        kin ? "kin" : "",
+        m.approx ? "approx" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      s += `<g class="mark${live_ ? " live" : ""}" data-touch="${esc(m.id)}" opacity="${m.out ? 0.28 : 1}"><title>${esc(tip)}</title>`;
+      s += `<circle cx="${f1(x)}" cy="${y}" r="11" class="hit"/>`;
+      s += `<circle cx="${f1(x)}" cy="${y}" r="4.2" class="${cls}"/>`;
+      if (m.touch)
+        s += `<path d="${ribbon(roughEllipse(14, 14, sd, { pad: 2 }), 1.5, sd)}" transform="translate(${f1(x - 7)} ${y - 7})" class="ink-accent"/>`;
+      if (!m.touch && offer && !m.out)
+        s += `<circle cx="${f1(x)}" cy="${y}" r="9" class="offer"/>`;
+      if (m.touch)
+        s += `<text x="${f1(x)}" y="${kin ? y + 22 + lift : y - 14 - lift}" text-anchor="${x < 110 ? "start" : x > W - 110 ? "end" : "middle"}" class="touch-label">${esc(
+          clip(m.label, 24),
+        )}</text>`;
+      s += `</g>`;
+    }
+    return s + `</svg>`;
+  }
+
+  /* ── rendering ─────────────────────────────────────────────────────────── */
+
+  function grow(el) {
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
+  function derived() {
+    const c = S.open;
+    const live = liveFor(c);
+    const liveBy = new Map((live?.members ?? []).map((m) => [m.id, m]));
+    const since = S.kept && c && live ? sinceKept(c, live) : null;
+    let offered = [];
+    if (c) {
+      const skip = new Set(
+        c.members.filter((m) => m.touch || m.out).map((m) => m.id),
+      );
+      offered = proposals(
+        c.members.map((m) => ({
+          id: m.id,
+          day: m.day,
+          approx: m.approx,
+          reached: liveBy.get(m.id)?.reached ?? 0,
+          threads: liveBy.get(m.id)?.threads ?? 0,
+        })),
+        skip,
+      );
+    }
+    return {
+      live,
+      liveBy,
+      since,
+      offered,
+      offeredMap: new Map(offered.map((p) => [p.id, p.because])),
+    };
+  }
+
+  function statusText() {
+    const c = S.open;
+    if (!c) return "";
+    if (!S.kept) return "looked at, not kept";
+    return `${readOnly(c) ? "Specimen A's · " : ""}kept ${dayWords(c.put)}${c.call ? ` · ${CALL_LABEL[c.call]}` : ""}`;
+  }
+  function renderStatus() {
+    const el = $("status");
+    if (el) el.textContent = statusText();
+  }
+
+  function segs(key, options, labels, value, label, w) {
+    return `<span class="segs" role="group" aria-label="${esc(label)}">${options
+      .map(
+        (o, i) =>
+          `<span><button type="button" class="seg" data-seg="${key}" data-v="${o}" data-k="seg-${key}-${o}" aria-pressed="${value === o}"${
+            w ? "" : " disabled"
+          }>${esc(labels[o])}</button>${i < options.length - 1 ? `<span class="dotsep" aria-hidden="true">·</span>` : ""}</span>`,
+      )
+      .join("")}</span>`;
+  }
+
+  function renderSheet() {
+    const sheet = $("sheet");
+    const focusKey = document.activeElement?.dataset?.k ?? null;
+    const c = S.open;
+    if (!c) {
+      sheet.innerHTML = `<p class="hand" style="font-size:18px;color:var(--muted);margin:0">${esc(
+        S.trouble ??
+          (S.garden === "folder" && !S.model
+            ? "Open your folder of notes to read its strands. Anything you kept from it is listed on the desk."
+            : "No note here is reached for by three or more others yet, so there is no strand to read."),
+      )}</p>`;
+      sketch(sheet, "canon-sheet", { draw: false });
+      return;
+    }
+    const w = writable();
+    const { live, liveBy, since, offered, offeredMap } = derived();
+    const span = spanOf(c);
+    const reachingN = c.members.filter((m) => m.how !== "kin").length;
+    const kinN = c.members.length - reachingN;
+    const touchN = c.members.filter((m) => m.touch).length;
+    const threads = live ? live.threads : c.threads;
+    const builds = live ? live.builds : c.builds;
+
+    let h = `<div class="head"><span class="label">the strand</span><span class="meta lower" id="status"></span></div>`;
+    h += `<textarea class="case name display" rows="1" data-field="name" data-k="name" aria-label="The strand, in your words"${w ? "" : " readonly"}>${esc(
+      c.name,
+    )}</textarea>`;
+    h += `<p class="grown">grown from <b>${esc(c.root.label)}</b> · ${reachingN} reach for it · ${kinN} kin by words${
+      c.root.day
+        ? ` · on record since ${dayYear(c.root.day)}${c.root.approx ? " (last change)" : ""}`
+        : ""
+    }</p>`;
+    if (!w) h += `<p class="specnote hand">${esc(CANON_WORDS.specimen)}</p>`;
+    h += `<div class="drawwrap"><div>${drawing(c, offeredMap, w)}</div></div>`;
+    h += `<p class="meta lower caption">${reachingN} reach for it, above the line · ${kinN} kin by words, below · ${touchN} touchpoints ringed${
+      offered.length ? ` · ${offered.length} offered, dashed` : ""
+    }${span.first && span.last ? ` · ${dayWords(span.first)} → ${dayWords(span.last)}` : ""}${w ? " · click a stone to ring it" : ""}</p>`;
+
+    h += `<div style="margin-top:28px"><span class="label">the stones</span><ol class="stones">`;
+    c.members.forEach((m, i) => {
+      const offer = offeredMap.get(m.id);
+      const lm = liveBy.get(m.id);
+      h += `<li class="row stone${m.out ? " out" : ""}" style="--i:${Math.min(i, 16)}">`;
+      h += `<button type="button" class="ringbtn${m.touch ? " on" : offer ? " offer" : ""}" data-ring="${esc(m.id)}" data-k="ring-${esc(
+        m.id,
+      )}" aria-pressed="${m.touch}" aria-label="${esc(m.touch ? `${m.label}: a touchpoint — let it go` : `${m.label}: make it a touchpoint`)}"${
+        !w || m.out ? " disabled" : ""
+      }><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg></button>`;
+      h += `<div style="min-width:0"><div class="lbl">${esc(m.label)}</div><div class="tiny">${HOW_LABEL[m.how]} · ${m.day ? dayYear(m.day) : "undated"}${
+        m.approx ? " (last change)" : ""
+      }${lm && lm.reached > 0 ? ` · ${lm.reached} reach for it` : ""}${lm && lm.shared.length ? ` · shares: ${esc(lm.shared.join(", "))}` : ""}</div>`;
+      if (offer && !m.touch && !m.out)
+        h += `<div class="offered hand">offered as a touchpoint: ${esc(offer)}</div>`;
+      h += `</div>`;
+      h += w
+        ? `<button type="button" class="lnk" data-strike="${esc(m.id)}" data-k="strike-${esc(m.id)}">${m.out ? "put back" : "not the story"}</button>`
+        : `<span></span>`;
+      h += `</li>`;
+    });
+    h += `</ol>`;
+    if (since && since.joined.length)
+      h += `<div class="arrive"><div class="meta">since it was kept</div><p class="small" style="margin:4px 0 0">${since.joined.length} more reach for it: ${esc(
+        since.joined.map((m) => m.label).join(", "),
+      )}.</p>${w ? `<div style="margin-top:8px"><button type="button" class="chip" data-act="takein" data-k="takein">take them in</button></div>` : ""}</div>`;
+    h += `</div>`;
+
+    const rows = [
+      {
+        key: "one",
+        q: CANON_WORDS.one,
+        because: `the stones thread each other ${threads} ${threads === 1 ? "time" : "times"}, the root not counted · ${kinN} of ${c.members.length} came in on words alone`,
+        options: ONES,
+        labels: ONE_LABEL,
+        note: "oneNote",
+      },
+      {
+        key: "moved",
+        q: CANON_WORDS.moved,
+        because:
+          span.first && span.last
+            ? `${dayYear(span.first)} to ${dayYear(span.last)}, ${daysBetween(span.first, span.last)} days · ${touchN} touchpoints along it`
+            : "no day on record",
+        options: MOVEDS,
+        labels: MOVED_LABEL,
+        note: "movedNote",
+      },
+      {
+        key: "use",
+        q: CANON_WORDS.use,
+        because: builds.length
+          ? `put to work in ${builds.length} ${builds.length === 1 ? "build" : "builds"}: ${builds.slice(0, 4).join(", ")}`
+          : "no build reached from the strand",
+        options: USES,
+        labels: USE_LABEL,
+        note: "useNote",
+      },
+    ];
+    h += `<div class="questions">`;
+    for (const r of rows)
+      h += `<div><div class="q display">${esc(r.q)}</div><div class="tiny" style="margin-top:4px">${esc(r.because)}</div>${segs(
+        r.key,
+        r.options,
+        r.labels,
+        c[r.key],
+        r.q,
+        w,
+      )}<textarea class="case note hand" rows="1" data-field="${r.note}" data-k="${r.note}" aria-label="${esc(`${r.q} In your words`)}" placeholder="${
+        w ? "in a line, if you want" : ""
+      }"${w ? "" : " readonly"}>${esc(c[r.note])}</textarea></div>`;
+    h += `</div>`;
+
+    h += `<div style="margin-top:34px"><span class="label">the story</span><textarea class="case story hand" rows="2" data-field="story" data-k="story" aria-label="The story, in your words" placeholder="${
+      w ? esc(CANON_WORDS.story) : ""
+    }"${w ? "" : " readonly"}>${esc(c.story)}</textarea></div>`;
+
+    h += `<div class="call"><span class="label">the call</span>`;
+    h += `<button type="button" class="chip" data-call="in" data-k="call-in" aria-pressed="${c.call === "in"}"${w ? "" : " disabled"}>into the canon</button>`;
+    h += `<button type="button" class="chip" data-call="out" data-k="call-out" aria-pressed="${c.call === "out"}"${w ? "" : " disabled"}>leave it out</button>`;
+    if (w && !S.kept)
+      h += `<button type="button" class="chip" data-act="keep" data-k="keep">keep it on the record, uncalled</button>`;
+    if (w && S.kept)
+      h += `<button type="button" class="chip${S.sure ? " accent" : ""}" data-act="remove" data-k="remove">${
+        S.sure ? "take it off the record — sure?" : "take it off the record"
+      }</button>`;
+    h += `</div>`;
+    if (S.trouble) h += `<p class="trouble hand">${esc(S.trouble)}</p>`;
+
+    sheet.innerHTML = h;
+    renderStatus();
+    sketch(sheet, "canon-sheet", { draw: false });
+    sheet.querySelectorAll("textarea").forEach(grow);
+    sheet
+      .querySelectorAll('.seg[aria-pressed="true"]')
+      .forEach((b) =>
+        sketch(b, `${b.dataset.seg}-${b.dataset.v}`, {
+          kind: "underline",
+          color: "var(--accent)",
+          draw: true,
+        }),
+      );
+    if (focusKey) {
+      const el = [...sheet.querySelectorAll("[data-k]")].find(
+        (x) => x.dataset.k === focusKey,
+      );
+      el?.focus({ preventScroll: true });
+    }
+  }
+
+  function renderDesk() {
+    const c = S.open;
+    const { since } = derived();
+    if (c) {
+      const r = readings(c, since);
+      $("reading").textContent = (
+        S.kept ? r : r.filter((l) => l !== "not called yet")
+      ).join(" · ");
+    } else $("reading").textContent = "nothing open";
+
+    const canon = canonList();
+    const roots = S.model?.roots ?? [];
+    $("record").textContent = recordReadings(
+      tally(canon, roots),
+      roots.length,
+      S.model?.corpus ?? 0,
+    ).join(" · ");
+
+    // the canon
+    $("shelfPanel").hidden = !canon.length;
+    const groups = [
+      ["in the canon", canon.filter((x) => x.call === "in")],
+      ["not called", canon.filter((x) => !x.call)],
+      ["left out", canon.filter((x) => x.call === "out")],
+    ];
+    $("shelf").innerHTML = groups
+      .filter(([, cs]) => cs.length)
+      .map(
+        ([name, cs]) =>
+          `<h3 class="meta">${name} · ${cs.length}</h3><ol class="list">${cs
+            .map((x, i) => {
+              const on = S.kept && c?.slug === x.slug;
+              const t = x.members.filter((m) => m.touch).length;
+              const spec = S.garden === "specimen" && SPEC_SLUGS.has(x.slug);
+              return `<li class="row" style="--i:${i}"><button type="button" class="pick" data-slug="${esc(x.slug)}"${on ? ' aria-current="true"' : ""}><span class="t display">${esc(
+                x.name,
+              )}${spec ? `<span class="spec hand">specimen</span>` : ""}</span><span class="meta lower">${x.members.length} stones · ${t} ${
+                t === 1 ? "touchpoint" : "touchpoints"
+              }${x.called ? ` · ${dayWords(x.called)}` : ""}</span></button></li>`;
+            })
+            .join("")}</ol>`,
+      )
+      .join("");
+
+    // the roots
+    $("rootsPanel").hidden = !roots.length;
+    const callOf = new Map(canon.map((x) => [x.root.id, x.call || "looked"]));
+    const t = S.q.trim().toLowerCase();
+    const hit = t
+      ? roots.filter((r) => r.label.toLowerCase().includes(t))
+      : roots;
+    const shown = S.allRoots || t ? hit : hit.slice(0, 18);
+    $("roots").innerHTML = shown
+      .map((r, i) => {
+        const on = c?.root.id === r.id;
+        const mark = callOf.get(r.id);
+        const by = ["links", "names", "term"]
+          .map((h) =>
+            r.by[h]
+              ? `${r.by[h]} ${r.by[h] === 1 ? HOW_LABEL[h] : HOW_MANY[h]}`
+              : "",
+          )
+          .filter(Boolean)
+          .join(" · ");
+        return `<li class="row" style="--i:${Math.min(i, 16)}"><button type="button" class="pick rootpick" data-root="${esc(r.id)}"${
+          on ? ' aria-current="true"' : ""
+        }><span class="n">${r.reached}</span><span class="t" style="min-width:0">${esc(r.label)}${
+          mark
+            ? `<span class="mk hand">${mark === "in" ? "in the canon" : mark === "out" ? "left out" : "looked at"}</span>`
+            : ""
+        }<span class="by">${by}</span></span></button></li>`;
+      })
+      .join("");
+    const more = !t && roots.length > 18;
+    $("allRoots").hidden = !more;
+    if (more)
+      $("allRoots").textContent = S.allRoots ? "fewer" : `all ${roots.length}`;
+  }
+
+  function renderBar() {
+    document.querySelectorAll("[data-g]").forEach((b) => {
+      b.setAttribute("aria-pressed", String(b.dataset.g === S.garden));
+      if (b.dataset.g === "folder") {
+        b.disabled = !S.folderModel && !S.mine.folder.length;
+        b.textContent = S.folderName
+          ? `your folder · ${S.folderName}`
+          : "your folder";
+      }
+    });
+    const m = S.model;
+    let t;
+    if (S.garden === "specimen")
+      t = `Specimen A is invented: ${m.notes} notes from a small design studio and a year spent by a harbour, ${m.roots.length} roots, and two strands they have already read. Open a folder of your own markdown notes to read your garden instead. The files are read in this page and never leave it. A note's day is its created: or date: in the frontmatter, or else when the file last changed.`;
+    else if (m)
+      t = `${S.folderName || "your folder"}: ${m.notes} notes read in this page, ${m.corpus} with text, ${
+        m.roots.length
+          ? `${m.roots.length} ${m.roots.length === 1 ? "root" : "roots"}`
+          : "no note reached for by three or more others"
+      }. Nothing was uploaded. What you keep stays in this browser; the notes themselves are not stored, so open the folder again after a reload.`;
+    else
+      t = `${S.mine.folder.length} ${S.mine.folder.length === 1 ? "strand" : "strands"} kept from ${
+        S.folderName || "your folder"
+      }, without the notes: open the folder again to read them against it.`;
+    if (!S.stored)
+      t +=
+        " This browser will not store anything, so what you keep goes on reload.";
+    $("gnote").textContent = t;
+  }
+
+  function render() {
+    pruneObservers();
+    renderBar();
+    renderSheet();
+    renderDesk();
+  }
+
+  /* ── events ────────────────────────────────────────────────────────────── */
+
+  $("sheet").addEventListener("click", (e) => {
+    const t = e.target.closest(
+      "[data-ring],[data-strike],[data-seg],[data-call],[data-act],[data-touch]",
+    );
+    if (!t || t.disabled) return;
+    const d = t.dataset;
+    if (d.ring) touch(d.ring);
+    else if (d.touch) {
+      if (writable()) touch(d.touch);
+    } else if (d.strike) strike(d.strike);
+    else if (d.seg)
+      set({ ...S.open, [d.seg]: S.open[d.seg] === d.v ? "" : d.v });
+    else if (d.call) call(S.open.call === d.call ? "" : d.call);
+    else if (d.act === "keep") keepIt();
+    else if (d.act === "remove") remove();
+    else if (d.act === "takein") {
+      const { since } = derived();
+      if (since) set(takeIn(S.open, since.joined));
+    }
+  });
+  $("sheet").addEventListener("input", (e) => {
+    const el = e.target;
+    if (el.tagName !== "TEXTAREA" || !S.open || !writable()) return;
+    grow(el);
+    S.open = { ...S.open, [el.dataset.field]: el.value };
+    renderDesk();
+  });
+  $("sheet").addEventListener("focusout", (e) => {
+    if (e.target.tagName === "TEXTAREA") commit();
+  });
+  $("shelf").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-slug]");
+    if (!b) return;
+    const c = canonList().find((x) => x.slug === b.dataset.slug);
+    if (c) {
+      load(c);
+      render();
+      $("sheet").scrollIntoView({
+        behavior: reduced() ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+  });
+  $("roots").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-root]");
+    if (b) openRoot(b.dataset.root);
+  });
+  $("find").addEventListener("input", (e) => {
+    S.q = e.target.value;
+    renderDesk();
+  });
+  $("allRoots").addEventListener("click", () => {
+    S.allRoots = !S.allRoots;
+    renderDesk();
+  });
+  document.querySelectorAll("[data-g]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (b.dataset.g === S.garden) return;
+      S.garden = b.dataset.g;
+      S.model = S.garden === "specimen" ? S.specimenModel : S.folderModel;
+      S.q = "";
+      $("find").value = "";
+      openFirst();
+      render();
+    }),
+  );
+  $("folder").addEventListener("change", async (e) => {
+    const all = [...(e.target.files ?? [])];
+    const md = all.filter((f) => {
+      const parts = (f.webkitRelativePath || f.name).split("/");
+      return (
+        /\.md$/i.test(f.name) &&
+        !parts.some((p) => p.startsWith(".") || p.startsWith("_attachments"))
+      );
+    });
+    e.target.value = "";
+    if (!md.length) {
+      S.trouble = all.length ? "no markdown notes in that folder" : null;
+      return render();
+    }
+    $("gnote").textContent = `reading ${md.length} notes…`;
+    const files = await Promise.all(
+      md.slice(0, 6000).map(async (f) => {
+        const parts = (f.webkitRelativePath || f.name).split("/");
+        const rel = parts.length > 1 ? parts.slice(1).join("/") : parts[0];
+        return { rel, text: await f.text(), mtime: f.lastModified || null };
+      }),
+    );
+    const top = (md[0].webkitRelativePath || "").split("/")[0];
+    S.folderName = top.slice(0, 120);
+    S.folderModel = modelOf(files);
+    S.model = S.folderModel;
+    S.garden = "folder";
+    S.q = "";
+    $("find").value = "";
+    persist();
+    openFirst();
+    render();
+  });
+
+  /* ── start: on the specimen ────────────────────────────────────────────── */
+
+  loadStore();
+  S.specimenModel = modelOf(SPECIMEN_FILES);
+  // Specimen A kept each strand as it stood: its threads are read from the garden as it was then.
+  for (const c of SPECIMEN_CANON) {
+    const s = S.specimenModel.strand(c.root.id);
+    const was = new Set(c.members.map((m) => m.id));
+    c.threads = s ? countThreads(S.specimenModel.links, was) : 0;
+  }
+  function countThreads(links, inside) {
+    const pairs = new Set();
+    for (const l of links) {
+      if (
+        l.source === l.target ||
+        !inside.has(l.source) ||
+        !inside.has(l.target)
+      )
+        continue;
+      pairs.add(
+        l.source < l.target
+          ? `${l.source}|${l.target}`
+          : `${l.target}|${l.source}`,
+      );
+    }
+    return pairs.size;
+  }
+  S.model = S.specimenModel;
+  $("blurb").textContent = CANON_WORDS.blurb;
+  $("holds").innerHTML = CANON_HOLDS.map((x) => `<li>${esc(x)}</li>`).join("");
+  [
+    "readingPanel",
+    "shelfPanel",
+    "rootsPanel",
+    "recordPanel",
+    "holdsPanel",
+  ].forEach((id) => sketch($(id), `canon-${id}`));
+  openFirst();
+  render();
+</script>
